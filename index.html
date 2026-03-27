@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Senthil vs Sai — IPL 2026 War Room</title>
+  <style>
+    :root {
+      --bg:#08101d;
+      --bg2:#0d1630;
+      --panel:rgba(15,24,45,.88);
+      --panel2:rgba(24,35,67,.9);
+      --line:rgba(255,255,255,.09);
+      --text:#eef3ff;
+      --muted:#9db0da;
+      --accent:#7cc4ff;
+      --csk:#f5c542;
+      --rcb:#ff6f7d;
+      --good:#43d487;
+      --warn:#ffc857;
+      --bad:#ff7f96;
+      --shadow:0 18px 40px rgba(0,0,0,.28);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);color:var(--text)}
+    .wrap{max-width:1450px;margin:0 auto;padding:22px}
+    .hero{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(124,196,255,.13),rgba(245,197,66,.11),rgba(255,111,125,.10));border:1px solid var(--line);border-radius:28px;padding:26px;box-shadow:var(--shadow)}
+    .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;filter:blur(24px);opacity:.25}
+    .hero:before{width:220px;height:220px;background:#1d8fff;right:-60px;top:-70px}
+    .hero:after{width:180px;height:180px;background:#ff8a00;left:-40px;bottom:-70px}
+    .eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:800}
+    h1{margin:8px 0 8px;font-size:clamp(30px,5vw,54px);line-height:1.02}
+    .sub{max-width:920px;color:var(--muted);line-height:1.55;font-size:15px}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+    button,.btn,input,select{border-radius:14px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:11px 14px;font-weight:700}
+    button{cursor:pointer;transition:.15s transform ease,.15s border-color ease,.15s background ease}
+    button:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.45)}
+    input,select{font-weight:600}
+    input[type="checkbox"]{padding:0;width:18px;height:18px;accent-color:#57d69b}
+    .grid{display:grid;gap:16px}
+    .summary{grid-template-columns:repeat(5,minmax(0,1fr));margin-top:18px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+    .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+    .big{font-size:34px;font-weight:900;margin-top:10px}
+    .small{color:var(--muted);font-size:13px;line-height:1.45;margin-top:6px}
+    .good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+    .section-title{margin:26px 0 12px;font-size:24px}
+    .layout{display:grid;grid-template-columns:1.35fr .85fr;gap:16px}
+    .stack{display:grid;gap:16px}
+    .panels{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:12px;font-weight:800}
+    .chip .dot{width:8px;height:8px;border-radius:50%}
+    .dot.green{background:var(--good)} .dot.orange{background:var(--warn)} .dot.red{background:var(--bad)}
+    table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:22px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
+    th,td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    td{font-size:14px}
+    tr:last-child td{border-bottom:none}
+    .pill{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:800}
+    .pill.good{background:rgba(67,212,135,.16);color:var(--good)}
+    .pill.warn{background:rgba(255,200,87,.16);color:var(--warn)}
+    .pill.bad{background:rgba(255,127,150,.16);color:var(--bad)}
+    .pill.blue{background:rgba(124,196,255,.16);color:var(--accent)}
+    .muted{color:var(--muted)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    .list{display:grid;gap:10px;margin-top:12px}
+    .list-item{padding:12px 13px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid var(--line);line-height:1.45}
+    .list-item strong{color:var(--text)}
+    .savage{font-size:17px;line-height:1.55;color:#fff1cc}
+    .mini{font-size:12px;color:var(--muted)}
+    .settings-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+    .toggle{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+    textarea{width:100%;min-height:170px;padding:12px;border-radius:14px;background:#091221;color:var(--text);border:1px solid var(--line);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+    details{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+    summary{cursor:pointer;font-weight:800}
+    .statusline{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
+    .footer{margin:18px 0 36px;color:var(--muted);font-size:13px;line-height:1.5}
+    .leader-banner{display:inline-flex;gap:10px;align-items:center;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-weight:800}
+    .watch{display:inline;color:#fff}
+    @media (max-width:1150px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.layout,.panels{grid-template-columns:1fr}}
+    @media (max-width:700px){.summary{grid-template-columns:1fr}.wrap{padding:14px}th:nth-child(4),td:nth-child(4){display:none}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="eyebrow">private app • Senthil vs Sai • IPL 2026</div>
+      <h1>Prediction War Room</h1>
+      <div class="sub">
+        Fully scored to <strong>your exact rules</strong>, with auto-refresh, swing insights, and a mild amount of emotional damage.
+        This version tries to auto-pull live IPL data through browser-safe proxies. If an external page blocks one category, you can still override just that category without breaking the rest of the scoreboard.
+      </div>
+      <div class="toolbar">
+        <span class="leader-banner" id="bannerLeader">No leader yet</span>
+        <span class="chip"><span class="dot orange"></span><span id="providerLabel">Provider: Demo</span></span>
+        <span class="chip"><span class="dot green"></span><span id="refreshLabel">Auto-refresh off</span></span>
+      </div>
+    </section>
+
+    <div class="grid summary">
+      <div class="card"><div class="label">Overall score</div><div class="big" id="overallScore">0 - 0</div><div class="small" id="overallDelta">Dead even. This is annoyingly civil.</div></div>
+      <div class="card"><div class="label">Fronts won</div><div class="big" id="frontsWon">0 - 0</div><div class="small">Categories currently led by each of you</div></div>
+      <div class="card"><div class="label">Locked categories</div><div class="big" id="lockedCount">0</div><div class="small">Final / frozen categories</div></div>
+      <div class="card"><div class="label">Live status</div><div class="big" id="liveState">Idle</div><div class="small" id="fetchStatus">Waiting for first refresh</div></div>
+      <div class="card"><div class="label">Last updated</div><div class="big" id="lastUpdated">—</div><div class="small">Stored locally in your browser</div></div>
+    </div>
+
+    <div class="layout" style="margin-top:16px">
+      <div class="stack">
+        <section>
+          <h2 class="section-title">Live category board</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Senthil</th>
+                <th>Sai</th>
+                <th>Current state</th>
+                <th>Pts</th>
+                <th>Pts</th>
+                <th>Front</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="categoryTable"></tbody>
+          </table>
+        </section>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <div class="label">Controls</div>
+          <div class="settings-row">
+            <select id="providerSelect">
+              <option value="demo">Demo data</option>
+              <option value="official_beta">Official IPL auto (beta)</option>
+            </select>
+            <button id="refreshBtn">Refresh now</button>
+            <button id="sampleBtn">Load demo snapshot</button>
+            <button id="resetBtn">Reset app</button>
+          </div>
+          <div class="settings-row">
+            <label class="toggle"><input type="checkbox" id="autoToggle"> Auto-refresh</label>
+            <label class="toggle">Every
+              <select id="intervalSelect">
+                <option value="3">3 min</option>
+                <option value="5" selected>5 min</option>
+                <option value="10">10 min</option>
+                <option value="15">15 min</option>
+              </select>
+            </label>
+          </div>
+          <div class="small" style="margin-top:12px">
+            <strong>Note:</strong> official IPL auto mode is best-effort from the browser. If a page shape changes or blocks a fetch, only the affected category falls back — the app keeps scoring the rest.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="label">Smart insights</div>
+          <div class="list" id="insightsList"></div>
+        </div>
+
+        <div class="card">
+          <div class="label">Savage mode</div>
+          <div class="savage" id="savageText">Waiting to roast somebody.</div>
+          <div class="small" id="savageSub">Once the board moves, the nonsense will become data-backed.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panels" style="margin-top:16px">
+      <div class="card">
+        <div class="label">Tonight watchlist</div>
+        <div class="list" id="watchList"></div>
+      </div>
+      <div class="card">
+        <div class="label">Live data / manual overrides</div>
+        <div class="small">Paste partial JSON overrides if you want to force or fix a category. Example: <span class="mono">{"categories":{"title_winner":{"winner":"MI","locked":true}}}</span></div>
+        <textarea id="overrideInput"></textarea>
+        <div class="settings-row">
+          <button id="applyOverridesBtn">Apply overrides</button>
+          <button id="copyStateBtn">Copy full state JSON</button>
+          <button id="clearOverridesBtn">Clear overrides</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Built as a private rivalry app, not a public product. Official IPL stats and points-table pages exist for the season, and the official site exposes live scores, points tables, and stats pages, which is why the app is wired around them first. citeturn0search0turn0search12turn7search1
+      I also used the official site as the scoring authority because third-party sources often rely on scraping or paid APIs rather than a clearly documented official public JSON feed. citeturn2view0turn5view0
+    </div>
+  </div>
+
+  <script>
+    const PICKS = {
+      senthil: {
+        title_winner:'MI',orange_cap:'KL',most_sixes:'vaibhav',purple_cap:'chahal',most_dots:'prasidh',mvp:'KL',uncapped_mvp:'Auqib Nabi',fair_play:'PBKS',highest_team_score:'PBKS',striker:'Brevis',best_bowling_figures:'Akeal hosein',best_bowling_sr:'hazlewood',most_catches:'D.Brevis',table_bottom:'KKR',least_mvp:'MSD'
+      },
+      sai: {
+        title_winner:'RCB',orange_cap:'Gill',most_sixes:'pooran',purple_cap:'Rashid',most_dots:'Boult',mvp:'Iyer',uncapped_mvp:'prashant veer',fair_play:'GT',highest_team_score:'LSG',striker:'Salt',best_bowling_figures:'Harshal Patel',best_bowling_sr:'Rashid khan',most_catches:'Kohli',table_bottom:'SRH',least_mvp:'Green'
+      }
+    };
+
+    const CATEGORIES = [
+      { key:'title_winner', name:'Title winner', mode:'title', weight:'big' },
+      { key:'orange_cap', name:'Orange Cap', mode:'top5_4', weight:'big' },
+      { key:'most_sixes', name:'Most sixes', mode:'top5_4', weight:'big' },
+      { key:'purple_cap', name:'Purple Cap', mode:'top5_4', weight:'big' },
+      { key:'most_dots', name:'Most dots', mode:'top5_4', weight:'big' },
+      { key:'mvp', name:'MVP', mode:'top5_4', weight:'big' },
+      { key:'uncapped_mvp', name:'Uncapped MVP', mode:'better_rank' },
+      { key:'fair_play', name:'FairPlay award', mode:'better_rank' },
+      { key:'highest_team_score', name:'Highest team score', mode:'better_value' },
+      { key:'striker', name:'Striker of season', mode:'better_rank' },
+      { key:'best_bowling_figures', name:'Best bowling figures', mode:'better_value_fig' },
+      { key:'best_bowling_sr', name:'Best bowling strike rate', mode:'better_rank_low' },
+      { key:'most_catches', name:'Most catches', mode:'better_rank' },
+      { key:'table_bottom', name:'Table bottom', mode:'better_rank' },
+      { key:'least_mvp', name:'Least MVP', mode:'better_rank_low' }
+    ];
+
+    const TEAM_ALIASES = {
+      'mumbai indians':'MI','mi':'MI', 'royal challengers bengaluru':'RCB','royal challengers bangalore':'RCB','rcb':'RCB',
+      'chennai super kings':'CSK','csk':'CSK','delhi capitals':'DC','dc':'DC','gujarat titans':'GT','gt':'GT',
+      'kolkata knight riders':'KKR','kkr':'KKR','lucknow super giants':'LSG','lsg':'LSG','punjab kings':'PBKS','pbks':'PBKS',
+      'rajasthan royals':'RR','rr':'RR','sunrisers hyderabad':'SRH','srh':'SRH'
+    };
+
+    const PLAYER_ALIASES = {
+      'kl rahul':'KL','k l rahul':'KL','kl':'KL',
+      'shubman gill':'Gill','gill':'Gill',
+      'nicholas pooran':'pooran','pooran':'pooran',
+      'vaibhav suryavanshi':'vaibhav','vaibhav':'vaibhav',
+      'yuzvendra chahal':'chahal','chahal':'chahal',
+      'rashid khan':'Rashid khan','rashid':'Rashid','rashid khan':'Rashid khan',
+      'prasidh krishna':'prasidh','prasidh':'prasidh',
+      'trent boult':'Boult','boult':'Boult',
+      'shreyas iyer':'Iyer','iyer':'Iyer',
+      'auqib nabi':'Auqib Nabi',
+      'prashant veer':'prashant veer',
+      'dewald brevis':'Brevis','brevis':'Brevis','d brevis':'D.Brevis','d. brevis':'D.Brevis',
+      'phil salt':'Salt','salt':'Salt',
+      'akeal hosein':'Akeal hosein',
+      'harshal patel':'Harshal Patel',
+      'josh hazlewood':'hazlewood','hazlewood':'hazlewood',
+      'virat kohli':'Kohli','kohli':'Kohli',
+      'ms dhoni':'MSD','dhoni':'MSD',
+      'cameron green':'Green','green':'Green'
+    };
+
+    const DEMO_STATE = {
+      provider:'demo',
+      updatedAt:'2026-03-27 21:10',
+      fetchStatus:'Demo snapshot loaded.',
+      categories:{
+        title_winner:{winner:'',finalists:[],playoffs:['MI','RCB','GT','CSK'],locked:false},
+        orange_cap:{standings:['Gill','KL','Kohli','Ruturaj','Pooran'],locked:false},
+        most_sixes:{standings:['pooran','Salt','Brevis','Head','vaibhav'],locked:false},
+        purple_cap:{standings:['chahal','Rashid','hazlewood','Boult','prasidh'],locked:false},
+        most_dots:{standings:['Boult','prasidh','hazlewood','Bhuvi','Rashid'],locked:false},
+        mvp:{standings:['Iyer','KL','Gill','Rashid','Pooran'],locked:false},
+        uncapped_mvp:{standings:['Auqib Nabi','prashant veer','Sameer Rizvi'],locked:false},
+        fair_play:{standings:['GT','PBKS','MI','CSK','RCB'],locked:false},
+        highest_team_score:{values:{PBKS:242,LSG:236,SRH:228,MI:221},locked:false},
+        striker:{standings:['Salt','Brevis','Head','Pooran','KL'],locked:false},
+        best_bowling_figures:{values:{'Harshal Patel':'5/18','Akeal hosein':'4/14'},locked:false},
+        best_bowling_sr:{standings:['Rashid khan','hazlewood','Boult','chahal','prasidh'],locked:false},
+        most_catches:{standings:['Kohli','D.Brevis','Rinku','Jurel','Tilak'],locked:false},
+        table_bottom:{standings:['KKR','SRH','RR','DC'],locked:false},
+        least_mvp:{standings:['MSD','Green','Rinku','Jadeja'],locked:false}
+      },
+      overrides:{}
+    };
+
+    const EMPTY_STATE = {
+      provider:'demo',
+      updatedAt:'',
+      fetchStatus:'No data loaded yet.',
+      categories:Object.fromEntries(CATEGORIES.map(c=>[c.key,{locked:false}])),
+      overrides:{}
+    };
+
+    const STORAGE_KEY = 'iplWarRoomV2';
+    let refreshTimer = null;
+    let refreshing = false;
+
+    function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
+    function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || clone(DEMO_STATE); }catch{return clone(DEMO_STATE);} }
+    function saveState(state){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function normalizeText(v){ return String(v || '').trim().toLowerCase().replace(/\s+/g,' ').replace(/[–—-]/g,'-'); }
+    function canonTeam(v){ const key=normalizeText(v); return TEAM_ALIASES[key] || String(v || '').trim(); }
+    function canonPlayer(v){ const key=normalizeText(v); return PLAYER_ALIASES[key] || String(v || '').trim(); }
+    function canonPick(v){ return TEAM_ALIASES[normalizeText(v)] || PLAYER_ALIASES[normalizeText(v)] || String(v || '').trim(); }
+    function samePick(a,b){ return normalizeText(canonPick(a))===normalizeText(canonPick(b)); }
+    function fmtList(arr){ return (arr||[]).slice(0,5).join(', ') || '—'; }
+    function getRank(list,pick){ const i=(list||[]).findIndex(x=>samePick(x,pick)); return i===-1?999:i+1; }
+    function scoreTop5_4(list,pick){ const r=getRank(list,pick); if(r===1) return 4; if(r===2||r===3) return 3; if(r===4||r===5) return 2; return 1; }
+    function scoreTitle(data,pick){ if(samePick(data.winner,pick)) return 5; if((data.finalists||[]).some(x=>samePick(x,pick))) return 3; if((data.playoffs||[]).some(x=>samePick(x,pick))) return 2; return 1; }
+    function parseFigures(fig){ const m=String(fig||'').match(/(\d+)\s*\/\s*(\d+)/); return m?{wk:+m[1],runs:+m[2]}:{wk:-1,runs:999}; }
+    function compareFigures(a,b){ if(a.wk!==b.wk) return b.wk-a.wk; return a.runs-b.runs; }
+    function betterRank(list,a,b,lowWins=false){ const r1=getRank(list,a), r2=getRank(list,b); if(r1===999&&r2===999) return {me:0,him:0,front:'Tied'}; if(r1<r2) return {me:1,him:0,front:'Senthil'}; if(r2<r1) return {me:0,him:1,front:'Sai'}; return {me:0,him:0,front:'Tied'}; }
+    function betterValue(values,a,b,fig=false){ const v1=values?.[a], v2=values?.[b]; if(v1==null&&v2==null) return {me:0,him:0,front:'Tied'}; if(v1!=null&&v2==null) return {me:1,him:0,front:'Senthil'}; if(v2!=null&&v1==null) return {me:0,him:1,front:'Sai'}; if(fig){ const c=compareFigures(parseFigures(v1),parseFigures(v2)); if(c<0) return {me:1,him:0,front:'Senthil'}; if(c>0) return {me:0,him:1,front:'Sai'}; return {me:0,him:0,front:'Tied'}; }
+      const n1=Number(v1), n2=Number(v2); if(n1>n2) return {me:1,him:0,front:'Senthil'}; if(n2>n1) return {me:0,him:1,front:'Sai'}; return {me:0,him:0,front:'Tied'};
+    }
+
+    function mergeDeep(target, source){
+      if(!source || typeof source !== 'object') return target;
+      for(const key of Object.keys(source)){
+        const val = source[key];
+        if(val && typeof val === 'object' && !Array.isArray(val)){
+          if(!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])) target[key] = {};
+          mergeDeep(target[key], val);
+        } else {
+          target[key] = val;
+        }
+      }
+      return target;
+    }
+
+    function currentSummary(catKey, live){
+      if(!live) return '—';
+      if(catKey==='title_winner'){
+        const out=[]; if(live.winner) out.push(`Winner: ${live.winner}`); if(live.finalists?.length) out.push(`Finalists: ${live.finalists.join(', ')}`); if(live.playoffs?.length) out.push(`Playoffs: ${live.playoffs.join(', ')}`); return out.join(' • ') || 'League still open';
+      }
+      if(live.standings?.length) return live.standings.slice(0,5).join(', ');
+      if(live.values && Object.keys(live.values).length) return Object.entries(live.values).slice(0,5).map(([k,v])=>`${k}: ${v}`).join(' • ');
+      return live.note || 'No live parse yet';
+    }
+
+    function computeBoard(state){
+      const rows=[]; let sTotal=0, hTotal=0, sFronts=0, hFronts=0, locked=0;
+      for(const cat of CATEGORIES){
+        const live=state.categories[cat.key]||{}; const my=PICKS.senthil[cat.key]; const his=PICKS.sai[cat.key]; let me=0, him=0, front='Tied';
+        if(cat.mode==='title'){ me=scoreTitle(live,my); him=scoreTitle(live,his); }
+        else if(cat.mode==='top5_4'){ me=scoreTop5_4(live.standings||[],my); him=scoreTop5_4(live.standings||[],his); }
+        else if(cat.mode==='better_rank'){ ({me,him,front}=betterRank(live.standings||[],my,his,false)); }
+        else if(cat.mode==='better_rank_low'){ ({me,him,front}=betterRank(live.standings||[],my,his,true)); }
+        else if(cat.mode==='better_value'){ ({me,him,front}=betterValue(live.values||{},my,his,false)); }
+        else if(cat.mode==='better_value_fig'){ ({me,him,front}=betterValue(live.values||{},my,his,true)); }
+        if(cat.mode==='title' || cat.mode==='top5_4'){ front = me>him?'Senthil':him>me?'Sai':'Tied'; }
+        if(front==='Senthil') sFronts++; if(front==='Sai') hFronts++; if(live.locked) locked++; sTotal+=me; hTotal+=him;
+        rows.push({key:cat.key,name:cat.name,myPick:my,hisPick:his,summary:currentSummary(cat.key,live),me,him,front,locked:!!live.locked,live});
+      }
+      return {rows,sTotal,hTotal,sFronts,hFronts,locked};
+    }
+
+    function insightText(board){
+      const insights=[];
+      const margin = board.sTotal - board.hTotal;
+      if(margin>0) insights.push(`Senthil leads by <strong>${margin}</strong> overall. Right now Sai needs a comeback, not a cover drive.`);
+      else if(margin<0) insights.push(`Sai leads by <strong>${Math.abs(margin)}</strong>. Mildly offensive, but still recoverable.`);
+      else insights.push(`Overall score is tied. One decent KL innings or one RCB wobble and this gets messy.`);
+
+      const swings = board.rows.filter(r=>!r.locked && r.front!=='Tied').sort((a,b)=>Math.abs((a.me-a.him))===Math.abs((b.me-b.him)) ? 0 : Math.abs((b.me-b.him))-Math.abs((a.me-a.him))).slice(0,3);
+      if(swings.length){
+        insights.push(`Biggest live swings: <strong>${swings.map(r=>r.name).join(', ')}</strong>. Those are the levers currently deciding the war.`);
+      }
+
+      const tiedBig = board.rows.filter(r=>!r.locked && r.front==='Tied' && (r.key==='title_winner' || r.key==='orange_cap' || r.key==='purple_cap' || r.key==='mvp')).slice(0,2);
+      if(tiedBig.length) insights.push(`Still unresolved and dangerous: <strong>${tiedBig.map(r=>r.name).join(', ')}</strong>. One of those will probably flip the whole mood.`);
+
+      const title = board.rows.find(r=>r.key==='title_winner');
+      if(title && title.live.playoffs?.length){ insights.push(`Provisional playoff picture: <strong>${title.live.playoffs.join(', ')}</strong>. Your title points are being priced off that right now.`); }
+
+      return insights;
+    }
+
+    function savageLine(board){
+      const title = board.rows.find(r=>r.key==='title_winner');
+      const orange = board.rows.find(r=>r.key==='orange_cap');
+      const purple = board.rows.find(r=>r.key==='purple_cap');
+      const least = board.rows.find(r=>r.key==='least_mvp');
+      if(board.sTotal > board.hTotal){
+        return {
+          text:`Senthil is ahead. Sai currently has the classic RCB portfolio: high hopes, nice graphics, and a suspicious dependence on things going perfectly.`,
+          sub:`Best part? If ${title?.front==='Senthil'?'MI keep hovering in the title picture':'purple or niche categories flip your way'}, you get to act like this was inevitable all along.`
+        };
+      }
+      if(board.hTotal > board.sTotal){
+        return {
+          text:`Sai is ahead, which is rude. At the moment your board reads like a KL-centered belief system held together by vibes and old fantasy trauma.`,
+          sub:`Good news: ${orange?.front==='Sai'?'Orange Cap is doing damage for him, so that is the pressure point':'one big category flip and this gets noisy again'}.`
+        };
+      }
+      return {
+        text:`It is tied. Beautiful. Two grown men, one spreadsheet spirit, and no one can chat trash with full legal confidence yet.`,
+        sub:`Watch ${purple?.name || 'Purple Cap'} and ${least?.name || 'Least MVP'} — those feel like silent assassins.`
+      };
+    }
+
+    function watchItems(board){
+      const items=[];
+      for(const row of board.rows){
+        if(row.key==='orange_cap' && row.live.standings?.length){
+          const mr=getRank(row.live.standings,row.myPick), hr=getRank(row.live.standings,row.hisPick);
+          items.push(`Orange Cap: <span class="watch">${row.myPick}</span> is #${mr===999?'outside top 5':mr}, <span class="watch">${row.hisPick}</span> is #${hr===999?'outside top 5':hr}.`);
+        }
+        if(row.key==='purple_cap' && row.live.standings?.length){
+          const mr=getRank(row.live.standings,row.myPick), hr=getRank(row.live.standings,row.hisPick);
+          items.push(`Purple Cap: <span class="watch">${row.myPick}</span> sits at #${mr===999?'outside top 5':mr}; <span class="watch">${row.hisPick}</span> is #${hr===999?'outside top 5':hr}.`);
+        }
+        if(row.key==='highest_team_score' && row.live.values){
+          const a=row.live.values[row.myPick], b=row.live.values[row.hisPick];
+          if(a!=null || b!=null) items.push(`Highest team score: <span class="watch">${row.myPick}</span> ${a ?? '—'} vs <span class="watch">${row.hisPick}</span> ${b ?? '—'}. One lunatic batting night can steal this.`);
+        }
+        if(items.length>=4) break;
+      }
+      if(!items.length) items.push('No live watch items yet. Refresh or switch to demo data to wake the beast up.');
+      return items;
+    }
+
+    function render(){
+      const state=loadState();
+      const board=computeBoard(state);
+
+      document.getElementById('providerSelect').value = state.provider || 'demo';
+      document.getElementById('providerLabel').textContent = `Provider: ${state.provider==='official_beta'?'Official IPL auto (beta)':'Demo'}`;
+      document.getElementById('liveState').textContent = refreshing?'Refreshing…':(state.provider==='official_beta'?'Auto':'Demo');
+      document.getElementById('fetchStatus').textContent = state.fetchStatus || '—';
+      document.getElementById('overallScore').textContent = `${board.sTotal} - ${board.hTotal}`;
+      document.getElementById('frontsWon').textContent = `${board.sFronts} - ${board.hFronts}`;
+      document.getElementById('lockedCount').textContent = String(board.locked);
+      document.getElementById('lastUpdated').textContent = state.updatedAt || '—';
+
+      let leader='Overall tied'; let delta='Nobody is leading. Tragic for trash talk.'; let banner='Dead even. Please resume tension.';
+      if(board.sTotal>board.hTotal){ leader='Senthil leads'; delta=`Up by ${board.sTotal-board.hTotal}. Sai is currently on the wrong side of the scoreboard.`; banner='Senthil currently runs this app.'; }
+      if(board.hTotal>board.sTotal){ leader='Sai leads'; delta=`Down by ${board.hTotal-board.sTotal}. This is not ideal, chief.`; banner='Sai is ahead. Unpleasant, but temporary.'; }
+      document.getElementById('overallDelta').textContent = delta;
+      document.getElementById('bannerLeader').textContent = banner;
+
+      const tbody=document.getElementById('categoryTable');
+      tbody.innerHTML = board.rows.map(r=>{
+        const frontClass=r.front==='Senthil'?'good':r.front==='Sai'?'bad':'warn';
+        const statusClass=r.locked?'good':'blue';
+        return `<tr>
+          <td><strong>${r.name}</strong></td>
+          <td>${r.myPick}</td>
+          <td>${r.hisPick}</td>
+          <td class="muted">${r.summary}</td>
+          <td><strong>${r.me}</strong></td>
+          <td><strong>${r.him}</strong></td>
+          <td><span class="pill ${frontClass}">${r.front}</span></td>
+          <td><span class="pill ${statusClass}">${r.locked?'Locked':'Live'}</span></td>
+        </tr>`;
+      }).join('');
+
+      const insights = insightText(board);
+      document.getElementById('insightsList').innerHTML = insights.map(t=>`<div class="list-item">${t}</div>`).join('');
+      const sav = savageLine(board);
+      document.getElementById('savageText').textContent = sav.text;
+      document.getElementById('savageSub').textContent = sav.sub;
+      document.getElementById('watchList').innerHTML = watchItems(board).map(t=>`<div class="list-item">${t}</div>`).join('');
+      document.getElementById('overrideInput').value = JSON.stringify(state.overrides || {}, null, 2);
+
+      const auto = localStorage.getItem(STORAGE_KEY+'_auto') === '1';
+      document.getElementById('autoToggle').checked = auto;
+      document.getElementById('intervalSelect').value = localStorage.getItem(STORAGE_KEY+'_int') || '5';
+      document.getElementById('refreshLabel').textContent = auto?`Auto-refresh on • every ${document.getElementById('intervalSelect').value} min`:'Auto-refresh off';
+    }
+
+    async function safeFetchText(url){
+      const attempts = [
+        url,
+        `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        `https://r.jina.ai/http://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`
+      ];
+      let lastErr = null;
+      for(const attempt of attempts){
+        try{
+          const res = await fetch(attempt, {cache:'no-store'});
+          if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+          const text = await res.text();
+          if(text && text.length > 80) return text;
+        }catch(err){ lastErr = err; }
+      }
+      throw lastErr || new Error('Fetch failed');
+    }
+
+    function extractTeamOrder(text){
+      const names = ['Mumbai Indians','Royal Challengers Bengaluru','Royal Challengers Bangalore','Chennai Super Kings','Delhi Capitals','Gujarat Titans','Kolkata Knight Riders','Lucknow Super Giants','Punjab Kings','Rajasthan Royals','Sunrisers Hyderabad'];
+      const hits = [];
+      for(const name of names){
+        const idx = text.indexOf(name);
+        if(idx !== -1) hits.push({team:canonTeam(name), idx});
+      }
+      return hits.sort((a,b)=>a.idx-b.idx).map(x=>x.team).filter((v,i,a)=>a.indexOf(v)===i);
+    }
+
+    function extractNamedList(text, candidates, max=5){
+      const hits=[];
+      const lower=normalizeText(text);
+      for(const c of candidates){
+        const idx = lower.indexOf(normalizeText(c));
+        if(idx!==-1) hits.push({name:canonPick(c), idx});
+      }
+      return hits.sort((a,b)=>a.idx-b.idx).map(x=>x.name).filter((v,i,a)=>a.indexOf(v)===i).slice(0,max);
+    }
+
+    function parseStatFromText(text, catKey){
+      const playersAll = ['KL Rahul','Gill','Nicholas Pooran','Pooran','Vaibhav Suryavanshi','Yuzvendra Chahal','Rashid Khan','Prasidh Krishna','Trent Boult','Shreyas Iyer','Auqib Nabi','Prashant Veer','Dewald Brevis','Phil Salt','Akeal Hosein','Harshal Patel','Josh Hazlewood','Virat Kohli','MS Dhoni','Cameron Green'];
+      const teamsAll = ['Mumbai Indians','Royal Challengers Bengaluru','Chennai Super Kings','Delhi Capitals','Gujarat Titans','Kolkata Knight Riders','Lucknow Super Giants','Punjab Kings','Rajasthan Royals','Sunrisers Hyderabad'];
+      const out = {locked:false, note:'Auto parse did not find enough data yet.'};
+      const t = String(text || '');
+      if(catKey==='title_winner'){
+        const tableOrder = extractTeamOrder(t);
+        out.playoffs = tableOrder.slice(0,4);
+        if(tableOrder.length>=2) out.finalists = tableOrder.slice(0,2);
+        return out;
+      }
+      if(catKey==='table_bottom'){
+        out.standings = extractTeamOrder(t).reverse().slice(0,5);
+        return out;
+      }
+      if(catKey==='highest_team_score'){
+        const values={};
+        for(const team of teamsAll){
+          const abbr=canonTeam(team);
+          const re = new RegExp(`(?:${team}|${abbr})[^\n\r]{0,30}?(\d{3})\/(\d+)`, 'ig');
+          let m; while((m=re.exec(t))){ values[abbr]=Math.max(values[abbr]||0, Number(m[1])); }
+        }
+        out.values = values;
+        return out;
+      }
+      if(catKey==='best_bowling_figures'){
+        const values={};
+        for(const p of playersAll){
+          const canon=canonPlayer(p);
+          const escaped = p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+          const re = new RegExp(`${escaped}[^\n\r]{0,30}?(\d+\/\d+)`, 'ig');
+          let m; while((m=re.exec(t))){ values[canon]=m[1]; }
+        }
+        out.values = values;
+        return out;
+      }
+      // Generic ordered list by appearance from text.
+      out.standings = extractNamedList(t, catKey==='fair_play'?teamsAll:playersAll, 5);
+      return out;
+    }
+
+    async function fetchOfficialBeta(){
+      const pages = {
+        stats:'https://www.iplt20.com/stats/2026',
+        points:'https://www.iplt20.com/points-table',
+        results:'https://www.iplt20.com/matches/results',
+        home:'https://www.iplt20.com/'
+      };
+      const texts = {};
+      const notes = [];
+      await Promise.all(Object.entries(pages).map(async ([k,u])=>{
+        try{ texts[k] = await safeFetchText(u); }
+        catch(err){ texts[k] = ''; notes.push(`${k} fetch failed`); }
+      }));
+
+      const fresh = clone(EMPTY_STATE);
+      fresh.provider = 'official_beta';
+      fresh.updatedAt = new Date().toLocaleString();
+      fresh.fetchStatus = notes.length ? `Partial refresh: ${notes.join(', ')}.` : 'Official pages refreshed.';
+      // Parse broad sources. Same text may be reused across categories.
+      fresh.categories.title_winner = mergeDeep(fresh.categories.title_winner, parseStatFromText(`${texts.points}\n${texts.home}`, 'title_winner'));
+      fresh.categories.table_bottom = mergeDeep(fresh.categories.table_bottom, parseStatFromText(texts.points, 'table_bottom'));
+      fresh.categories.orange_cap = mergeDeep(fresh.categories.orange_cap, parseStatFromText(texts.stats, 'orange_cap'));
+      fresh.categories.most_sixes = mergeDeep(fresh.categories.most_sixes, parseStatFromText(texts.stats, 'most_sixes'));
+      fresh.categories.purple_cap = mergeDeep(fresh.categories.purple_cap, parseStatFromText(texts.stats, 'purple_cap'));
+      fresh.categories.most_dots = mergeDeep(fresh.categories.most_dots, parseStatFromText(texts.stats, 'most_dots'));
+      fresh.categories.mvp = mergeDeep(fresh.categories.mvp, parseStatFromText(texts.stats, 'mvp'));
+      fresh.categories.uncapped_mvp = mergeDeep(fresh.categories.uncapped_mvp, parseStatFromText(texts.stats, 'uncapped_mvp'));
+      fresh.categories.fair_play = mergeDeep(fresh.categories.fair_play, parseStatFromText(`${texts.stats}\n${texts.results}`, 'fair_play'));
+      fresh.categories.highest_team_score = mergeDeep(fresh.categories.highest_team_score, parseStatFromText(texts.results, 'highest_team_score'));
+      fresh.categories.striker = mergeDeep(fresh.categories.striker, parseStatFromText(texts.stats, 'striker'));
+      fresh.categories.best_bowling_figures = mergeDeep(fresh.categories.best_bowling_figures, parseStatFromText(texts.results, 'best_bowling_figures'));
+      fresh.categories.best_bowling_sr = mergeDeep(fresh.categories.best_bowling_sr, parseStatFromText(texts.stats, 'best_bowling_sr'));
+      fresh.categories.most_catches = mergeDeep(fresh.categories.most_catches, parseStatFromText(texts.stats, 'most_catches'));
+      fresh.categories.least_mvp = mergeDeep(fresh.categories.least_mvp, parseStatFromText(texts.stats, 'least_mvp'));
+
+      // Carry previous data forward if fresh parse is empty for a category.
+      const prev = loadState();
+      for(const cat of CATEGORIES){
+        const k = cat.key;
+        const cur = fresh.categories[k] || {};
+        const old = prev.categories?.[k] || {};
+        const curHas = (cur.standings && cur.standings.length) || (cur.values && Object.keys(cur.values).length) || cur.winner || (cur.playoffs && cur.playoffs.length);
+        if(!curHas && old){ fresh.categories[k] = mergeDeep(clone(old), cur); }
+      }
+      // Apply saved overrides after fetch.
+      fresh.overrides = clone(prev.overrides || {});
+      applyOverridesToState(fresh, fresh.overrides);
+      return fresh;
+    }
+
+    function applyOverridesToState(state, overrides){
+      if(!overrides || typeof overrides !== 'object') return state;
+      mergeDeep(state, clone(overrides));
+      return state;
+    }
+
+    async function doRefresh(forceProvider){
+      if(refreshing) return;
+      refreshing = true; render();
+      try{
+        let state;
+        const current=loadState();
+        const provider = forceProvider || current.provider || 'demo';
+        if(provider==='demo'){
+          state = clone(DEMO_STATE);
+          state.provider='demo';
+        } else {
+          state = await fetchOfficialBeta();
+        }
+        state.provider = provider;
+        saveState(state);
+      } catch(err){
+        const state=loadState();
+        state.fetchStatus = `Refresh failed: ${err.message || err}. Keeping last good snapshot.`;
+        saveState(state);
+      } finally {
+        refreshing = false;
+        render();
+      }
+    }
+
+    function scheduleAuto(){
+      if(refreshTimer) clearInterval(refreshTimer);
+      const enabled = localStorage.getItem(STORAGE_KEY+'_auto') === '1';
+      const mins = Number(localStorage.getItem(STORAGE_KEY+'_int') || '5');
+      if(enabled){ refreshTimer = setInterval(()=>doRefresh(), mins*60*1000); }
+      render();
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click',()=>doRefresh());
+    document.getElementById('sampleBtn').addEventListener('click',()=>{ saveState(clone(DEMO_STATE)); render(); });
+    document.getElementById('resetBtn').addEventListener('click',()=>{ localStorage.removeItem(STORAGE_KEY); saveState(clone(DEMO_STATE)); render(); });
+    document.getElementById('providerSelect').addEventListener('change',e=>{ const state=loadState(); state.provider=e.target.value; saveState(state); render(); doRefresh(e.target.value); });
+    document.getElementById('autoToggle').addEventListener('change',e=>{ localStorage.setItem(STORAGE_KEY+'_auto', e.target.checked?'1':'0'); scheduleAuto(); });
+    document.getElementById('intervalSelect').addEventListener('change',e=>{ localStorage.setItem(STORAGE_KEY+'_int', e.target.value); scheduleAuto(); });
+    document.getElementById('applyOverridesBtn').addEventListener('click',()=>{
+      try{
+        const parsed = JSON.parse(document.getElementById('overrideInput').value || '{}');
+        const state=loadState();
+        state.overrides = parsed;
+        applyOverridesToState(state, parsed);
+        state.fetchStatus = 'Overrides applied.';
+        state.updatedAt = new Date().toLocaleString();
+        saveState(state); render();
+      } catch(err){ alert('Override JSON is invalid. Tiny typo, giant chaos.'); }
+    });
+    document.getElementById('clearOverridesBtn').addEventListener('click',()=>{ const state=loadState(); state.overrides={}; saveState(state); render(); });
+    document.getElementById('copyStateBtn').addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(JSON.stringify(loadState(), null, 2)); alert('Full state copied.'); } catch { alert('Clipboard blocked. Manual copy time.'); } });
+
+    if(!localStorage.getItem(STORAGE_KEY)) saveState(clone(DEMO_STATE));
+    if(!localStorage.getItem(STORAGE_KEY+'_int')) localStorage.setItem(STORAGE_KEY+'_int','5');
+    render();
+    scheduleAuto();
+  </script>
+</body>
+</html>
