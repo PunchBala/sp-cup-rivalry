@@ -1,8 +1,8 @@
 {
   "season": 2026,
   "provider": "data/live.json",
-  "scrapeStatus": "partial (3 ok, 10 failed)",
-  "fetchedAt": "2026-03-28T23:13:04.306Z",
+  "scrapeStatus": "partial (3 ok, 9 failed)",
+  "fetchedAt": "2026-03-28T23:28:48.227Z",
   "scrapeReport": {
     "orangeCap": {
       "ok": false,
@@ -45,8 +45,8 @@
       "source": "https://www.iplt20.com/stats/2026"
     },
     "bestBowlingStrikeRate": {
-      "ok": false,
-      "error": "Could not select metric: Best Bowling Strike-Rate",
+      "ok": true,
+      "count": 15,
       "source": "https://www.iplt20.com/stats/2026"
     },
     "titleWinner": {
@@ -65,8 +65,8 @@
       "source": "https://www.iplt20.com/matches/results"
     },
     "mostCatches": {
-      "ok": true,
-      "count": 14,
+      "ok": false,
+      "error": "Temporarily disabled to avoid junk data",
       "source": "https://www.espncricinfo.com/series/ipl-2026-1510719/stats"
     }
   },
@@ -147,42 +147,44 @@
     "extendedRanking": []
   },
   "bestBowlingStrikeRate": {
-    "ranking": [],
-    "extendedRanking": []
-  },
-  "mostCatches": {
     "ranking": [
-      "Devdutt Padikkal",
-      "Runs: 61Wkts: 0",
-      "9.3",
-      "Jacob Duffy",
-      "Runs: 0Wkts: 3",
-      "9.1",
+      "Ishan Kishan",
       "Virat Kohli",
-      "Runs: 69Wkts: 0",
-      "Instant Answers To T20 Questions",
-      "Ask A Question",
-      "Terms Of Use",
-      "Cookie Policy",
-      "Feedback",
-      "© 2026 ESPN Sports Media Ltd. All Rights Reserved"
+      "Devdutt Padikkal",
+      "Aniket Verma",
+      "Rajat Patidar",
+      "Heinrich Klaasen",
+      "Tim David",
+      "Travis Head",
+      "Salil Arora",
+      "Phil Salt",
+      "Abhishek Sharma",
+      "David Payne",
+      "Jaydev Unadkat",
+      "Harsh Dubey",
+      "Nitish Kumar Reddy"
     ],
     "extendedRanking": [
-      "Devdutt Padikkal",
-      "Runs: 61Wkts: 0",
-      "9.3",
-      "Jacob Duffy",
-      "Runs: 0Wkts: 3",
-      "9.1",
+      "Ishan Kishan",
       "Virat Kohli",
-      "Runs: 69Wkts: 0",
-      "Instant Answers To T20 Questions",
-      "Ask A Question",
-      "Terms Of Use",
-      "Cookie Policy",
-      "Feedback",
-      "© 2026 ESPN Sports Media Ltd. All Rights Reserved"
-    ],
+      "Devdutt Padikkal",
+      "Aniket Verma",
+      "Rajat Patidar",
+      "Heinrich Klaasen",
+      "Tim David",
+      "Travis Head",
+      "Salil Arora",
+      "Phil Salt",
+      "Abhishek Sharma",
+      "David Payne",
+      "Jaydev Unadkat",
+      "Harsh Dubey",
+      "Nitish Kumar Reddy"
+    ]
+  },
+  "mostCatches": {
+    "ranking": [],
+    "extendedRanking": [],
     "source": "https://www.espncricinfo.com/series/ipl-2026-1510719/stats"
   },
   "tableBottom": {
