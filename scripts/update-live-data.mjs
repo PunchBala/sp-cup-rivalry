@@ -10,13 +10,10 @@ const USER_DATA_DIR = path.join(ROOT, '.chrome-profile');
 
 const IPL_STATS_URL = 'https://www.iplt20.com/stats/2026';
 const IPL_POINTS_URLS = [
-  'https://www.iplt20.com/points-table/men',
-  'https://www.espncricinfo.com/series/ipl-2026-1510719/points-table-standings',
-  'https://sports.ndtv.com/ipl-2026/points-table'
+  'https://www.iplt20.com/points-table/men'
 ];
 const IPL_RESULTS_URLS = [
-  'https://www.iplt20.com/matches/results',
-  'https://www.iplt20.com/matches/results/2018'
+  'https://www.iplt20.com/matches/results'
 ];
 const ESPN_CATCHES_URLS = [
   'https://www.espncricinfo.com/series/ipl-2026-1510719/stats'
@@ -45,6 +42,8 @@ const TEAM_ALIASES = new Map([
   ['kkr', 'Kolkata Knight Riders'],
   ['kolkata knight riders', 'Kolkata Knight Riders']
 ]);
+
+const TEAM_CODES = new Set(['MI','RCB','CSK','SRH','GT','LSG','DC','PBKS','RR','KKR']);
 
 const PLAYER_ALIASES = new Map([
   ['v kohli', 'Virat Kohli'], ['virat kohli', 'Virat Kohli'],
@@ -120,17 +119,29 @@ function titleCase(value) {
   return value.split(' ').filter(Boolean).map((x) => x[0]?.toUpperCase() + x.slice(1)).join(' ');
 }
 
+function cleanPlayerText(value) {
+  let s = String(value || '')
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/\s+\*$/, '')
+    .replace(/\bPOS\b/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const parts = s.split(' ');
+  if (parts.length && TEAM_CODES.has(parts[parts.length - 1].toUpperCase())) {
+    parts.pop();
+    s = parts.join(' ');
+  }
+  return s.trim();
+}
+
 function canonicalizeTeamName(value) {
   const key = normalize(String(value).replace(/\d+[/-]\d+.*$/, ''));
   return TEAM_ALIASES.get(key) || String(value).trim();
 }
 
 function canonicalizePlayerName(value) {
-  const noTeam = String(value)
-    .replace(/\([^)]*\)/g, ' ')
-    .replace(/\s+\*$/, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const noTeam = cleanPlayerText(value);
   const key = normalize(noTeam);
   return PLAYER_ALIASES.get(key) || titleCase(noTeam);
 }
@@ -204,60 +215,52 @@ async function gotoSettled(page, url, debugName) {
   }
 }
 
-async function clickVisibleText(page, candidates, exact = false) {
-  const labels = Array.isArray(candidates) ? candidates : [candidates];
-  for (const text of labels) {
-    const locators = [
-      page.getByRole('option', { name: new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }).first(),
-      page.getByRole('button', { name: new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }).first(),
-      page.getByText(new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), exact ? 'i' : 'i')).first()
-    ];
-    for (const locator of locators) {
-      try {
-        if (await locator.isVisible({ timeout: 700 })) {
-          await locator.click({ timeout: 1500 });
-          await page.waitForTimeout(600);
+async function clickTextInPage(page, texts, exact = false) {
+  const list = Array.isArray(texts) ? texts : [texts];
+  for (const txt of list) {
+    try {
+      const rx = new RegExp(txt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      const locators = [
+        page.getByRole('button', { name: rx }).first(),
+        page.getByRole('tab', { name: rx }).first(),
+        page.getByRole('option', { name: rx }).first(),
+        page.getByText(rx).first()
+      ];
+      for (const loc of locators) {
+        if (await loc.isVisible({ timeout: 700 })) {
+          await loc.click({ timeout: 1500 });
+          await page.waitForTimeout(500);
           return true;
         }
-      } catch {}
-    }
+      }
+    } catch {}
   }
 
-  const clicked = await page.evaluate(({ labels, exact }) => {
+  const ok = await page.evaluate(({ texts, exact }) => {
     const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
-    const wants = labels.map(norm);
+    const wants = texts.map(norm);
     const isVisible = (el) => {
       const r = el.getBoundingClientRect();
       const s = getComputedStyle(el);
       return r.width > 20 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
     };
-    const maybeClick = (el) => {
-      el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
-      el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-      el.click?.();
-      el.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
-    };
-    const nodes = [...document.querySelectorAll('button, [role="button"], [role="option"], li, a, span, div, label, input')];
-    for (const el of nodes) {
+    const all = [...document.querySelectorAll('button, [role="button"], [role="tab"], [role="option"], li, a, span, div, label, input')];
+    for (const el of all) {
       if (!isVisible(el)) continue;
       const text = norm(el.innerText || el.textContent || el.value || '');
       if (!text) continue;
       if (wants.some((w) => exact ? text === w : text === w || text.includes(w))) {
-        maybeClick(el);
+        el.click?.();
         return true;
       }
     }
     return false;
-  }, { labels, exact }).catch(() => false);
-
-  if (clicked) {
-    await page.waitForTimeout(700);
-    return true;
-  }
-  return false;
+  }, { texts: list, exact }).catch(() => false);
+  if (ok) await page.waitForTimeout(600);
+  return ok;
 }
 
-async function openMetricDropdown(page) {
+async function clickMetricControl(page) {
   const opened = await page.evaluate(() => {
     const visible = (el) => {
       const r = el.getBoundingClientRect();
@@ -278,7 +281,6 @@ async function openMetricDropdown(page) {
 
     const rowY = nodes[0]?.y ?? 0;
     const row = nodes.filter((n) => Math.abs(n.y - rowY) < 35).sort((a, b) => a.x - b.x);
-
     const target = row[1] || nodes[1];
     if (!target) return false;
     target.el.click?.();
@@ -289,47 +291,65 @@ async function openMetricDropdown(page) {
   return opened;
 }
 
+async function chooseFromOpenDropdown(page, labels) {
+  let clicked = await clickTextInPage(page, labels, false);
+  if (clicked) return true;
+
+  for (let i = 0; i < 10; i += 1) {
+    await page.evaluate(() => {
+      const visible = (el) => {
+        const r = el.getBoundingClientRect();
+        const s = getComputedStyle(el);
+        return r.width > 160 && r.height > 100 && s.display !== 'none' && s.visibility !== 'hidden';
+      };
+      const boxes = [...document.querySelectorAll('div, ul')]
+        .filter(visible)
+        .filter((el) => {
+          const s = getComputedStyle(el);
+          return /(auto|scroll)/.test(s.overflowY) || el.scrollHeight > el.clientHeight + 10;
+        })
+        .sort((a, b) => (b.scrollHeight - b.clientHeight) - (a.scrollHeight - a.clientHeight));
+      const target = boxes[0];
+      if (target) target.scrollTop += 220;
+    }).catch(() => {});
+    await page.waitForTimeout(350);
+    clicked = await clickTextInPage(page, labels, false);
+    if (clicked) return true;
+  }
+  return false;
+}
+
 async function chooseStatsMetric(page, task) {
-  await page.locator('body').evaluate(el => el.scrollTo?.(0, 400)).catch(() => {});
-  await page.waitForTimeout(400);
+  await page.locator('body').evaluate(() => window.scrollTo(0, 350)).catch(() => {});
+  await page.waitForTimeout(300);
 
-  const tabClicked = await clickVisibleText(page, task.tab, true);
-  if (!tabClicked) throw new Error(`Could not click tab: ${task.tab}`);
+  const tabOk = await clickTextInPage(page, task.tab, true);
+  if (!tabOk) throw new Error(`Could not click tab: ${task.tab}`);
+  await page.waitForTimeout(600);
 
-  await page.waitForTimeout(700);
-  await openMetricDropdown(page);
+  let controlOpened = await clickMetricControl(page);
+  if (!controlOpened) throw new Error('Could not open metric dropdown');
 
   if (task.group) {
-    const groupClicked = await clickVisibleText(page, task.group, true);
-    if (groupClicked) await page.waitForTimeout(400);
-  }
-
-  let optionClicked = await clickVisibleText(page, task.labels, false);
-  if (!optionClicked) {
-    // scroll inside any visible dropdown/list and retry a few times
-    for (let i = 0; i < 6 && !optionClicked; i += 1) {
-      await page.evaluate(() => {
-        const visible = (el) => {
-          const r = el.getBoundingClientRect();
-          const s = getComputedStyle(el);
-          return r.width > 120 && r.height > 80 && s.display !== 'none' && s.visibility !== 'hidden';
-        };
-        const boxes = [...document.querySelectorAll('div, ul')].filter(visible).filter((el) => {
-          const s = getComputedStyle(el);
-          return /(auto|scroll)/.test(s.overflowY) || el.scrollHeight > el.clientHeight + 20;
-        });
-        const target = boxes.sort((a, b) => (b.scrollHeight - b.clientHeight) - (a.scrollHeight - a.clientHeight))[0];
-        if (target) target.scrollTop += 260;
-      }).catch(() => {});
-      await page.waitForTimeout(500);
-      optionClicked = await clickVisibleText(page, task.labels, false);
+    const groupOk = await clickTextInPage(page, task.group, true);
+    if (groupOk) {
+      await page.waitForTimeout(400);
+    } else {
+      // reopen dropdown if it closed before group click
+      await clickMetricControl(page);
+      const retryGroup = await clickTextInPage(page, task.group, true);
+      if (!retryGroup) throw new Error(`Could not switch group: ${task.group}`);
+      await page.waitForTimeout(400);
     }
   }
 
-  if (!optionClicked) throw new Error(`Could not select metric: ${task.labels.join(' / ')}`);
+  // reopen after group switch if needed
+  await clickMetricControl(page).catch(() => {});
+  const optionOk = await chooseFromOpenDropdown(page, task.labels);
+  if (!optionOk) throw new Error(`Could not select metric: ${task.labels.join(' / ')}`);
 
   await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
-  await page.waitForTimeout(1400);
+  await page.waitForTimeout(1200);
 }
 
 async function extractVisibleTables(page) {
@@ -358,6 +378,7 @@ function extractRankingFromRows(rows, entity) {
   for (const row of rows) {
     let raw = row[0];
     if (/^\d+$/.test(raw) && row[1]) raw = row[1];
+    if (/^pos$/i.test(raw)) continue;
     const clean = entity === 'team' ? canonicalizeTeamName(raw) : canonicalizePlayerName(raw);
     if (!clean) continue;
     if (entity === 'team' && !TEAM_ALIASES.has(normalize(clean))) continue;
@@ -375,8 +396,8 @@ function extractPlayerLinesFromText(text) {
   const lines = String(text || '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
   const ranking = [];
   for (const line of lines) {
-    const cleaned = canonicalizePlayerName(line);
-    if (cleaned && !TEAM_ALIASES.has(normalize(cleaned)) && cleaned.length > 2) ranking.push(cleaned);
+    const player = canonicalizePlayerName(line);
+    if (player && player.length > 2 && !TEAM_ALIASES.has(normalize(player)) && !/^pos$/i.test(player)) ranking.push(player);
   }
   return uniq(ranking);
 }
@@ -493,18 +514,14 @@ async function scrapePointsTable(context) {
   throw lastError ?? new Error('Could not scrape points table');
 }
 
-async function clickLoadMore(page) {
-  return clickVisibleText(page, [/load more/i, /show more/i, /^more$/i].map(String), false);
-}
-
 async function scrapeHighestTeamScores(context) {
   let lastError = null;
   for (const url of IPL_RESULTS_URLS) {
     const page = await makePage(context);
     try {
       await gotoSettled(page, url, `blocked_results_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
-      for (let i = 0; i < 12; i += 1) {
-        const more = await clickVisibleText(page, ['Load More', 'Show More', 'More'], false);
+      for (let i = 0; i < 10; i += 1) {
+        const more = await clickTextInPage(page, ['Load More', 'Show More', 'More'], false);
         if (!more) break;
       }
       const text = await page.locator('body').innerText().catch(() => '');
@@ -528,7 +545,6 @@ async function scrapeMostCatches(context) {
     const page = await makePage(context);
     try {
       await gotoSettled(page, url, `blocked_catches_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
-      // try visible text from accessible series stats page first
       const text = await page.locator('body').innerText().catch(() => '');
       let ranking = extractCatchesRankingFromText(text);
       if (!ranking.length) {
@@ -617,7 +633,7 @@ async function main() {
   live.scrapeStatus = errors.length ? `partial (${Object.values(live.scrapeReport).filter((x) => x?.ok).length} ok, ${errors.length} failed)` : 'ok';
 
   if (!majorCategoryCount(live)) {
-    throw new Error('All major categories are still empty. The sites loaded, but the worker still could not navigate the controls/tables correctly.');
+    throw new Error('All major categories are still empty. The worker still could not navigate the controls/tables correctly.');
   }
 
   await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
