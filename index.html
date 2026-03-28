@@ -38,7 +38,7 @@
     input,select{font-weight:600}
     input[type="checkbox"]{padding:0;width:18px;height:18px;accent-color:#57d69b}
     .grid{display:grid;gap:16px}
-    .summary{grid-template-columns:repeat(5,minmax(0,1fr));margin-top:18px}
+    .summary{grid-template-columns:repeat(7,minmax(0,1fr));margin-top:18px}
     .card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
     .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
     .big{font-size:34px;font-weight:900;margin-top:10px}
@@ -92,7 +92,7 @@
       </div>
       <div class="toolbar">
         <span class="leader-banner" id="bannerLeader">No leader yet</span>
-        <span class="chip"><span class="dot orange"></span><span id="providerLabel">Provider: Demo</span></span>
+        <span class="chip"><span class="dot orange"></span><span id="providerLabel">Provider: Live</span></span>
         <span class="chip"><span class="dot green"></span><span id="refreshLabel">Auto-refresh off</span></span>
       </div>
     </section>
@@ -102,6 +102,8 @@
       <div class="card"><div class="label">Fronts won</div><div class="big" id="frontsWon">0 - 0</div><div class="small">Categories currently led by each of you</div></div>
       <div class="card"><div class="label">Locked categories</div><div class="big" id="lockedCount">0</div><div class="small">Final / frozen categories</div></div>
       <div class="card"><div class="label">Live status</div><div class="big" id="liveState">Idle</div><div class="small" id="fetchStatus">Waiting for first refresh</div></div>
+      <div class="card"><div class="label">Likely winner</div><div class="big" id="likelyWinner">Too early</div><div class="small" id="winnerForecast">Need live movement before calling it.</div></div>
+      <div class="card"><div class="label">Confidence</div><div class="big" id="confidenceScore">50% - 50%</div><div class="small" id="confidenceBreakdown">Even confidence on both sides right now.</div></div>
       <div class="card"><div class="label">Last updated</div><div class="big" id="lastUpdated">—</div><div class="small">Stored locally in your browser</div></div>
     </div>
 
@@ -135,8 +137,7 @@
               <option value="official_beta">Official IPL auto (beta)</option>
             </select>
             <button id="refreshBtn">Refresh now</button>
-            <button id="sampleBtn">Load demo snapshot</button>
-            <button id="resetBtn">Reset app</button>
+                        <button id="resetBtn">Reset app</button>
           </div>
           <div class="settings-row">
             <label class="toggle"><input type="checkbox" id="autoToggle"> Auto-refresh</label>
@@ -160,9 +161,9 @@
         </div>
 
         <div class="card">
-          <div class="label">Savage mode</div>
-          <div class="savage" id="savageText">Waiting to roast somebody.</div>
-          <div class="small" id="savageSub">Once the board moves, the nonsense will become data-backed.</div>
+          <div class="label">Sledging mode</div>
+          <div class="savage" id="savageText">Waiting for the first proper sledge.</div>
+          <div class="small" id="savageSub">Neutral scoring. Equal-opportunity roasting.</div>
         </div>
       </div>
     </div>
@@ -272,9 +273,9 @@
     };
 
     const EMPTY_STATE = {
-      provider:'demo',
+      provider:'official_beta',
       updatedAt:'',
-      fetchStatus:'No data loaded yet.',
+      fetchStatus:'Waiting for live data… hit refresh.',
       categories:Object.fromEntries(CATEGORIES.map(c=>[c.key,{locked:false}])),
       overrides:{}
     };
@@ -284,7 +285,7 @@
     let refreshing = false;
 
     function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
-    function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || clone(DEMO_STATE); }catch{return clone(DEMO_STATE);} }
+    function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || clone(EMPTY_STATE); }catch{return clone(EMPTY_STATE);} }
     function saveState(state){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
     function normalizeText(v){ return String(v || '').trim().toLowerCase().replace(/\s+/g,' ').replace(/[–—-]/g,'-'); }
     function canonTeam(v){ const key=normalizeText(v); return TEAM_ALIASES[key] || String(v || '').trim(); }
@@ -346,44 +347,103 @@
     function insightText(board){
       const insights=[];
       const margin = board.sTotal - board.hTotal;
-      if(margin>0) insights.push(`Senthil leads by <strong>${margin}</strong> overall. Right now Sai needs a comeback, not a cover drive.`);
-      else if(margin<0) insights.push(`Sai leads by <strong>${Math.abs(margin)}</strong>. Mildly offensive, but still recoverable.`);
-      else insights.push(`Overall score is tied. One decent KL innings or one RCB wobble and this gets messy.`);
+      if(margin>0) insights.push(`Senthil leads by <strong>${margin}</strong> overall. Sai needs a shift in momentum.`);
+      else if(margin<0) insights.push(`Sai leads by <strong>${Math.abs(margin)}</strong>. Still early — plenty of room to swing.`);
+      else insights.push(`Overall score is tied. One good matchday can tilt the whole board.`);
 
-      const swings = board.rows.filter(r=>!r.locked && r.front!=='Tied').sort((a,b)=>Math.abs((a.me-a.him))===Math.abs((b.me-b.him)) ? 0 : Math.abs((b.me-b.him))-Math.abs((a.me-a.him))).slice(0,3);
+      const swings = board.rows
+        .filter(r=>!r.locked)
+        .map(r=>({...r, gap:Math.abs((r.me||0)-(r.him||0))}))
+        .sort((a,b)=>b.gap-a.gap)
+        .slice(0,3);
       if(swings.length){
-        insights.push(`Biggest live swings: <strong>${swings.map(r=>r.name).join(', ')}</strong>. Those are the levers currently deciding the war.`);
+        insights.push(`Biggest live swings: <strong>${swings.map(r=>r.name).join(', ')}</strong>. Those categories are carrying most of the pressure.`);
       }
 
-      const tiedBig = board.rows.filter(r=>!r.locked && r.front==='Tied' && (r.key==='title_winner' || r.key==='orange_cap' || r.key==='purple_cap' || r.key==='mvp')).slice(0,2);
-      if(tiedBig.length) insights.push(`Still unresolved and dangerous: <strong>${tiedBig.map(r=>r.name).join(', ')}</strong>. One of those will probably flip the whole mood.`);
+      const tiedBig = board.rows.filter(r=>!r.locked && r.front==='Tied' && ['title_winner','orange_cap','purple_cap','mvp'].includes(r.key)).slice(0,3);
+      if(tiedBig.length) insights.push(`Still unresolved and high leverage: <strong>${tiedBig.map(r=>r.name).join(', ')}</strong>.`);
 
       const title = board.rows.find(r=>r.key==='title_winner');
-      if(title && title.live.playoffs?.length){ insights.push(`Provisional playoff picture: <strong>${title.live.playoffs.join(', ')}</strong>. Your title points are being priced off that right now.`); }
+      if(title && title.live.playoffs?.length){ insights.push(`Current playoff picture: <strong>${title.live.playoffs.join(', ')}</strong>.`); }
+
+      const weak = board.rows
+        .filter(r=>!r.locked)
+        .map(r=>({...r, rankGap: Math.abs((r.me||0)-(r.him||0))}))
+        .sort((a,b)=>b.rankGap-a.rankGap)
+        .slice(0,2);
+      if(weak.length) insights.push(`Most influential categories right now: <strong>${weak.map(r=>r.name).join(', ')}</strong>.`);
 
       return insights;
     }
 
-    function savageLine(board){
-      const title = board.rows.find(r=>r.key==='title_winner');
-      const orange = board.rows.find(r=>r.key==='orange_cap');
-      const purple = board.rows.find(r=>r.key==='purple_cap');
-      const least = board.rows.find(r=>r.key==='least_mvp');
-      if(board.sTotal > board.hTotal){
-        return {
-          text:`Senthil is ahead. Sai currently has the classic RCB portfolio: high hopes, nice graphics, and a suspicious dependence on things going perfectly.`,
-          sub:`Best part? If ${title?.front==='Senthil'?'MI keep hovering in the title picture':'purple or niche categories flip your way'}, you get to act like this was inevitable all along.`
-        };
+    function computeConfidence(board){
+      const maxPossible = CATEGORIES.reduce((sum, cat)=>{
+        if(cat.mode==='title') return sum + 5;
+        if(cat.mode==='top5_4') return sum + 4;
+        return sum + 1;
+      }, 0);
+      const remainingSwing = board.rows.filter(r=>!r.locked).reduce((sum,r)=>{
+        return sum + Math.max(1, Math.abs((r.me||0)-(r.him||0)));
+      }, 0);
+      const baseSenthil = board.sTotal / Math.max(1, maxPossible);
+      const baseSai = board.hTotal / Math.max(1, maxPossible);
+      const margin = board.sTotal - board.hTotal;
+      let senthil = 50 + (margin * 4) + (baseSenthil - baseSai) * 30 - remainingSwing * 0.15;
+      senthil = Math.max(5, Math.min(95, senthil));
+      const sai = Math.max(5, Math.min(95, 100 - senthil));
+      return { senthil: Math.round(senthil), sai: Math.round(sai), remainingSwing };
+    }
+
+    function likelyWinnerText(board, confidence){
+      if(board.sTotal === board.hTotal){
+        return { leader:'Too close', sub:'Currently level. Forecast is basically a shrug with spreadsheets.' };
       }
-      if(board.hTotal > board.sTotal){
-        return {
-          text:`Sai is ahead, which is rude. At the moment your board reads like a KL-centered belief system held together by vibes and old fantasy trauma.`,
-          sub:`Good news: ${orange?.front==='Sai'?'Orange Cap is doing damage for him, so that is the pressure point':'one big category flip and this gets noisy again'}.`
-        };
+      if(confidence.senthil >= 60){
+        return { leader:'Senthil edge', sub:`Senthil is favoured for now at ${confidence.senthil}%. Plenty can still change.` };
+      }
+      if(confidence.sai >= 60){
+        return { leader:'Sai edge', sub:`Sai is favoured for now at ${confidence.sai}%. Plenty can still change.` };
       }
       return {
-        text:`It is tied. Beautiful. Two grown men, one spreadsheet spirit, and no one can chat trash with full legal confidence yet.`,
-        sub:`Watch ${purple?.name || 'Purple Cap'} and ${least?.name || 'Least MVP'} — those feel like silent assassins.`
+        leader: board.sTotal > board.hTotal ? 'Senthil slight edge' : 'Sai slight edge',
+        sub: `This is still volatile. Confidence split is ${confidence.senthil}% to ${confidence.sai}%.`
+      };
+    }
+
+    function savageLine(board){
+      const diff = board.sTotal - board.hTotal;
+      const weakForSenthil = board.rows.filter(r=>r.front==='Sai').sort((a,b)=>(b.him-b.me)-(a.him-a.me))[0];
+      const weakForSai = board.rows.filter(r=>r.front==='Senthil').sort((a,b)=>(b.me-b.him)-(a.me-a.him))[0];
+
+      const roastSenthil = [
+        weakForSenthil ? `Senthil’s ${weakForSenthil.name} call is currently doing charity work for Sai.` : `Senthil has a few picks running on confidence rather than evidence.`,
+        weakForSenthil ? `${weakForSenthil.myPick} in ${weakForSenthil.name} is not aging well right now.` : `Some of Senthil’s calls are wobbling a bit.`,
+        `Senthil is still alive here, but a couple of picks are one bad week away from comedy.`
+      ];
+
+      const roastSai = [
+        weakForSai ? `Sai’s ${weakForSai.name} pick is currently donating points across the aisle.` : `Sai’s sheet is showing strong imagination and mixed returns.`,
+        weakForSai ? `${weakForSai.hisPick} in ${weakForSai.name} has entered the danger zone.` : `A few of Sai’s calls are hanging on by vibes alone.`,
+        `Sai is still in this, but not every prediction deserves legal representation.`
+      ];
+
+      const neutral = [
+        `Both sides are still very much in this.`,
+        `One high-swing category can flip the whole mood.`,
+        `Neutral scoreboard, maximum dressing-room noise.`
+      ];
+
+      function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+      if(diff > 0){
+        return { text:`Senthil leads by ${diff}. ${pick(roastSai)}`, sub:pick(neutral) };
+      }
+      if(diff < 0){
+        return { text:`Sai leads by ${Math.abs(diff)}. ${pick(roastSenthil)}`, sub:pick(neutral) };
+      }
+      return {
+        text:`Scores are level. ${pick(roastSenthil)} Also, ${pick(roastSai)}`,
+        sub:`Nobody has full bragging rights yet.`
       };
     }
 
@@ -412,8 +472,8 @@
       const state=loadState();
       const board=computeBoard(state);
 
-      document.getElementById('providerSelect').value = state.provider || 'demo';
-      document.getElementById('providerLabel').textContent = `Provider: ${state.provider==='official_beta'?'Official IPL auto (beta)':'Demo'}`;
+      document.getElementById('providerSelect').value = state.provider || 'official_beta';
+      document.getElementById('providerLabel').textContent = `Provider: ${state.provider==='official_beta'?'Live':'Demo'}`;
       document.getElementById('liveState').textContent = refreshing?'Refreshing…':(state.provider==='official_beta'?'Auto':'Demo');
       document.getElementById('fetchStatus').textContent = state.fetchStatus || '—';
       document.getElementById('overallScore').textContent = `${board.sTotal} - ${board.hTotal}`;
@@ -421,11 +481,17 @@
       document.getElementById('lockedCount').textContent = String(board.locked);
       document.getElementById('lastUpdated').textContent = state.updatedAt || '—';
 
-      let leader='Overall tied'; let delta='Nobody is leading. Tragic for trash talk.'; let banner='Dead even. Please resume tension.';
-      if(board.sTotal>board.hTotal){ leader='Senthil leads'; delta=`Up by ${board.sTotal-board.hTotal}. Sai is currently on the wrong side of the scoreboard.`; banner='Senthil currently runs this app.'; }
-      if(board.hTotal>board.sTotal){ leader='Sai leads'; delta=`Down by ${board.hTotal-board.sTotal}. This is not ideal, chief.`; banner='Sai is ahead. Unpleasant, but temporary.'; }
+      let leader='Overall tied'; let delta='Scores level. Nothing to separate them yet.'; let banner='Overall score is level.';
+      if(board.sTotal>board.hTotal){ leader='Senthil leads'; delta=`Senthil leads by ${board.sTotal-board.hTotal} points.`; banner='Senthil currently leads overall.'; }
+      if(board.hTotal>board.sTotal){ leader='Sai leads'; delta=`Sai leads by ${board.hTotal-board.sTotal} points.`; banner='Sai currently leads overall.'; }
       document.getElementById('overallDelta').textContent = delta;
       document.getElementById('bannerLeader').textContent = banner;
+      const confidence = computeConfidence(board);
+      const forecast = likelyWinnerText(board, confidence);
+      document.getElementById('likelyWinner').textContent = forecast.leader;
+      document.getElementById('winnerForecast').textContent = forecast.sub;
+      document.getElementById('confidenceScore').textContent = `${confidence.senthil}% - ${confidence.sai}%`;
+      document.getElementById('confidenceBreakdown').textContent = `Senthil confidence ${confidence.senthil}%, Sai confidence ${confidence.sai}%. Remaining swing still matters.`;
 
       const tbody=document.getElementById('categoryTable');
       tbody.innerHTML = board.rows.map(r=>{
@@ -599,7 +665,7 @@
       try{
         let state;
         const current=loadState();
-        const provider = forceProvider || current.provider || 'demo';
+        const provider = forceProvider || current.provider || 'official_beta';
         if(provider==='demo'){
           state = clone(DEMO_STATE);
           state.provider='demo';
@@ -627,8 +693,7 @@
     }
 
     document.getElementById('refreshBtn').addEventListener('click',()=>doRefresh());
-    document.getElementById('sampleBtn').addEventListener('click',()=>{ saveState(clone(DEMO_STATE)); render(); });
-    document.getElementById('resetBtn').addEventListener('click',()=>{ localStorage.removeItem(STORAGE_KEY); saveState(clone(DEMO_STATE)); render(); });
+    document.getElementById('resetBtn').addEventListener('click',()=>{ localStorage.removeItem(STORAGE_KEY); saveState(clone(EMPTY_STATE)); render(); });
     document.getElementById('providerSelect').addEventListener('change',e=>{ const state=loadState(); state.provider=e.target.value; saveState(state); render(); doRefresh(e.target.value); });
     document.getElementById('autoToggle').addEventListener('change',e=>{ localStorage.setItem(STORAGE_KEY+'_auto', e.target.checked?'1':'0'); scheduleAuto(); });
     document.getElementById('intervalSelect').addEventListener('change',e=>{ localStorage.setItem(STORAGE_KEY+'_int', e.target.value); scheduleAuto(); });
@@ -646,9 +711,10 @@
     document.getElementById('clearOverridesBtn').addEventListener('click',()=>{ const state=loadState(); state.overrides={}; saveState(state); render(); });
     document.getElementById('copyStateBtn').addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(JSON.stringify(loadState(), null, 2)); alert('Full state copied.'); } catch { alert('Clipboard blocked. Manual copy time.'); } });
 
-    if(!localStorage.getItem(STORAGE_KEY)) saveState(clone(DEMO_STATE));
+    if(!localStorage.getItem(STORAGE_KEY)) saveState(clone(EMPTY_STATE));
     if(!localStorage.getItem(STORAGE_KEY+'_int')) localStorage.setItem(STORAGE_KEY+'_int','5');
     render();
+    if(loadState().provider === 'official_beta' && !loadState().updatedAt){ doRefresh('official_beta'); }
     scheduleAuto();
   </script>
 </body>
