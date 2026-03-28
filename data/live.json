@@ -2,26 +2,26 @@
   "season": 2026,
   "provider": "data/live.json",
   "scrapeStatus": "partial (3 ok, 10 failed)",
-  "fetchedAt": "2026-03-28T23:03:28.176Z",
+  "fetchedAt": "2026-03-28T23:13:04.306Z",
   "scrapeReport": {
     "orangeCap": {
       "ok": false,
-      "error": "Could not switch group: BATTERS",
+      "error": "Could not select metric: Orange Cap",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "mostSixes": {
       "ok": false,
-      "error": "Could not switch group: BATTERS",
+      "error": "Could not select metric: Angel One Super Sixes Of The Season / Angel One Super Sixes of the Season",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "purpleCap": {
       "ok": false,
-      "error": "Could not switch group: BOWLERS",
+      "error": "Could not select metric: Purple Cap",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "mostDots": {
       "ok": false,
-      "error": "Could not switch group: BOWLERS",
+      "error": "Could not select metric: TATA IPL Green Dot Balls",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "mvp": {
@@ -36,17 +36,17 @@
     },
     "striker": {
       "ok": false,
-      "error": "Could not switch group: BATTERS",
+      "error": "Could not select metric: Curvv Super Striker Of The Season / Curvv Super Striker of the Season",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "bestBowlingFigures": {
       "ok": false,
-      "error": "Could not switch group: BOWLERS",
+      "error": "Could not select metric: Best Bowling Figures",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "bestBowlingStrikeRate": {
       "ok": false,
-      "error": "Could not switch group: BOWLERS",
+      "error": "Could not select metric: Best Bowling Strike-Rate",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "titleWinner": {
@@ -66,7 +66,7 @@
     },
     "mostCatches": {
       "ok": true,
-      "count": 19,
+      "count": 14,
       "source": "https://www.espncricinfo.com/series/ipl-2026-1510719/stats"
     }
   },
@@ -152,46 +152,36 @@
   },
   "mostCatches": {
     "ranking": [
-      "Overall IPL Records",
-      "Tournament Fan Ratings",
-      "1.",
       "Devdutt Padikkal",
       "Runs: 61Wkts: 0",
       "9.3",
-      "2.",
       "Jacob Duffy",
       "Runs: 0Wkts: 3",
       "9.1",
-      "3.",
       "Virat Kohli",
       "Runs: 69Wkts: 0",
-      "View Full List",
       "Instant Answers To T20 Questions",
       "Ask A Question",
       "Terms Of Use",
-      "|",
-      "Privacy Policy"
+      "Cookie Policy",
+      "Feedback",
+      "© 2026 ESPN Sports Media Ltd. All Rights Reserved"
     ],
     "extendedRanking": [
-      "Overall IPL Records",
-      "Tournament Fan Ratings",
-      "1.",
       "Devdutt Padikkal",
       "Runs: 61Wkts: 0",
       "9.3",
-      "2.",
       "Jacob Duffy",
       "Runs: 0Wkts: 3",
       "9.1",
-      "3.",
       "Virat Kohli",
       "Runs: 69Wkts: 0",
-      "View Full List",
       "Instant Answers To T20 Questions",
       "Ask A Question",
       "Terms Of Use",
-      "|",
-      "Privacy Policy"
+      "Cookie Policy",
+      "Feedback",
+      "© 2026 ESPN Sports Media Ltd. All Rights Reserved"
     ],
     "source": "https://www.espncricinfo.com/series/ipl-2026-1510719/stats"
   },
