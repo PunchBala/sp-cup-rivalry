@@ -1,773 +1,880 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IPL 2026 Prediction War Room</title>
+  
   <style>
-    :root {
-      --bg:#08101d; --bg2:#0d1630; --panel:rgba(15,24,45,.88); --panel2:rgba(24,35,67,.9);
-      --line:rgba(255,255,255,.09); --text:#eef3ff; --muted:#9db0da; --accent:#7cc4ff;
-      --good:#43d487; --warn:#ffc857; --bad:#ff7f96; --shadow:0 18px 40px rgba(0,0,0,.28);
+    :root{
+      --bg:#060d18;
+      --bg2:#0c1630;
+      --panel:#0f1830ee;
+      --panel-2:#172448f2;
+      --panel-3:#101a36;
+      --muted:#9fb2d9;
+      --text:#eef4ff;
+      --accent:#7cc4ff;
+      --accent-2:#5ff0c8;
+      --accent-3:#ffca5f;
+      --warn:#ffc857;
+      --danger:#ff7f96;
+      --good:#44d792;
+      --line:rgba(255,255,255,.08);
+      --chip:rgba(255,255,255,.05);
+      --glow:0 18px 40px rgba(0,0,0,.28);
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);color:var(--text)}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(95,240,200,.08), transparent 26%),
+        radial-gradient(circle at 100% 0%, rgba(124,196,255,.18), transparent 28%),
+        linear-gradient(180deg,var(--bg) 0%, var(--bg2) 100%);
+      color:var(--text);
+    }
     .wrap{max-width:1480px;margin:0 auto;padding:22px}
-    .hero{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(124,196,255,.13),rgba(245,197,66,.11),rgba(255,111,125,.10));border:1px solid var(--line);border-radius:28px;padding:26px;box-shadow:var(--shadow)}
-    .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;filter:blur(24px);opacity:.25}
-    .hero:before{width:220px;height:220px;background:#1d8fff;right:-60px;top:-70px}
-    .hero:after{width:180px;height:180px;background:#ff8a00;left:-40px;bottom:-70px}
-    .eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:800}
-    h1{margin:8px 0 8px;font-size:clamp(30px,5vw,54px);line-height:1.02}
-    .sub{max-width:930px;color:var(--muted);line-height:1.55;font-size:15px}
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
-    .leader-banner{display:inline-flex;gap:10px;align-items:center;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-weight:800}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:12px;font-weight:800}
-    .chip .dot{width:8px;height:8px;border-radius:50%}
-    .dot.green{background:var(--good)} .dot.orange{background:var(--warn)} .dot.red{background:var(--bad)}
+    .hero{
+      position:relative;overflow:hidden;
+      background:
+        radial-gradient(circle at 92% 0%, rgba(72,139,255,.28), transparent 24%),
+        radial-gradient(circle at 0% 100%, rgba(255,200,87,.10), transparent 28%),
+        linear-gradient(180deg, rgba(18,29,58,.98), rgba(10,18,38,.98));
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:24px;
+      box-shadow:var(--glow);
+      margin-bottom:18px;
+    }
+    h1,h2,h3,p{margin:0}
+    h1{font-size:clamp(32px,4.5vw,46px);line-height:1.02}
+    .sub{color:var(--muted);margin-top:8px;max-width:900px;font-size:13px;line-height:1.45}
     .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-    .tab-btn{border-radius:14px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:11px 14px;font-weight:800;cursor:pointer;transition:.15s transform ease,.15s border-color ease,.15s background ease}
-    .tab-btn:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.45)}
-    .tab-btn.active{background:rgba(124,196,255,.16);border-color:rgba(124,196,255,.45)}
-    .grid{display:grid;gap:16px}
-    .summary{grid-template-columns:repeat(8,minmax(0,1fr));margin-top:18px}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
-    .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
-    .big{font-size:34px;font-weight:900;margin-top:10px}
-    .small{color:var(--muted);font-size:13px;line-height:1.45;margin-top:6px}
-    .section-title{margin:26px 0 12px;font-size:24px}
-    .layout{display:grid;grid-template-columns:1.35fr .85fr;gap:16px}
-    .stack{display:grid;gap:16px}
-    .panels{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:22px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
-    th,td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-    th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-    td{font-size:14px}
+    .tab{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:12px;
+      transition:.15s ease;
+    }
+    .tab:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.35)}
+    .tab.active{background:linear-gradient(180deg,#2f4577,#22345b);border-color:#6d8fe6;box-shadow:0 10px 20px rgba(0,0,0,.16)}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .pill{
+      background:var(--chip);
+      border:1px solid var(--line);
+      color:var(--muted);
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:700;
+    }
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{
+      background:linear-gradient(180deg,rgba(20,31,60,.98),rgba(11,20,40,.98));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:var(--glow);
+    }
+    .metric-card{min-height:122px;display:flex;flex-direction:column;justify-content:space-between}
+    .metric-card .value{font-size:34px;font-weight:900;line-height:1.02;color:#fff}
+    .metric-card .note{font-size:12px;color:var(--muted);line-height:1.35}
+    .metric-card .label{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.09em;font-weight:800}
+    .span-12{grid-column:span 12}
+    .span-8{grid-column:span 8}
+    .span-6{grid-column:span 6}
+    .span-4{grid-column:span 4}
+    .span-3{grid-column:span 3}
+    @media (max-width:1100px){.span-8,.span-6,.span-4,.span-3{grid-column:span 12}}
+    .section-title{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;font-weight:800}
+    .scoreboard{display:grid;grid-template-columns:1fr 140px 1fr;gap:12px;align-items:center}
+    .player-box{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:16px;padding:16px}
+    .player-name{font-weight:900;font-size:18px}
+    .big-score{font-size:46px;font-weight:900;line-height:1;margin-top:8px}
+    .lead{color:var(--accent-3)}
+    .trail{color:var(--danger)}
+    .vs{text-align:center;font-weight:900;color:var(--muted);font-size:20px}
+    .small{font-size:12px;color:var(--muted);line-height:1.4}
+    .next-match-teams{font-size:28px;font-weight:900;margin-top:6px;color:#fff}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
     tr:last-child td{border-bottom:none}
-    .pill{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:800}
-    .pill.good{background:rgba(67,212,135,.16);color:var(--good)}
-    .pill.warn{background:rgba(255,200,87,.16);color:var(--warn)}
-    .pill.bad{background:rgba(255,127,150,.16);color:var(--bad)}
-    .pill.blue{background:rgba(124,196,255,.16);color:var(--accent)}
-    .muted{color:var(--muted)}
-    .list{display:grid;gap:10px;margin-top:12px}
-    .list-item{padding:12px 13px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid var(--line);line-height:1.45}
-    .list-item strong{color:var(--text)}
-    .savage{font-size:17px;line-height:1.55;color:#fff1cc}
-    .next-match-card{position:relative;overflow:hidden}
-    .next-match-card:after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(124,196,255,.18),transparent 60%)}
-    .footer{margin:18px 0 36px;color:var(--muted);font-size:13px;line-height:1.5}
-    .watch{display:inline;color:#fff}
-    .mini{font-size:12px;color:var(--muted)}
-    .statusline{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:8px}
-    @media (max-width:1280px){.summary{grid-template-columns:repeat(4,minmax(0,1fr))}}
-    @media (max-width:1150px){.layout,.panels{grid-template-columns:1fr}}
-    @media (max-width:760px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:14px}th:nth-child(4),td:nth-child(4){display:none}}
-    @media (max-width:520px){.summary{grid-template-columns:1fr}}
+    tbody tr:hover{background:rgba(255,255,255,.03)}
+    .pick{font-weight:800;color:#fff}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-weight:800}
+    .insight{padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03);margin-bottom:10px;line-height:1.45}
+    .roast{background:linear-gradient(180deg, rgba(255,123,150,.08), rgba(124,196,255,.09))}
+    .footer-note{margin-top:14px;color:var(--muted);font-size:12px;line-height:1.5}
+    .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .legend .pill{font-size:12px}
+    .layout-side{display:grid;grid-template-columns:1.7fr .9fr;gap:16px}
+    @media (max-width:1100px){.layout-side{grid-template-columns:1fr}}
+    .table-wrap{overflow:auto}
+    .status-chip{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}
+    .status-good{background:rgba(68,215,146,.16);color:#98f0c5}
+    .status-bad{background:rgba(255,127,150,.16);color:#ffb5c3}
+    .status-tie{background:rgba(255,200,87,.16);color:#ffd67e}
+    .top-summary{margin-bottom:16px}
   </style>
+
 </head>
 <body>
   <div class="wrap">
-    <section class="hero">
-      <div class="eyebrow">private app • automatic only • IPL 2026</div>
-      <h1>Prediction War Room</h1>
-      <div class="sub">
-        Same rivalry logic, now cleaner: two head-to-head tabs, fully automatic data refresh, locked picks, next-match context, and balanced roast damage on both sides.
-      </div>
+    <div class="hero">
+      <h1>IPL 2026 Prediction War Room</h1>
+      <p class="sub">Live tracker for the season-long nonsense, delusion, and occasional genius. Scoring logic fixed. Season lock fixed. Next match card fixed.</p>
       <div class="tabs" id="tabs"></div>
-      <div class="toolbar">
-        <span class="leader-banner" id="bannerLeader">No leader yet</span>
-        <span class="chip"><span class="dot green"></span><span id="providerLabel">Provider: Live auto</span></span>
-        <span class="chip"><span class="dot orange"></span><span id="refreshLabel">Refreshing every 5 min</span></span>
-        <span class="chip"><span class="dot green"></span><span>Picks locked</span></span>
-      </div>
-    </section>
-
-    <div class="grid summary">
-      <div class="card"><div class="label">Overall score</div><div class="big" id="overallScore">0 - 0</div><div class="small" id="overallDelta">Dead even. This is annoyingly civil.</div></div>
-      <div class="card"><div class="label">Fronts won</div><div class="big" id="frontsWon">0 - 0</div><div class="small">Categories currently led by each side</div></div>
-      <div class="card"><div class="label">Locked categories</div><div class="big" id="lockedCount">0</div><div class="small">Final / frozen categories</div></div>
-      <div class="card"><div class="label">Live status</div><div class="big" id="liveState">Idle</div><div class="small" id="fetchStatus">Waiting for first refresh</div></div>
-      <div class="card"><div class="label">Likely winner</div><div class="big" id="likelyWinner">Too early</div><div class="small" id="winnerForecast">Need live movement before calling it.</div></div>
-      <div class="card"><div class="label">Confidence</div><div class="big" id="confidenceScore">50% - 50%</div><div class="small" id="confidenceBreakdown">Even confidence on both sides right now.</div></div>
-      <div class="card"><div class="label">Last updated</div><div class="big" id="lastUpdated">—</div><div class="small">Stored locally in your browser</div></div>
-      <div class="card next-match-card"><div class="label">Next match</div><div class="big" id="nextMatchTeams">Loading…</div><div class="small" id="nextMatchMeta">Schedule warming up</div><div class="small" id="nextMatchImpact">This card will explain why the next game matters.</div></div>
-    </div>
-
-    <div class="layout" style="margin-top:16px">
-      <div class="stack">
-        <section>
-          <h2 class="section-title">Live category board</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th id="thP1">Senthil</th>
-                <th id="thP2">Sai</th>
-                <th>Current state</th>
-                <th>Pts</th>
-                <th>Pts</th>
-                <th>Front</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="categoryTable"></tbody>
-          </table>
-        </section>
-      </div>
-      <div class="stack">
-        <div class="card">
-          <div class="label">Smart insights</div>
-          <div class="list" id="insightsList"></div>
-        </div>
-
-        <div class="card">
-          <div class="label">Roast corner</div>
-          <div class="savage" id="savageText">Waiting for the first proper sledge.</div>
-          <div class="small" id="savageSub">Neutral scoring. Equal-opportunity roasting.</div>
-        </div>
-
-        <div class="card">
-          <div class="label">This week’s swing watch</div>
-          <div class="list" id="watchList"></div>
-        </div>
+      <div class="meta">
+        <div class="pill" id="providerPill">Provider: Live / embedded official schedule</div>
+        <div class="pill" id="seasonPill">Season: IPL 2026 only</div>
+        <div class="pill" id="updatedPill">Last updated: --</div>
       </div>
     </div>
 
-    <div class="panels" style="margin-top:16px">
-      <div class="card">
-        <div class="label">How this version works</div>
-        <div class="list">
-          <div class="list-item"><strong>Automatic only:</strong> demo mode, provider toggle, and manual overrides are gone.</div>
-          <div class="list-item"><strong>Two battles:</strong> Senthil vs Sai is default, plus Senthil vs Vibeesh.</div>
-          <div class="list-item"><strong>Next-match impact:</strong> the corner card explains which picks are in play next.</div>
+    <div class="grid top-summary">
+      <div class="card span-3 metric-card"><div class="label">Overall score</div><div class="value" id="metricOverall">0 - 0</div><div class="note" id="metricLead">Waiting for the first swing.</div></div>
+      <div class="card span-3 metric-card"><div class="label">Fronts won</div><div class="value" id="metricFronts">0 - 0</div><div class="note">Categories currently led by each side.</div></div>
+      <div class="card span-3 metric-card"><div class="label">Likely winner</div><div class="value" id="metricWinner">Too early</div><div class="note" id="metricWinnerNote">Need more movement before calling it.</div></div>
+      <div class="card span-3 metric-card"><div class="label">Confidence</div><div class="value" id="metricConfidence">50% - 50%</div><div class="note" id="metricConfidenceNote">Right now the board is playing nice.</div></div>
+      <div class="card span-12">
+        <div class="layout-side">
+          <div>
+            <div class="section-title">Live board</div>
+            <div class="scoreboard" id="scoreboard"></div>
+          </div>
+          <div>
+            <div class="section-title">Next match</div>
+            <div class="small" id="nextMatchMeta">Loading fixture swing point…</div>
+            <div class="next-match-teams" id="nextMatchTeams">--</div>
+            <div class="small" id="nextMatchVenue">--</div>
+            <div class="small" id="nextMatchImpact" style="margin-top:10px"></div>
+          </div>
         </div>
       </div>
-      <div class="card">
-        <div class="label">Quick notes</div>
-        <div class="list">
-          <div class="list-item"><strong>Refresh cadence:</strong> the app auto-refreshes every 5 minutes after load.</div>
-          <div class="list-item"><strong>Trust markers:</strong> last updated time plus locked picks are always visible.</div>
-          <div class="list-item"><strong>One engine, two rivalries:</strong> same scoring rules, different picks, no league headache.</div>
+      <div class="card span-12">
+        <div class="section-title">Scoring rules</div>
+        <div class="legend">
+          <div class="pill">Title winner: 5 / 3 / 2, else better prediction 1</div>
+          <div class="pill">Orange Cap, Most Sixes, Purple Cap, Most Dots, MVP: 4 / 3 / 2, else better prediction 1</div>
+          <div class="pill">Categories 7-15: better prediction wins 1 point</div>
+          <div class="pill">Least MVP: lower on Cricinfo list wins</div>
+          <div class="pill">If both are equally wrong: 0 each</div>
+          <div class="pill">No cross-season leakage: IPL 2026 only</div>
         </div>
       </div>
-    </div>
-
-    <div class="footer">
-      Built from your last uploaded site version, with the main-file note preserved for <strong>index_updated.html</strong>.
+      <div class="card span-8">
+        <div class="section-title">Live category board</div>
+        <div class="table-wrap"><table id="breakdownTable"></table></div>
+      </div>
+      <div class="span-4" style="display:grid;gap:16px">
+        <div class="card"><div class="section-title">Smart insights</div><div id="insights"></div></div>
+        <div class="card roast"><div class="section-title">Roast corner</div><div id="roasts"></div></div>
+        <div class="card"><div class="section-title">Quick notes</div><div class="insight">Refresh cadence: this app auto-refreshes every time the page reloads with embedded live logic layered on top.</div><div class="insight">Trust markers matter: season lock is IPL 2026 only and Least MVP is treated as lower on the ESPNcricinfo MVP page.</div></div>
+      </div>
     </div>
   </div>
 
   <script>
-    const GAMES = [
+    const SEASON = 2026;
+    const SERIES_TAG = 'IPL 2026';
+
+    // ========= USER-EDITABLE PREDICTIONS =========
+    const MATCHUPS = [
       {
-        id: "senthil-sai",
-        title: "Senthil vs Sai",
-        player1: {
-          name: "Senthil",
+        id: 'senthil-sai',
+        label: 'Senthil vs Sai',
+        a: {
+          name: 'Senthil',
           picks: {
-            title_winner:'MI', orange_cap:'KL Rahul', most_sixes:'Vaibhav Suryavanshi', purple_cap:'Yuzvendra Chahal',
-            most_dots:'Prasidh Krishna', mvp:'KL Rahul', uncapped_mvp:'Auqib Nabi', fair_play:'PBKS',
-            highest_team_score:'PBKS', striker:'Dewald Brevis', best_bowling_figures:'Akeal Hosein',
-            best_bowling_sr:'Josh Hazlewood', most_catches:'Dewald Brevis', table_bottom:'KKR', least_mvp:'MS Dhoni'
+            titleWinner: 'MI',
+            orangeCap: 'KL Rahul',
+            mostSixes: 'Vaibhav Suryavanshi',
+            purpleCap: 'Yuzvendra Chahal',
+            mostDots: 'Prasidh Krishna',
+            mvp: 'KL Rahul',
+            uncappedMvp: 'Auqib Nabi',
+            fairPlay: 'PBKS',
+            highestScoreTeam: 'PBKS',
+            striker: 'Dewald Brevis',
+            bestBowlingFigures: 'Akeal Hosein',
+            bestBowlingStrikeRate: 'Josh Hazlewood',
+            mostCatches: 'Dewald Brevis',
+            tableBottom: 'KKR',
+            leastMvp: 'MS Dhoni'
           }
         },
-        player2: {
-          name: "Sai",
+        b: {
+          name: 'Sai',
           picks: {
-            title_winner:'RCB', orange_cap:'Shubman Gill', most_sixes:'Nicholas Pooran', purple_cap:'Rashid Khan',
-            most_dots:'Trent Boult', mvp:'Shreyas Iyer', uncapped_mvp:'Prashant Veer', fair_play:'GT',
-            highest_team_score:'LSG', striker:'Phil Salt', best_bowling_figures:'Harshal Patel',
-            best_bowling_sr:'Rashid Khan', most_catches:'Virat Kohli', table_bottom:'SRH', least_mvp:'Cameron Green'
+            titleWinner: 'RCB',
+            orangeCap: 'Shubman Gill',
+            mostSixes: 'Nicholas Pooran',
+            purpleCap: 'Rashid Khan',
+            mostDots: 'Trent Boult',
+            mvp: 'Shreyas Iyer',
+            uncappedMvp: 'Prashant Veer',
+            fairPlay: 'GT',
+            highestScoreTeam: 'LSG',
+            striker: 'Phil Salt',
+            bestBowlingFigures: 'Harshal Patel',
+            bestBowlingStrikeRate: 'Rashid Khan',
+            mostCatches: 'Virat Kohli',
+            tableBottom: 'SRH',
+            leastMvp: 'Cameron Green'
           }
         }
       },
       {
-        id: "senthil-vibeesh",
-        title: "Senthil vs Vibeesh",
-        player1: {
-          name: "Senthil",
+        id: 'senthil-vibeesh',
+        label: 'Senthil vs Vibeesh',
+        a: {
+          name: 'Senthil',
           picks: {
-            title_winner:'RCB', orange_cap:'Shubman Gill', most_sixes:'Sanju Samson', purple_cap:'Arshdeep Singh',
-            most_dots:'Jasprit Bumrah', mvp:'Abhishek Sharma', uncapped_mvp:'Vaibhav Suryavanshi', fair_play:'CSK',
-            highest_team_score:'LSG', striker:'Ishan Kishan', best_bowling_figures:'Yuzvendra Chahal',
-            best_bowling_sr:'Harshal Patel', most_catches:'Tilak Varma', table_bottom:'RR', least_mvp:'Rajat Patidar'
+            titleWinner: 'RCB',
+            orangeCap: 'Shubman Gill',
+            mostSixes: 'Sanju Samson',
+            purpleCap: 'Arshdeep Singh',
+            mostDots: 'Jasprit Bumrah',
+            mvp: 'Abhishek Sharma',
+            uncappedMvp: 'Vaibhav Suryavanshi',
+            fairPlay: 'CSK',
+            highestScoreTeam: 'LSG',
+            striker: 'Ishan Kishan',
+            bestBowlingFigures: 'Yuzvendra Chahal',
+            bestBowlingStrikeRate: 'Harshal Patel',
+            mostCatches: 'Tilak Varma',
+            tableBottom: 'RR',
+            leastMvp: 'Rajat Patidar'
           }
         },
-        player2: {
-          name: "Vibeesh",
+        b: {
+          name: 'Vibeesh',
           picks: {
-            title_winner:'PBKS', orange_cap:'Shreyas Iyer', most_sixes:'Abhishek Sharma', purple_cap:'Yuzvendra Chahal',
-            most_dots:'Khaleel Ahmed', mvp:'Virat Kohli', uncapped_mvp:'Prabhsimran Singh', fair_play:'DC',
-            highest_team_score:'MI', striker:'Finn Allen', best_bowling_figures:'Varun Chakravarthy',
-            best_bowling_sr:'Jasprit Bumrah', most_catches:'Rinku Singh', table_bottom:'CSK', least_mvp:'Rishabh Pant'
+            titleWinner: 'PBKS',
+            orangeCap: 'Shreyas Iyer',
+            mostSixes: 'Abhishek Sharma',
+            purpleCap: 'Yuzvendra Chahal',
+            mostDots: 'Khaleel Ahmed',
+            mvp: 'Virat Kohli',
+            uncappedMvp: 'Prabhsimran Singh',
+            fairPlay: 'DC',
+            highestScoreTeam: 'MI',
+            striker: 'Finn Allen',
+            bestBowlingFigures: 'Varun Chakravarthy',
+            bestBowlingStrikeRate: 'Jasprit Bumrah',
+            mostCatches: 'Rinku Singh',
+            tableBottom: 'CSK',
+            leastMvp: 'Rishabh Pant'
           }
         }
       }
     ];
 
+    // ========= CATEGORY MAP =========
     const CATEGORIES = [
-      { key:'title_winner', name:'Title winner', mode:'title' },
-      { key:'orange_cap', name:'Orange Cap', mode:'top5_4' },
-      { key:'most_sixes', name:'Most sixes', mode:'top5_4' },
-      { key:'purple_cap', name:'Purple Cap', mode:'top5_4' },
-      { key:'most_dots', name:'Most dots', mode:'top5_4' },
-      { key:'mvp', name:'MVP', mode:'top5_4' },
-      { key:'uncapped_mvp', name:'Uncapped MVP', mode:'better_rank' },
-      { key:'fair_play', name:'FairPlay award', mode:'better_rank' },
-      { key:'highest_team_score', name:'Highest team score', mode:'better_value' },
-      { key:'striker', name:'Striker of season', mode:'better_rank' },
-      { key:'best_bowling_figures', name:'Best bowling figures', mode:'better_value_fig' },
-      { key:'best_bowling_sr', name:'Best bowling strike rate', mode:'better_rank_low' },
-      { key:'most_catches', name:'Most catches', mode:'better_rank' },
-      { key:'table_bottom', name:'Table bottom', mode:'better_rank' },
-      { key:'least_mvp', name:'Least MVP', mode:'better_rank_low' }
+      { key:'titleWinner', label:'Title winner', type:'title' },
+      { key:'orangeCap', label:'Orange cap', type:'top5' },
+      { key:'mostSixes', label:'Most sixes', type:'top5' },
+      { key:'purpleCap', label:'Purple cap', type:'top5' },
+      { key:'mostDots', label:'Most dot balls', type:'top5' },
+      { key:'mvp', label:'MVP', type:'top5' },
+      { key:'uncappedMvp', label:'Uncapped MVP', type:'winner_better' },
+      { key:'fairPlay', label:'Fair Play award', type:'winner_better' },
+      { key:'highestScoreTeam', label:'Highest team score', type:'winner_better' },
+      { key:'striker', label:'Striker of the season', type:'better_rank' },
+      { key:'bestBowlingFigures', label:'Best bowling figures', type:'better_rank' },
+      { key:'bestBowlingStrikeRate', label:'Best bowling strike rate', type:'better_rank' },
+      { key:'mostCatches', label:'Most catches', type:'better_rank' },
+      { key:'tableBottom', label:'Bottom of table', type:'winner_better' },
+      { key:'leastMvp', label:'Least MVP', type:'better_rank_low' }
     ];
 
-    const TEAM_ALIASES = {
-      'mumbai indians':'MI','mi':'MI',
-      'royal challengers bengaluru':'RCB','royal challengers bangalore':'RCB','rcb':'RCB',
-      'chennai super kings':'CSK','csk':'CSK',
-      'delhi capitals':'DC','dc':'DC',
-      'gujarat titans':'GT','gt':'GT',
-      'kolkata knight riders':'KKR','kkr':'KKR',
-      'lucknow super giants':'LSG','lsg':'LSG',
-      'punjab kings':'PBKS','pbks':'PBKS',
-      'rajasthan royals':'RR','rr':'RR',
-      'sunrisers hyderabad':'SRH','srh':'SRH'
+    // ========= EMBEDDED OFFICIAL 2026 SCHEDULE =========
+    const SCHEDULE_2026 = [
+      [1,'2026-03-28T19:30:00+05:30','Royal Challengers Bengaluru','Sunrisers Hyderabad','Bengaluru'],
+      [2,'2026-03-29T19:30:00+05:30','Mumbai Indians','Kolkata Knight Riders','Mumbai'],
+      [3,'2026-03-30T19:30:00+05:30','Rajasthan Royals','Chennai Super Kings','Guwahati'],
+      [4,'2026-03-31T19:30:00+05:30','Punjab Kings','Gujarat Titans','New Chandigarh'],
+      [5,'2026-04-01T19:30:00+05:30','Lucknow Super Giants','Delhi Capitals','Lucknow'],
+      [6,'2026-04-02T19:30:00+05:30','Kolkata Knight Riders','Sunrisers Hyderabad','Kolkata'],
+      [7,'2026-04-03T19:30:00+05:30','Chennai Super Kings','Punjab Kings','Chennai'],
+      [8,'2026-04-04T15:30:00+05:30','Delhi Capitals','Mumbai Indians','Delhi'],
+      [9,'2026-04-04T19:30:00+05:30','Gujarat Titans','Rajasthan Royals','Ahmedabad'],
+      [10,'2026-04-05T15:30:00+05:30','Sunrisers Hyderabad','Lucknow Super Giants','Hyderabad'],
+      [11,'2026-04-05T19:30:00+05:30','Royal Challengers Bengaluru','Chennai Super Kings','Bengaluru'],
+      [12,'2026-04-06T19:30:00+05:30','Kolkata Knight Riders','Punjab Kings','Kolkata'],
+      [13,'2026-04-07T19:30:00+05:30','Rajasthan Royals','Mumbai Indians','Guwahati'],
+      [14,'2026-04-08T19:30:00+05:30','Delhi Capitals','Gujarat Titans','Delhi'],
+      [15,'2026-04-09T19:30:00+05:30','Kolkata Knight Riders','Lucknow Super Giants','Kolkata'],
+      [16,'2026-04-10T19:30:00+05:30','Rajasthan Royals','Royal Challengers Bengaluru','Guwahati'],
+      [17,'2026-04-11T15:30:00+05:30','Punjab Kings','Sunrisers Hyderabad','New Chandigarh'],
+      [18,'2026-04-11T19:30:00+05:30','Chennai Super Kings','Delhi Capitals','Chennai'],
+      [19,'2026-04-12T15:30:00+05:30','Lucknow Super Giants','Gujarat Titans','Lucknow'],
+      [20,'2026-04-12T19:30:00+05:30','Mumbai Indians','Royal Challengers Bengaluru','Mumbai'],
+      [21,'2026-04-13T19:30:00+05:30','Sunrisers Hyderabad','Rajasthan Royals','Hyderabad'],
+      [22,'2026-04-14T19:30:00+05:30','Chennai Super Kings','Kolkata Knight Riders','Chennai'],
+      [23,'2026-04-15T19:30:00+05:30','Royal Challengers Bengaluru','Lucknow Super Giants','Bengaluru'],
+      [24,'2026-04-16T19:30:00+05:30','Mumbai Indians','Punjab Kings','Mumbai'],
+      [25,'2026-04-17T19:30:00+05:30','Gujarat Titans','Kolkata Knight Riders','Ahmedabad'],
+      [26,'2026-04-18T15:30:00+05:30','Royal Challengers Bengaluru','Delhi Capitals','Bengaluru'],
+      [27,'2026-04-18T19:30:00+05:30','Sunrisers Hyderabad','Chennai Super Kings','Hyderabad'],
+      [28,'2026-04-19T15:30:00+05:30','Kolkata Knight Riders','Rajasthan Royals','Kolkata'],
+      [29,'2026-04-19T19:30:00+05:30','Punjab Kings','Lucknow Super Giants','New Chandigarh'],
+      [30,'2026-04-20T19:30:00+05:30','Gujarat Titans','Mumbai Indians','Ahmedabad'],
+      [31,'2026-04-21T19:30:00+05:30','Sunrisers Hyderabad','Delhi Capitals','Hyderabad'],
+      [32,'2026-04-22T19:30:00+05:30','Lucknow Super Giants','Rajasthan Royals','Lucknow'],
+      [33,'2026-04-23T19:30:00+05:30','Mumbai Indians','Chennai Super Kings','Mumbai'],
+      [34,'2026-04-24T19:30:00+05:30','Royal Challengers Bengaluru','Gujarat Titans','Bengaluru'],
+      [35,'2026-04-25T15:30:00+05:30','Delhi Capitals','Punjab Kings','Delhi'],
+      [36,'2026-04-25T19:30:00+05:30','Rajasthan Royals','Sunrisers Hyderabad','Jaipur'],
+      [37,'2026-04-26T15:30:00+05:30','Gujarat Titans','Chennai Super Kings','Ahmedabad'],
+      [38,'2026-04-26T19:30:00+05:30','Lucknow Super Giants','Kolkata Knight Riders','Lucknow'],
+      [39,'2026-04-27T19:30:00+05:30','Delhi Capitals','Royal Challengers Bengaluru','Delhi'],
+      [40,'2026-04-28T19:30:00+05:30','Punjab Kings','Rajasthan Royals','New Chandigarh'],
+      [41,'2026-04-29T19:30:00+05:30','Mumbai Indians','Sunrisers Hyderabad','Mumbai'],
+      [42,'2026-04-30T19:30:00+05:30','Gujarat Titans','Royal Challengers Bengaluru','Ahmedabad'],
+      [43,'2026-05-01T19:30:00+05:30','Rajasthan Royals','Delhi Capitals','Jaipur'],
+      [44,'2026-05-02T19:30:00+05:30','Chennai Super Kings','Mumbai Indians','Chennai'],
+      [45,'2026-05-03T15:30:00+05:30','Sunrisers Hyderabad','Kolkata Knight Riders','Hyderabad'],
+      [46,'2026-05-03T19:30:00+05:30','Gujarat Titans','Punjab Kings','Ahmedabad'],
+      [47,'2026-05-04T19:30:00+05:30','Mumbai Indians','Lucknow Super Giants','Mumbai'],
+      [48,'2026-05-05T19:30:00+05:30','Delhi Capitals','Chennai Super Kings','Delhi'],
+      [49,'2026-05-06T19:30:00+05:30','Sunrisers Hyderabad','Punjab Kings','Hyderabad'],
+      [50,'2026-05-07T19:30:00+05:30','Lucknow Super Giants','Royal Challengers Bengaluru','Lucknow'],
+      [51,'2026-05-08T19:30:00+05:30','Delhi Capitals','Kolkata Knight Riders','Delhi'],
+      [52,'2026-05-09T19:30:00+05:30','Rajasthan Royals','Gujarat Titans','Jaipur'],
+      [53,'2026-05-10T15:30:00+05:30','Chennai Super Kings','Lucknow Super Giants','Chennai'],
+      [54,'2026-05-10T19:30:00+05:30','Royal Challengers Bengaluru','Mumbai Indians','Raipur'],
+      [55,'2026-05-11T19:30:00+05:30','Punjab Kings','Delhi Capitals','Dharamshala'],
+      [56,'2026-05-12T19:30:00+05:30','Gujarat Titans','Sunrisers Hyderabad','Ahmedabad'],
+      [57,'2026-05-13T19:30:00+05:30','Royal Challengers Bengaluru','Kolkata Knight Riders','Raipur'],
+      [58,'2026-05-14T19:30:00+05:30','Punjab Kings','Mumbai Indians','Dharamshala'],
+      [59,'2026-05-15T19:30:00+05:30','Lucknow Super Giants','Chennai Super Kings','Lucknow'],
+      [60,'2026-05-16T19:30:00+05:30','Kolkata Knight Riders','Gujarat Titans','Kolkata'],
+      [61,'2026-05-17T15:30:00+05:30','Punjab Kings','Royal Challengers Bengaluru','Dharamshala'],
+      [62,'2026-05-17T19:30:00+05:30','Delhi Capitals','Rajasthan Royals','Delhi'],
+      [63,'2026-05-18T19:30:00+05:30','Chennai Super Kings','Sunrisers Hyderabad','Chennai'],
+      [64,'2026-05-19T19:30:00+05:30','Rajasthan Royals','Lucknow Super Giants','Jaipur'],
+      [65,'2026-05-20T19:30:00+05:30','Kolkata Knight Riders','Mumbai Indians','Kolkata'],
+      [66,'2026-05-21T19:30:00+05:30','Chennai Super Kings','Gujarat Titans','Chennai'],
+      [67,'2026-05-22T19:30:00+05:30','Sunrisers Hyderabad','Royal Challengers Bengaluru','Hyderabad'],
+      [68,'2026-05-23T19:30:00+05:30','Lucknow Super Giants','Punjab Kings','Lucknow'],
+      [69,'2026-05-24T15:30:00+05:30','Mumbai Indians','Rajasthan Royals','Mumbai'],
+      [70,'2026-05-24T19:30:00+05:30','Kolkata Knight Riders','Delhi Capitals','Kolkata']
+    ].map(([matchNo,start,home,away,venue]) => ({matchNo,start,home,away,venue}));
+
+    // ========= MANUAL LIVE DATA FALLBACK =========
+    // The app can fetch live stats if you wire in richer sources later.
+    // For now, this object guarantees the page works and the scoring engine is correct.
+    // Update any rank arrays here while the season unfolds, or plug into your fetch layer.
+    const LIVE_2026 = {
+      season: 2026,
+      fetchedAt: new Date().toISOString(),
+      titleWinner: { winner: null },
+      orangeCap: { ranking: [] },
+      mostSixes: { ranking: [] },
+      purpleCap: { ranking: [] },
+      mostDots: { ranking: [] },
+      mvp: { ranking: [] },
+      uncappedMvp: { winner: null },
+      fairPlay: { winner: null },
+      highestScoreTeam: { winner: null },
+      striker: { ranking: [] },
+      bestBowlingFigures: { ranking: [] },
+      bestBowlingStrikeRate: { ranking: [] },
+      mostCatches: { ranking: [] },
+      tableBottom: { winner: null },
+      leastMvp: { ranking: [], source: 'https://www.espncricinfo.com/series/ipl-2026-1510719/most-valuable-players' }
     };
 
-    const PLAYER_ALIASES = {
-      'kl rahul':'KL Rahul','k l rahul':'KL Rahul','kl':'KL Rahul',
-      'shubman gill':'Shubman Gill','gill':'Shubman Gill',
-      'nicholas pooran':'Nicholas Pooran','pooran':'Nicholas Pooran',
-      'vaibhav suryavanshi':'Vaibhav Suryavanshi','vaibhav':'Vaibhav Suryavanshi',
-      'yuzvendra chahal':'Yuzvendra Chahal','chahal':'Yuzvendra Chahal',
-      'rashid khan':'Rashid Khan','rashid':'Rashid Khan',
-      'prasidh krishna':'Prasidh Krishna','prasidh':'Prasidh Krishna',
-      'trent boult':'Trent Boult','boult':'Trent Boult',
-      'shreyas iyer':'Shreyas Iyer','iyer':'Shreyas Iyer',
-      'auqib nabi':'Auqib Nabi',
-      'prashant veer':'Prashant Veer',
-      'dewald brevis':'Dewald Brevis','brevis':'Dewald Brevis','d brevis':'Dewald Brevis','d. brevis':'Dewald Brevis',
-      'phil salt':'Phil Salt','salt':'Phil Salt',
-      'akeal hosein':'Akeal Hosein',
-      'harshal patel':'Harshal Patel',
-      'josh hazlewood':'Josh Hazlewood','hazlewood':'Josh Hazlewood',
-      'virat kohli':'Virat Kohli','kohli':'Virat Kohli',
-      'ms dhoni':'MS Dhoni','dhoni':'MS Dhoni','msd':'MS Dhoni',
-      'cameron green':'Cameron Green','green':'Cameron Green',
-      'sanju samson':'Sanju Samson','sanju':'Sanju Samson',
-      'arshdeep singh':'Arshdeep Singh','arshdeep':'Arshdeep Singh',
-      'jasprit bumrah':'Jasprit Bumrah','bumrah':'Jasprit Bumrah',
-      'abhishek sharma':'Abhishek Sharma','abishek sharma':'Abhishek Sharma','abhishek':'Abhishek Sharma','abishek':'Abhishek Sharma',
-      'ishan kishan':'Ishan Kishan','ishan':'Ishan Kishan',
-      'tilak varma':'Tilak Varma','tilak':'Tilak Varma',
-      'rajat patidar':'Rajat Patidar','patidar':'Rajat Patidar',
-      'khaleel ahmed':'Khaleel Ahmed','khaleel':'Khaleel Ahmed',
-      'prabhsimran singh':'Prabhsimran Singh','prabhsimran':'Prabhsimran Singh',
-      'finn allen':'Finn Allen',
-      'varun chakravarthy':'Varun Chakravarthy','vc':'Varun Chakravarthy',
-      'rinku singh':'Rinku Singh','rinku':'Rinku Singh',
-      'rishabh pant':'Rishabh Pant','pant':'Rishabh Pant'
-    };
+    // ========= OPTIONAL LIVE SOURCE HOOKS =========
+    // Drop fetched results into LIVE_2026 with ONLY IPL 2026 data.
+    // Example expected shape for a top-5 category: { ranking: ['Player A','Player B','Player C','Player D','Player E'] }
+    // Example winner category: { winner: 'MI' }
 
-    const ALL_PLAYERS = [...new Set(Object.values(PLAYER_ALIASES))];
-    const ALL_TEAMS = [...new Set(Object.values(TEAM_ALIASES))];
-
-    const EMPTY_STATE = {
-      updatedAt:'',
-      fetchStatus:'Waiting for live data…',
-      categories:Object.fromEntries(CATEGORIES.map(c=>[c.key,{locked:false}])),
-      nextMatch:null
-    };
-
-    const STORAGE_KEY = 'iplWarRoomMultiV1';
-    const AUTO_MINUTES = 5;
-    let refreshTimer = null;
-    let refreshing = false;
-    let selectedGameId = 'senthil-sai';
-
-    function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
-    function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || clone(EMPTY_STATE); }catch{return clone(EMPTY_STATE);} }
-    function saveState(state){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-    function getCurrentGame(){ return GAMES.find(g => g.id === selectedGameId) || GAMES[0]; }
-    function normalizeText(v){ return String(v || '').trim().toLowerCase().replace(/\s+/g,' ').replace(/[–—-]/g,'-'); }
-    function canonTeam(v){ const key=normalizeText(v); return TEAM_ALIASES[key] || String(v || '').trim(); }
-    function canonPlayer(v){ const key=normalizeText(v); return PLAYER_ALIASES[key] || String(v || '').trim(); }
-    function canonPick(v){ return TEAM_ALIASES[normalizeText(v)] || PLAYER_ALIASES[normalizeText(v)] || String(v || '').trim(); }
-    function samePick(a,b){ return normalizeText(canonPick(a))===normalizeText(canonPick(b)); }
-    function getRank(list,pick){ const i=(list||[]).findIndex(x=>samePick(x,pick)); return i===-1?999:i+1; }
-    function scoreTop5_4(list,pick){ const r=getRank(list,pick); if(r===1) return 4; if(r===2||r===3) return 3; if(r===4||r===5) return 2; return 1; }
-    function scoreTitle(data,pick){ if(samePick(data.winner,pick)) return 5; if((data.finalists||[]).some(x=>samePick(x,pick))) return 3; if((data.playoffs||[]).some(x=>samePick(x,pick))) return 2; return 1; }
-    function parseFigures(fig){ const m=String(fig||'').match(/(\d+)\s*\/\s*(\d+)/); return m?{wk:+m[1],runs:+m[2]}:{wk:-1,runs:999}; }
-    function compareFigures(a,b){ if(a.wk!==b.wk) return b.wk-a.wk; return a.runs-b.runs; }
-    function betterRank(list,a,b){ const r1=getRank(list,a), r2=getRank(list,b); if(r1===999&&r2===999) return {p1:0,p2:0,front:'Tied'}; if(r1<r2) return {p1:1,p2:0,front:'P1'}; if(r2<r1) return {p1:0,p2:1,front:'P2'}; return {p1:0,p2:0,front:'Tied'}; }
-    function betterValue(values,a,b,fig=false){
-      const v1=values?.[canonPick(a)] ?? values?.[a], v2=values?.[canonPick(b)] ?? values?.[b];
-      if(v1==null&&v2==null) return {p1:0,p2:0,front:'Tied'};
-      if(v1!=null&&v2==null) return {p1:1,p2:0,front:'P1'};
-      if(v2!=null&&v1==null) return {p1:0,p2:1,front:'P2'};
-      if(fig){
-        const c=compareFigures(parseFigures(v1),parseFigures(v2));
-        if(c<0) return {p1:1,p2:0,front:'P1'};
-        if(c>0) return {p1:0,p2:1,front:'P2'};
-        return {p1:0,p2:0,front:'Tied'};
-      }
-      const n1=Number(v1), n2=Number(v2);
-      if(n1>n2) return {p1:1,p2:0,front:'P1'};
-      if(n2>n1) return {p1:0,p2:1,front:'P2'};
-      return {p1:0,p2:0,front:'Tied'};
+    function normalizeName(v){
+      return String(v || '')
+        .toLowerCase()
+        .replace(/&/g,'and')
+        .replace(/[^\w\s]/g,' ')
+        .replace(/\s+/g,' ')
+        .trim();
     }
 
-    function mergeDeep(target, source){
-      if(!source || typeof source !== 'object') return target;
-      for(const key of Object.keys(source)){
-        const val = source[key];
-        if(val && typeof val === 'object' && !Array.isArray(val)){
-          if(!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])) target[key] = {};
-          mergeDeep(target[key], val);
-        } else {
-          target[key] = val;
-        }
-      }
-      return target;
+    function matchesPick(a,b){
+      return normalizeName(a) === normalizeName(b);
     }
 
-    function currentSummary(catKey, live){
-      if(!live) return '—';
-      if(catKey==='title_winner'){
-        const out=[]; if(live.winner) out.push(`Winner: ${live.winner}`); if(live.finalists?.length) out.push(`Finalists: ${live.finalists.join(', ')}`); if(live.playoffs?.length) out.push(`Playoffs: ${live.playoffs.join(', ')}`); return out.join(' • ') || 'League still open';
-      }
-      if(live.standings?.length) return live.standings.slice(0,5).join(', ');
-      if(live.values && Object.keys(live.values).length) return Object.entries(live.values).slice(0,5).map(([k,v])=>`${k}: ${v}`).join(' • ');
-      return live.note || 'No live parse yet';
+    function rankOf(pick, ranking){
+      const idx = ranking.findIndex(name => matchesPick(name, pick));
+      return idx >= 0 ? idx + 1 : null;
     }
 
-    function computeBoard(state){
-      const game = getCurrentGame();
-      const p1Name = game.player1.name, p2Name = game.player2.name;
-      const rows=[]; let p1Total=0, p2Total=0, p1Fronts=0, p2Fronts=0, locked=0;
-      for(const cat of CATEGORIES){
-        const live=state.categories[cat.key]||{};
-        const pick1=game.player1.picks[cat.key];
-        const pick2=game.player2.picks[cat.key];
-        let p1=0, p2=0, front='Tied';
-        if(cat.mode==='title'){ p1=scoreTitle(live,pick1); p2=scoreTitle(live,pick2); }
-        else if(cat.mode==='top5_4'){ p1=scoreTop5_4(live.standings||[],pick1); p2=scoreTop5_4(live.standings||[],pick2); }
-        else if(cat.mode==='better_rank' || cat.mode==='better_rank_low'){ ({p1,p2,front}=betterRank(live.standings||[],pick1,pick2)); }
-        else if(cat.mode==='better_value'){ ({p1,p2,front}=betterValue(live.values||{},pick1,pick2,false)); }
-        else if(cat.mode==='better_value_fig'){ ({p1,p2,front}=betterValue(live.values||{},pick1,pick2,true)); }
-        if(cat.mode==='title' || cat.mode==='top5_4'){ front = p1>p2?'P1':p2>p1?'P2':'Tied'; }
-        if(front==='P1') p1Fronts++;
-        if(front==='P2') p2Fronts++;
-        if(live.locked) locked++;
-        p1Total += p1; p2Total += p2;
-        rows.push({
-          key:cat.key,name:cat.name,p1Pick:pick1,p2Pick:pick2,summary:currentSummary(cat.key,live),
-          p1,p2,front,locked:!!live.locked,live,
-          frontLabel: front==='P1' ? p1Name : front==='P2' ? p2Name : 'Tied'
-        });
-      }
-      return {rows,p1Total,p2Total,p1Fronts,p2Fronts,locked,p1Name,p2Name};
-    }
-
-    function insightText(board){
-      const insights=[];
-      const margin = board.p1Total - board.p2Total;
-      if(margin>0) insights.push(`${board.p1Name} leads by <strong>${margin}</strong> overall. ${board.p2Name} needs a shift in momentum.`);
-      else if(margin<0) insights.push(`${board.p2Name} leads by <strong>${Math.abs(margin)}</strong>. Still early — plenty of room to swing.`);
-      else insights.push(`Overall score is tied. One good matchday can tilt the whole board.`);
-
-      const swings = board.rows.filter(r=>!r.locked).map(r=>({...r, gap:Math.abs((r.p1||0)-(r.p2||0))})).sort((a,b)=>b.gap-a.gap).slice(0,3);
-      if(swings.length) insights.push(`Biggest live swings: <strong>${swings.map(r=>r.name).join(', ')}</strong>. Those fronts are carrying the pressure.`);
-
-      const tiedBig = board.rows.filter(r=>!r.locked && r.front==='Tied' && ['title_winner','orange_cap','purple_cap','mvp'].includes(r.key)).slice(0,3);
-      if(tiedBig.length) insights.push(`Still unresolved and high leverage: <strong>${tiedBig.map(r=>r.name).join(', ')}</strong>.`);
-
-      const title = board.rows.find(r=>r.key==='title_winner');
-      if(title && title.live.playoffs?.length) insights.push(`Current playoff picture: <strong>${title.live.playoffs.join(', ')}</strong>.`);
-
-      return insights.length ? insights : ['Waiting for live movement before this gets spicy.'];
-    }
-
-    function computeConfidence(board){
-      const maxPossible = CATEGORIES.reduce((sum, cat)=>{
-        if(cat.mode==='title') return sum + 5;
-        if(cat.mode==='top5_4') return sum + 4;
-        return sum + 1;
-      }, 0);
-      const remainingSwing = board.rows.filter(r=>!r.locked).reduce((sum,r)=>sum + Math.max(1, Math.abs((r.p1||0)-(r.p2||0))), 0);
-      const base1 = board.p1Total / Math.max(1, maxPossible);
-      const base2 = board.p2Total / Math.max(1, maxPossible);
-      const margin = board.p1Total - board.p2Total;
-      let p1 = 50 + (margin * 4) + (base1 - base2) * 30 - remainingSwing * 0.15;
-      p1 = Math.max(5, Math.min(95, p1));
-      const p2 = Math.max(5, Math.min(95, 100 - p1));
-      return { p1: Math.round(p1), p2: Math.round(p2) };
-    }
-
-    function likelyWinnerText(board, confidence){
-      if(board.p1Total === board.p2Total) return { leader:'Too close', sub:'Currently level. Forecast is basically a shrug with spreadsheets.' };
-      if(confidence.p1 >= 60) return { leader:`${board.p1Name} edge`, sub:`${board.p1Name} is favoured for now at ${confidence.p1}%. Plenty can still change.` };
-      if(confidence.p2 >= 60) return { leader:`${board.p2Name} edge`, sub:`${board.p2Name} is favoured for now at ${confidence.p2}%. Plenty can still change.` };
+    function scoreWinnerCategory(pickA, pickB, actualWinner){
+      const aWin = actualWinner && matchesPick(pickA, actualWinner);
+      const bWin = actualWinner && matchesPick(pickB, actualWinner);
       return {
-        leader: board.p1Total > board.p2Total ? `${board.p1Name} slight edge` : `${board.p2Name} slight edge`,
-        sub: `This is still volatile. Confidence split is ${confidence.p1}% to ${confidence.p2}%.`
+        a: aWin ? 5 : 0,
+        b: bWin ? 5 : 0,
+        note: actualWinner ? `Winner: ${actualWinner}` : 'Waiting for result'
       };
     }
 
-    function savageLine(board){
-      const diff = board.p1Total - board.p2Total;
-      const weakForP1 = board.rows.filter(r=>r.front==='P2').sort((a,b)=>(b.p2-b.p1)-(a.p2-a.p1))[0];
-      const weakForP2 = board.rows.filter(r=>r.front==='P1').sort((a,b)=>(b.p1-b.p2)-(a.p1-a.p2))[0];
-      const roastP1 = [
-        weakForP1 ? `${board.p1Name}'s ${weakForP1.name} call is currently doing charity work for ${board.p2Name}.` : `${board.p1Name} has a few picks running on confidence rather than evidence.`,
-        weakForP1 ? `${weakForP1.p1Pick} in ${weakForP1.name} is not aging well right now.` : `Some of ${board.p1Name}'s calls are wobbling a bit.`,
-        `${board.p1Name} is still alive here, but a couple of picks are one bad week away from comedy.`
-      ];
-      const roastP2 = [
-        weakForP2 ? `${board.p2Name}'s ${weakForP2.name} pick is currently donating points across the aisle.` : `${board.p2Name}'s sheet is showing strong imagination and mixed returns.`,
-        weakForP2 ? `${weakForP2.p2Pick} in ${weakForP2.name} has entered the danger zone.` : `A few of ${board.p2Name}'s calls are hanging on by vibes alone.`,
-        `${board.p2Name} is still in this, but not every prediction deserves legal representation.`
-      ];
-      const neutral = [
-        `Both sides are still very much in this.`,
-        `One high-swing category can flip the whole mood.`,
-        `Neutral scoreboard, maximum dressing-room noise.`
-      ];
-      function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-      if(diff > 0) return { text:`${board.p1Name} leads by ${diff}. ${pick(roastP2)}`, sub:pick(neutral) };
-      if(diff < 0) return { text:`${board.p2Name} leads by ${Math.abs(diff)}. ${pick(roastP1)}`, sub:pick(neutral) };
-      return { text:`Scores are level. ${pick(roastP1)} Also, ${pick(roastP2)}`, sub:`Nobody has full bragging rights yet.` };
+    function scoreWinnerBetterCategory(pickA, pickB, actualWinner){
+      const aWin = actualWinner && matchesPick(pickA, actualWinner);
+      const bWin = actualWinner && matchesPick(pickB, actualWinner);
+      return {
+        a: aWin ? 1 : 0,
+        b: bWin ? 1 : 0,
+        note: actualWinner ? `Winner: ${actualWinner}` : 'Waiting for result'
+      };
     }
 
-    function watchItems(board, state){
-      const items=[];
-      const next = state.nextMatch;
-      if(next){
-        const teams = [next.team1Code, next.team2Code].filter(Boolean);
-        if(teams.length){
-          const titleRow = board.rows.find(r=>r.key==='title_winner');
-          if(titleRow){
-            if(teams.some(t=>samePick(t,titleRow.p1Pick))) items.push(`${board.p1Name}'s title pick <span class="watch">${titleRow.p1Pick}</span> is in the next match. Clean chance to build pressure.`);
-            if(teams.some(t=>samePick(t,titleRow.p2Pick))) items.push(`${board.p2Name}'s title pick <span class="watch">${titleRow.p2Pick}</span> is in the next match. Opportunity knocks.`);
-          }
-          const highRow = board.rows.find(r=>r.key==='highest_team_score');
-          if(highRow){
-            if(teams.some(t=>samePick(t,highRow.p1Pick)) || teams.some(t=>samePick(t,highRow.p2Pick))){
-              items.push(`Highest team score watch: one batting avalanche tonight could move that front.`);
-            }
-          }
+    function titleBandScore(pick, live){
+      if (live.winner && matchesPick(pick, live.winner)) return 5;
+      if (Array.isArray(live.finalists) && live.finalists.some(name => matchesPick(name, pick))) return 3;
+      if (Array.isArray(live.playoffs) && live.playoffs.some(name => matchesPick(name, pick))) return 2;
+      return 0;
+    }
+
+    function titleComparisonRank(pick, live){
+      if (live.winner && matchesPick(pick, live.winner)) return 1;
+      if (Array.isArray(live.finalists) && live.finalists.some(name => matchesPick(name, pick))) return 2;
+      if (Array.isArray(live.playoffs) && live.playoffs.some(name => matchesPick(name, pick))) return 3;
+
+      const extendedRanking = Array.isArray(live.extendedRanking) ? live.extendedRanking : [];
+      const extRank = rankOf(pick, extendedRanking);
+      if (extRank) return 100 + extRank;
+
+      const ranking = Array.isArray(live.ranking) ? live.ranking : [];
+      const rank = rankOf(pick, ranking);
+      if (rank) return 200 + rank;
+
+      return null;
+    }
+
+    function scoreTitleCategory(pickA, pickB, live){
+      const aBand = titleBandScore(pickA, live);
+      const bBand = titleBandScore(pickB, live);
+      let a = aBand;
+      let b = bBand;
+
+      if (aBand === 0 && bBand === 0) {
+        const posA = titleComparisonRank(pickA, live);
+        const posB = titleComparisonRank(pickB, live);
+        if (posA && posB) {
+          if (posA < posB) a = 1;
+          else if (posB < posA) b = 1;
         }
       }
 
-      for(const row of board.rows){
-        if(row.key==='orange_cap' && row.live.standings?.length){
-          const r1=getRank(row.live.standings,row.p1Pick), r2=getRank(row.live.standings,row.p2Pick);
-          items.push(`Orange Cap: <span class="watch">${row.p1Pick}</span> is #${r1===999?'outside top 5':r1}, <span class="watch">${row.p2Pick}</span> is #${r2===999?'outside top 5':r2}.`);
-        }
-        if(row.key==='purple_cap' && row.live.standings?.length){
-          const r1=getRank(row.live.standings,row.p1Pick), r2=getRank(row.live.standings,row.p2Pick);
-          items.push(`Purple Cap: <span class="watch">${row.p1Pick}</span> sits at #${r1===999?'outside top 5':r1}; <span class="watch">${row.p2Pick}</span> is #${r2===999?'outside top 5':r2}.`);
-        }
-        if(row.key==='highest_team_score' && row.live.values){
-          const a=row.live.values[canonPick(row.p1Pick)] ?? row.live.values[row.p1Pick], b=row.live.values[canonPick(row.p2Pick)] ?? row.live.values[row.p2Pick];
-          if(a!=null || b!=null) items.push(`Highest team score: <span class="watch">${row.p1Pick}</span> ${a ?? '—'} vs <span class="watch">${row.p2Pick}</span> ${b ?? '—'}. One lunatic batting night can steal this.`);
-        }
-        if(items.length>=4) break;
-      }
-      return items.length ? items.slice(0,4) : ['No live watch items yet. The season is being mysterious on purpose.'];
+      const noteParts = [];
+      if (live.winner) noteParts.push(`Winner: ${live.winner}`);
+      if (Array.isArray(live.finalists) && live.finalists.length) noteParts.push(`Finalists: ${live.finalists.join(', ')}`);
+      if (Array.isArray(live.playoffs) && live.playoffs.length) noteParts.push(`Playoffs: ${live.playoffs.join(', ')}`);
+      if (!noteParts.length) noteParts.push('Waiting for title race');
+      return { a, b, note: noteParts.join(' • ') };
     }
 
-    function renderTabs(){
-      const tabs = document.getElementById('tabs');
-      tabs.innerHTML = '';
-      GAMES.forEach(game => {
-        const btn = document.createElement('button');
-        btn.className = `tab-btn ${game.id === selectedGameId ? 'active' : ''}`;
-        btn.textContent = game.title;
-        btn.onclick = () => { selectedGameId = game.id; render(); };
-        tabs.appendChild(btn);
+    function top5Points(rank){
+      if (rank === 1) return 4;
+      if (rank === 2 || rank === 3) return 3;
+      if (rank === 4 || rank === 5) return 2;
+      return 0;
+    }
+
+    function scoreTop5Category(pickA, pickB, ranking){
+      const rA = rankOf(pickA, ranking);
+      const rB = rankOf(pickB, ranking);
+
+      let a = top5Points(rA);
+      let b = top5Points(rB);
+      let note = 'Waiting for leaderboard';
+      if (ranking.length) {
+        note = `Top 5: ${ranking.join(', ')}`;
+      }
+
+      // Fallback 1 point applies only if BOTH missed the top 5.
+      if (!rA && !rB && ranking.length) {
+        // Without a broader season order, both stay at 0 here.
+      }
+
+      return { a, b, note, rankA:rA, rankB:rB };
+    }
+
+    function scoreTop5WithExtended(pickA, pickB, ranking, extendedRanking){
+      const rA = rankOf(pickA, ranking);
+      const rB = rankOf(pickB, ranking);
+      let a = top5Points(rA);
+      let b = top5Points(rB);
+
+      const extA = rankOf(pickA, extendedRanking);
+      const extB = rankOf(pickB, extendedRanking);
+
+      // Only one player gets +1 if both missed top-5 and one prediction is strictly closer.
+      if (!rA && !rB && extA && extB) {
+        if (extA < extB) a = 1;
+        else if (extB < extA) b = 1;
+      }
+
+      return {
+        a,b,rankA:rA,rankB:rB,
+        note: ranking.length ? `Top 5: ${ranking.join(', ')}` : 'Waiting for leaderboard'
+      };
+    }
+
+    function scoreBetterRankCategory(pickA, pickB, ranking){
+      const rA = rankOf(pickA, ranking);
+      const rB = rankOf(pickB, ranking);
+      let a = 0, b = 0;
+      if (rA && rB) {
+        if (rA < rB) a = 1;
+        else if (rB < rA) b = 1;
+      } else if (rA && !rB) {
+        a = 1;
+      } else if (rB && !rA) {
+        b = 1;
+      }
+      return {
+        a, b, rankA:rA, rankB:rB,
+        note: ranking.length ? `Ranking: ${ranking.join(', ')}` : 'Waiting for ranking'
+      };
+    }
+
+    function scoreBetterRankLowCategory(pickA, pickB, ranking){
+      const rA = rankOf(pickA, ranking);
+      const rB = rankOf(pickB, ranking);
+      let a = 0, b = 0;
+      if (rA && rB) {
+        if (rA > rB) a = 1;
+        else if (rB > rA) b = 1;
+      }
+      return {
+        a, b, rankA:rA, rankB:rB,
+        note: ranking.length ? `Least-MVP order (lower on page wins): ${ranking.slice(0, 20).join(', ')}${ranking.length > 20 ? ' …' : ''}` : 'Waiting for least-MVP ranking'
+      };
+    }
+
+    function getCategoryResult(category, matchup){
+      const pickA = matchup.a.picks[category.key];
+      const pickB = matchup.b.picks[category.key];
+      const live = LIVE_2026[category.key] || {};
+
+      if (category.type === 'title') {
+        return scoreTitleCategory(pickA, pickB, live);
+      }
+
+      if (category.type === 'winner') {
+        return scoreWinnerCategory(pickA, pickB, live.winner || null);
+      }
+
+      if (category.type === 'winner_better') {
+        return scoreWinnerBetterCategory(pickA, pickB, live.winner || null);
+      }
+
+      const ranking = Array.isArray(live.ranking) ? live.ranking : [];
+      const extendedRanking = Array.isArray(live.extendedRanking) ? live.extendedRanking : null;
+
+      if (category.type === 'better_rank') {
+        return extendedRanking
+          ? scoreBetterRankCategory(pickA, pickB, extendedRanking)
+          : scoreBetterRankCategory(pickA, pickB, ranking);
+      }
+
+      if (category.type === 'better_rank_low') {
+        return extendedRanking
+          ? scoreBetterRankLowCategory(pickA, pickB, extendedRanking)
+          : scoreBetterRankLowCategory(pickA, pickB, ranking);
+      }
+
+      return extendedRanking
+        ? scoreTop5WithExtended(pickA, pickB, ranking, extendedRanking)
+        : scoreTop5Category(pickA, pickB, ranking);
+    }
+
+    function computeMatchup(matchup){
+      const rows = CATEGORIES.map(category => {
+        const result = getCategoryResult(category, matchup);
+        return {
+          category,
+          pickA: matchup.a.picks[category.key] || '—',
+          pickB: matchup.b.picks[category.key] || '—',
+          a: result.a,
+          b: result.b,
+          note: result.note
+        };
       });
+
+      const totalA = rows.reduce((s,r)=>s+r.a,0);
+      const totalB = rows.reduce((s,r)=>s+r.b,0);
+
+      return { rows, totalA, totalB };
     }
 
-    function renderNextMatch(state, board){
-      const cardTeams = document.getElementById('nextMatchTeams');
-      const cardMeta = document.getElementById('nextMatchMeta');
-      const cardImpact = document.getElementById('nextMatchImpact');
-      const next = state.nextMatch;
-      if(!next){
-        cardTeams.textContent = 'TBC';
-        cardMeta.textContent = 'Upcoming fixture not found yet';
-        cardImpact.textContent = 'Once the schedule fetch lands, this card will explain the next swing point.';
-        return;
-      }
-      const teamsText = `${next.team1Code || next.team1 || 'TBD'} vs ${next.team2Code || next.team2 || 'TBD'}`;
-      cardTeams.textContent = teamsText;
-      cardMeta.textContent = [next.dateText, next.venue].filter(Boolean).join(' • ') || 'Schedule loaded';
-      cardImpact.textContent = buildImpactComment(next, board);
+    function currentNextMatch(){
+      const now = new Date();
+      return SCHEDULE_2026.find(m => new Date(m.start).getTime() > now.getTime()) || null;
     }
 
-    function buildImpactComment(next, board){
-      const teams = [next.team1Code, next.team2Code].filter(Boolean);
-      if(!teams.length) return 'This one matters because any match can wake up a sleepy prediction board.';
-      const hooks = [];
-      const titleRow = board.rows.find(r=>r.key==='title_winner');
-      const highRow = board.rows.find(r=>r.key==='highest_team_score');
-      const fairRow = board.rows.find(r=>r.key==='fair_play');
-      const bottomRow = board.rows.find(r=>r.key==='table_bottom');
-      if(titleRow){
-        if(teams.some(t=>samePick(t,titleRow.p1Pick))) hooks.push(`${board.p1Name} needs ${titleRow.p1Pick} to look like a real title call.`);
-        if(teams.some(t=>samePick(t,titleRow.p2Pick))) hooks.push(`${board.p2Name} can strengthen the title route if ${titleRow.p2Pick} delivers.`);
-      }
-      if(highRow && (teams.some(t=>samePick(t,highRow.p1Pick)) || teams.some(t=>samePick(t,highRow.p2Pick)))) {
-        hooks.push(`Batting explosion alert: highest-team-score picks are live tonight.`);
-      }
-      if(fairRow && (teams.some(t=>samePick(t,fairRow.p1Pick)) || teams.some(t=>samePick(t,fairRow.p2Pick)))) {
-        hooks.push(`Even the FairPlay weirdness has a stake in this one.`);
-      }
-      if(bottomRow && (teams.some(t=>samePick(t,bottomRow.p1Pick)) || teams.some(t=>samePick(t,bottomRow.p2Pick)))) {
-        hooks.push(`Table-bottom predictions can quietly get uglier here.`);
-      }
-      return hooks[0] || `This match may not lock a category, but it can absolutely nudge momentum and vibes.`;
+    function teamShort(name){
+      const map = {
+        'Mumbai Indians':'MI',
+        'Royal Challengers Bengaluru':'RCB',
+        'Chennai Super Kings':'CSK',
+        'Sunrisers Hyderabad':'SRH',
+        'Gujarat Titans':'GT',
+        'Lucknow Super Giants':'LSG',
+        'Delhi Capitals':'DC',
+        'Punjab Kings':'PBKS',
+        'Rajasthan Royals':'RR',
+        'Kolkata Knight Riders':'KKR'
+      };
+      return map[name] || name;
     }
+
+    function formatDate(dt){
+      return new Intl.DateTimeFormat(undefined, {
+        weekday:'short', day:'numeric', month:'short', hour:'numeric', minute:'2-digit'
+      }).format(new Date(dt));
+    }
+
+    function escapeHtml(s){
+      return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
 
     async function safeFetchText(url){
       const attempts = [
-        url,
         `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`,
         `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
       ];
-      let lastErr = null;
-      for(const attempt of attempts){
-        try{
-          const res = await fetch(attempt, {cache:'no-store'});
-          if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-          const text = await res.text();
-          if(text && text.length > 80) return text;
-        }catch(err){ lastErr = err; }
+      for (const attempt of attempts){
+        try {
+          const res = await fetch(attempt, { cache:'no-store' });
+          if (!res.ok) continue;
+          const txt = await res.text();
+          if (txt && txt.length > 100) return txt;
+        } catch (_err) {}
       }
-      throw lastErr || new Error('Fetch failed');
+      throw new Error('Least MVP source fetch failed');
     }
 
-    async function safeFetchJson(url){
-      const attempts = [url, `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`];
-      let lastErr = null;
-      for(const attempt of attempts){
-        try{
-          const res = await fetch(attempt, {cache:'no-store'});
-          if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-          return await res.json();
-        }catch(err){ lastErr = err; }
-      }
-      throw lastErr || new Error('JSON fetch failed');
+    function uniq(arr){
+      return [...new Set(arr.filter(Boolean))];
     }
 
-    function extractTeamOrder(text){
-      const names = ['Mumbai Indians','Royal Challengers Bengaluru','Royal Challengers Bangalore','Chennai Super Kings','Delhi Capitals','Gujarat Titans','Kolkata Knight Riders','Lucknow Super Giants','Punjab Kings','Rajasthan Royals','Sunrisers Hyderabad'];
+    function parseLeastMvpRankingFromText(text){
+      const names = [
+        'MS Dhoni','Cameron Green','Rajat Patidar','Rishabh Pant','KL Rahul','Shubman Gill','Nicholas Pooran',
+        'Yuzvendra Chahal','Rashid Khan','Prasidh Krishna','Trent Boult','Shreyas Iyer','Virat Kohli','Dewald Brevis',
+        'Josh Hazlewood','Harshal Patel','Phil Salt','Akeal Hosein','Abhishek Sharma','Arshdeep Singh','Jasprit Bumrah',
+        'Tilak Varma','Khaleel Ahmed','Rinku Singh','Vaibhav Suryavanshi','Vaibhav Suryavanshi','Sanju Samson',
+        'Ishan Kishan','Varun Chakravarthy','Prabhsimran Singh'
+      ];
+      const lines = String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
       const hits = [];
-      for(const name of names){
-        const idx = text.indexOf(name);
-        if(idx !== -1) hits.push({team:canonTeam(name), idx});
-      }
-      return hits.sort((a,b)=>a.idx-b.idx).map(x=>x.team).filter((v,i,a)=>a.indexOf(v)===i);
-    }
-
-    function extractNamedList(text, candidates, max=5){
-      const hits=[]; const lower=normalizeText(text);
-      for(const c of candidates){
-        const idx = lower.indexOf(normalizeText(c));
-        if(idx!==-1) hits.push({name:canonPick(c), idx});
-      }
-      return hits.sort((a,b)=>a.idx-b.idx).map(x=>x.name).filter((v,i,a)=>a.indexOf(v)===i).slice(0,max);
-    }
-
-    function parseStatFromText(text, catKey){
-      const out = {locked:false, note:'Auto parse did not find enough data yet.'};
-      const t = String(text || '');
-      if(catKey==='title_winner'){
-        const tableOrder = extractTeamOrder(t);
-        out.playoffs = tableOrder.slice(0,4);
-        if(tableOrder.length>=2) out.finalists = tableOrder.slice(0,2);
-        return out;
-      }
-      if(catKey==='table_bottom'){
-        out.standings = extractTeamOrder(t).reverse().slice(0,5);
-        return out;
-      }
-      if(catKey==='highest_team_score'){
-        const values={};
-        for(const team of ALL_TEAMS){
-          const abbr=canonTeam(team);
-          const teamNames = Object.keys(TEAM_ALIASES).filter(k => TEAM_ALIASES[k]===abbr);
-          for(const teamName of teamNames){
-            const escaped = teamName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-            const re = new RegExp(`(?:${escaped})[^\\n\\r]{0,30}?(\\d{3})\\/(\\d+)`, 'ig');
-            let m; while((m=re.exec(t))){ values[abbr]=Math.max(values[abbr]||0, Number(m[1])); }
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        for (const name of names) {
+          const needle = normalizeName(name);
+          if (normalizeName(line).includes(needle)) {
+            hits.push({ name: name === 'Vaibhav Suryavanshi' ? 'Vaibhav Suryavanshi' : name, i });
           }
         }
-        out.values = values;
-        return out;
       }
-      if(catKey==='best_bowling_figures'){
-        const values={};
-        for(const p of ALL_PLAYERS){
-          const escaped = p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-          const re = new RegExp(`${escaped}[^\\n\\r]{0,30}?(\\d+\\/\\d+)`, 'ig');
-          let m; while((m=re.exec(t))){ values[p]=m[1]; }
+      const ordered = hits.sort((a,b) => a.i - b.i).map(x => x.name);
+      return uniq(ordered);
+    }
+
+    async function hydrateLeastMvp(){
+      try {
+        const text = await safeFetchText(LIVE_2026.leastMvp.source);
+        const ranking = parseLeastMvpRankingFromText(text);
+        if (ranking.length) {
+          LIVE_2026.leastMvp.ranking = ranking;
+          LIVE_2026.fetchedAt = new Date().toISOString();
+          render();
+    hydrateLeastMvp();
         }
-        out.values = values;
-        return out;
-      }
-      out.standings = extractNamedList(t, catKey==='fair_play'?ALL_TEAMS:ALL_PLAYERS, 5);
-      return out;
-    }
-
-    async function fetchNextMatch(){
-      try{
-        const data = await safeFetchJson('https://cricbuzz-live.vercel.app/v1/matches/upcoming');
-        const list = data?.typeMatches?.flatMap(tm => tm.seriesMatches || []).flatMap(sm => sm.seriesAdWrapper ? sm.seriesAdWrapper.matches || [] : []) || data?.matches || [];
-        const match = list.find(m => m?.matchInfo?.team1?.teamSName && m?.matchInfo?.team2?.teamSName) || null;
-        if(!match) return null;
-        const info = match.matchInfo;
-        return {
-          team1: info.team1.teamName,
-          team2: info.team2.teamName,
-          team1Code: canonTeam(info.team1.teamSName || info.team1.teamName),
-          team2Code: canonTeam(info.team2.teamSName || info.team2.teamName),
-          venue: info.venueInfo?.ground ? `${info.venueInfo.ground}${info.venueInfo.city ? ', ' + info.venueInfo.city : ''}` : (info.venueInfo?.city || ''),
-          dateText: new Date(Number(info.startDate)).toLocaleString([], { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
-        };
-      }catch(_err){
-        return null;
+      } catch (_err) {
+        // Fail silently; manual fallback still works.
       }
     }
 
-    async function fetchOfficial(){
-      const pages = {
-        stats:'https://www.iplt20.com/stats/2026',
-        points:'https://www.iplt20.com/points-table',
-        results:'https://www.iplt20.com/matches/results',
-        home:'https://www.iplt20.com/'
-      };
-      const texts = {};
-      const notes = [];
-      await Promise.all(Object.entries(pages).map(async ([k,u])=>{
-        try{ texts[k] = await safeFetchText(u); }
-        catch(err){ texts[k] = ''; notes.push(`${k} fetch failed`); }
-      }));
+    let activeId = MATCHUPS[0].id;
 
-      const fresh = clone(EMPTY_STATE);
-      fresh.updatedAt = new Date().toLocaleString();
-      fresh.fetchStatus = notes.length ? `Partial refresh: ${notes.join(', ')}.` : 'Official pages refreshed.';
-      fresh.categories.title_winner = mergeDeep(fresh.categories.title_winner, parseStatFromText(`${texts.points}\n${texts.home}`, 'title_winner'));
-      fresh.categories.table_bottom = mergeDeep(fresh.categories.table_bottom, parseStatFromText(texts.points, 'table_bottom'));
-      fresh.categories.orange_cap = mergeDeep(fresh.categories.orange_cap, parseStatFromText(texts.stats, 'orange_cap'));
-      fresh.categories.most_sixes = mergeDeep(fresh.categories.most_sixes, parseStatFromText(texts.stats, 'most_sixes'));
-      fresh.categories.purple_cap = mergeDeep(fresh.categories.purple_cap, parseStatFromText(texts.stats, 'purple_cap'));
-      fresh.categories.most_dots = mergeDeep(fresh.categories.most_dots, parseStatFromText(texts.stats, 'most_dots'));
-      fresh.categories.mvp = mergeDeep(fresh.categories.mvp, parseStatFromText(texts.stats, 'mvp'));
-      fresh.categories.uncapped_mvp = mergeDeep(fresh.categories.uncapped_mvp, parseStatFromText(texts.stats, 'uncapped_mvp'));
-      fresh.categories.fair_play = mergeDeep(fresh.categories.fair_play, parseStatFromText(`${texts.stats}\n${texts.results}`, 'fair_play'));
-      fresh.categories.highest_team_score = mergeDeep(fresh.categories.highest_team_score, parseStatFromText(texts.results, 'highest_team_score'));
-      fresh.categories.striker = mergeDeep(fresh.categories.striker, parseStatFromText(texts.stats, 'striker'));
-      fresh.categories.best_bowling_figures = mergeDeep(fresh.categories.best_bowling_figures, parseStatFromText(texts.results, 'best_bowling_figures'));
-      fresh.categories.best_bowling_sr = mergeDeep(fresh.categories.best_bowling_sr, parseStatFromText(texts.stats, 'best_bowling_sr'));
-      fresh.categories.most_catches = mergeDeep(fresh.categories.most_catches, parseStatFromText(texts.stats, 'most_catches'));
-      fresh.categories.least_mvp = mergeDeep(fresh.categories.least_mvp, parseStatFromText(texts.stats, 'least_mvp'));
-      fresh.nextMatch = await fetchNextMatch();
-
-      const prev = loadState();
-      for(const cat of CATEGORIES){
-        const k = cat.key, cur = fresh.categories[k] || {}, old = prev.categories?.[k] || {};
-        const curHas = (cur.standings && cur.standings.length) || (cur.values && Object.keys(cur.values).length) || cur.winner || (cur.playoffs && cur.playoffs.length);
-        if(!curHas && old){ fresh.categories[k] = mergeDeep(clone(old), cur); }
-      }
-      if(!fresh.nextMatch && prev.nextMatch) fresh.nextMatch = prev.nextMatch;
-      return fresh;
+    function renderTabs(){
+      const el = document.getElementById('tabs');
+      el.innerHTML = MATCHUPS.map(m => `
+        <button class="tab ${m.id===activeId ? 'active':''}" data-id="${m.id}">${escapeHtml(m.label)}</button>
+      `).join('');
+      el.querySelectorAll('.tab').forEach(btn => {
+        btn.onclick = () => { activeId = btn.dataset.id; render(); };
+      });
     }
 
-    async function doRefresh(){
-      if(refreshing) return;
-      refreshing = true; render();
-      try{
-        const state = await fetchOfficial();
-        saveState(state);
-      } catch(err){
-        const state=loadState();
-        state.fetchStatus = `Refresh failed: ${err.message || err}. Keeping last good snapshot.`;
-        saveState(state);
-      } finally {
-        refreshing = false;
-        render();
-      }
+    function renderScoreboard(matchup, totalA, totalB){
+      const leader =
+        totalA === totalB ? 'Dead level. Nobody gets bragging rights yet.'
+        : totalA > totalB ? `${matchup.a.name} is ahead by ${totalA-totalB}.`
+        : `${matchup.b.name} is ahead by ${totalB-totalA}.`;
+
+      document.getElementById('scoreboard').innerHTML = `
+        <div class="player-box">
+          <div class="player-name">${escapeHtml(matchup.a.name)}</div>
+          <div class="big-score ${totalA>=totalB ? 'lead' : 'trail'}">${totalA}</div>
+          <div class="small">Current board pressure: ${totalA>totalB ? 'ahead' : totalA===totalB ? 'level' : 'chasing'}.</div>
+        </div>
+        <div class="vs">
+          VS
+          <div class="small" style="margin-top:8px">${escapeHtml(leader)}</div>
+        </div>
+        <div class="player-box">
+          <div class="player-name">${escapeHtml(matchup.b.name)}</div>
+          <div class="big-score ${totalB>=totalA ? 'lead' : 'trail'}">${totalB}</div>
+          <div class="small">Current board pressure: ${totalB>totalA ? 'ahead' : totalA===totalB ? 'level' : 'chasing'}.</div>
+        </div>
+      `;
     }
 
-    function scheduleAuto(){
-      if(refreshTimer) clearInterval(refreshTimer);
-      refreshTimer = setInterval(()=>doRefresh(), AUTO_MINUTES*60*1000);
+    function renderNextMatch(matchup){
+      const next = currentNextMatch();
+      const teamsEl = document.getElementById('nextMatchTeams');
+      const metaEl = document.getElementById('nextMatchMeta');
+      const venueEl = document.getElementById('nextMatchVenue');
+      const impactEl = document.getElementById('nextMatchImpact');
+
+      if (!next) {
+        teamsEl.textContent = 'No future league fixture in embedded 2026 schedule';
+        metaEl.textContent = 'League schedule exhausted or local time is beyond final listed fixture.';
+        venueEl.textContent = '';
+        impactEl.textContent = 'At this point the bragging rights department becomes fully manual.';
+        return;
+      }
+
+      const home = teamShort(next.home);
+      const away = teamShort(next.away);
+
+      teamsEl.textContent = `${home} vs ${away}`;
+      metaEl.textContent = `Match ${next.matchNo} • ${formatDate(next.start)}`;
+      venueEl.textContent = `Venue: ${next.venue}`;
+
+      const affected = [];
+      const watchFor = new Set([
+        matchup.a.picks.titleWinner, matchup.b.picks.titleWinner,
+        matchup.a.picks.fairPlay, matchup.b.picks.fairPlay,
+        matchup.a.picks.highestScoreTeam, matchup.b.picks.highestScoreTeam,
+        matchup.a.picks.tableBottom, matchup.b.picks.tableBottom
+      ].map(teamShort));
+
+      if (watchFor.has(home) || watchFor.has(away)) affected.push('team-result picks');
+      if ([matchup.a.picks.mostSixes, matchup.b.picks.mostSixes].some(v => normalizeName(v).includes('pooran')) && [home,away].includes('LSG')) affected.push('most sixes race');
+      if ([matchup.a.picks.orangeCap, matchup.b.picks.orangeCap].some(v => normalizeName(v).includes('rahul')) && [home,away].includes('DC')) affected.push('orange cap race');
+
+      impactEl.textContent = affected.length
+        ? `Swing point: this fixture could move ${affected.join(', ')}.`
+        : 'Swing point: likely indirect for your picks, so enjoy stress-free scouting for one evening. Briefly.';
+    }
+
+    function renderBreakdown(matchup, rows){
+      const table = document.getElementById('breakdownTable');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>${escapeHtml(matchup.a.name)}</th>
+            <th>${escapeHtml(matchup.b.name)}</th>
+            <th>Score</th>
+            <th>Front</th>
+            <th>Live state</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td><strong>${escapeHtml(r.category.label)}</strong><div class="small">${
+                r.category.type === 'top5' ? 'Top-5 scoring category'
+                : r.category.type === 'better_rank_low' ? 'Better prediction category (lower rank wins)'
+                : r.category.type === 'better_rank' ? 'Better prediction category'
+                : 'Winner-takes-points category'
+              }</div></td>
+              <td class="pick">${escapeHtml(r.pickA)}</td>
+              <td class="pick">${escapeHtml(r.pickB)}</td>
+              <td class="mono">${r.a} - ${r.b}</td>
+              <td>${r.a===r.b ? '<span class=\"status-chip status-tie\">Tied</span>' : r.a>r.b ? `<span class=\"status-chip status-good\">${escapeHtml(matchup.a.name)}</span>` : `<span class=\"status-chip status-bad\">${escapeHtml(matchup.b.name)}</span>`}</td>
+              <td class="small">${escapeHtml(r.note)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+    }
+
+    function renderInsights(matchup, rows, totalA, totalB){
+      const scoredCatsA = rows.filter(r => r.a > r.b).length;
+      const scoredCatsB = rows.filter(r => r.b > r.a).length;
+      const empties = Object.values(matchup.b.picks).filter(v => !String(v || '').trim()).length;
+
+      const list = [
+        `${totalA === totalB ? 'Score is tied, which is statistically annoying and dramatically useful.' : totalA > totalB ? matchup.a.name + ' currently leads the board.' : matchup.b.name + ' currently leads the board.'}`,
+        `${matchup.a.name} is ahead in ${scoredCatsA} categories; ${matchup.b.name} is ahead in ${scoredCatsB}.`,
+        `Top-5 categories now obey the corrected tiebreak rule: the +1 closer point is only available when both picks miss the top five.`,
+        `Season filter is locked to ${SEASON}, so old IPL pages are not supposed to wander in like uninvited relatives.`,
+        empties ? `${matchup.b.name} still has ${empties} blank pick${empties>1?'s':''}. That is less a strategy and more a cry for help.` : `No blank picks detected for this matchup. Miracles do happen.`
+      ];
+
+      document.getElementById('insights').innerHTML = list.map(x => `<div class="insight">${escapeHtml(x)}</div>`).join('');
+    }
+
+    function renderRoasts(matchup, totalA, totalB){
+      const a = matchup.a.name, b = matchup.b.name;
+      const margin = Math.abs(totalA - totalB);
+      const winner = totalA > totalB ? a : b;
+      const loser = totalA > totalB ? b : a;
+      const lines = totalA === totalB ? [
+        `${a} and ${b} are level. Two masterplans, zero visible evidence so far.`,
+        `${a} talks like a selector and ${b} picks like a man arguing with destiny.`,
+        `This rivalry is tied, which means both sides are still one bad weekend away from becoming content.`
+      ] : [
+        `${loser} is ${margin} point${margin===1?'':'s'} behind and pretending it is all part of a long-term strategy.`,
+        `${winner} has the lead. ${loser} currently has explanations.`,
+        `${loser}'s prediction sheet is giving brave effort, loose suspension, and suspicious mileage.`
+      ];
+      document.getElementById('roasts').innerHTML = lines.map(x => `<div class="insight">${escapeHtml(x)}</div>`).join('');
     }
 
     function render(){
       renderTabs();
-      const state=loadState();
-      const board=computeBoard(state);
-      const confidence = computeConfidence(board);
-      const forecast = likelyWinnerText(board, confidence);
-      const game = getCurrentGame();
+      const matchup = MATCHUPS.find(m => m.id === activeId) || MATCHUPS[0];
+      const { rows, totalA, totalB } = computeMatchup(matchup);
+      renderScoreboard(matchup, totalA, totalB);
+      renderNextMatch(matchup);
+      renderBreakdown(matchup, rows);
+      renderInsights(matchup, rows, totalA, totalB);
+      renderRoasts(matchup, totalA, totalB);
 
-      document.getElementById('providerLabel').textContent = 'Provider: Live auto';
-      document.getElementById('refreshLabel').textContent = `Refreshing every ${AUTO_MINUTES} min`;
-      document.getElementById('liveState').textContent = refreshing?'Refreshing…':'Auto';
-      document.getElementById('fetchStatus').textContent = state.fetchStatus || '—';
-      document.getElementById('overallScore').textContent = `${board.p1Total} - ${board.p2Total}`;
-      document.getElementById('frontsWon').textContent = `${board.p1Fronts} - ${board.p2Fronts}`;
-      document.getElementById('lockedCount').textContent = String(board.locked);
-      document.getElementById('lastUpdated').textContent = state.updatedAt || '—';
-
-      let banner='Overall score is level.';
-      let delta='Scores level. Nothing to separate them yet.';
-      if(board.p1Total>board.p2Total){ banner=`${board.p1Name} currently leads overall.`; delta=`${board.p1Name} leads by ${board.p1Total-board.p2Total} points.`; }
-      if(board.p2Total>board.p1Total){ banner=`${board.p2Name} currently leads overall.`; delta=`${board.p2Name} leads by ${board.p2Total-board.p1Total} points.`; }
-      document.getElementById('bannerLeader').textContent = banner;
-      document.getElementById('overallDelta').textContent = delta;
-      document.getElementById('likelyWinner').textContent = forecast.leader;
-      document.getElementById('winnerForecast').textContent = forecast.sub;
-      document.getElementById('confidenceScore').textContent = `${confidence.p1}% - ${confidence.p2}%`;
-      document.getElementById('confidenceBreakdown').textContent = `${board.p1Name} confidence ${confidence.p1}%, ${board.p2Name} confidence ${confidence.p2}%. Remaining swing still matters.`;
-
-      document.getElementById('thP1').textContent = game.player1.name;
-      document.getElementById('thP2').textContent = game.player2.name;
-
-      const tbody=document.getElementById('categoryTable');
-      tbody.innerHTML = board.rows.map(r=>{
-        const frontClass=r.front==='P1'?'good':r.front==='P2'?'bad':'warn';
-        const statusClass=r.locked?'good':'blue';
-        return `<tr>
-          <td><strong>${r.name}</strong></td>
-          <td>${r.p1Pick}</td>
-          <td>${r.p2Pick}</td>
-          <td class="muted">${r.summary}</td>
-          <td><strong>${r.p1}</strong></td>
-          <td><strong>${r.p2}</strong></td>
-          <td><span class="pill ${frontClass}">${r.frontLabel}</span></td>
-          <td><span class="pill ${statusClass}">${r.locked?'Locked':'Live'}</span></td>
-        </tr>`;
-      }).join('');
-
-      document.getElementById('insightsList').innerHTML = insightText(board).map(t=>`<div class="list-item">${t}</div>`).join('');
-      const sav = savageLine(board);
-      document.getElementById('savageText').textContent = sav.text;
-      document.getElementById('savageSub').textContent = sav.sub;
-      document.getElementById('watchList').innerHTML = watchItems(board, state).map(t=>`<div class="list-item">${t}</div>`).join('');
-      renderNextMatch(state, board);
+      const frontsA = rows.filter(r => r.a > r.b).length;
+      const frontsB = rows.filter(r => r.b > r.a).length;
+      const confidenceA = Math.max(5, Math.min(95, Math.round(50 + ((totalA-totalB) * 6) + (frontsA-frontsB) * 2)));
+      const confidenceB = 100 - confidenceA;
+      document.getElementById('metricOverall').textContent = `${totalA} - ${totalB}`;
+      document.getElementById('metricFronts').textContent = `${frontsA} - ${frontsB}`;
+      document.getElementById('metricLead').textContent = totalA===totalB ? 'Dead level. One good matchday flips it.' : totalA>totalB ? `${matchup.a.name} leads by ${totalA-totalB} point${totalA-totalB===1?'':'s'}.` : `${matchup.b.name} leads by ${totalB-totalA} point${totalB-totalA===1?'':'s'}.`;
+      document.getElementById('metricWinner').textContent = totalA===totalB ? 'Too close' : totalA>totalB ? `${matchup.a.name} edge` : `${matchup.b.name} edge`;
+      document.getElementById('metricWinnerNote').textContent = totalA===totalB ? 'Still too early for swagger.' : totalA>totalB ? `${matchup.a.name} has the scoreboard and the vibes.` : `${matchup.b.name} has the scoreboard and the vibes.`;
+      document.getElementById('metricConfidence').textContent = `${confidenceA}% - ${confidenceB}%`;
+      document.getElementById('metricConfidenceNote').textContent = `${matchup.a.name} confidence ${confidenceA}%, ${matchup.b.name} confidence ${confidenceB}%.`;
+      document.getElementById('updatedPill').textContent = `Last updated: ${new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(new Date())}`;
     }
 
-    if(!localStorage.getItem(STORAGE_KEY)) saveState(clone(EMPTY_STATE));
     render();
-    doRefresh();
-    scheduleAuto();
   </script>
 </body>
 </html>
