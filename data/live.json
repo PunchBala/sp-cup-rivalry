@@ -1,27 +1,27 @@
 {
   "season": 2026,
   "provider": "data/live.json",
-  "scrapeStatus": "partial (5 ok, 8 failed)",
-  "fetchedAt": "2026-03-28T22:38:56.445Z",
+  "scrapeStatus": "partial (3 ok, 10 failed)",
+  "fetchedAt": "2026-03-28T22:57:05.978Z",
   "scrapeReport": {
     "orangeCap": {
-      "ok": true,
-      "count": 16,
+      "ok": false,
+      "error": "Could not switch group: BATTERS",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "mostSixes": {
       "ok": false,
-      "error": "Could not select metric: Angel One Super Sixes Of The Season / Angel One Super Sixes of the Season",
+      "error": "Could not switch group: BATTERS",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "purpleCap": {
       "ok": false,
-      "error": "Could not select metric: Purple Cap",
+      "error": "Could not switch group: BOWLERS",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "mostDots": {
       "ok": false,
-      "error": "Could not select metric: TATA IPL Green Dot Balls",
+      "error": "Could not switch group: BOWLERS",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "mvp": {
@@ -36,17 +36,17 @@
     },
     "striker": {
       "ok": false,
-      "error": "Could not select metric: Curvv Super Striker Of The Season / Curvv Super Striker of the Season",
+      "error": "Could not switch group: BATTERS",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "bestBowlingFigures": {
       "ok": false,
-      "error": "Could not select metric: Best Bowling Figures",
+      "error": "Could not switch group: BOWLERS",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "bestBowlingStrikeRate": {
       "ok": false,
-      "error": "Could not select metric: Best Bowling Strike-Rate",
+      "error": "Could not switch group: BOWLERS",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "titleWinner": {
@@ -60,9 +60,9 @@
       "source": "https://www.iplt20.com/points-table/men"
     },
     "highestScoreTeam": {
-      "ok": true,
-      "count": 7,
-      "source": "https://www.iplt20.com/matches/results/2018"
+      "ok": false,
+      "error": "Could not extract any team scores from results page",
+      "source": "https://www.iplt20.com/matches/results"
     },
     "mostCatches": {
       "ok": true,
@@ -106,31 +106,8 @@
     "source": "https://www.iplt20.com/points-table/men"
   },
   "orangeCap": {
-    "ranking": [
-      "POS",
-      "Ishan Kishan SRH",
-      "Virat Kohli RCB",
-      "Devdutt Padikkal RCB",
-      "Aniket Verma SRH"
-    ],
-    "extendedRanking": [
-      "POS",
-      "Ishan Kishan SRH",
-      "Virat Kohli RCB",
-      "Devdutt Padikkal RCB",
-      "Aniket Verma SRH",
-      "Rajat Patidar RCB",
-      "Heinrich Klaasen SRH",
-      "Tim David RCB",
-      "Travis Head SRH",
-      "Salil Arora SRH",
-      "Phil Salt RCB",
-      "Abhishek Sharma SRH",
-      "David Payne SRH",
-      "Jaydev Unadkat SRH",
-      "Harsh Dubey SRH",
-      "Nitish Kumar Reddy SRH"
-    ]
+    "ranking": [],
+    "extendedRanking": []
   },
   "mostSixes": {
     "ranking": [],
@@ -157,34 +134,9 @@
     "extendedRanking": []
   },
   "highestScoreTeam": {
-    "ranking": [
-      "Mumbai Indians",
-      "Kolkata Knight Riders",
-      "Chennai Super Kings",
-      "Sunrisers Hyderabad",
-      "Rajasthan Royals",
-      "Punjab Kings",
-      "Royal Challengers Bengaluru"
-    ],
-    "extendedRanking": [
-      "Mumbai Indians",
-      "Kolkata Knight Riders",
-      "Chennai Super Kings",
-      "Sunrisers Hyderabad",
-      "Rajasthan Royals",
-      "Punjab Kings",
-      "Royal Challengers Bengaluru"
-    ],
-    "values": {
-      "Sunrisers Hyderabad": 31,
-      "Kolkata Knight Riders": 71,
-      "Rajasthan Royals": 30,
-      "Royal Challengers Bengaluru": 14,
-      "Mumbai Indians": 102,
-      "Chennai Super Kings": 64,
-      "Punjab Kings": 15
-    },
-    "source": "https://www.iplt20.com/matches/results/2018"
+    "ranking": [],
+    "extendedRanking": [],
+    "values": {}
   },
   "striker": {
     "ranking": [],
