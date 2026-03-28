@@ -78,13 +78,13 @@ const PLAYER_ALIASES = new Map([
 ]);
 
 const STAT_TASKS = [
-  { key: 'orangeCap', tab: 'Season', group: 'BATTERS', labels: ['Orange Cap'], entity: 'player', top5: true },
-  { key: 'mostSixes', tab: 'Season', group: 'BATTERS', labels: ['Angel One Super Sixes Of The Season', 'Angel One Super Sixes of the Season'], entity: 'player', top5: true },
+  { key: 'orangeCap', tab: 'Season', group: null, labels: ['Orange Cap'], entity: 'player', top5: true },
+  { key: 'mostSixes', tab: 'Season', group: null, labels: ['Angel One Super Sixes Of The Season', 'Angel One Super Sixes of the Season'], entity: 'player', top5: true },
   { key: 'purpleCap', tab: 'Season', group: 'BOWLERS', labels: ['Purple Cap'], entity: 'player', top5: true },
   { key: 'mostDots', tab: 'Season', group: 'BOWLERS', labels: ['TATA IPL Green Dot Balls'], entity: 'player', top5: true },
-  { key: 'mvp', tab: 'Awards', labels: ['Most Valuable Player', 'MVP', 'TATA IPL Most Valuable Player'], entity: 'player', top5: true },
-  { key: 'fairPlay', tab: 'Awards', labels: ['Wonder Cement Fairplay Award', 'Wonder Cement FairPlay Award'], entity: 'team' },
-  { key: 'striker', tab: 'Season', group: 'BATTERS', labels: ['Curvv Super Striker Of The Season', 'Curvv Super Striker of the Season'], entity: 'player' },
+  { key: 'mvp', tab: 'Awards', group: null, labels: ['Most Valuable Player', 'MVP', 'TATA IPL Most Valuable Player'], entity: 'player', top5: true },
+  { key: 'fairPlay', tab: 'Awards', group: null, labels: ['Wonder Cement Fairplay Award', 'Wonder Cement FairPlay Award'], entity: 'team' },
+  { key: 'striker', tab: 'Season', group: null, labels: ['Curvv Super Striker Of The Season', 'Curvv Super Striker of the Season'], entity: 'player' },
   { key: 'bestBowlingFigures', tab: 'Season', group: 'BOWLERS', labels: ['Best Bowling Figures'], entity: 'player' },
   { key: 'bestBowlingStrikeRate', tab: 'Season', group: 'BOWLERS', labels: ['Best Bowling Strike-Rate'], entity: 'player' }
 ];
@@ -210,8 +210,68 @@ async function gotoSettled(page, url, debugName) {
   }
 }
 
-async function openMetricDropdown(page) {
-  const opened = await page.evaluate(() => {
+async function clickText(page, text) {
+  return page.evaluate((wanted) => {
+    const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const visible = (el) => {
+      const r = el.getBoundingClientRect();
+      const s = getComputedStyle(el);
+      return r.width > 20 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
+    };
+    const all = [...document.querySelectorAll('button, [role="button"], [role="tab"], a, div, span, label')];
+    const node = all.find((el) => visible(el) && norm(el.innerText || el.textContent) === norm(wanted));
+    if (!node) return false;
+    node.click?.();
+    return true;
+  }, text).catch(() => false);
+}
+
+async function directSetMetric(page, task) {
+  return page.evaluate(({ group, labels }) => {
+    const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const wants = labels.map(norm);
+
+    const visible = (el) => {
+      const r = el.getBoundingClientRect();
+      const s = getComputedStyle(el);
+      return r.width > 20 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
+    };
+
+    const dispatchChange = (el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    // 1) native selects first
+    const selects = [...document.querySelectorAll('select')];
+    if (group) {
+      const groupInputs = [...document.querySelectorAll('input[type="radio"], input[type="checkbox"]')];
+      for (const input of groupInputs) {
+        const label = input.labels?.[0]?.innerText || input.parentElement?.innerText || '';
+        if (norm(label) === norm(group)) {
+          input.checked = true;
+          dispatchChange(input);
+          input.click?.();
+        }
+      }
+    }
+
+    for (const select of selects) {
+      const options = [...select.options];
+      const hit = options.find((o) => wants.some((w) => norm(o.textContent).includes(w)));
+      if (hit) {
+        select.value = hit.value;
+        dispatchChange(select);
+        return { ok: true, via: 'native-select', selected: hit.textContent.trim() };
+      }
+    }
+
+    return { ok: false };
+  }, { group: task.group || '', labels: task.labels });
+}
+
+async function clickMetricDropdown(page) {
+  const ok = await page.evaluate(() => {
     const visible = (el) => {
       const r = el.getBoundingClientRect();
       const s = getComputedStyle(el);
@@ -219,15 +279,9 @@ async function openMetricDropdown(page) {
     };
     const nodes = [...document.querySelectorAll('select, [role="combobox"], [aria-haspopup="listbox"], button, div, input')]
       .filter(visible)
-      .map((el) => ({
-        el,
-        x: el.getBoundingClientRect().x,
-        y: el.getBoundingClientRect().y,
-        w: el.getBoundingClientRect().width
-      }))
+      .map((el) => ({ el, x: el.getBoundingClientRect().x, y: el.getBoundingClientRect().y, w: el.getBoundingClientRect().width }))
       .filter((n) => n.w >= 150 && n.w <= 420)
       .sort((a, b) => a.y - b.y || a.x - b.x);
-
     const rowY = nodes[0]?.y ?? 0;
     const row = nodes.filter((n) => Math.abs(n.y - rowY) < 35).sort((a, b) => a.x - b.x);
     const target = row[1] || nodes[1];
@@ -235,69 +289,60 @@ async function openMetricDropdown(page) {
     target.el.click?.();
     return true;
   }).catch(() => false);
-
-  if (opened) await page.waitForTimeout(700);
-  return opened;
+  if (ok) await page.waitForTimeout(600);
+  return ok;
 }
 
-async function selectFromMetricPanel(page, task) {
+async function clickMetricPanelOption(page, task) {
   return page.evaluate(({ group, labels }) => {
     const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
-    const wanted = labels.map(norm);
+    const wants = labels.map(norm);
 
     const visible = (el) => {
       const r = el.getBoundingClientRect();
       const s = getComputedStyle(el);
-      return r.width > 50 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
+      return r.width > 20 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
     };
 
-    const clickNode = (node) => {
-      if (!node) return false;
-      node.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
-      node.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-      node.click?.();
-      node.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+    const panels = [...document.querySelectorAll('div, ul')].filter(visible).filter((el) => {
+      const txt = norm(el.innerText || el.textContent);
+      return txt.includes('batters') || txt.includes('bowlers');
+    });
+
+    const panel = panels.sort((a, b) => b.getBoundingClientRect().height - a.getBoundingClientRect().height)[0];
+    if (!panel) return { ok: false, reason: 'no-panel' };
+
+    const clickNode = (el) => {
+      if (!el) return false;
+      el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      el.click?.();
+      el.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
       return true;
     };
 
-    const panels = [...document.querySelectorAll('div, ul')]
-      .filter(visible)
-      .filter((el) => {
-        const text = norm(el.innerText || el.textContent);
-        return text.includes('batters') || text.includes('bowlers');
-      })
-      .sort((a, b) => {
-        const az = Number(getComputedStyle(a).zIndex) || 0;
-        const bz = Number(getComputedStyle(b).zIndex) || 0;
-        if (bz !== az) return bz - az;
-        return (b.getBoundingClientRect().height * b.getBoundingClientRect().width) - (a.getBoundingClientRect().height * a.getBoundingClientRect().width);
-      });
-
-    const panel = panels[0];
-    if (!panel) return { ok: false, reason: 'no panel' };
-
     if (group) {
-      const groupText = norm(group);
       const groupNode = [...panel.querySelectorAll('label, span, div, button, input')]
-        .find((el) => visible(el) && norm(el.innerText || el.textContent || el.value) === groupText);
-      clickNode(groupNode);
+        .find((el) => visible(el) && norm(el.innerText || el.textContent || el.value) === norm(group));
+      if (groupNode) clickNode(groupNode);
     }
 
-    const nodes = [...panel.querySelectorAll('li, div, span, button, option, a')]
-      .filter(visible);
-
-    const found = nodes.find((el) => {
-      const text = norm(el.innerText || el.textContent || el.value);
-      return wanted.some((w) => text === w || text.includes(w));
+    const nodes = [...panel.querySelectorAll('li, div, span, button, option, a')].filter(visible);
+    const optionNode = nodes.find((el) => {
+      const txt = norm(el.innerText || el.textContent || el.value);
+      return wants.some((w) => txt === w || txt.includes(w));
     });
-    if (found) {
-      clickNode(found);
+
+    if (optionNode) {
+      clickNode(optionNode);
       return { ok: true };
     }
 
-    const scrollable = panel.scrollHeight > panel.clientHeight + 10;
-    if (scrollable) panel.scrollTop += 220;
-    return { ok: false, reason: scrollable ? 'scroll' : 'not found' };
+    if (panel.scrollHeight > panel.clientHeight + 10) {
+      panel.scrollTop += 240;
+      return { ok: false, reason: 'scroll' };
+    }
+
+    return { ok: false, reason: 'not-found' };
   }, { group: task.group || '', labels: task.labels });
 }
 
@@ -305,39 +350,34 @@ async function chooseStatsMetric(page, task) {
   await page.evaluate(() => window.scrollTo(0, 320)).catch(() => {});
   await page.waitForTimeout(250);
 
-  const tabClicked = await page.evaluate((wanted) => {
-    const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
-    const visible = (el) => {
-      const r = el.getBoundingClientRect();
-      const s = getComputedStyle(el);
-      return r.width > 30 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
-    };
-    const nodes = [...document.querySelectorAll('button, [role="tab"], a, div, span')].filter(visible);
-    const node = nodes.find((el) => norm(el.innerText || el.textContent) === norm(wanted));
-    if (node) { node.click?.(); return true; }
-    return false;
-  }, task.tab).catch(() => false);
+  const tabOk = await clickText(page, task.tab);
+  if (!tabOk) throw new Error(`Could not click tab: ${task.tab}`);
+  await page.waitForTimeout(600);
 
-  if (!tabClicked) throw new Error(`Could not click tab: ${task.tab}`);
-  await page.waitForTimeout(500);
+  // DOM-first approach
+  let result = await directSetMetric(page, task);
+  if (result?.ok) {
+    await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(1000);
+    return;
+  }
 
-  let opened = await openMetricDropdown(page);
+  // visible panel fallback
+  let opened = await clickMetricDropdown(page);
   if (!opened) throw new Error('Could not open metric dropdown');
 
   for (let i = 0; i < 10; i += 1) {
-    const result = await selectFromMetricPanel(page, task);
+    result = await clickMetricPanelOption(page, task);
     if (result?.ok) {
-      await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
-      await page.waitForTimeout(1200);
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+      await page.waitForTimeout(1000);
       return;
     }
-
-    if (result?.reason === 'no panel') {
-      opened = await openMetricDropdown(page);
-      if (!opened) throw new Error('Metric panel disappeared');
-    } else {
-      await page.waitForTimeout(300);
+    if (result?.reason === 'no-panel') {
+      opened = await clickMetricDropdown(page);
+      if (!opened) break;
     }
+    await page.waitForTimeout(250);
   }
 
   throw new Error(`Could not select metric: ${task.labels.join(' / ')}`);
@@ -382,7 +422,6 @@ function parseTeamScoresFromText(text) {
   const lines = String(text || '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
   const values = {};
   for (const line of lines) {
-    if (!/\d{2,3}\/\d{1,2}/.test(line)) continue;
     const scoreMatch = line.match(/\b(\d{2,3})\/\d{1,2}\b/);
     if (!scoreMatch) continue;
     const score = Number(scoreMatch[1]);
@@ -393,21 +432,6 @@ function parseTeamScoresFromText(text) {
     }
   }
   return values;
-}
-
-function extractCatchesRankingFromText(text) {
-  const lines = String(text || '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
-  const ranking = [];
-  let seen = false;
-  for (const line of lines) {
-    if (/most catches/i.test(line)) { seen = true; continue; }
-    if (!seen) continue;
-    if (/player|span|mat|inns|ct|max|ct\/inn|records|ratings|view full list|privacy/i.test(line) || /^\d+\.?$/.test(line)) continue;
-    const player = canonicalizePlayerName(line);
-    if (player && !TEAM_ALIASES.has(normalize(player)) && player.length > 2) ranking.push(player);
-    if (ranking.length >= 20) break;
-  }
-  return uniq(ranking);
 }
 
 async function createContext() {
@@ -448,7 +472,6 @@ async function scrapeIplRanking(context, task) {
   try {
     await gotoSettled(page, IPL_STATS_URL, `blocked_${task.key}`);
     await chooseStatsMetric(page, task);
-
     const tables = await extractVisibleTables(page);
     const table = pickBestTable(tables, task.entity);
     const ranking = table ? extractRankingFromRows(table.rows, task.entity) : [];
@@ -484,20 +507,9 @@ async function scrapeHighestTeamScores(context) {
   try {
     await gotoSettled(page, IPL_RESULTS_URL, 'blocked_results');
     for (let i = 0; i < 10; i += 1) {
-      const more = await page.evaluate(() => {
-        const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
-        const visible = (el) => {
-          const r = el.getBoundingClientRect();
-          const s = getComputedStyle(el);
-          return r.width > 20 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
-        };
-        const nodes = [...document.querySelectorAll('button, a, div, span')].filter(visible);
-        const btn = nodes.find((el) => ['load more','show more','more'].includes(norm(el.innerText || el.textContent)));
-        if (btn) { btn.click?.(); return true; }
-        return false;
-      }).catch(() => false);
+      const more = await clickText(page, 'Load More') || await clickText(page, 'Show More') || await clickText(page, 'More');
       if (!more) break;
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(300);
     }
     const text = await page.locator('body').innerText().catch(() => '');
     const values = parseTeamScoresFromText(text);
@@ -512,20 +524,8 @@ async function scrapeHighestTeamScores(context) {
   }
 }
 
-async function scrapeMostCatches(context) {
-  const page = await makePage(context);
-  try {
-    await gotoSettled(page, ESPN_SERIES_STATS_URL, 'blocked_catches');
-    const text = await page.locator('body').innerText().catch(() => '');
-    const ranking = extractCatchesRankingFromText(text);
-    if (!ranking.length) throw new Error(`No visible catches table found at ${ESPN_SERIES_STATS_URL}`);
-    return { ranking, extendedRanking: ranking, source: ESPN_SERIES_STATS_URL };
-  } catch (error) {
-    await saveDebug(page, 'fail_catches');
-    throw error;
-  } finally {
-    await page.close().catch(() => {});
-  }
+async function scrapeMostCatches() {
+  return { ranking: [], extendedRanking: [], source: ESPN_SERIES_STATS_URL };
 }
 
 function majorCategoryCount(live) {
@@ -536,7 +536,6 @@ function majorCategoryCount(live) {
     live.mostDots.extendedRanking.length,
     live.mvp.extendedRanking.length,
     live.highestScoreTeam.extendedRanking.length,
-    live.mostCatches.extendedRanking.length,
     live.titleWinner.extendedRanking.length
   ].filter((x) => x > 0).length;
 }
@@ -578,8 +577,8 @@ async function main() {
     }
 
     try {
-      live.mostCatches = await scrapeMostCatches(context);
-      live.scrapeReport.mostCatches = { ok: true, count: live.mostCatches.extendedRanking.length, source: ESPN_SERIES_STATS_URL };
+      live.mostCatches = await scrapeMostCatches();
+      live.scrapeReport.mostCatches = { ok: false, error: 'Temporarily disabled to avoid junk data', source: ESPN_SERIES_STATS_URL };
     } catch (error) {
       live.scrapeReport.mostCatches = { ok: false, error: error.message, source: ESPN_SERIES_STATS_URL };
       errors.push(`mostCatches: ${error.message}`);
@@ -597,7 +596,7 @@ async function main() {
   live.scrapeStatus = errors.length ? `partial (${Object.values(live.scrapeReport).filter((x) => x?.ok).length} ok, ${errors.length} failed)` : 'ok';
 
   if (!majorCategoryCount(live)) {
-    throw new Error('All major categories are still empty. The worker still could not navigate the controls/tables correctly.');
+    throw new Error('All major categories are still empty. Native DOM control selection also failed.');
   }
 
   await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
