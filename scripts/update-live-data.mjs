@@ -6,6 +6,7 @@ const ROOT = process.cwd();
 const DATA_DIR = path.join(ROOT, 'data');
 const DEBUG_DIR = path.join(ROOT, 'debug');
 const DATA_FILE = path.join(DATA_DIR, 'live.json');
+const USER_DATA_DIR = path.join(ROOT, '.chrome-profile');
 
 const IPL_STATS_URL = 'https://www.iplt20.com/stats/2026';
 const IPL_POINTS_URLS = [
@@ -18,9 +19,9 @@ const IPL_RESULTS_URLS = [
   'https://www.iplt20.com/matches/results/2018'
 ];
 const ESPN_CATCHES_URLS = [
+  'https://www.espncricinfo.com/series/ipl-2026-1510719/stats',
   'https://www.espncricinfo.com/records/tournament/fielding-most-catches-career/indian-premier-league-17740',
-  'https://www.espncricinfo.com/records/tournament/indian-premier-league-17740',
-  'https://www.espncricinfo.com/series/ipl-2026-1510719/stats'
+  'https://www.espncricinfo.com/records/tournament/indian-premier-league-17740'
 ];
 
 const TEAM_ALIASES = new Map([
@@ -164,6 +165,7 @@ function emptyLive() {
 async function ensureDirs() {
   await fs.mkdir(DATA_DIR, { recursive: true });
   await fs.mkdir(DEBUG_DIR, { recursive: true });
+  await fs.mkdir(USER_DATA_DIR, { recursive: true });
 }
 
 async function saveDebug(page, name) {
@@ -189,12 +191,30 @@ async function acceptCookies(page) {
   }
 }
 
-async function gotoSettled(page, url) {
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
-  await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-  await page.waitForTimeout(1800);
-  await acceptCookies(page);
-  await page.waitForTimeout(1200);
+async function isAccessDenied(page) {
+  const text = normalize(await page.locator('body').innerText().catch(() => ''));
+  return text.includes('access denied') || text.includes("you don't have permission to access");
+}
+
+async function gotoSettled(page, url, debugName) {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+    await page.waitForTimeout(1800);
+    await acceptCookies(page);
+    await page.waitForTimeout(1200);
+
+    if (!(await isAccessDenied(page))) return;
+
+    if (attempt === 0) {
+      await page.waitForTimeout(3000);
+      await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 }).catch(() => {});
+      await page.waitForTimeout(2000);
+    }
+  }
+
+  await saveDebug(page, debugName);
+  throw new Error(`Access denied at ${url}. Open this site once in the visible Chrome window/profile, then rerun.`);
 }
 
 async function clickIfVisible(locator) {
@@ -398,26 +418,47 @@ function extractCatchesRankingFromText(text) {
   return uniq(ranking);
 }
 
-async function makePage(browser) {
-  const context = await browser.newContext({
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+async function createContext() {
+  const context = await chromium.launchPersistentContext(USER_DATA_DIR, {
+    channel: 'chrome',
+    headless: false,
     viewport: { width: 1440, height: 2200 },
     locale: 'en-GB',
     timezoneId: 'Asia/Kolkata',
-    extraHTTPHeaders: { 'Accept-Language': 'en-GB,en;q=0.9' }
+    ignoreHTTPSErrors: true,
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    extraHTTPHeaders: {
+      'Accept-Language': 'en-GB,en;q=0.9',
+      'Upgrade-Insecure-Requests': '1',
+      'Cache-Control': 'max-age=0'
+    },
+    args: [
+      '--start-maximized',
+      '--disable-blink-features=AutomationControlled',
+      '--disable-dev-shm-usage'
+    ]
   });
+
   await context.addInitScript(() => {
     Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+    window.chrome = window.chrome || { runtime: {} };
+    Object.defineProperty(navigator, 'languages', { get: () => ['en-GB', 'en'] });
+    Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
   });
-  const page = await context.newPage();
-  page.setDefaultTimeout(15000);
-  return { context, page };
+
+  return context;
 }
 
-async function scrapeIplRanking(browser, task) {
-  const { context, page } = await makePage(browser);
+async function makePage(context) {
+  const page = await context.newPage();
+  page.setDefaultTimeout(15000);
+  return page;
+}
+
+async function scrapeIplRanking(context, task) {
+  const page = await makePage(context);
   try {
-    await gotoSettled(page, IPL_STATS_URL);
+    await gotoSettled(page, IPL_STATS_URL, `blocked_${task.key}`);
     await clickTab(page, task.tab);
     const selected = await selectMetricFromStatsPage(page, task.labels);
     if (!selected) throw new Error(`Could not select metric: ${task.labels.join(' / ')}`);
@@ -437,16 +478,16 @@ async function scrapeIplRanking(browser, task) {
     await saveDebug(page, `fail_${task.key}`);
     throw error;
   } finally {
-    await context.close();
+    await page.close().catch(() => {});
   }
 }
 
-async function scrapePointsTable(browser) {
+async function scrapePointsTable(context) {
   let lastError = null;
   for (const url of IPL_POINTS_URLS) {
-    const { context, page } = await makePage(browser);
+    const page = await makePage(context);
     try {
-      await gotoSettled(page, url);
+      await gotoSettled(page, url, `blocked_points_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
       const tables = await extractVisibleTables(page);
       const table = pickBestTable(tables, 'team');
       let ranking = table ? extractRankingFromRows(table.rows, 'team') : [];
@@ -460,7 +501,7 @@ async function scrapePointsTable(browser) {
       lastError = error;
       await saveDebug(page, `fail_points_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
     } finally {
-      await context.close();
+      await page.close().catch(() => {});
     }
   }
   throw lastError ?? new Error('Could not scrape points table');
@@ -473,12 +514,12 @@ async function clickLoadMore(page) {
   return false;
 }
 
-async function scrapeHighestTeamScores(browser) {
+async function scrapeHighestTeamScores(context) {
   let lastError = null;
   for (const url of IPL_RESULTS_URLS) {
-    const { context, page } = await makePage(browser);
+    const page = await makePage(context);
     try {
-      await gotoSettled(page, url);
+      await gotoSettled(page, url, `blocked_results_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
       for (let i = 0; i < 12; i += 1) {
         if (!(await clickLoadMore(page))) break;
       }
@@ -492,18 +533,18 @@ async function scrapeHighestTeamScores(browser) {
       lastError = error;
       await saveDebug(page, `fail_results_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
     } finally {
-      await context.close();
+      await page.close().catch(() => {});
     }
   }
   throw lastError ?? new Error('Could not scrape results');
 }
 
-async function scrapeMostCatches(browser) {
+async function scrapeMostCatches(context) {
   let lastError = null;
   for (const url of ESPN_CATCHES_URLS) {
-    const { context, page } = await makePage(browser);
+    const page = await makePage(context);
     try {
-      await gotoSettled(page, url);
+      await gotoSettled(page, url, `blocked_catches_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
       const tables = await extractVisibleTables(page);
       const table = pickBestTable(tables, 'player');
       let ranking = table ? extractRankingFromRows(table.rows, 'player') : [];
@@ -517,22 +558,35 @@ async function scrapeMostCatches(browser) {
       lastError = error;
       await saveDebug(page, `fail_catches_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
     } finally {
-      await context.close();
+      await page.close().catch(() => {});
     }
   }
   throw lastError ?? new Error('Could not scrape most catches from ESPN');
 }
 
+function majorCategoryCount(live) {
+  return [
+    live.orangeCap.extendedRanking.length,
+    live.mostSixes.extendedRanking.length,
+    live.purpleCap.extendedRanking.length,
+    live.mostDots.extendedRanking.length,
+    live.mvp.extendedRanking.length,
+    live.highestScoreTeam.extendedRanking.length,
+    live.mostCatches.extendedRanking.length,
+    live.titleWinner.extendedRanking.length
+  ].filter((x) => x > 0).length;
+}
+
 async function main() {
   await ensureDirs();
   const live = emptyLive();
-  const browser = await chromium.launch({ headless: true, args: ['--disable-blink-features=AutomationControlled', '--no-sandbox'] });
+  const context = await createContext();
   const errors = [];
 
   try {
     for (const task of STAT_TASKS) {
       try {
-        live[task.key] = await scrapeIplRanking(browser, task);
+        live[task.key] = await scrapeIplRanking(context, task);
         live.scrapeReport[task.key] = { ok: true, count: live[task.key].extendedRanking.length, source: IPL_STATS_URL };
       } catch (error) {
         live.scrapeReport[task.key] = { ok: false, error: error.message, source: IPL_STATS_URL };
@@ -541,7 +595,7 @@ async function main() {
     }
 
     try {
-      live.titleWinner = await scrapePointsTable(browser);
+      live.titleWinner = await scrapePointsTable(context);
       live.tableBottom = { ranking: [...live.titleWinner.extendedRanking], extendedRanking: [...live.titleWinner.extendedRanking] };
       live.scrapeReport.titleWinner = { ok: true, count: live.titleWinner.extendedRanking.length, source: live.titleWinner.source };
       live.scrapeReport.tableBottom = { ok: true, count: live.tableBottom.extendedRanking.length, source: live.titleWinner.source };
@@ -552,7 +606,7 @@ async function main() {
     }
 
     try {
-      live.highestScoreTeam = await scrapeHighestTeamScores(browser);
+      live.highestScoreTeam = await scrapeHighestTeamScores(context);
       live.scrapeReport.highestScoreTeam = { ok: true, count: live.highestScoreTeam.extendedRanking.length, source: live.highestScoreTeam.source };
     } catch (error) {
       live.scrapeReport.highestScoreTeam = { ok: false, error: error.message, source: IPL_RESULTS_URLS[0] };
@@ -560,14 +614,14 @@ async function main() {
     }
 
     try {
-      live.mostCatches = await scrapeMostCatches(browser);
+      live.mostCatches = await scrapeMostCatches(context);
       live.scrapeReport.mostCatches = { ok: true, count: live.mostCatches.extendedRanking.length, source: live.mostCatches.source };
     } catch (error) {
       live.scrapeReport.mostCatches = { ok: false, error: error.message, source: ESPN_CATCHES_URLS[0] };
       errors.push(`mostCatches: ${error.message}`);
     }
   } finally {
-    await browser.close();
+    await context.close().catch(() => {});
   }
 
   if (live.mvp.extendedRanking.length) {
@@ -577,6 +631,11 @@ async function main() {
 
   live.fetchedAt = new Date().toISOString();
   live.scrapeStatus = errors.length ? `partial (${Object.values(live.scrapeReport).filter((x) => x?.ok).length} ok, ${errors.length} failed)` : 'ok';
+
+  if (!majorCategoryCount(live)) {
+    throw new Error('All major categories are still empty. The sites are probably blocking the automated browser. Open the visible Chrome window/profile once, visit the blocked sites manually, then rerun.');
+  }
+
   await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
 
   if (errors.length) {
