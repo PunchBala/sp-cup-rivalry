@@ -1,12 +1,12 @@
 {
   "season": 2026,
   "provider": "data/live.json",
-  "scrapeStatus": "partial (0 ok, 12 failed)",
-  "fetchedAt": "2026-03-28T21:55:54.363Z",
+  "scrapeStatus": "partial (4 ok, 9 failed)",
+  "fetchedAt": "2026-03-28T22:15:17.435Z",
   "scrapeReport": {
     "orangeCap": {
-      "ok": false,
-      "error": "Could not select metric: Orange Cap",
+      "ok": true,
+      "count": 16,
       "source": "https://www.iplt20.com/stats/2026"
     },
     "mostSixes": {
@@ -50,36 +50,87 @@
       "source": "https://www.iplt20.com/stats/2026"
     },
     "titleWinner": {
-      "ok": false,
-      "error": "No visible points table found",
+      "ok": true,
+      "count": 10,
       "source": "https://www.iplt20.com/points-table/men"
     },
     "tableBottom": {
-      "ok": false,
-      "error": "No visible points table found",
+      "ok": true,
+      "count": 10,
       "source": "https://www.iplt20.com/points-table/men"
     },
     "highestScoreTeam": {
-      "ok": false,
-      "error": "Could not extract any team scores from results page",
-      "source": "https://www.iplt20.com/matches/results"
+      "ok": true,
+      "count": 7,
+      "source": "https://www.iplt20.com/matches/results/2018"
     },
     "mostCatches": {
       "ok": false,
-      "error": "No visible catches table found at https://www.espncricinfo.com/series/ipl-2026-1510719/stats",
-      "source": "https://www.espncricinfo.com/records/tournament/fielding-most-catches-career/indian-premier-league-17740"
+      "error": "Access denied at https://www.espncricinfo.com/records/tournament/indian-premier-league-17740. Open this site once in the visible Chrome window/profile, then rerun.",
+      "source": "https://www.espncricinfo.com/series/ipl-2026-1510719/stats"
     }
   },
   "titleWinner": {
-    "winner": null,
+    "ranking": [
+      "Royal Challengers Bengaluru",
+      "Sunrisers Hyderabad",
+      "Chennai Super Kings",
+      "Delhi Capitals",
+      "Gujarat Titans",
+      "Kolkata Knight Riders",
+      "Lucknow Super Giants",
+      "Mumbai Indians",
+      "Punjab Kings",
+      "Rajasthan Royals"
+    ],
+    "extendedRanking": [
+      "Royal Challengers Bengaluru",
+      "Sunrisers Hyderabad",
+      "Chennai Super Kings",
+      "Delhi Capitals",
+      "Gujarat Titans",
+      "Kolkata Knight Riders",
+      "Lucknow Super Giants",
+      "Mumbai Indians",
+      "Punjab Kings",
+      "Rajasthan Royals"
+    ],
+    "playoffs": [
+      "Royal Challengers Bengaluru",
+      "Sunrisers Hyderabad",
+      "Chennai Super Kings",
+      "Delhi Capitals"
+    ],
     "finalists": [],
-    "playoffs": [],
-    "ranking": [],
-    "extendedRanking": []
+    "winner": null,
+    "source": "https://www.iplt20.com/points-table/men"
   },
   "orangeCap": {
-    "ranking": [],
-    "extendedRanking": []
+    "ranking": [
+      "POS",
+      "Ishan Kishan SRH",
+      "Virat Kohli RCB",
+      "Devdutt Padikkal RCB",
+      "Aniket Verma SRH"
+    ],
+    "extendedRanking": [
+      "POS",
+      "Ishan Kishan SRH",
+      "Virat Kohli RCB",
+      "Devdutt Padikkal RCB",
+      "Aniket Verma SRH",
+      "Rajat Patidar RCB",
+      "Heinrich Klaasen SRH",
+      "Tim David RCB",
+      "Travis Head SRH",
+      "Salil Arora SRH",
+      "Phil Salt RCB",
+      "Abhishek Sharma SRH",
+      "David Payne SRH",
+      "Jaydev Unadkat SRH",
+      "Harsh Dubey SRH",
+      "Nitish Kumar Reddy SRH"
+    ]
   },
   "mostSixes": {
     "ranking": [],
@@ -106,9 +157,34 @@
     "extendedRanking": []
   },
   "highestScoreTeam": {
-    "ranking": [],
-    "extendedRanking": [],
-    "values": {}
+    "ranking": [
+      "Mumbai Indians",
+      "Kolkata Knight Riders",
+      "Chennai Super Kings",
+      "Sunrisers Hyderabad",
+      "Rajasthan Royals",
+      "Punjab Kings",
+      "Royal Challengers Bengaluru"
+    ],
+    "extendedRanking": [
+      "Mumbai Indians",
+      "Kolkata Knight Riders",
+      "Chennai Super Kings",
+      "Sunrisers Hyderabad",
+      "Rajasthan Royals",
+      "Punjab Kings",
+      "Royal Challengers Bengaluru"
+    ],
+    "values": {
+      "Sunrisers Hyderabad": 31,
+      "Kolkata Knight Riders": 71,
+      "Rajasthan Royals": 30,
+      "Royal Challengers Bengaluru": 14,
+      "Mumbai Indians": 102,
+      "Chennai Super Kings": 64,
+      "Punjab Kings": 15
+    },
+    "source": "https://www.iplt20.com/matches/results/2018"
   },
   "striker": {
     "ranking": [],
@@ -127,8 +203,30 @@
     "extendedRanking": []
   },
   "tableBottom": {
-    "ranking": [],
-    "extendedRanking": []
+    "ranking": [
+      "Royal Challengers Bengaluru",
+      "Sunrisers Hyderabad",
+      "Chennai Super Kings",
+      "Delhi Capitals",
+      "Gujarat Titans",
+      "Kolkata Knight Riders",
+      "Lucknow Super Giants",
+      "Mumbai Indians",
+      "Punjab Kings",
+      "Rajasthan Royals"
+    ],
+    "extendedRanking": [
+      "Royal Challengers Bengaluru",
+      "Sunrisers Hyderabad",
+      "Chennai Super Kings",
+      "Delhi Capitals",
+      "Gujarat Titans",
+      "Kolkata Knight Riders",
+      "Lucknow Super Giants",
+      "Mumbai Indians",
+      "Punjab Kings",
+      "Rajasthan Royals"
+    ]
   },
   "leastMvp": {
     "ranking": [],
