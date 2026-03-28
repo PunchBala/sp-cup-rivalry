@@ -3,54 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Senthil vs Sai — IPL 2026 War Room</title>
+  <title>IPL 2026 Prediction War Room</title>
   <style>
     :root {
-      --bg:#08101d;
-      --bg2:#0d1630;
-      --panel:rgba(15,24,45,.88);
-      --panel2:rgba(24,35,67,.9);
-      --line:rgba(255,255,255,.09);
-      --text:#eef3ff;
-      --muted:#9db0da;
-      --accent:#7cc4ff;
-      --csk:#f5c542;
-      --rcb:#ff6f7d;
-      --good:#43d487;
-      --warn:#ffc857;
-      --bad:#ff7f96;
-      --shadow:0 18px 40px rgba(0,0,0,.28);
+      --bg:#08101d; --bg2:#0d1630; --panel:rgba(15,24,45,.88); --panel2:rgba(24,35,67,.9);
+      --line:rgba(255,255,255,.09); --text:#eef3ff; --muted:#9db0da; --accent:#7cc4ff;
+      --good:#43d487; --warn:#ffc857; --bad:#ff7f96; --shadow:0 18px 40px rgba(0,0,0,.28);
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);color:var(--text)}
-    .wrap{max-width:1450px;margin:0 auto;padding:22px}
+    .wrap{max-width:1480px;margin:0 auto;padding:22px}
     .hero{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(124,196,255,.13),rgba(245,197,66,.11),rgba(255,111,125,.10));border:1px solid var(--line);border-radius:28px;padding:26px;box-shadow:var(--shadow)}
     .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;filter:blur(24px);opacity:.25}
     .hero:before{width:220px;height:220px;background:#1d8fff;right:-60px;top:-70px}
     .hero:after{width:180px;height:180px;background:#ff8a00;left:-40px;bottom:-70px}
     .eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:800}
     h1{margin:8px 0 8px;font-size:clamp(30px,5vw,54px);line-height:1.02}
-    .sub{max-width:920px;color:var(--muted);line-height:1.55;font-size:15px}
+    .sub{max-width:930px;color:var(--muted);line-height:1.55;font-size:15px}
     .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
-    button,.btn,input,select{border-radius:14px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:11px 14px;font-weight:700}
-    button{cursor:pointer;transition:.15s transform ease,.15s border-color ease,.15s background ease}
-    button:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.45)}
-    input,select{font-weight:600}
-    input[type="checkbox"]{padding:0;width:18px;height:18px;accent-color:#57d69b}
+    .leader-banner{display:inline-flex;gap:10px;align-items:center;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-weight:800}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:12px;font-weight:800}
+    .chip .dot{width:8px;height:8px;border-radius:50%}
+    .dot.green{background:var(--good)} .dot.orange{background:var(--warn)} .dot.red{background:var(--bad)}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .tab-btn{border-radius:14px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:11px 14px;font-weight:800;cursor:pointer;transition:.15s transform ease,.15s border-color ease,.15s background ease}
+    .tab-btn:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.45)}
+    .tab-btn.active{background:rgba(124,196,255,.16);border-color:rgba(124,196,255,.45)}
     .grid{display:grid;gap:16px}
-    .summary{grid-template-columns:repeat(7,minmax(0,1fr));margin-top:18px}
+    .summary{grid-template-columns:repeat(8,minmax(0,1fr));margin-top:18px}
     .card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
     .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
     .big{font-size:34px;font-weight:900;margin-top:10px}
     .small{color:var(--muted);font-size:13px;line-height:1.45;margin-top:6px}
-    .good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
     .section-title{margin:26px 0 12px;font-size:24px}
     .layout{display:grid;grid-template-columns:1.35fr .85fr;gap:16px}
     .stack{display:grid;gap:16px}
     .panels{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:12px;font-weight:800}
-    .chip .dot{width:8px;height:8px;border-radius:50%}
-    .dot.green{background:var(--good)} .dot.orange{background:var(--warn)} .dot.red{background:var(--bad)}
     table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:22px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
     th,td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
     th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
@@ -62,49 +50,48 @@
     .pill.bad{background:rgba(255,127,150,.16);color:var(--bad)}
     .pill.blue{background:rgba(124,196,255,.16);color:var(--accent)}
     .muted{color:var(--muted)}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
     .list{display:grid;gap:10px;margin-top:12px}
     .list-item{padding:12px 13px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid var(--line);line-height:1.45}
     .list-item strong{color:var(--text)}
     .savage{font-size:17px;line-height:1.55;color:#fff1cc}
-    .mini{font-size:12px;color:var(--muted)}
-    .settings-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
-    .toggle{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
-    textarea{width:100%;min-height:170px;padding:12px;border-radius:14px;background:#091221;color:var(--text);border:1px solid var(--line);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
-    details{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
-    summary{cursor:pointer;font-weight:800}
-    .statusline{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
+    .next-match-card{position:relative;overflow:hidden}
+    .next-match-card:after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(124,196,255,.18),transparent 60%)}
     .footer{margin:18px 0 36px;color:var(--muted);font-size:13px;line-height:1.5}
-    .leader-banner{display:inline-flex;gap:10px;align-items:center;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-weight:800}
     .watch{display:inline;color:#fff}
-    @media (max-width:1150px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.layout,.panels{grid-template-columns:1fr}}
-    @media (max-width:700px){.summary{grid-template-columns:1fr}.wrap{padding:14px}th:nth-child(4),td:nth-child(4){display:none}}
+    .mini{font-size:12px;color:var(--muted)}
+    .statusline{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:8px}
+    @media (max-width:1280px){.summary{grid-template-columns:repeat(4,minmax(0,1fr))}}
+    @media (max-width:1150px){.layout,.panels{grid-template-columns:1fr}}
+    @media (max-width:760px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:14px}th:nth-child(4),td:nth-child(4){display:none}}
+    @media (max-width:520px){.summary{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <section class="hero">
-      <div class="eyebrow">private app • Senthil vs Sai • IPL 2026</div>
+      <div class="eyebrow">private app • automatic only • IPL 2026</div>
       <h1>Prediction War Room</h1>
       <div class="sub">
-        Fully scored to <strong>your exact rules</strong>, with auto-refresh, swing insights, and a mild amount of emotional damage.
-        This version tries to auto-pull live IPL data through browser-safe proxies. If an external page blocks one category, you can still override just that category without breaking the rest of the scoreboard.
+        Same rivalry logic, now cleaner: two head-to-head tabs, fully automatic data refresh, locked picks, next-match context, and balanced roast damage on both sides.
       </div>
+      <div class="tabs" id="tabs"></div>
       <div class="toolbar">
         <span class="leader-banner" id="bannerLeader">No leader yet</span>
-        <span class="chip"><span class="dot orange"></span><span id="providerLabel">Provider: Live</span></span>
-        <span class="chip"><span class="dot green"></span><span id="refreshLabel">Auto-refresh off</span></span>
+        <span class="chip"><span class="dot green"></span><span id="providerLabel">Provider: Live auto</span></span>
+        <span class="chip"><span class="dot orange"></span><span id="refreshLabel">Refreshing every 5 min</span></span>
+        <span class="chip"><span class="dot green"></span><span>Picks locked</span></span>
       </div>
     </section>
 
     <div class="grid summary">
       <div class="card"><div class="label">Overall score</div><div class="big" id="overallScore">0 - 0</div><div class="small" id="overallDelta">Dead even. This is annoyingly civil.</div></div>
-      <div class="card"><div class="label">Fronts won</div><div class="big" id="frontsWon">0 - 0</div><div class="small">Categories currently led by each of you</div></div>
+      <div class="card"><div class="label">Fronts won</div><div class="big" id="frontsWon">0 - 0</div><div class="small">Categories currently led by each side</div></div>
       <div class="card"><div class="label">Locked categories</div><div class="big" id="lockedCount">0</div><div class="small">Final / frozen categories</div></div>
       <div class="card"><div class="label">Live status</div><div class="big" id="liveState">Idle</div><div class="small" id="fetchStatus">Waiting for first refresh</div></div>
       <div class="card"><div class="label">Likely winner</div><div class="big" id="likelyWinner">Too early</div><div class="small" id="winnerForecast">Need live movement before calling it.</div></div>
       <div class="card"><div class="label">Confidence</div><div class="big" id="confidenceScore">50% - 50%</div><div class="small" id="confidenceBreakdown">Even confidence on both sides right now.</div></div>
       <div class="card"><div class="label">Last updated</div><div class="big" id="lastUpdated">—</div><div class="small">Stored locally in your browser</div></div>
+      <div class="card next-match-card"><div class="label">Next match</div><div class="big" id="nextMatchTeams">Loading…</div><div class="small" id="nextMatchMeta">Schedule warming up</div><div class="small" id="nextMatchImpact">This card will explain why the next game matters.</div></div>
     </div>
 
     <div class="layout" style="margin-top:16px">
@@ -115,8 +102,8 @@
             <thead>
               <tr>
                 <th>Category</th>
-                <th>Senthil</th>
-                <th>Sai</th>
+                <th id="thP1">Senthil</th>
+                <th id="thP2">Sai</th>
                 <th>Current state</th>
                 <th>Pts</th>
                 <th>Pts</th>
@@ -130,84 +117,102 @@
       </div>
       <div class="stack">
         <div class="card">
-          <div class="label">Controls</div>
-          <div class="settings-row">
-            <select id="providerSelect">
-              <option value="demo">Demo data</option>
-              <option value="official_beta">Official IPL auto (beta)</option>
-            </select>
-            <button id="refreshBtn">Refresh now</button>
-                        <button id="resetBtn">Reset app</button>
-          </div>
-          <div class="settings-row">
-            <label class="toggle"><input type="checkbox" id="autoToggle"> Auto-refresh</label>
-            <label class="toggle">Every
-              <select id="intervalSelect">
-                <option value="3">3 min</option>
-                <option value="5" selected>5 min</option>
-                <option value="10">10 min</option>
-                <option value="15">15 min</option>
-              </select>
-            </label>
-          </div>
-          <div class="small" style="margin-top:12px">
-            <strong>Note:</strong> official IPL auto mode is best-effort from the browser. If a page shape changes or blocks a fetch, only the affected category falls back — the app keeps scoring the rest.
-          </div>
-        </div>
-
-        <div class="card">
           <div class="label">Smart insights</div>
           <div class="list" id="insightsList"></div>
         </div>
 
         <div class="card">
-          <div class="label">Sledging mode</div>
+          <div class="label">Roast corner</div>
           <div class="savage" id="savageText">Waiting for the first proper sledge.</div>
           <div class="small" id="savageSub">Neutral scoring. Equal-opportunity roasting.</div>
+        </div>
+
+        <div class="card">
+          <div class="label">This week’s swing watch</div>
+          <div class="list" id="watchList"></div>
         </div>
       </div>
     </div>
 
     <div class="panels" style="margin-top:16px">
       <div class="card">
-        <div class="label">Tonight watchlist</div>
-        <div class="list" id="watchList"></div>
+        <div class="label">How this version works</div>
+        <div class="list">
+          <div class="list-item"><strong>Automatic only:</strong> demo mode, provider toggle, and manual overrides are gone.</div>
+          <div class="list-item"><strong>Two battles:</strong> Senthil vs Sai is default, plus Senthil vs Vibeesh.</div>
+          <div class="list-item"><strong>Next-match impact:</strong> the corner card explains which picks are in play next.</div>
+        </div>
       </div>
       <div class="card">
-        <div class="label">Live data / manual overrides</div>
-        <div class="small">Paste partial JSON overrides if you want to force or fix a category. Example: <span class="mono">{"categories":{"title_winner":{"winner":"MI","locked":true}}}</span></div>
-        <textarea id="overrideInput"></textarea>
-        <div class="settings-row">
-          <button id="applyOverridesBtn">Apply overrides</button>
-          <button id="copyStateBtn">Copy full state JSON</button>
-          <button id="clearOverridesBtn">Clear overrides</button>
+        <div class="label">Quick notes</div>
+        <div class="list">
+          <div class="list-item"><strong>Refresh cadence:</strong> the app auto-refreshes every 5 minutes after load.</div>
+          <div class="list-item"><strong>Trust markers:</strong> last updated time plus locked picks are always visible.</div>
+          <div class="list-item"><strong>One engine, two rivalries:</strong> same scoring rules, different picks, no league headache.</div>
         </div>
       </div>
     </div>
 
     <div class="footer">
-      Built as a private rivalry app, not a public product. Official IPL stats and points-table pages exist for the season, and the official site exposes live scores, points tables, and stats pages, which is why the app is wired around them first. citeturn0search0turn0search12turn7search1
-      I also used the official site as the scoring authority because third-party sources often rely on scraping or paid APIs rather than a clearly documented official public JSON feed. citeturn2view0turn5view0
+      Built from your last uploaded site version, with the main-file note preserved for <strong>index_updated.html</strong>.
     </div>
   </div>
 
   <script>
-    const PICKS = {
-      senthil: {
-        title_winner:'MI',orange_cap:'KL',most_sixes:'vaibhav',purple_cap:'chahal',most_dots:'prasidh',mvp:'KL',uncapped_mvp:'Auqib Nabi',fair_play:'PBKS',highest_team_score:'PBKS',striker:'Brevis',best_bowling_figures:'Akeal hosein',best_bowling_sr:'hazlewood',most_catches:'D.Brevis',table_bottom:'KKR',least_mvp:'MSD'
+    const GAMES = [
+      {
+        id: "senthil-sai",
+        title: "Senthil vs Sai",
+        player1: {
+          name: "Senthil",
+          picks: {
+            title_winner:'MI', orange_cap:'KL Rahul', most_sixes:'Vaibhav Suryavanshi', purple_cap:'Yuzvendra Chahal',
+            most_dots:'Prasidh Krishna', mvp:'KL Rahul', uncapped_mvp:'Auqib Nabi', fair_play:'PBKS',
+            highest_team_score:'PBKS', striker:'Dewald Brevis', best_bowling_figures:'Akeal Hosein',
+            best_bowling_sr:'Josh Hazlewood', most_catches:'Dewald Brevis', table_bottom:'KKR', least_mvp:'MS Dhoni'
+          }
+        },
+        player2: {
+          name: "Sai",
+          picks: {
+            title_winner:'RCB', orange_cap:'Shubman Gill', most_sixes:'Nicholas Pooran', purple_cap:'Rashid Khan',
+            most_dots:'Trent Boult', mvp:'Shreyas Iyer', uncapped_mvp:'Prashant Veer', fair_play:'GT',
+            highest_team_score:'LSG', striker:'Phil Salt', best_bowling_figures:'Harshal Patel',
+            best_bowling_sr:'Rashid Khan', most_catches:'Virat Kohli', table_bottom:'SRH', least_mvp:'Cameron Green'
+          }
+        }
       },
-      sai: {
-        title_winner:'RCB',orange_cap:'Gill',most_sixes:'pooran',purple_cap:'Rashid',most_dots:'Boult',mvp:'Iyer',uncapped_mvp:'prashant veer',fair_play:'GT',highest_team_score:'LSG',striker:'Salt',best_bowling_figures:'Harshal Patel',best_bowling_sr:'Rashid khan',most_catches:'Kohli',table_bottom:'SRH',least_mvp:'Green'
+      {
+        id: "senthil-vibeesh",
+        title: "Senthil vs Vibeesh",
+        player1: {
+          name: "Senthil",
+          picks: {
+            title_winner:'RCB', orange_cap:'Shubman Gill', most_sixes:'Sanju Samson', purple_cap:'Arshdeep Singh',
+            most_dots:'Jasprit Bumrah', mvp:'Abhishek Sharma', uncapped_mvp:'Vaibhav Suryavanshi', fair_play:'CSK',
+            highest_team_score:'LSG', striker:'Ishan Kishan', best_bowling_figures:'Yuzvendra Chahal',
+            best_bowling_sr:'Harshal Patel', most_catches:'Tilak Varma', table_bottom:'RR', least_mvp:'Rajat Patidar'
+          }
+        },
+        player2: {
+          name: "Vibeesh",
+          picks: {
+            title_winner:'PBKS', orange_cap:'Shreyas Iyer', most_sixes:'Abhishek Sharma', purple_cap:'Yuzvendra Chahal',
+            most_dots:'Khaleel Ahmed', mvp:'Virat Kohli', uncapped_mvp:'Prabhsimran Singh', fair_play:'DC',
+            highest_team_score:'MI', striker:'Finn Allen', best_bowling_figures:'Varun Chakravarthy',
+            best_bowling_sr:'Jasprit Bumrah', most_catches:'Rinku Singh', table_bottom:'CSK', least_mvp:'Rishabh Pant'
+          }
+        }
       }
-    };
+    ];
 
     const CATEGORIES = [
-      { key:'title_winner', name:'Title winner', mode:'title', weight:'big' },
-      { key:'orange_cap', name:'Orange Cap', mode:'top5_4', weight:'big' },
-      { key:'most_sixes', name:'Most sixes', mode:'top5_4', weight:'big' },
-      { key:'purple_cap', name:'Purple Cap', mode:'top5_4', weight:'big' },
-      { key:'most_dots', name:'Most dots', mode:'top5_4', weight:'big' },
-      { key:'mvp', name:'MVP', mode:'top5_4', weight:'big' },
+      { key:'title_winner', name:'Title winner', mode:'title' },
+      { key:'orange_cap', name:'Orange Cap', mode:'top5_4' },
+      { key:'most_sixes', name:'Most sixes', mode:'top5_4' },
+      { key:'purple_cap', name:'Purple Cap', mode:'top5_4' },
+      { key:'most_dots', name:'Most dots', mode:'top5_4' },
+      { key:'mvp', name:'MVP', mode:'top5_4' },
       { key:'uncapped_mvp', name:'Uncapped MVP', mode:'better_rank' },
       { key:'fair_play', name:'FairPlay award', mode:'better_rank' },
       { key:'highest_team_score', name:'Highest team score', mode:'better_value' },
@@ -220,87 +225,99 @@
     ];
 
     const TEAM_ALIASES = {
-      'mumbai indians':'MI','mi':'MI', 'royal challengers bengaluru':'RCB','royal challengers bangalore':'RCB','rcb':'RCB',
-      'chennai super kings':'CSK','csk':'CSK','delhi capitals':'DC','dc':'DC','gujarat titans':'GT','gt':'GT',
-      'kolkata knight riders':'KKR','kkr':'KKR','lucknow super giants':'LSG','lsg':'LSG','punjab kings':'PBKS','pbks':'PBKS',
-      'rajasthan royals':'RR','rr':'RR','sunrisers hyderabad':'SRH','srh':'SRH'
+      'mumbai indians':'MI','mi':'MI',
+      'royal challengers bengaluru':'RCB','royal challengers bangalore':'RCB','rcb':'RCB',
+      'chennai super kings':'CSK','csk':'CSK',
+      'delhi capitals':'DC','dc':'DC',
+      'gujarat titans':'GT','gt':'GT',
+      'kolkata knight riders':'KKR','kkr':'KKR',
+      'lucknow super giants':'LSG','lsg':'LSG',
+      'punjab kings':'PBKS','pbks':'PBKS',
+      'rajasthan royals':'RR','rr':'RR',
+      'sunrisers hyderabad':'SRH','srh':'SRH'
     };
 
     const PLAYER_ALIASES = {
-      'kl rahul':'KL','k l rahul':'KL','kl':'KL',
-      'shubman gill':'Gill','gill':'Gill',
-      'nicholas pooran':'pooran','pooran':'pooran',
-      'vaibhav suryavanshi':'vaibhav','vaibhav':'vaibhav',
-      'yuzvendra chahal':'chahal','chahal':'chahal',
-      'rashid khan':'Rashid khan','rashid':'Rashid','rashid khan':'Rashid khan',
-      'prasidh krishna':'prasidh','prasidh':'prasidh',
-      'trent boult':'Boult','boult':'Boult',
-      'shreyas iyer':'Iyer','iyer':'Iyer',
+      'kl rahul':'KL Rahul','k l rahul':'KL Rahul','kl':'KL Rahul',
+      'shubman gill':'Shubman Gill','gill':'Shubman Gill',
+      'nicholas pooran':'Nicholas Pooran','pooran':'Nicholas Pooran',
+      'vaibhav suryavanshi':'Vaibhav Suryavanshi','vaibhav':'Vaibhav Suryavanshi',
+      'yuzvendra chahal':'Yuzvendra Chahal','chahal':'Yuzvendra Chahal',
+      'rashid khan':'Rashid Khan','rashid':'Rashid Khan',
+      'prasidh krishna':'Prasidh Krishna','prasidh':'Prasidh Krishna',
+      'trent boult':'Trent Boult','boult':'Trent Boult',
+      'shreyas iyer':'Shreyas Iyer','iyer':'Shreyas Iyer',
       'auqib nabi':'Auqib Nabi',
-      'prashant veer':'prashant veer',
-      'dewald brevis':'Brevis','brevis':'Brevis','d brevis':'D.Brevis','d. brevis':'D.Brevis',
-      'phil salt':'Salt','salt':'Salt',
-      'akeal hosein':'Akeal hosein',
+      'prashant veer':'Prashant Veer',
+      'dewald brevis':'Dewald Brevis','brevis':'Dewald Brevis','d brevis':'Dewald Brevis','d. brevis':'Dewald Brevis',
+      'phil salt':'Phil Salt','salt':'Phil Salt',
+      'akeal hosein':'Akeal Hosein',
       'harshal patel':'Harshal Patel',
-      'josh hazlewood':'hazlewood','hazlewood':'hazlewood',
-      'virat kohli':'Kohli','kohli':'Kohli',
-      'ms dhoni':'MSD','dhoni':'MSD',
-      'cameron green':'Green','green':'Green'
+      'josh hazlewood':'Josh Hazlewood','hazlewood':'Josh Hazlewood',
+      'virat kohli':'Virat Kohli','kohli':'Virat Kohli',
+      'ms dhoni':'MS Dhoni','dhoni':'MS Dhoni','msd':'MS Dhoni',
+      'cameron green':'Cameron Green','green':'Cameron Green',
+      'sanju samson':'Sanju Samson','sanju':'Sanju Samson',
+      'arshdeep singh':'Arshdeep Singh','arshdeep':'Arshdeep Singh',
+      'jasprit bumrah':'Jasprit Bumrah','bumrah':'Jasprit Bumrah',
+      'abhishek sharma':'Abhishek Sharma','abishek sharma':'Abhishek Sharma','abhishek':'Abhishek Sharma','abishek':'Abhishek Sharma',
+      'ishan kishan':'Ishan Kishan','ishan':'Ishan Kishan',
+      'tilak varma':'Tilak Varma','tilak':'Tilak Varma',
+      'rajat patidar':'Rajat Patidar','patidar':'Rajat Patidar',
+      'khaleel ahmed':'Khaleel Ahmed','khaleel':'Khaleel Ahmed',
+      'prabhsimran singh':'Prabhsimran Singh','prabhsimran':'Prabhsimran Singh',
+      'finn allen':'Finn Allen',
+      'varun chakravarthy':'Varun Chakravarthy','vc':'Varun Chakravarthy',
+      'rinku singh':'Rinku Singh','rinku':'Rinku Singh',
+      'rishabh pant':'Rishabh Pant','pant':'Rishabh Pant'
     };
 
-    const DEMO_STATE = {
-      provider:'demo',
-      updatedAt:'2026-03-27 21:10',
-      fetchStatus:'Demo snapshot loaded.',
-      categories:{
-        title_winner:{winner:'',finalists:[],playoffs:['MI','RCB','GT','CSK'],locked:false},
-        orange_cap:{standings:['Gill','KL','Kohli','Ruturaj','Pooran'],locked:false},
-        most_sixes:{standings:['pooran','Salt','Brevis','Head','vaibhav'],locked:false},
-        purple_cap:{standings:['chahal','Rashid','hazlewood','Boult','prasidh'],locked:false},
-        most_dots:{standings:['Boult','prasidh','hazlewood','Bhuvi','Rashid'],locked:false},
-        mvp:{standings:['Iyer','KL','Gill','Rashid','Pooran'],locked:false},
-        uncapped_mvp:{standings:['Auqib Nabi','prashant veer','Sameer Rizvi'],locked:false},
-        fair_play:{standings:['GT','PBKS','MI','CSK','RCB'],locked:false},
-        highest_team_score:{values:{PBKS:242,LSG:236,SRH:228,MI:221},locked:false},
-        striker:{standings:['Salt','Brevis','Head','Pooran','KL'],locked:false},
-        best_bowling_figures:{values:{'Harshal Patel':'5/18','Akeal hosein':'4/14'},locked:false},
-        best_bowling_sr:{standings:['Rashid khan','hazlewood','Boult','chahal','prasidh'],locked:false},
-        most_catches:{standings:['Kohli','D.Brevis','Rinku','Jurel','Tilak'],locked:false},
-        table_bottom:{standings:['KKR','SRH','RR','DC'],locked:false},
-        least_mvp:{standings:['MSD','Green','Rinku','Jadeja'],locked:false}
-      },
-      overrides:{}
-    };
+    const ALL_PLAYERS = [...new Set(Object.values(PLAYER_ALIASES))];
+    const ALL_TEAMS = [...new Set(Object.values(TEAM_ALIASES))];
 
     const EMPTY_STATE = {
-      provider:'official_beta',
       updatedAt:'',
-      fetchStatus:'Waiting for live data… hit refresh.',
+      fetchStatus:'Waiting for live data…',
       categories:Object.fromEntries(CATEGORIES.map(c=>[c.key,{locked:false}])),
-      overrides:{}
+      nextMatch:null
     };
 
-    const STORAGE_KEY = 'iplWarRoomV2';
+    const STORAGE_KEY = 'iplWarRoomMultiV1';
+    const AUTO_MINUTES = 5;
     let refreshTimer = null;
     let refreshing = false;
+    let selectedGameId = 'senthil-sai';
 
     function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
     function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || clone(EMPTY_STATE); }catch{return clone(EMPTY_STATE);} }
     function saveState(state){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function getCurrentGame(){ return GAMES.find(g => g.id === selectedGameId) || GAMES[0]; }
     function normalizeText(v){ return String(v || '').trim().toLowerCase().replace(/\s+/g,' ').replace(/[–—-]/g,'-'); }
     function canonTeam(v){ const key=normalizeText(v); return TEAM_ALIASES[key] || String(v || '').trim(); }
     function canonPlayer(v){ const key=normalizeText(v); return PLAYER_ALIASES[key] || String(v || '').trim(); }
     function canonPick(v){ return TEAM_ALIASES[normalizeText(v)] || PLAYER_ALIASES[normalizeText(v)] || String(v || '').trim(); }
     function samePick(a,b){ return normalizeText(canonPick(a))===normalizeText(canonPick(b)); }
-    function fmtList(arr){ return (arr||[]).slice(0,5).join(', ') || '—'; }
     function getRank(list,pick){ const i=(list||[]).findIndex(x=>samePick(x,pick)); return i===-1?999:i+1; }
     function scoreTop5_4(list,pick){ const r=getRank(list,pick); if(r===1) return 4; if(r===2||r===3) return 3; if(r===4||r===5) return 2; return 1; }
     function scoreTitle(data,pick){ if(samePick(data.winner,pick)) return 5; if((data.finalists||[]).some(x=>samePick(x,pick))) return 3; if((data.playoffs||[]).some(x=>samePick(x,pick))) return 2; return 1; }
     function parseFigures(fig){ const m=String(fig||'').match(/(\d+)\s*\/\s*(\d+)/); return m?{wk:+m[1],runs:+m[2]}:{wk:-1,runs:999}; }
     function compareFigures(a,b){ if(a.wk!==b.wk) return b.wk-a.wk; return a.runs-b.runs; }
-    function betterRank(list,a,b,lowWins=false){ const r1=getRank(list,a), r2=getRank(list,b); if(r1===999&&r2===999) return {me:0,him:0,front:'Tied'}; if(r1<r2) return {me:1,him:0,front:'Senthil'}; if(r2<r1) return {me:0,him:1,front:'Sai'}; return {me:0,him:0,front:'Tied'}; }
-    function betterValue(values,a,b,fig=false){ const v1=values?.[a], v2=values?.[b]; if(v1==null&&v2==null) return {me:0,him:0,front:'Tied'}; if(v1!=null&&v2==null) return {me:1,him:0,front:'Senthil'}; if(v2!=null&&v1==null) return {me:0,him:1,front:'Sai'}; if(fig){ const c=compareFigures(parseFigures(v1),parseFigures(v2)); if(c<0) return {me:1,him:0,front:'Senthil'}; if(c>0) return {me:0,him:1,front:'Sai'}; return {me:0,him:0,front:'Tied'}; }
-      const n1=Number(v1), n2=Number(v2); if(n1>n2) return {me:1,him:0,front:'Senthil'}; if(n2>n1) return {me:0,him:1,front:'Sai'}; return {me:0,him:0,front:'Tied'};
+    function betterRank(list,a,b){ const r1=getRank(list,a), r2=getRank(list,b); if(r1===999&&r2===999) return {p1:0,p2:0,front:'Tied'}; if(r1<r2) return {p1:1,p2:0,front:'P1'}; if(r2<r1) return {p1:0,p2:1,front:'P2'}; return {p1:0,p2:0,front:'Tied'}; }
+    function betterValue(values,a,b,fig=false){
+      const v1=values?.[canonPick(a)] ?? values?.[a], v2=values?.[canonPick(b)] ?? values?.[b];
+      if(v1==null&&v2==null) return {p1:0,p2:0,front:'Tied'};
+      if(v1!=null&&v2==null) return {p1:1,p2:0,front:'P1'};
+      if(v2!=null&&v1==null) return {p1:0,p2:1,front:'P2'};
+      if(fig){
+        const c=compareFigures(parseFigures(v1),parseFigures(v2));
+        if(c<0) return {p1:1,p2:0,front:'P1'};
+        if(c>0) return {p1:0,p2:1,front:'P2'};
+        return {p1:0,p2:0,front:'Tied'};
+      }
+      const n1=Number(v1), n2=Number(v2);
+      if(n1>n2) return {p1:1,p2:0,front:'P1'};
+      if(n2>n1) return {p1:0,p2:1,front:'P2'};
+      return {p1:0,p2:0,front:'Tied'};
     }
 
     function mergeDeep(target, source){
@@ -328,52 +345,50 @@
     }
 
     function computeBoard(state){
-      const rows=[]; let sTotal=0, hTotal=0, sFronts=0, hFronts=0, locked=0;
+      const game = getCurrentGame();
+      const p1Name = game.player1.name, p2Name = game.player2.name;
+      const rows=[]; let p1Total=0, p2Total=0, p1Fronts=0, p2Fronts=0, locked=0;
       for(const cat of CATEGORIES){
-        const live=state.categories[cat.key]||{}; const my=PICKS.senthil[cat.key]; const his=PICKS.sai[cat.key]; let me=0, him=0, front='Tied';
-        if(cat.mode==='title'){ me=scoreTitle(live,my); him=scoreTitle(live,his); }
-        else if(cat.mode==='top5_4'){ me=scoreTop5_4(live.standings||[],my); him=scoreTop5_4(live.standings||[],his); }
-        else if(cat.mode==='better_rank'){ ({me,him,front}=betterRank(live.standings||[],my,his,false)); }
-        else if(cat.mode==='better_rank_low'){ ({me,him,front}=betterRank(live.standings||[],my,his,true)); }
-        else if(cat.mode==='better_value'){ ({me,him,front}=betterValue(live.values||{},my,his,false)); }
-        else if(cat.mode==='better_value_fig'){ ({me,him,front}=betterValue(live.values||{},my,his,true)); }
-        if(cat.mode==='title' || cat.mode==='top5_4'){ front = me>him?'Senthil':him>me?'Sai':'Tied'; }
-        if(front==='Senthil') sFronts++; if(front==='Sai') hFronts++; if(live.locked) locked++; sTotal+=me; hTotal+=him;
-        rows.push({key:cat.key,name:cat.name,myPick:my,hisPick:his,summary:currentSummary(cat.key,live),me,him,front,locked:!!live.locked,live});
+        const live=state.categories[cat.key]||{};
+        const pick1=game.player1.picks[cat.key];
+        const pick2=game.player2.picks[cat.key];
+        let p1=0, p2=0, front='Tied';
+        if(cat.mode==='title'){ p1=scoreTitle(live,pick1); p2=scoreTitle(live,pick2); }
+        else if(cat.mode==='top5_4'){ p1=scoreTop5_4(live.standings||[],pick1); p2=scoreTop5_4(live.standings||[],pick2); }
+        else if(cat.mode==='better_rank' || cat.mode==='better_rank_low'){ ({p1,p2,front}=betterRank(live.standings||[],pick1,pick2)); }
+        else if(cat.mode==='better_value'){ ({p1,p2,front}=betterValue(live.values||{},pick1,pick2,false)); }
+        else if(cat.mode==='better_value_fig'){ ({p1,p2,front}=betterValue(live.values||{},pick1,pick2,true)); }
+        if(cat.mode==='title' || cat.mode==='top5_4'){ front = p1>p2?'P1':p2>p1?'P2':'Tied'; }
+        if(front==='P1') p1Fronts++;
+        if(front==='P2') p2Fronts++;
+        if(live.locked) locked++;
+        p1Total += p1; p2Total += p2;
+        rows.push({
+          key:cat.key,name:cat.name,p1Pick:pick1,p2Pick:pick2,summary:currentSummary(cat.key,live),
+          p1,p2,front,locked:!!live.locked,live,
+          frontLabel: front==='P1' ? p1Name : front==='P2' ? p2Name : 'Tied'
+        });
       }
-      return {rows,sTotal,hTotal,sFronts,hFronts,locked};
+      return {rows,p1Total,p2Total,p1Fronts,p2Fronts,locked,p1Name,p2Name};
     }
 
     function insightText(board){
       const insights=[];
-      const margin = board.sTotal - board.hTotal;
-      if(margin>0) insights.push(`Senthil leads by <strong>${margin}</strong> overall. Sai needs a shift in momentum.`);
-      else if(margin<0) insights.push(`Sai leads by <strong>${Math.abs(margin)}</strong>. Still early — plenty of room to swing.`);
+      const margin = board.p1Total - board.p2Total;
+      if(margin>0) insights.push(`${board.p1Name} leads by <strong>${margin}</strong> overall. ${board.p2Name} needs a shift in momentum.`);
+      else if(margin<0) insights.push(`${board.p2Name} leads by <strong>${Math.abs(margin)}</strong>. Still early — plenty of room to swing.`);
       else insights.push(`Overall score is tied. One good matchday can tilt the whole board.`);
 
-      const swings = board.rows
-        .filter(r=>!r.locked)
-        .map(r=>({...r, gap:Math.abs((r.me||0)-(r.him||0))}))
-        .sort((a,b)=>b.gap-a.gap)
-        .slice(0,3);
-      if(swings.length){
-        insights.push(`Biggest live swings: <strong>${swings.map(r=>r.name).join(', ')}</strong>. Those categories are carrying most of the pressure.`);
-      }
+      const swings = board.rows.filter(r=>!r.locked).map(r=>({...r, gap:Math.abs((r.p1||0)-(r.p2||0))})).sort((a,b)=>b.gap-a.gap).slice(0,3);
+      if(swings.length) insights.push(`Biggest live swings: <strong>${swings.map(r=>r.name).join(', ')}</strong>. Those fronts are carrying the pressure.`);
 
       const tiedBig = board.rows.filter(r=>!r.locked && r.front==='Tied' && ['title_winner','orange_cap','purple_cap','mvp'].includes(r.key)).slice(0,3);
       if(tiedBig.length) insights.push(`Still unresolved and high leverage: <strong>${tiedBig.map(r=>r.name).join(', ')}</strong>.`);
 
       const title = board.rows.find(r=>r.key==='title_winner');
-      if(title && title.live.playoffs?.length){ insights.push(`Current playoff picture: <strong>${title.live.playoffs.join(', ')}</strong>.`); }
+      if(title && title.live.playoffs?.length) insights.push(`Current playoff picture: <strong>${title.live.playoffs.join(', ')}</strong>.`);
 
-      const weak = board.rows
-        .filter(r=>!r.locked)
-        .map(r=>({...r, rankGap: Math.abs((r.me||0)-(r.him||0))}))
-        .sort((a,b)=>b.rankGap-a.rankGap)
-        .slice(0,2);
-      if(weak.length) insights.push(`Most influential categories right now: <strong>${weak.map(r=>r.name).join(', ')}</strong>.`);
-
-      return insights;
+      return insights.length ? insights : ['Waiting for live movement before this gets spicy.'];
     }
 
     function computeConfidence(board){
@@ -382,153 +397,147 @@
         if(cat.mode==='top5_4') return sum + 4;
         return sum + 1;
       }, 0);
-      const remainingSwing = board.rows.filter(r=>!r.locked).reduce((sum,r)=>{
-        return sum + Math.max(1, Math.abs((r.me||0)-(r.him||0)));
-      }, 0);
-      const baseSenthil = board.sTotal / Math.max(1, maxPossible);
-      const baseSai = board.hTotal / Math.max(1, maxPossible);
-      const margin = board.sTotal - board.hTotal;
-      let senthil = 50 + (margin * 4) + (baseSenthil - baseSai) * 30 - remainingSwing * 0.15;
-      senthil = Math.max(5, Math.min(95, senthil));
-      const sai = Math.max(5, Math.min(95, 100 - senthil));
-      return { senthil: Math.round(senthil), sai: Math.round(sai), remainingSwing };
+      const remainingSwing = board.rows.filter(r=>!r.locked).reduce((sum,r)=>sum + Math.max(1, Math.abs((r.p1||0)-(r.p2||0))), 0);
+      const base1 = board.p1Total / Math.max(1, maxPossible);
+      const base2 = board.p2Total / Math.max(1, maxPossible);
+      const margin = board.p1Total - board.p2Total;
+      let p1 = 50 + (margin * 4) + (base1 - base2) * 30 - remainingSwing * 0.15;
+      p1 = Math.max(5, Math.min(95, p1));
+      const p2 = Math.max(5, Math.min(95, 100 - p1));
+      return { p1: Math.round(p1), p2: Math.round(p2) };
     }
 
     function likelyWinnerText(board, confidence){
-      if(board.sTotal === board.hTotal){
-        return { leader:'Too close', sub:'Currently level. Forecast is basically a shrug with spreadsheets.' };
-      }
-      if(confidence.senthil >= 60){
-        return { leader:'Senthil edge', sub:`Senthil is favoured for now at ${confidence.senthil}%. Plenty can still change.` };
-      }
-      if(confidence.sai >= 60){
-        return { leader:'Sai edge', sub:`Sai is favoured for now at ${confidence.sai}%. Plenty can still change.` };
-      }
+      if(board.p1Total === board.p2Total) return { leader:'Too close', sub:'Currently level. Forecast is basically a shrug with spreadsheets.' };
+      if(confidence.p1 >= 60) return { leader:`${board.p1Name} edge`, sub:`${board.p1Name} is favoured for now at ${confidence.p1}%. Plenty can still change.` };
+      if(confidence.p2 >= 60) return { leader:`${board.p2Name} edge`, sub:`${board.p2Name} is favoured for now at ${confidence.p2}%. Plenty can still change.` };
       return {
-        leader: board.sTotal > board.hTotal ? 'Senthil slight edge' : 'Sai slight edge',
-        sub: `This is still volatile. Confidence split is ${confidence.senthil}% to ${confidence.sai}%.`
+        leader: board.p1Total > board.p2Total ? `${board.p1Name} slight edge` : `${board.p2Name} slight edge`,
+        sub: `This is still volatile. Confidence split is ${confidence.p1}% to ${confidence.p2}%.`
       };
     }
 
     function savageLine(board){
-      const diff = board.sTotal - board.hTotal;
-      const weakForSenthil = board.rows.filter(r=>r.front==='Sai').sort((a,b)=>(b.him-b.me)-(a.him-a.me))[0];
-      const weakForSai = board.rows.filter(r=>r.front==='Senthil').sort((a,b)=>(b.me-b.him)-(a.me-a.him))[0];
-
-      const roastSenthil = [
-        weakForSenthil ? `Senthil’s ${weakForSenthil.name} call is currently doing charity work for Sai.` : `Senthil has a few picks running on confidence rather than evidence.`,
-        weakForSenthil ? `${weakForSenthil.myPick} in ${weakForSenthil.name} is not aging well right now.` : `Some of Senthil’s calls are wobbling a bit.`,
-        `Senthil is still alive here, but a couple of picks are one bad week away from comedy.`
+      const diff = board.p1Total - board.p2Total;
+      const weakForP1 = board.rows.filter(r=>r.front==='P2').sort((a,b)=>(b.p2-b.p1)-(a.p2-a.p1))[0];
+      const weakForP2 = board.rows.filter(r=>r.front==='P1').sort((a,b)=>(b.p1-b.p2)-(a.p1-a.p2))[0];
+      const roastP1 = [
+        weakForP1 ? `${board.p1Name}'s ${weakForP1.name} call is currently doing charity work for ${board.p2Name}.` : `${board.p1Name} has a few picks running on confidence rather than evidence.`,
+        weakForP1 ? `${weakForP1.p1Pick} in ${weakForP1.name} is not aging well right now.` : `Some of ${board.p1Name}'s calls are wobbling a bit.`,
+        `${board.p1Name} is still alive here, but a couple of picks are one bad week away from comedy.`
       ];
-
-      const roastSai = [
-        weakForSai ? `Sai’s ${weakForSai.name} pick is currently donating points across the aisle.` : `Sai’s sheet is showing strong imagination and mixed returns.`,
-        weakForSai ? `${weakForSai.hisPick} in ${weakForSai.name} has entered the danger zone.` : `A few of Sai’s calls are hanging on by vibes alone.`,
-        `Sai is still in this, but not every prediction deserves legal representation.`
+      const roastP2 = [
+        weakForP2 ? `${board.p2Name}'s ${weakForP2.name} pick is currently donating points across the aisle.` : `${board.p2Name}'s sheet is showing strong imagination and mixed returns.`,
+        weakForP2 ? `${weakForP2.p2Pick} in ${weakForP2.name} has entered the danger zone.` : `A few of ${board.p2Name}'s calls are hanging on by vibes alone.`,
+        `${board.p2Name} is still in this, but not every prediction deserves legal representation.`
       ];
-
       const neutral = [
         `Both sides are still very much in this.`,
         `One high-swing category can flip the whole mood.`,
         `Neutral scoreboard, maximum dressing-room noise.`
       ];
-
       function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-      if(diff > 0){
-        return { text:`Senthil leads by ${diff}. ${pick(roastSai)}`, sub:pick(neutral) };
-      }
-      if(diff < 0){
-        return { text:`Sai leads by ${Math.abs(diff)}. ${pick(roastSenthil)}`, sub:pick(neutral) };
-      }
-      return {
-        text:`Scores are level. ${pick(roastSenthil)} Also, ${pick(roastSai)}`,
-        sub:`Nobody has full bragging rights yet.`
-      };
+      if(diff > 0) return { text:`${board.p1Name} leads by ${diff}. ${pick(roastP2)}`, sub:pick(neutral) };
+      if(diff < 0) return { text:`${board.p2Name} leads by ${Math.abs(diff)}. ${pick(roastP1)}`, sub:pick(neutral) };
+      return { text:`Scores are level. ${pick(roastP1)} Also, ${pick(roastP2)}`, sub:`Nobody has full bragging rights yet.` };
     }
 
-    function watchItems(board){
+    function watchItems(board, state){
       const items=[];
+      const next = state.nextMatch;
+      if(next){
+        const teams = [next.team1Code, next.team2Code].filter(Boolean);
+        if(teams.length){
+          const titleRow = board.rows.find(r=>r.key==='title_winner');
+          if(titleRow){
+            if(teams.some(t=>samePick(t,titleRow.p1Pick))) items.push(`${board.p1Name}'s title pick <span class="watch">${titleRow.p1Pick}</span> is in the next match. Clean chance to build pressure.`);
+            if(teams.some(t=>samePick(t,titleRow.p2Pick))) items.push(`${board.p2Name}'s title pick <span class="watch">${titleRow.p2Pick}</span> is in the next match. Opportunity knocks.`);
+          }
+          const highRow = board.rows.find(r=>r.key==='highest_team_score');
+          if(highRow){
+            if(teams.some(t=>samePick(t,highRow.p1Pick)) || teams.some(t=>samePick(t,highRow.p2Pick))){
+              items.push(`Highest team score watch: one batting avalanche tonight could move that front.`);
+            }
+          }
+        }
+      }
+
       for(const row of board.rows){
         if(row.key==='orange_cap' && row.live.standings?.length){
-          const mr=getRank(row.live.standings,row.myPick), hr=getRank(row.live.standings,row.hisPick);
-          items.push(`Orange Cap: <span class="watch">${row.myPick}</span> is #${mr===999?'outside top 5':mr}, <span class="watch">${row.hisPick}</span> is #${hr===999?'outside top 5':hr}.`);
+          const r1=getRank(row.live.standings,row.p1Pick), r2=getRank(row.live.standings,row.p2Pick);
+          items.push(`Orange Cap: <span class="watch">${row.p1Pick}</span> is #${r1===999?'outside top 5':r1}, <span class="watch">${row.p2Pick}</span> is #${r2===999?'outside top 5':r2}.`);
         }
         if(row.key==='purple_cap' && row.live.standings?.length){
-          const mr=getRank(row.live.standings,row.myPick), hr=getRank(row.live.standings,row.hisPick);
-          items.push(`Purple Cap: <span class="watch">${row.myPick}</span> sits at #${mr===999?'outside top 5':mr}; <span class="watch">${row.hisPick}</span> is #${hr===999?'outside top 5':hr}.`);
+          const r1=getRank(row.live.standings,row.p1Pick), r2=getRank(row.live.standings,row.p2Pick);
+          items.push(`Purple Cap: <span class="watch">${row.p1Pick}</span> sits at #${r1===999?'outside top 5':r1}; <span class="watch">${row.p2Pick}</span> is #${r2===999?'outside top 5':r2}.`);
         }
         if(row.key==='highest_team_score' && row.live.values){
-          const a=row.live.values[row.myPick], b=row.live.values[row.hisPick];
-          if(a!=null || b!=null) items.push(`Highest team score: <span class="watch">${row.myPick}</span> ${a ?? '—'} vs <span class="watch">${row.hisPick}</span> ${b ?? '—'}. One lunatic batting night can steal this.`);
+          const a=row.live.values[canonPick(row.p1Pick)] ?? row.live.values[row.p1Pick], b=row.live.values[canonPick(row.p2Pick)] ?? row.live.values[row.p2Pick];
+          if(a!=null || b!=null) items.push(`Highest team score: <span class="watch">${row.p1Pick}</span> ${a ?? '—'} vs <span class="watch">${row.p2Pick}</span> ${b ?? '—'}. One lunatic batting night can steal this.`);
         }
         if(items.length>=4) break;
       }
-      if(!items.length) items.push('No live watch items yet. Refresh or switch to demo data to wake the beast up.');
-      return items;
+      return items.length ? items.slice(0,4) : ['No live watch items yet. The season is being mysterious on purpose.'];
     }
 
-    function render(){
-      const state=loadState();
-      const board=computeBoard(state);
+    function renderTabs(){
+      const tabs = document.getElementById('tabs');
+      tabs.innerHTML = '';
+      GAMES.forEach(game => {
+        const btn = document.createElement('button');
+        btn.className = `tab-btn ${game.id === selectedGameId ? 'active' : ''}`;
+        btn.textContent = game.title;
+        btn.onclick = () => { selectedGameId = game.id; render(); };
+        tabs.appendChild(btn);
+      });
+    }
 
-      document.getElementById('providerSelect').value = state.provider || 'official_beta';
-      document.getElementById('providerLabel').textContent = `Provider: ${state.provider==='official_beta'?'Live':'Demo'}`;
-      document.getElementById('liveState').textContent = refreshing?'Refreshing…':(state.provider==='official_beta'?'Auto':'Demo');
-      document.getElementById('fetchStatus').textContent = state.fetchStatus || '—';
-      document.getElementById('overallScore').textContent = `${board.sTotal} - ${board.hTotal}`;
-      document.getElementById('frontsWon').textContent = `${board.sFronts} - ${board.hFronts}`;
-      document.getElementById('lockedCount').textContent = String(board.locked);
-      document.getElementById('lastUpdated').textContent = state.updatedAt || '—';
+    function renderNextMatch(state, board){
+      const cardTeams = document.getElementById('nextMatchTeams');
+      const cardMeta = document.getElementById('nextMatchMeta');
+      const cardImpact = document.getElementById('nextMatchImpact');
+      const next = state.nextMatch;
+      if(!next){
+        cardTeams.textContent = 'TBC';
+        cardMeta.textContent = 'Upcoming fixture not found yet';
+        cardImpact.textContent = 'Once the schedule fetch lands, this card will explain the next swing point.';
+        return;
+      }
+      const teamsText = `${next.team1Code || next.team1 || 'TBD'} vs ${next.team2Code || next.team2 || 'TBD'}`;
+      cardTeams.textContent = teamsText;
+      cardMeta.textContent = [next.dateText, next.venue].filter(Boolean).join(' • ') || 'Schedule loaded';
+      cardImpact.textContent = buildImpactComment(next, board);
+    }
 
-      let leader='Overall tied'; let delta='Scores level. Nothing to separate them yet.'; let banner='Overall score is level.';
-      if(board.sTotal>board.hTotal){ leader='Senthil leads'; delta=`Senthil leads by ${board.sTotal-board.hTotal} points.`; banner='Senthil currently leads overall.'; }
-      if(board.hTotal>board.sTotal){ leader='Sai leads'; delta=`Sai leads by ${board.hTotal-board.sTotal} points.`; banner='Sai currently leads overall.'; }
-      document.getElementById('overallDelta').textContent = delta;
-      document.getElementById('bannerLeader').textContent = banner;
-      const confidence = computeConfidence(board);
-      const forecast = likelyWinnerText(board, confidence);
-      document.getElementById('likelyWinner').textContent = forecast.leader;
-      document.getElementById('winnerForecast').textContent = forecast.sub;
-      document.getElementById('confidenceScore').textContent = `${confidence.senthil}% - ${confidence.sai}%`;
-      document.getElementById('confidenceBreakdown').textContent = `Senthil confidence ${confidence.senthil}%, Sai confidence ${confidence.sai}%. Remaining swing still matters.`;
-
-      const tbody=document.getElementById('categoryTable');
-      tbody.innerHTML = board.rows.map(r=>{
-        const frontClass=r.front==='Senthil'?'good':r.front==='Sai'?'bad':'warn';
-        const statusClass=r.locked?'good':'blue';
-        return `<tr>
-          <td><strong>${r.name}</strong></td>
-          <td>${r.myPick}</td>
-          <td>${r.hisPick}</td>
-          <td class="muted">${r.summary}</td>
-          <td><strong>${r.me}</strong></td>
-          <td><strong>${r.him}</strong></td>
-          <td><span class="pill ${frontClass}">${r.front}</span></td>
-          <td><span class="pill ${statusClass}">${r.locked?'Locked':'Live'}</span></td>
-        </tr>`;
-      }).join('');
-
-      const insights = insightText(board);
-      document.getElementById('insightsList').innerHTML = insights.map(t=>`<div class="list-item">${t}</div>`).join('');
-      const sav = savageLine(board);
-      document.getElementById('savageText').textContent = sav.text;
-      document.getElementById('savageSub').textContent = sav.sub;
-      document.getElementById('watchList').innerHTML = watchItems(board).map(t=>`<div class="list-item">${t}</div>`).join('');
-      document.getElementById('overrideInput').value = JSON.stringify(state.overrides || {}, null, 2);
-
-      const auto = localStorage.getItem(STORAGE_KEY+'_auto') === '1';
-      document.getElementById('autoToggle').checked = auto;
-      document.getElementById('intervalSelect').value = localStorage.getItem(STORAGE_KEY+'_int') || '5';
-      document.getElementById('refreshLabel').textContent = auto?`Auto-refresh on • every ${document.getElementById('intervalSelect').value} min`:'Auto-refresh off';
+    function buildImpactComment(next, board){
+      const teams = [next.team1Code, next.team2Code].filter(Boolean);
+      if(!teams.length) return 'This one matters because any match can wake up a sleepy prediction board.';
+      const hooks = [];
+      const titleRow = board.rows.find(r=>r.key==='title_winner');
+      const highRow = board.rows.find(r=>r.key==='highest_team_score');
+      const fairRow = board.rows.find(r=>r.key==='fair_play');
+      const bottomRow = board.rows.find(r=>r.key==='table_bottom');
+      if(titleRow){
+        if(teams.some(t=>samePick(t,titleRow.p1Pick))) hooks.push(`${board.p1Name} needs ${titleRow.p1Pick} to look like a real title call.`);
+        if(teams.some(t=>samePick(t,titleRow.p2Pick))) hooks.push(`${board.p2Name} can strengthen the title route if ${titleRow.p2Pick} delivers.`);
+      }
+      if(highRow && (teams.some(t=>samePick(t,highRow.p1Pick)) || teams.some(t=>samePick(t,highRow.p2Pick)))) {
+        hooks.push(`Batting explosion alert: highest-team-score picks are live tonight.`);
+      }
+      if(fairRow && (teams.some(t=>samePick(t,fairRow.p1Pick)) || teams.some(t=>samePick(t,fairRow.p2Pick)))) {
+        hooks.push(`Even the FairPlay weirdness has a stake in this one.`);
+      }
+      if(bottomRow && (teams.some(t=>samePick(t,bottomRow.p1Pick)) || teams.some(t=>samePick(t,bottomRow.p2Pick)))) {
+        hooks.push(`Table-bottom predictions can quietly get uglier here.`);
+      }
+      return hooks[0] || `This match may not lock a category, but it can absolutely nudge momentum and vibes.`;
     }
 
     async function safeFetchText(url){
       const attempts = [
         url,
         `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-        `https://r.jina.ai/http://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
       ];
       let lastErr = null;
       for(const attempt of attempts){
@@ -542,6 +551,19 @@
       throw lastErr || new Error('Fetch failed');
     }
 
+    async function safeFetchJson(url){
+      const attempts = [url, `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`];
+      let lastErr = null;
+      for(const attempt of attempts){
+        try{
+          const res = await fetch(attempt, {cache:'no-store'});
+          if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+          return await res.json();
+        }catch(err){ lastErr = err; }
+      }
+      throw lastErr || new Error('JSON fetch failed');
+    }
+
     function extractTeamOrder(text){
       const names = ['Mumbai Indians','Royal Challengers Bengaluru','Royal Challengers Bangalore','Chennai Super Kings','Delhi Capitals','Gujarat Titans','Kolkata Knight Riders','Lucknow Super Giants','Punjab Kings','Rajasthan Royals','Sunrisers Hyderabad'];
       const hits = [];
@@ -553,8 +575,7 @@
     }
 
     function extractNamedList(text, candidates, max=5){
-      const hits=[];
-      const lower=normalizeText(text);
+      const hits=[]; const lower=normalizeText(text);
       for(const c of candidates){
         const idx = lower.indexOf(normalizeText(c));
         if(idx!==-1) hits.push({name:canonPick(c), idx});
@@ -563,8 +584,6 @@
     }
 
     function parseStatFromText(text, catKey){
-      const playersAll = ['KL Rahul','Gill','Nicholas Pooran','Pooran','Vaibhav Suryavanshi','Yuzvendra Chahal','Rashid Khan','Prasidh Krishna','Trent Boult','Shreyas Iyer','Auqib Nabi','Prashant Veer','Dewald Brevis','Phil Salt','Akeal Hosein','Harshal Patel','Josh Hazlewood','Virat Kohli','MS Dhoni','Cameron Green'];
-      const teamsAll = ['Mumbai Indians','Royal Challengers Bengaluru','Chennai Super Kings','Delhi Capitals','Gujarat Titans','Kolkata Knight Riders','Lucknow Super Giants','Punjab Kings','Rajasthan Royals','Sunrisers Hyderabad'];
       const out = {locked:false, note:'Auto parse did not find enough data yet.'};
       const t = String(text || '');
       if(catKey==='title_winner'){
@@ -579,31 +598,53 @@
       }
       if(catKey==='highest_team_score'){
         const values={};
-        for(const team of teamsAll){
+        for(const team of ALL_TEAMS){
           const abbr=canonTeam(team);
-          const re = new RegExp(`(?:${team}|${abbr})[^\n\r]{0,30}?(\d{3})\/(\d+)`, 'ig');
-          let m; while((m=re.exec(t))){ values[abbr]=Math.max(values[abbr]||0, Number(m[1])); }
+          const teamNames = Object.keys(TEAM_ALIASES).filter(k => TEAM_ALIASES[k]===abbr);
+          for(const teamName of teamNames){
+            const escaped = teamName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+            const re = new RegExp(`(?:${escaped})[^\\n\\r]{0,30}?(\\d{3})\\/(\\d+)`, 'ig');
+            let m; while((m=re.exec(t))){ values[abbr]=Math.max(values[abbr]||0, Number(m[1])); }
+          }
         }
         out.values = values;
         return out;
       }
       if(catKey==='best_bowling_figures'){
         const values={};
-        for(const p of playersAll){
-          const canon=canonPlayer(p);
+        for(const p of ALL_PLAYERS){
           const escaped = p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-          const re = new RegExp(`${escaped}[^\n\r]{0,30}?(\d+\/\d+)`, 'ig');
-          let m; while((m=re.exec(t))){ values[canon]=m[1]; }
+          const re = new RegExp(`${escaped}[^\\n\\r]{0,30}?(\\d+\\/\\d+)`, 'ig');
+          let m; while((m=re.exec(t))){ values[p]=m[1]; }
         }
         out.values = values;
         return out;
       }
-      // Generic ordered list by appearance from text.
-      out.standings = extractNamedList(t, catKey==='fair_play'?teamsAll:playersAll, 5);
+      out.standings = extractNamedList(t, catKey==='fair_play'?ALL_TEAMS:ALL_PLAYERS, 5);
       return out;
     }
 
-    async function fetchOfficialBeta(){
+    async function fetchNextMatch(){
+      try{
+        const data = await safeFetchJson('https://cricbuzz-live.vercel.app/v1/matches/upcoming');
+        const list = data?.typeMatches?.flatMap(tm => tm.seriesMatches || []).flatMap(sm => sm.seriesAdWrapper ? sm.seriesAdWrapper.matches || [] : []) || data?.matches || [];
+        const match = list.find(m => m?.matchInfo?.team1?.teamSName && m?.matchInfo?.team2?.teamSName) || null;
+        if(!match) return null;
+        const info = match.matchInfo;
+        return {
+          team1: info.team1.teamName,
+          team2: info.team2.teamName,
+          team1Code: canonTeam(info.team1.teamSName || info.team1.teamName),
+          team2Code: canonTeam(info.team2.teamSName || info.team2.teamName),
+          venue: info.venueInfo?.ground ? `${info.venueInfo.ground}${info.venueInfo.city ? ', ' + info.venueInfo.city : ''}` : (info.venueInfo?.city || ''),
+          dateText: new Date(Number(info.startDate)).toLocaleString([], { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
+        };
+      }catch(_err){
+        return null;
+      }
+    }
+
+    async function fetchOfficial(){
       const pages = {
         stats:'https://www.iplt20.com/stats/2026',
         points:'https://www.iplt20.com/points-table',
@@ -618,10 +659,8 @@
       }));
 
       const fresh = clone(EMPTY_STATE);
-      fresh.provider = 'official_beta';
       fresh.updatedAt = new Date().toLocaleString();
       fresh.fetchStatus = notes.length ? `Partial refresh: ${notes.join(', ')}.` : 'Official pages refreshed.';
-      // Parse broad sources. Same text may be reused across categories.
       fresh.categories.title_winner = mergeDeep(fresh.categories.title_winner, parseStatFromText(`${texts.points}\n${texts.home}`, 'title_winner'));
       fresh.categories.table_bottom = mergeDeep(fresh.categories.table_bottom, parseStatFromText(texts.points, 'table_bottom'));
       fresh.categories.orange_cap = mergeDeep(fresh.categories.orange_cap, parseStatFromText(texts.stats, 'orange_cap'));
@@ -637,42 +676,23 @@
       fresh.categories.best_bowling_sr = mergeDeep(fresh.categories.best_bowling_sr, parseStatFromText(texts.stats, 'best_bowling_sr'));
       fresh.categories.most_catches = mergeDeep(fresh.categories.most_catches, parseStatFromText(texts.stats, 'most_catches'));
       fresh.categories.least_mvp = mergeDeep(fresh.categories.least_mvp, parseStatFromText(texts.stats, 'least_mvp'));
+      fresh.nextMatch = await fetchNextMatch();
 
-      // Carry previous data forward if fresh parse is empty for a category.
       const prev = loadState();
       for(const cat of CATEGORIES){
-        const k = cat.key;
-        const cur = fresh.categories[k] || {};
-        const old = prev.categories?.[k] || {};
+        const k = cat.key, cur = fresh.categories[k] || {}, old = prev.categories?.[k] || {};
         const curHas = (cur.standings && cur.standings.length) || (cur.values && Object.keys(cur.values).length) || cur.winner || (cur.playoffs && cur.playoffs.length);
         if(!curHas && old){ fresh.categories[k] = mergeDeep(clone(old), cur); }
       }
-      // Apply saved overrides after fetch.
-      fresh.overrides = clone(prev.overrides || {});
-      applyOverridesToState(fresh, fresh.overrides);
+      if(!fresh.nextMatch && prev.nextMatch) fresh.nextMatch = prev.nextMatch;
       return fresh;
     }
 
-    function applyOverridesToState(state, overrides){
-      if(!overrides || typeof overrides !== 'object') return state;
-      mergeDeep(state, clone(overrides));
-      return state;
-    }
-
-    async function doRefresh(forceProvider){
+    async function doRefresh(){
       if(refreshing) return;
       refreshing = true; render();
       try{
-        let state;
-        const current=loadState();
-        const provider = forceProvider || current.provider || 'official_beta';
-        if(provider==='demo'){
-          state = clone(DEMO_STATE);
-          state.provider='demo';
-        } else {
-          state = await fetchOfficialBeta();
-        }
-        state.provider = provider;
+        const state = await fetchOfficial();
         saveState(state);
       } catch(err){
         const state=loadState();
@@ -686,35 +706,67 @@
 
     function scheduleAuto(){
       if(refreshTimer) clearInterval(refreshTimer);
-      const enabled = localStorage.getItem(STORAGE_KEY+'_auto') === '1';
-      const mins = Number(localStorage.getItem(STORAGE_KEY+'_int') || '5');
-      if(enabled){ refreshTimer = setInterval(()=>doRefresh(), mins*60*1000); }
-      render();
+      refreshTimer = setInterval(()=>doRefresh(), AUTO_MINUTES*60*1000);
     }
 
-    document.getElementById('refreshBtn').addEventListener('click',()=>doRefresh());
-    document.getElementById('resetBtn').addEventListener('click',()=>{ localStorage.removeItem(STORAGE_KEY); saveState(clone(EMPTY_STATE)); render(); });
-    document.getElementById('providerSelect').addEventListener('change',e=>{ const state=loadState(); state.provider=e.target.value; saveState(state); render(); doRefresh(e.target.value); });
-    document.getElementById('autoToggle').addEventListener('change',e=>{ localStorage.setItem(STORAGE_KEY+'_auto', e.target.checked?'1':'0'); scheduleAuto(); });
-    document.getElementById('intervalSelect').addEventListener('change',e=>{ localStorage.setItem(STORAGE_KEY+'_int', e.target.value); scheduleAuto(); });
-    document.getElementById('applyOverridesBtn').addEventListener('click',()=>{
-      try{
-        const parsed = JSON.parse(document.getElementById('overrideInput').value || '{}');
-        const state=loadState();
-        state.overrides = parsed;
-        applyOverridesToState(state, parsed);
-        state.fetchStatus = 'Overrides applied.';
-        state.updatedAt = new Date().toLocaleString();
-        saveState(state); render();
-      } catch(err){ alert('Override JSON is invalid. Tiny typo, giant chaos.'); }
-    });
-    document.getElementById('clearOverridesBtn').addEventListener('click',()=>{ const state=loadState(); state.overrides={}; saveState(state); render(); });
-    document.getElementById('copyStateBtn').addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(JSON.stringify(loadState(), null, 2)); alert('Full state copied.'); } catch { alert('Clipboard blocked. Manual copy time.'); } });
+    function render(){
+      renderTabs();
+      const state=loadState();
+      const board=computeBoard(state);
+      const confidence = computeConfidence(board);
+      const forecast = likelyWinnerText(board, confidence);
+      const game = getCurrentGame();
+
+      document.getElementById('providerLabel').textContent = 'Provider: Live auto';
+      document.getElementById('refreshLabel').textContent = `Refreshing every ${AUTO_MINUTES} min`;
+      document.getElementById('liveState').textContent = refreshing?'Refreshing…':'Auto';
+      document.getElementById('fetchStatus').textContent = state.fetchStatus || '—';
+      document.getElementById('overallScore').textContent = `${board.p1Total} - ${board.p2Total}`;
+      document.getElementById('frontsWon').textContent = `${board.p1Fronts} - ${board.p2Fronts}`;
+      document.getElementById('lockedCount').textContent = String(board.locked);
+      document.getElementById('lastUpdated').textContent = state.updatedAt || '—';
+
+      let banner='Overall score is level.';
+      let delta='Scores level. Nothing to separate them yet.';
+      if(board.p1Total>board.p2Total){ banner=`${board.p1Name} currently leads overall.`; delta=`${board.p1Name} leads by ${board.p1Total-board.p2Total} points.`; }
+      if(board.p2Total>board.p1Total){ banner=`${board.p2Name} currently leads overall.`; delta=`${board.p2Name} leads by ${board.p2Total-board.p1Total} points.`; }
+      document.getElementById('bannerLeader').textContent = banner;
+      document.getElementById('overallDelta').textContent = delta;
+      document.getElementById('likelyWinner').textContent = forecast.leader;
+      document.getElementById('winnerForecast').textContent = forecast.sub;
+      document.getElementById('confidenceScore').textContent = `${confidence.p1}% - ${confidence.p2}%`;
+      document.getElementById('confidenceBreakdown').textContent = `${board.p1Name} confidence ${confidence.p1}%, ${board.p2Name} confidence ${confidence.p2}%. Remaining swing still matters.`;
+
+      document.getElementById('thP1').textContent = game.player1.name;
+      document.getElementById('thP2').textContent = game.player2.name;
+
+      const tbody=document.getElementById('categoryTable');
+      tbody.innerHTML = board.rows.map(r=>{
+        const frontClass=r.front==='P1'?'good':r.front==='P2'?'bad':'warn';
+        const statusClass=r.locked?'good':'blue';
+        return `<tr>
+          <td><strong>${r.name}</strong></td>
+          <td>${r.p1Pick}</td>
+          <td>${r.p2Pick}</td>
+          <td class="muted">${r.summary}</td>
+          <td><strong>${r.p1}</strong></td>
+          <td><strong>${r.p2}</strong></td>
+          <td><span class="pill ${frontClass}">${r.frontLabel}</span></td>
+          <td><span class="pill ${statusClass}">${r.locked?'Locked':'Live'}</span></td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('insightsList').innerHTML = insightText(board).map(t=>`<div class="list-item">${t}</div>`).join('');
+      const sav = savageLine(board);
+      document.getElementById('savageText').textContent = sav.text;
+      document.getElementById('savageSub').textContent = sav.sub;
+      document.getElementById('watchList').innerHTML = watchItems(board, state).map(t=>`<div class="list-item">${t}</div>`).join('');
+      renderNextMatch(state, board);
+    }
 
     if(!localStorage.getItem(STORAGE_KEY)) saveState(clone(EMPTY_STATE));
-    if(!localStorage.getItem(STORAGE_KEY+'_int')) localStorage.setItem(STORAGE_KEY+'_int','5');
     render();
-    if(loadState().provider === 'official_beta' && !loadState().updatedAt){ doRefresh('official_beta'); }
+    doRefresh();
     scheduleAuto();
   </script>
 </body>
