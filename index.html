@@ -133,7 +133,7 @@
       <p class="sub">Live tracker for the season-long nonsense, delusion, and occasional genius. Scoring logic fixed. Season lock fixed. Next match card fixed.</p>
       <div class="tabs" id="tabs"></div>
       <div class="meta">
-        <div class="pill" id="providerPill">Provider: Live / embedded official schedule</div>
+        <div class="pill" id="providerPill">Provider: data/live.json (worker-fed)</div>
         <div class="pill" id="seasonPill">Season: IPL 2026 only</div>
         <div class="pill" id="updatedPill">Last updated: --</div>
       </div>
@@ -177,7 +177,7 @@
       <div class="span-4" style="display:grid;gap:16px">
         <div class="card"><div class="section-title">Smart insights</div><div id="insights"></div></div>
         <div class="card roast"><div class="section-title">Roast corner</div><div id="roasts"></div></div>
-        <div class="card"><div class="section-title">Quick notes</div><div class="insight">Refresh cadence: this app auto-refreshes every time the page reloads with embedded live logic layered on top.</div><div class="insight">Trust markers matter: season lock is IPL 2026 only and Least MVP is treated as lower on the ESPNcricinfo MVP page.</div></div>
+        <div class="card"><div class="section-title">Quick notes</div><div class="insight">Refresh cadence: this app reads ./data/live.json, which is meant to be refreshed by the Playwright worker outside the browser.</div><div class="insight">Trust markers matter: the browser no longer scrapes IPL pages directly. It consumes a worker-generated JSON snapshot built from the exact source pages.</div></div>
       </div>
     </div>
   </div>
@@ -286,14 +286,14 @@
       { key:'purpleCap', label:'Purple cap', type:'top5' },
       { key:'mostDots', label:'Most dot balls', type:'top5' },
       { key:'mvp', label:'MVP', type:'top5' },
-      { key:'uncappedMvp', label:'Uncapped MVP', type:'winner_better' },
-      { key:'fairPlay', label:'Fair Play award', type:'winner_better' },
-      { key:'highestScoreTeam', label:'Highest team score', type:'winner_better' },
+      { key:'uncappedMvp', label:'Uncapped MVP', type:'better_rank' },
+      { key:'fairPlay', label:'Fair Play award', type:'better_rank' },
+      { key:'highestScoreTeam', label:'Highest team score', type:'better_rank' },
       { key:'striker', label:'Striker of the season', type:'better_rank' },
       { key:'bestBowlingFigures', label:'Best bowling figures', type:'better_rank' },
       { key:'bestBowlingStrikeRate', label:'Best bowling strike rate', type:'better_rank' },
       { key:'mostCatches', label:'Most catches', type:'better_rank' },
-      { key:'tableBottom', label:'Bottom of table', type:'winner_better' },
+      { key:'tableBottom', label:'Bottom of table', type:'better_rank_low' },
       { key:'leastMvp', label:'Least MVP', type:'better_rank_low' }
     ];
 
@@ -371,29 +371,37 @@
       [70,'2026-05-24T19:30:00+05:30','Kolkata Knight Riders','Delhi Capitals','Kolkata']
     ].map(([matchNo,start,home,away,venue]) => ({matchNo,start,home,away,venue}));
 
-    // ========= MANUAL LIVE DATA FALLBACK =========
-    // The app can fetch live stats if you wire in richer sources later.
-    // For now, this object guarantees the page works and the scoring engine is correct.
-    // Update any rank arrays here while the season unfolds, or plug into your fetch layer.
+    // ========= LIVE DATA =========
+    // This object is hydrated from ./data/live.json by the frontend.
+    // A scheduled Playwright worker updates that file outside the browser so the app
+    // does not need to scrape JS-rendered pages on the client.
     const LIVE_2026 = {
       season: 2026,
-      fetchedAt: new Date().toISOString(),
-      titleWinner: { winner: null },
-      orangeCap: { ranking: [] },
-      mostSixes: { ranking: [] },
-      purpleCap: { ranking: [] },
-      mostDots: { ranking: [] },
-      mvp: { ranking: [] },
-      uncappedMvp: { winner: null },
-      fairPlay: { winner: null },
-      highestScoreTeam: { winner: null },
-      striker: { ranking: [] },
-      bestBowlingFigures: { ranking: [] },
-      bestBowlingStrikeRate: { ranking: [] },
-      mostCatches: { ranking: [] },
-      tableBottom: { winner: null },
-      leastMvp: { ranking: [], source: 'https://www.espncricinfo.com/series/ipl-2026-1510719/most-valuable-players' }
+      fetchedAt: null,
+      provider: 'data/live.json',
+      scrapeStatus: 'waiting',
+      scrapeReport: {},
+      titleWinner: { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [] },
+      orangeCap: { ranking: [], extendedRanking: [] },
+      mostSixes: { ranking: [], extendedRanking: [] },
+      purpleCap: { ranking: [], extendedRanking: [] },
+      mostDots: { ranking: [], extendedRanking: [] },
+      mvp: { ranking: [], extendedRanking: [] },
+      uncappedMvp: { ranking: [], extendedRanking: [] },
+      fairPlay: { ranking: [], extendedRanking: [] },
+      highestScoreTeam: { ranking: [], extendedRanking: [], values: {} },
+      striker: { ranking: [], extendedRanking: [] },
+      bestBowlingFigures: { ranking: [], extendedRanking: [] },
+      bestBowlingStrikeRate: { ranking: [], extendedRanking: [] },
+      mostCatches: { ranking: [], extendedRanking: [] },
+      tableBottom: { ranking: [], extendedRanking: [] },
+      leastMvp: { ranking: [], extendedRanking: [] }
     };
+
+    const LIVE_KEYS = [
+      'titleWinner','orangeCap','mostSixes','purpleCap','mostDots','mvp','uncappedMvp','fairPlay','highestScoreTeam',
+      'striker','bestBowlingFigures','bestBowlingStrikeRate','mostCatches','tableBottom','leastMvp'
+    ];
 
     // ========= OPTIONAL LIVE SOURCE HOOKS =========
     // Drop fetched results into LIVE_2026 with ONLY IPL 2026 data.
@@ -545,7 +553,7 @@
       }
       return {
         a, b, rankA:rA, rankB:rB,
-        note: ranking.length ? `Ranking: ${ranking.join(', ')}` : 'Waiting for ranking'
+        note: ranking.length ? `Ranking: ${ranking.slice(0, 10).join(', ')}${ranking.length > 10 ? ' …' : ''}` : 'Waiting for ranking'
       };
     }
 
@@ -559,7 +567,7 @@
       }
       return {
         a, b, rankA:rA, rankB:rB,
-        note: ranking.length ? `Least-MVP order (lower on page wins): ${ranking.slice(0, 20).join(', ')}${ranking.length > 20 ? ' …' : ''}` : 'Waiting for least-MVP ranking'
+        note: ranking.length ? `Ranking (lower on page wins): ${ranking.slice(0, 10).join(', ')}${ranking.length > 10 ? ' …' : ''}` : 'Waiting for least-MVP ranking'
       };
     }
 
@@ -609,7 +617,9 @@
           pickB: matchup.b.picks[category.key] || '—',
           a: result.a,
           b: result.b,
-          note: result.note
+          note: result.note,
+          rankA: result.rankA || null,
+          rankB: result.rankB || null
         };
       });
 
@@ -651,62 +661,50 @@
     }
 
 
-    async function safeFetchText(url){
-      const attempts = [
-        `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
-      ];
-      for (const attempt of attempts){
-        try {
-          const res = await fetch(attempt, { cache:'no-store' });
-          if (!res.ok) continue;
-          const txt = await res.text();
-          if (txt && txt.length > 100) return txt;
-        } catch (_err) {}
-      }
-      throw new Error('Least MVP source fetch failed');
-    }
+    
+    function mergeLiveData(payload){
+      if (!payload || typeof payload !== 'object') return;
+      LIVE_2026.season = payload.season || LIVE_2026.season;
+      LIVE_2026.fetchedAt = payload.fetchedAt || LIVE_2026.fetchedAt;
+      LIVE_2026.provider = payload.provider || LIVE_2026.provider;
+      LIVE_2026.scrapeStatus = payload.scrapeStatus || LIVE_2026.scrapeStatus;
+      LIVE_2026.scrapeReport = payload.scrapeReport || LIVE_2026.scrapeReport;
 
-    function uniq(arr){
-      return [...new Set(arr.filter(Boolean))];
-    }
-
-    function parseLeastMvpRankingFromText(text){
-      const names = [
-        'MS Dhoni','Cameron Green','Rajat Patidar','Rishabh Pant','KL Rahul','Shubman Gill','Nicholas Pooran',
-        'Yuzvendra Chahal','Rashid Khan','Prasidh Krishna','Trent Boult','Shreyas Iyer','Virat Kohli','Dewald Brevis',
-        'Josh Hazlewood','Harshal Patel','Phil Salt','Akeal Hosein','Abhishek Sharma','Arshdeep Singh','Jasprit Bumrah',
-        'Tilak Varma','Khaleel Ahmed','Rinku Singh','Vaibhav Suryavanshi','Vaibhav Suryavanshi','Sanju Samson',
-        'Ishan Kishan','Varun Chakravarthy','Prabhsimran Singh'
-      ];
-      const lines = String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-      const hits = [];
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        for (const name of names) {
-          const needle = normalizeName(name);
-          if (normalizeName(line).includes(needle)) {
-            hits.push({ name: name === 'Vaibhav Suryavanshi' ? 'Vaibhav Suryavanshi' : name, i });
-          }
+      LIVE_KEYS.forEach(key => {
+        if (!(key in payload)) return;
+        const src = payload[key];
+        if (src && typeof src === 'object' && !Array.isArray(src)) {
+          LIVE_2026[key] = {
+            ...LIVE_2026[key],
+            ...src
+          };
         }
+      });
+
+      if ((!LIVE_2026.uncappedMvp.ranking || !LIVE_2026.uncappedMvp.ranking.length) && LIVE_2026.mvp.extendedRanking?.length) {
+        LIVE_2026.uncappedMvp.ranking = [...LIVE_2026.mvp.extendedRanking];
+        LIVE_2026.uncappedMvp.extendedRanking = [...LIVE_2026.mvp.extendedRanking];
       }
-      const ordered = hits.sort((a,b) => a.i - b.i).map(x => x.name);
-      return uniq(ordered);
+      if ((!LIVE_2026.leastMvp.ranking || !LIVE_2026.leastMvp.ranking.length) && LIVE_2026.mvp.extendedRanking?.length) {
+        LIVE_2026.leastMvp.ranking = [...LIVE_2026.mvp.extendedRanking];
+        LIVE_2026.leastMvp.extendedRanking = [...LIVE_2026.mvp.extendedRanking];
+      }
+      if ((!LIVE_2026.tableBottom.ranking || !LIVE_2026.tableBottom.ranking.length) && LIVE_2026.titleWinner.extendedRanking?.length) {
+        LIVE_2026.tableBottom.ranking = [...LIVE_2026.titleWinner.extendedRanking];
+        LIVE_2026.tableBottom.extendedRanking = [...LIVE_2026.titleWinner.extendedRanking];
+      }
     }
 
-    async function hydrateLeastMvp(){
+    async function loadLiveData(){
       try {
-        const text = await safeFetchText(LIVE_2026.leastMvp.source);
-        const ranking = parseLeastMvpRankingFromText(text);
-        if (ranking.length) {
-          LIVE_2026.leastMvp.ranking = ranking;
-          LIVE_2026.fetchedAt = new Date().toISOString();
-          render();
-    hydrateLeastMvp();
-        }
-      } catch (_err) {
-        // Fail silently; manual fallback still works.
+        const res = await fetch(`./data/live.json?ts=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const payload = await res.json();
+        mergeLiveData(payload);
+      } catch (err) {
+        LIVE_2026.scrapeStatus = `live json unavailable: ${err.message}`;
       }
+      render();
     }
 
     let activeId = MATCHUPS[0].id;
@@ -806,8 +804,8 @@
                 : r.category.type === 'better_rank' ? 'Better prediction category'
                 : 'Winner-takes-points category'
               }</div></td>
-              <td class="pick">${escapeHtml(r.pickA)}</td>
-              <td class="pick">${escapeHtml(r.pickB)}</td>
+              <td class="pick">${escapeHtml(r.pickA)}${r.rankA ? `<div class="small">Live rank: #${r.rankA}</div>` : ''}</td>
+              <td class="pick">${escapeHtml(r.pickB)}${r.rankB ? `<div class="small">Live rank: #${r.rankB}</div>` : ''}</td>
               <td class="mono">${r.a} - ${r.b}</td>
               <td>${r.a===r.b ? '<span class=\"status-chip status-tie\">Tied</span>' : r.a>r.b ? `<span class=\"status-chip status-good\">${escapeHtml(matchup.a.name)}</span>` : `<span class=\"status-chip status-bad\">${escapeHtml(matchup.b.name)}</span>`}</td>
               <td class="small">${escapeHtml(r.note)}</td>
@@ -871,10 +869,16 @@
       document.getElementById('metricWinnerNote').textContent = totalA===totalB ? 'Still too early for swagger.' : totalA>totalB ? `${matchup.a.name} has the scoreboard and the vibes.` : `${matchup.b.name} has the scoreboard and the vibes.`;
       document.getElementById('metricConfidence').textContent = `${confidenceA}% - ${confidenceB}%`;
       document.getElementById('metricConfidenceNote').textContent = `${matchup.a.name} confidence ${confidenceA}%, ${matchup.b.name} confidence ${confidenceB}%.`;
-      document.getElementById('updatedPill').textContent = `Last updated: ${new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(new Date())}`;
+            const fetchedAt = LIVE_2026.fetchedAt ? new Date(LIVE_2026.fetchedAt) : null;
+      document.getElementById('providerPill').textContent = `Provider: ${LIVE_2026.provider} • ${LIVE_2026.scrapeStatus}`;
+      document.getElementById('updatedPill').textContent = fetchedAt && !Number.isNaN(fetchedAt.getTime())
+        ? `Last worker update: ${new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(fetchedAt)}`
+        : 'Last worker update: --';
     }
 
     render();
+    loadLiveData();
+    setInterval(loadLiveData, 5 * 60 * 1000);
   </script>
 </body>
 </html>
