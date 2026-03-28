@@ -19,9 +19,7 @@ const IPL_RESULTS_URLS = [
   'https://www.iplt20.com/matches/results/2018'
 ];
 const ESPN_CATCHES_URLS = [
-  'https://www.espncricinfo.com/series/ipl-2026-1510719/stats',
-  'https://www.espncricinfo.com/records/tournament/fielding-most-catches-career/indian-premier-league-17740',
-  'https://www.espncricinfo.com/records/tournament/indian-premier-league-17740'
+  'https://www.espncricinfo.com/series/ipl-2026-1510719/stats'
 ];
 
 const TEAM_ALIASES = new Map([
@@ -86,15 +84,15 @@ const PLAYER_ALIASES = new Map([
 ]);
 
 const STAT_TASKS = [
-  { key: 'orangeCap', tab: 'Season', labels: ['Orange Cap'], entity: 'player', top5: true },
-  { key: 'mostSixes', tab: 'Season', labels: ['Angel One Super Sixes Of The Season', 'Angel One Super Sixes of the Season'], entity: 'player', top5: true },
-  { key: 'purpleCap', tab: 'Season', labels: ['Purple Cap'], entity: 'player', top5: true },
-  { key: 'mostDots', tab: 'Season', labels: ['TATA IPL Green Dot Balls'], entity: 'player', top5: true },
+  { key: 'orangeCap', tab: 'Season', group: 'BATTERS', labels: ['Orange Cap'], entity: 'player', top5: true },
+  { key: 'mostSixes', tab: 'Season', group: 'BATTERS', labels: ['Angel One Super Sixes Of The Season', 'Angel One Super Sixes of the Season'], entity: 'player', top5: true },
+  { key: 'purpleCap', tab: 'Season', group: 'BOWLERS', labels: ['Purple Cap'], entity: 'player', top5: true },
+  { key: 'mostDots', tab: 'Season', group: 'BOWLERS', labels: ['TATA IPL Green Dot Balls'], entity: 'player', top5: true },
   { key: 'mvp', tab: 'Awards', labels: ['Most Valuable Player', 'MVP', 'TATA IPL Most Valuable Player'], entity: 'player', top5: true },
   { key: 'fairPlay', tab: 'Awards', labels: ['Wonder Cement Fairplay Award', 'Wonder Cement FairPlay Award'], entity: 'team' },
-  { key: 'striker', tab: 'Season', labels: ['Curvv Super Striker Of The Season', 'Curvv Super Striker of the Season'], entity: 'player' },
-  { key: 'bestBowlingFigures', tab: 'Season', labels: ['Best Bowling Figures'], entity: 'player' },
-  { key: 'bestBowlingStrikeRate', tab: 'Season', labels: ['Best Bowling Strike-Rate'], entity: 'player' }
+  { key: 'striker', tab: 'Season', group: 'BATTERS', labels: ['Curvv Super Striker Of The Season', 'Curvv Super Striker of the Season'], entity: 'player' },
+  { key: 'bestBowlingFigures', tab: 'Season', group: 'BOWLERS', labels: ['Best Bowling Figures'], entity: 'player' },
+  { key: 'bestBowlingStrikeRate', tab: 'Season', group: 'BOWLERS', labels: ['Best Bowling Strike-Rate'], entity: 'player' }
 ];
 
 function normalize(text) {
@@ -173,17 +171,15 @@ async function saveDebug(page, name) {
     await page.screenshot({ path: path.join(DEBUG_DIR, `${name}.png`), fullPage: true });
     await fs.writeFile(path.join(DEBUG_DIR, `${name}.html`), await page.content(), 'utf8');
     await fs.writeFile(path.join(DEBUG_DIR, `${name}.txt`), await page.locator('body').innerText().catch(() => ''), 'utf8');
-  } catch {
-    // ignore
-  }
+  } catch {}
 }
 
 async function acceptCookies(page) {
   for (const label of [/accept cookies/i, /accept/i, /allow all/i, /i agree/i, /^ok$/i]) {
-    const button = page.getByRole('button', { name: label }).first();
     try {
-      if (await button.isVisible({ timeout: 700 })) {
-        await button.click({ timeout: 1500 });
+      const button = page.getByRole('button', { name: label }).first();
+      if (await button.isVisible({ timeout: 600 })) {
+        await button.click({ timeout: 1200 });
         await page.waitForTimeout(500);
         return;
       }
@@ -197,136 +193,143 @@ async function isAccessDenied(page) {
 }
 
 async function gotoSettled(page, url, debugName) {
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
-    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-    await page.waitForTimeout(1800);
-    await acceptCookies(page);
-    await page.waitForTimeout(1200);
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
+  await page.waitForLoadState('networkidle', { timeout: 12000 }).catch(() => {});
+  await page.waitForTimeout(1500);
+  await acceptCookies(page);
+  await page.waitForTimeout(800);
+  if (await isAccessDenied(page)) {
+    await saveDebug(page, debugName);
+    throw new Error(`Access denied at ${url}`);
+  }
+}
 
-    if (!(await isAccessDenied(page))) return;
-
-    if (attempt === 0) {
-      await page.waitForTimeout(3000);
-      await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 }).catch(() => {});
-      await page.waitForTimeout(2000);
+async function clickVisibleText(page, candidates, exact = false) {
+  const labels = Array.isArray(candidates) ? candidates : [candidates];
+  for (const text of labels) {
+    const locators = [
+      page.getByRole('option', { name: new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }).first(),
+      page.getByRole('button', { name: new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }).first(),
+      page.getByText(new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), exact ? 'i' : 'i')).first()
+    ];
+    for (const locator of locators) {
+      try {
+        if (await locator.isVisible({ timeout: 700 })) {
+          await locator.click({ timeout: 1500 });
+          await page.waitForTimeout(600);
+          return true;
+        }
+      } catch {}
     }
   }
 
-  await saveDebug(page, debugName);
-  throw new Error(`Access denied at ${url}. Open this site once in the visible Chrome window/profile, then rerun.`);
-}
-
-async function clickIfVisible(locator) {
-  try {
-    if (await locator.isVisible({ timeout: 1200 })) {
-      await locator.click({ timeout: 2500 });
-      await locator.page().waitForTimeout(800);
-      return true;
-    }
-  } catch {}
-  return false;
-}
-
-async function clickTab(page, tabName) {
-  const patterns = [
-    page.getByRole('tab', { name: new RegExp(`^${tabName}$`, 'i') }).first(),
-    page.getByRole('button', { name: new RegExp(`^${tabName}$`, 'i') }).first(),
-    page.getByText(new RegExp(`^${tabName}$`, 'i')).first()
-  ];
-  for (const locator of patterns) {
-    if (await clickIfVisible(locator)) return true;
-  }
-  const brute = await page.evaluate((wanted) => {
+  const clicked = await page.evaluate(({ labels, exact }) => {
     const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const wants = labels.map(norm);
     const isVisible = (el) => {
       const r = el.getBoundingClientRect();
       const s = getComputedStyle(el);
       return r.width > 20 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
     };
-    for (const el of [...document.querySelectorAll('button, [role="button"], [role="tab"], a, div, span')]) {
-      if (isVisible(el) && norm(el.innerText || el.textContent) === norm(wanted)) {
-        el.click();
+    const maybeClick = (el) => {
+      el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      el.click?.();
+      el.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+    };
+    const nodes = [...document.querySelectorAll('button, [role="button"], [role="option"], li, a, span, div, label, input')];
+    for (const el of nodes) {
+      if (!isVisible(el)) continue;
+      const text = norm(el.innerText || el.textContent || el.value || '');
+      if (!text) continue;
+      if (wants.some((w) => exact ? text === w : text === w || text.includes(w))) {
+        maybeClick(el);
         return true;
       }
     }
     return false;
-  }, tabName).catch(() => false);
-  if (brute) await page.waitForTimeout(800);
-  return brute;
+  }, { labels, exact }).catch(() => false);
+
+  if (clicked) {
+    await page.waitForTimeout(700);
+    return true;
+  }
+  return false;
 }
 
-async function clickLikelyMetricDropdown(page) {
-  const ok = await page.evaluate(() => {
+async function openMetricDropdown(page) {
+  const opened = await page.evaluate(() => {
     const visible = (el) => {
       const r = el.getBoundingClientRect();
       const s = getComputedStyle(el);
-      return r.width > 120 && r.height > 24 && s.display !== 'none' && s.visibility !== 'hidden' && r.y > 120 && r.y < 450;
+      return r.width > 140 && r.height > 24 && s.display !== 'none' && s.visibility !== 'hidden' && r.y > 180 && r.y < 420;
     };
-    const nodes = [...document.querySelectorAll('select, [role="combobox"], [aria-haspopup="listbox"], button, input, div')]
+    const nodes = [...document.querySelectorAll('select, [role="combobox"], [aria-haspopup="listbox"], button, div, input')]
       .filter(visible)
-      .map((el) => ({ el, x: el.getBoundingClientRect().x, y: el.getBoundingClientRect().y, text: (el.innerText || el.textContent || el.value || '').trim() }))
-      .filter((x) => x.text.length <= 100)
+      .map((el) => ({
+        el,
+        x: el.getBoundingClientRect().x,
+        y: el.getBoundingClientRect().y,
+        w: el.getBoundingClientRect().width,
+        text: (el.innerText || el.textContent || el.value || '').trim()
+      }))
+      .filter((n) => n.w >= 150 && n.w <= 420)
       .sort((a, b) => a.y - b.y || a.x - b.x);
-    const row = nodes.filter((x) => Math.abs(x.y - (nodes[0]?.y ?? 0)) < 30);
-    const target = row[1] || nodes[1] || null;
-    target?.el?.click?.();
-    return !!target;
+
+    const rowY = nodes[0]?.y ?? 0;
+    const row = nodes.filter((n) => Math.abs(n.y - rowY) < 35).sort((a, b) => a.x - b.x);
+
+    const target = row[1] || nodes[1];
+    if (!target) return false;
+    target.el.click?.();
+    return true;
   }).catch(() => false);
-  if (ok) await page.waitForTimeout(600);
-  return ok;
+
+  if (opened) await page.waitForTimeout(800);
+  return opened;
 }
 
-async function selectMetricFromStatsPage(page, labels) {
-  const selects = page.locator('select:visible');
-  const selectCount = await selects.count().catch(() => 0);
-  if (selectCount >= 2) {
-    const metricSelect = selects.nth(1);
-    const options = await metricSelect.locator('option').allTextContents().catch(() => []);
-    for (const label of labels) {
-      const found = options.find((opt) => normalize(opt).includes(normalize(label)));
-      if (found) {
-        await metricSelect.selectOption({ label: found });
-        await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
-        await page.waitForTimeout(1200);
-        return true;
-      }
+async function chooseStatsMetric(page, task) {
+  await page.locator('body').evaluate(el => el.scrollTo?.(0, 400)).catch(() => {});
+  await page.waitForTimeout(400);
+
+  const tabClicked = await clickVisibleText(page, task.tab, true);
+  if (!tabClicked) throw new Error(`Could not click tab: ${task.tab}`);
+
+  await page.waitForTimeout(700);
+  await openMetricDropdown(page);
+
+  if (task.group) {
+    const groupClicked = await clickVisibleText(page, task.group, true);
+    if (groupClicked) await page.waitForTimeout(400);
+  }
+
+  let optionClicked = await clickVisibleText(page, task.labels, false);
+  if (!optionClicked) {
+    // scroll inside any visible dropdown/list and retry a few times
+    for (let i = 0; i < 6 && !optionClicked; i += 1) {
+      await page.evaluate(() => {
+        const visible = (el) => {
+          const r = el.getBoundingClientRect();
+          const s = getComputedStyle(el);
+          return r.width > 120 && r.height > 80 && s.display !== 'none' && s.visibility !== 'hidden';
+        };
+        const boxes = [...document.querySelectorAll('div, ul')].filter(visible).filter((el) => {
+          const s = getComputedStyle(el);
+          return /(auto|scroll)/.test(s.overflowY) || el.scrollHeight > el.clientHeight + 20;
+        });
+        const target = boxes.sort((a, b) => (b.scrollHeight - b.clientHeight) - (a.scrollHeight - a.clientHeight))[0];
+        if (target) target.scrollTop += 260;
+      }).catch(() => {});
+      await page.waitForTimeout(500);
+      optionClicked = await clickVisibleText(page, task.labels, false);
     }
   }
 
-  for (let attempt = 0; attempt < 4; attempt += 1) {
-    await clickLikelyMetricDropdown(page);
-    for (const label of labels) {
-      const option = page.getByText(new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')).last();
-      if (await clickIfVisible(option)) return true;
-    }
-    const brute = await page.evaluate((candidates) => {
-      const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
-      const wanted = candidates.map(norm);
-      const isVisible = (el) => {
-        const r = el.getBoundingClientRect();
-        const s = getComputedStyle(el);
-        return r.width > 20 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
-      };
-      for (const el of [...document.querySelectorAll('button, [role="button"], [role="option"], option, li, div, span, a')]) {
-        const text = norm(el.innerText || el.textContent);
-        if (!text || !isVisible(el)) continue;
-        if (wanted.some((x) => text === x || text.includes(x))) {
-          el.click();
-          return true;
-        }
-      }
-      return false;
-    }, labels).catch(() => false);
-    if (brute) {
-      await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
-      await page.waitForTimeout(1200);
-      return true;
-    }
-  }
+  if (!optionClicked) throw new Error(`Could not select metric: ${task.labels.join(' / ')}`);
 
-  const bodyText = normalize(await page.locator('body').innerText().catch(() => ''));
-  return labels.some((label) => bodyText.includes(normalize(label)));
+  await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+  await page.waitForTimeout(1400);
 }
 
 async function extractVisibleTables(page) {
@@ -334,11 +337,7 @@ async function extractVisibleTables(page) {
     headers: [...table.querySelectorAll('th')].map((n) => n.innerText.trim()).filter(Boolean),
     rows: [...table.querySelectorAll('tbody tr')].map((row) => [...row.querySelectorAll('th,td')].map((c) => c.innerText.trim()).filter(Boolean)).filter((r) => r.length)
   }))).catch(() => []);
-  const roleTables = await page.locator('[role="table"]:visible, [role="grid"]:visible').evaluateAll((nodes) => nodes.map((table) => ({
-    headers: [...table.querySelectorAll('[role="columnheader"]')].map((n) => n.innerText.trim()).filter(Boolean),
-    rows: [...table.querySelectorAll('[role="row"]')].map((row) => [...row.querySelectorAll('[role="cell"], [role="rowheader"]')].map((c) => c.innerText.trim()).filter(Boolean)).filter((r) => r.length)
-  }))).catch(() => []);
-  return [...tables, ...roleTables].filter((x) => x.rows.length);
+  return tables.filter((x) => x.rows.length);
 }
 
 function pickBestTable(tables, entity) {
@@ -348,7 +347,7 @@ function pickBestTable(tables, entity) {
       let score = table.rows.length;
       if (entity === 'player' && /player/.test(headers)) score += 40;
       if (entity === 'team' && /team/.test(headers)) score += 40;
-      if (/mat|inns|runs|wkts|ct|pts|nrr|sr|avg/.test(headers)) score += 10;
+      if (/mat|inns|runs|wkts|ct|pts|nrr|sr|avg|bf|6s|4s/.test(headers)) score += 10;
       return { score, table };
     })
     .sort((a, b) => b.score - a.score)[0]?.table ?? null;
@@ -367,40 +366,35 @@ function extractRankingFromRows(rows, entity) {
   return uniq(out);
 }
 
+function extractTeamLinesFromText(text) {
+  const lines = String(text || '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
+  return uniq(lines.map((line) => TEAM_ALIASES.has(normalize(line)) ? canonicalizeTeamName(line) : null).filter(Boolean));
+}
+
 function extractPlayerLinesFromText(text) {
   const lines = String(text || '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
   const ranking = [];
-  const skip = /^(player|pos|span|mat|inns?|runs|wkts|ct|max|avg|sr|bf|100|50|4s|6s|pts|nrr|won|lost|team|search by player name|all teams|all players|loading)$/i;
   for (const line of lines) {
-    if (skip.test(line) || /^\d+$/.test(line)) continue;
-    if (/\b(?:rcb|srh|mi|csk|gt|lsg|dc|pbks|rr|kkr)\b/i.test(line) || /^[A-Z]{1,3}\s[A-Za-z]/.test(line) || /^[A-Z][a-z]+\s[A-Za-z]/.test(line)) {
-      const player = canonicalizePlayerName(line);
-      if (player && player.length > 2 && !TEAM_ALIASES.has(normalize(player))) ranking.push(player);
-    }
+    const cleaned = canonicalizePlayerName(line);
+    if (cleaned && !TEAM_ALIASES.has(normalize(cleaned)) && cleaned.length > 2) ranking.push(cleaned);
   }
   return uniq(ranking);
 }
 
-function extractTeamLinesFromText(text) {
-  return uniq(
-    String(text || '').split(/\n+/).map((x) => x.trim()).filter(Boolean).map((line) => TEAM_ALIASES.has(normalize(line)) ? canonicalizeTeamName(line) : null).filter(Boolean)
-  );
-}
-
 function parseTeamScoresFromText(text) {
   const lines = String(text || '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
-  const hits = [];
+  const values = {};
   for (const line of lines) {
-    const scoreMatch = line.match(/\b(\d{2,3})(?:\/(\d{1,2}))?\b/);
+    const scoreMatch = line.match(/\b(\d{2,3})(?:\/\d{1,2})?\b/);
     if (!scoreMatch) continue;
     const score = Number(scoreMatch[1]);
     for (const [alias, team] of TEAM_ALIASES.entries()) {
       if (new RegExp(`\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(line)) {
-        hits.push({ team, score });
+        values[team] = Math.max(values[team] || 0, score);
       }
     }
   }
-  return hits;
+  return values;
 }
 
 function extractCatchesRankingFromText(text) {
@@ -408,9 +402,9 @@ function extractCatchesRankingFromText(text) {
   const ranking = [];
   let seen = false;
   for (const line of lines) {
-    if (/player/i.test(line) && /ct/i.test(line)) { seen = true; continue; }
+    if (/most catches/i.test(line)) { seen = true; continue; }
     if (!seen) continue;
-    if (/^(span|mat|inns|ct|max|ct\/inn)$/i.test(line) || /^\d+$/.test(line)) continue;
+    if (/player|span|mat|inns|ct|max|ct\/inn/i.test(line) || /^\d+$/.test(line)) continue;
     const player = canonicalizePlayerName(line);
     if (player && !TEAM_ALIASES.has(normalize(player))) ranking.push(player);
     if (ranking.length >= 20) break;
@@ -432,11 +426,7 @@ async function createContext() {
       'Upgrade-Insecure-Requests': '1',
       'Cache-Control': 'max-age=0'
     },
-    args: [
-      '--start-maximized',
-      '--disable-blink-features=AutomationControlled',
-      '--disable-dev-shm-usage'
-    ]
+    args: ['--start-maximized', '--disable-blink-features=AutomationControlled', '--disable-dev-shm-usage']
   });
 
   await context.addInitScript(() => {
@@ -459,11 +449,7 @@ async function scrapeIplRanking(context, task) {
   const page = await makePage(context);
   try {
     await gotoSettled(page, IPL_STATS_URL, `blocked_${task.key}`);
-    await clickTab(page, task.tab);
-    const selected = await selectMetricFromStatsPage(page, task.labels);
-    if (!selected) throw new Error(`Could not select metric: ${task.labels.join(' / ')}`);
-    await page.waitForFunction(() => !/loading\.\.\./i.test(document.body.innerText), null, { timeout: 12000 }).catch(() => {});
-    await page.waitForTimeout(1500);
+    await chooseStatsMetric(page, task);
 
     const tables = await extractVisibleTables(page);
     const table = pickBestTable(tables, task.entity);
@@ -508,10 +494,7 @@ async function scrapePointsTable(context) {
 }
 
 async function clickLoadMore(page) {
-  for (const label of [/load more/i, /show more/i, /more/i]) {
-    if (await clickIfVisible(page.getByRole('button', { name: label }).first())) return true;
-  }
-  return false;
+  return clickVisibleText(page, [/load more/i, /show more/i, /^more$/i].map(String), false);
 }
 
 async function scrapeHighestTeamScores(context) {
@@ -521,11 +504,11 @@ async function scrapeHighestTeamScores(context) {
     try {
       await gotoSettled(page, url, `blocked_results_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
       for (let i = 0; i < 12; i += 1) {
-        if (!(await clickLoadMore(page))) break;
+        const more = await clickVisibleText(page, ['Load More', 'Show More', 'More'], false);
+        if (!more) break;
       }
       const text = await page.locator('body').innerText().catch(() => '');
-      const values = {};
-      for (const hit of parseTeamScoresFromText(text)) values[hit.team] = Math.max(values[hit.team] || 0, hit.score);
+      const values = parseTeamScoresFromText(text);
       const ranking = Object.entries(values).sort((a, b) => b[1] - a[1]).map(([team]) => team);
       if (!ranking.length) throw new Error('Could not extract any team scores from results page');
       return { ranking, extendedRanking: ranking, values, source: url };
@@ -545,12 +528,13 @@ async function scrapeMostCatches(context) {
     const page = await makePage(context);
     try {
       await gotoSettled(page, url, `blocked_catches_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
-      const tables = await extractVisibleTables(page);
-      const table = pickBestTable(tables, 'player');
-      let ranking = table ? extractRankingFromRows(table.rows, 'player') : [];
+      // try visible text from accessible series stats page first
+      const text = await page.locator('body').innerText().catch(() => '');
+      let ranking = extractCatchesRankingFromText(text);
       if (!ranking.length) {
-        const text = await page.locator('body').innerText().catch(() => '');
-        ranking = extractCatchesRankingFromText(text);
+        const tables = await extractVisibleTables(page);
+        const table = pickBestTable(tables, 'player');
+        ranking = table ? extractRankingFromRows(table.rows, 'player') : [];
       }
       if (!ranking.length) throw new Error(`No visible catches table found at ${url}`);
       return { ranking, extendedRanking: ranking, source: url };
@@ -633,7 +617,7 @@ async function main() {
   live.scrapeStatus = errors.length ? `partial (${Object.values(live.scrapeReport).filter((x) => x?.ok).length} ok, ${errors.length} failed)` : 'ok';
 
   if (!majorCategoryCount(live)) {
-    throw new Error('All major categories are still empty. The sites are probably blocking the automated browser. Open the visible Chrome window/profile once, visit the blocked sites manually, then rerun.');
+    throw new Error('All major categories are still empty. The sites loaded, but the worker still could not navigate the controls/tables correctly.');
   }
 
   await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
