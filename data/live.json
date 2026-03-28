@@ -1,9 +1,75 @@
 {
   "season": 2026,
   "provider": "data/live.json",
-  "scrapeStatus": "seed file - run the Playwright worker",
-  "fetchedAt": null,
-  "scrapeReport": {},
+  "scrapeStatus": "partial (0 ok, 12 failed)",
+  "fetchedAt": "2026-03-28T20:33:11.501Z",
+  "scrapeReport": {
+    "orangeCap": {
+      "ok": false,
+      "error": "Could not select metric: Orange Cap",
+      "source": "https://www.iplt20.com/stats/2026"
+    },
+    "mostSixes": {
+      "ok": false,
+      "error": "Could not select metric: Angel One Super Sixes Of The Season / Angel One Super Sixes of the Season",
+      "source": "https://www.iplt20.com/stats/2026"
+    },
+    "purpleCap": {
+      "ok": false,
+      "error": "Could not select metric: Purple Cap",
+      "source": "https://www.iplt20.com/stats/2026"
+    },
+    "mostDots": {
+      "ok": false,
+      "error": "Could not select metric: TATA IPL Green Dot Balls",
+      "source": "https://www.iplt20.com/stats/2026"
+    },
+    "mvp": {
+      "ok": false,
+      "error": "Could not select metric: Most Valuable Player / MVP / TATA IPL Most Valuable Player",
+      "source": "https://www.iplt20.com/stats/2026"
+    },
+    "fairPlay": {
+      "ok": false,
+      "error": "Could not select metric: Wonder Cement Fairplay Award / Wonder Cement FairPlay Award",
+      "source": "https://www.iplt20.com/stats/2026"
+    },
+    "striker": {
+      "ok": false,
+      "error": "Could not select metric: Curvv Super Striker Of The Season / Curvv Super Striker of the Season",
+      "source": "https://www.iplt20.com/stats/2026"
+    },
+    "bestBowlingFigures": {
+      "ok": false,
+      "error": "Could not select metric: Best Bowling Figures",
+      "source": "https://www.iplt20.com/stats/2026"
+    },
+    "bestBowlingStrikeRate": {
+      "ok": false,
+      "error": "Could not select metric: Best Bowling Strike-Rate",
+      "source": "https://www.iplt20.com/stats/2026"
+    },
+    "titleWinner": {
+      "ok": false,
+      "error": "No visible points table found",
+      "source": "https://www.iplt20.com/points-table/men"
+    },
+    "tableBottom": {
+      "ok": false,
+      "error": "No visible points table found",
+      "source": "https://www.iplt20.com/points-table/men"
+    },
+    "highestScoreTeam": {
+      "ok": false,
+      "error": "Could not extract any team scores from results page",
+      "source": "https://www.iplt20.com/matches/results"
+    },
+    "mostCatches": {
+      "ok": false,
+      "error": "No visible catches table found at https://www.espncricinfo.com/series/ipl-2026-1510719/stats",
+      "source": "https://www.espncricinfo.com/records/tournament/fielding-most-catches-career/indian-premier-league-17740"
+    }
+  },
   "titleWinner": {
     "winner": null,
     "finalists": [],
