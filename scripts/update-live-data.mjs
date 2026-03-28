@@ -9,15 +9,9 @@ const DATA_FILE = path.join(DATA_DIR, 'live.json');
 const USER_DATA_DIR = path.join(ROOT, '.chrome-profile');
 
 const IPL_STATS_URL = 'https://www.iplt20.com/stats/2026';
-const IPL_POINTS_URLS = [
-  'https://www.iplt20.com/points-table/men'
-];
-const IPL_RESULTS_URLS = [
-  'https://www.iplt20.com/matches/results'
-];
-const ESPN_CATCHES_URLS = [
-  'https://www.espncricinfo.com/series/ipl-2026-1510719/stats'
-];
+const IPL_POINTS_URL = 'https://www.iplt20.com/points-table/men';
+const IPL_RESULTS_URL = 'https://www.iplt20.com/matches/results';
+const ESPN_SERIES_STATS_URL = 'https://www.espncricinfo.com/series/ipl-2026-1510719/stats';
 
 const TEAM_ALIASES = new Map([
   ['mi', 'Mumbai Indians'],
@@ -79,7 +73,8 @@ const PLAYER_ALIASES = new Map([
   ['a nabi', 'Auqib Nabi'], ['auqib nabi', 'Auqib Nabi'],
   ['p veer', 'Prashant Veer'], ['prashant veer', 'Prashant Veer'],
   ['m dhoni', 'MS Dhoni'], ['ms dhoni', 'MS Dhoni'],
-  ['c green', 'Cameron Green'], ['cameron green', 'Cameron Green']
+  ['c green', 'Cameron Green'], ['cameron green', 'Cameron Green'],
+  ['j duffy', 'Jacob Duffy'], ['jacob duffy', 'Jacob Duffy']
 ]);
 
 const STAT_TASKS = [
@@ -215,52 +210,7 @@ async function gotoSettled(page, url, debugName) {
   }
 }
 
-async function clickTextInPage(page, texts, exact = false) {
-  const list = Array.isArray(texts) ? texts : [texts];
-  for (const txt of list) {
-    try {
-      const rx = new RegExp(txt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-      const locators = [
-        page.getByRole('button', { name: rx }).first(),
-        page.getByRole('tab', { name: rx }).first(),
-        page.getByRole('option', { name: rx }).first(),
-        page.getByText(rx).first()
-      ];
-      for (const loc of locators) {
-        if (await loc.isVisible({ timeout: 700 })) {
-          await loc.click({ timeout: 1500 });
-          await page.waitForTimeout(500);
-          return true;
-        }
-      }
-    } catch {}
-  }
-
-  const ok = await page.evaluate(({ texts, exact }) => {
-    const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
-    const wants = texts.map(norm);
-    const isVisible = (el) => {
-      const r = el.getBoundingClientRect();
-      const s = getComputedStyle(el);
-      return r.width > 20 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
-    };
-    const all = [...document.querySelectorAll('button, [role="button"], [role="tab"], [role="option"], li, a, span, div, label, input')];
-    for (const el of all) {
-      if (!isVisible(el)) continue;
-      const text = norm(el.innerText || el.textContent || el.value || '');
-      if (!text) continue;
-      if (wants.some((w) => exact ? text === w : text === w || text.includes(w))) {
-        el.click?.();
-        return true;
-      }
-    }
-    return false;
-  }, { texts: list, exact }).catch(() => false);
-  if (ok) await page.waitForTimeout(600);
-  return ok;
-}
-
-async function clickMetricControl(page) {
+async function openMetricDropdown(page) {
   const opened = await page.evaluate(() => {
     const visible = (el) => {
       const r = el.getBoundingClientRect();
@@ -273,8 +223,7 @@ async function clickMetricControl(page) {
         el,
         x: el.getBoundingClientRect().x,
         y: el.getBoundingClientRect().y,
-        w: el.getBoundingClientRect().width,
-        text: (el.innerText || el.textContent || el.value || '').trim()
+        w: el.getBoundingClientRect().width
       }))
       .filter((n) => n.w >= 150 && n.w <= 420)
       .sort((a, b) => a.y - b.y || a.x - b.x);
@@ -287,69 +236,111 @@ async function clickMetricControl(page) {
     return true;
   }).catch(() => false);
 
-  if (opened) await page.waitForTimeout(800);
+  if (opened) await page.waitForTimeout(700);
   return opened;
 }
 
-async function chooseFromOpenDropdown(page, labels) {
-  let clicked = await clickTextInPage(page, labels, false);
-  if (clicked) return true;
+async function selectFromMetricPanel(page, task) {
+  return page.evaluate(({ group, labels }) => {
+    const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const wanted = labels.map(norm);
 
-  for (let i = 0; i < 10; i += 1) {
-    await page.evaluate(() => {
-      const visible = (el) => {
-        const r = el.getBoundingClientRect();
-        const s = getComputedStyle(el);
-        return r.width > 160 && r.height > 100 && s.display !== 'none' && s.visibility !== 'hidden';
-      };
-      const boxes = [...document.querySelectorAll('div, ul')]
-        .filter(visible)
-        .filter((el) => {
-          const s = getComputedStyle(el);
-          return /(auto|scroll)/.test(s.overflowY) || el.scrollHeight > el.clientHeight + 10;
-        })
-        .sort((a, b) => (b.scrollHeight - b.clientHeight) - (a.scrollHeight - a.clientHeight));
-      const target = boxes[0];
-      if (target) target.scrollTop += 220;
-    }).catch(() => {});
-    await page.waitForTimeout(350);
-    clicked = await clickTextInPage(page, labels, false);
-    if (clicked) return true;
-  }
-  return false;
+    const visible = (el) => {
+      const r = el.getBoundingClientRect();
+      const s = getComputedStyle(el);
+      return r.width > 50 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
+    };
+
+    const clickNode = (node) => {
+      if (!node) return false;
+      node.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      node.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      node.click?.();
+      node.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+      return true;
+    };
+
+    const panels = [...document.querySelectorAll('div, ul')]
+      .filter(visible)
+      .filter((el) => {
+        const text = norm(el.innerText || el.textContent);
+        return text.includes('batters') || text.includes('bowlers');
+      })
+      .sort((a, b) => {
+        const az = Number(getComputedStyle(a).zIndex) || 0;
+        const bz = Number(getComputedStyle(b).zIndex) || 0;
+        if (bz !== az) return bz - az;
+        return (b.getBoundingClientRect().height * b.getBoundingClientRect().width) - (a.getBoundingClientRect().height * a.getBoundingClientRect().width);
+      });
+
+    const panel = panels[0];
+    if (!panel) return { ok: false, reason: 'no panel' };
+
+    if (group) {
+      const groupText = norm(group);
+      const groupNode = [...panel.querySelectorAll('label, span, div, button, input')]
+        .find((el) => visible(el) && norm(el.innerText || el.textContent || el.value) === groupText);
+      clickNode(groupNode);
+    }
+
+    const nodes = [...panel.querySelectorAll('li, div, span, button, option, a')]
+      .filter(visible);
+
+    const found = nodes.find((el) => {
+      const text = norm(el.innerText || el.textContent || el.value);
+      return wanted.some((w) => text === w || text.includes(w));
+    });
+    if (found) {
+      clickNode(found);
+      return { ok: true };
+    }
+
+    const scrollable = panel.scrollHeight > panel.clientHeight + 10;
+    if (scrollable) panel.scrollTop += 220;
+    return { ok: false, reason: scrollable ? 'scroll' : 'not found' };
+  }, { group: task.group || '', labels: task.labels });
 }
 
 async function chooseStatsMetric(page, task) {
-  await page.locator('body').evaluate(() => window.scrollTo(0, 350)).catch(() => {});
-  await page.waitForTimeout(300);
+  await page.evaluate(() => window.scrollTo(0, 320)).catch(() => {});
+  await page.waitForTimeout(250);
 
-  const tabOk = await clickTextInPage(page, task.tab, true);
-  if (!tabOk) throw new Error(`Could not click tab: ${task.tab}`);
-  await page.waitForTimeout(600);
+  const tabClicked = await page.evaluate((wanted) => {
+    const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const visible = (el) => {
+      const r = el.getBoundingClientRect();
+      const s = getComputedStyle(el);
+      return r.width > 30 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
+    };
+    const nodes = [...document.querySelectorAll('button, [role="tab"], a, div, span')].filter(visible);
+    const node = nodes.find((el) => norm(el.innerText || el.textContent) === norm(wanted));
+    if (node) { node.click?.(); return true; }
+    return false;
+  }, task.tab).catch(() => false);
 
-  let controlOpened = await clickMetricControl(page);
-  if (!controlOpened) throw new Error('Could not open metric dropdown');
+  if (!tabClicked) throw new Error(`Could not click tab: ${task.tab}`);
+  await page.waitForTimeout(500);
 
-  if (task.group) {
-    const groupOk = await clickTextInPage(page, task.group, true);
-    if (groupOk) {
-      await page.waitForTimeout(400);
+  let opened = await openMetricDropdown(page);
+  if (!opened) throw new Error('Could not open metric dropdown');
+
+  for (let i = 0; i < 10; i += 1) {
+    const result = await selectFromMetricPanel(page, task);
+    if (result?.ok) {
+      await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+      await page.waitForTimeout(1200);
+      return;
+    }
+
+    if (result?.reason === 'no panel') {
+      opened = await openMetricDropdown(page);
+      if (!opened) throw new Error('Metric panel disappeared');
     } else {
-      // reopen dropdown if it closed before group click
-      await clickMetricControl(page);
-      const retryGroup = await clickTextInPage(page, task.group, true);
-      if (!retryGroup) throw new Error(`Could not switch group: ${task.group}`);
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(300);
     }
   }
 
-  // reopen after group switch if needed
-  await clickMetricControl(page).catch(() => {});
-  const optionOk = await chooseFromOpenDropdown(page, task.labels);
-  if (!optionOk) throw new Error(`Could not select metric: ${task.labels.join(' / ')}`);
-
-  await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
-  await page.waitForTimeout(1200);
+  throw new Error(`Could not select metric: ${task.labels.join(' / ')}`);
 }
 
 async function extractVisibleTables(page) {
@@ -387,26 +378,12 @@ function extractRankingFromRows(rows, entity) {
   return uniq(out);
 }
 
-function extractTeamLinesFromText(text) {
-  const lines = String(text || '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
-  return uniq(lines.map((line) => TEAM_ALIASES.has(normalize(line)) ? canonicalizeTeamName(line) : null).filter(Boolean));
-}
-
-function extractPlayerLinesFromText(text) {
-  const lines = String(text || '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
-  const ranking = [];
-  for (const line of lines) {
-    const player = canonicalizePlayerName(line);
-    if (player && player.length > 2 && !TEAM_ALIASES.has(normalize(player)) && !/^pos$/i.test(player)) ranking.push(player);
-  }
-  return uniq(ranking);
-}
-
 function parseTeamScoresFromText(text) {
   const lines = String(text || '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
   const values = {};
   for (const line of lines) {
-    const scoreMatch = line.match(/\b(\d{2,3})(?:\/\d{1,2})?\b/);
+    if (!/\d{2,3}\/\d{1,2}/.test(line)) continue;
+    const scoreMatch = line.match(/\b(\d{2,3})\/\d{1,2}\b/);
     if (!scoreMatch) continue;
     const score = Number(scoreMatch[1]);
     for (const [alias, team] of TEAM_ALIASES.entries()) {
@@ -425,9 +402,9 @@ function extractCatchesRankingFromText(text) {
   for (const line of lines) {
     if (/most catches/i.test(line)) { seen = true; continue; }
     if (!seen) continue;
-    if (/player|span|mat|inns|ct|max|ct\/inn/i.test(line) || /^\d+$/.test(line)) continue;
+    if (/player|span|mat|inns|ct|max|ct\/inn|records|ratings|view full list|privacy/i.test(line) || /^\d+\.?$/.test(line)) continue;
     const player = canonicalizePlayerName(line);
-    if (player && !TEAM_ALIASES.has(normalize(player))) ranking.push(player);
+    if (player && !TEAM_ALIASES.has(normalize(player)) && player.length > 2) ranking.push(player);
     if (ranking.length >= 20) break;
   }
   return uniq(ranking);
@@ -474,12 +451,8 @@ async function scrapeIplRanking(context, task) {
 
     const tables = await extractVisibleTables(page);
     const table = pickBestTable(tables, task.entity);
-    let ranking = table ? extractRankingFromRows(table.rows, task.entity) : [];
-    if (!ranking.length) {
-      const bodyText = await page.locator('body').innerText().catch(() => '');
-      ranking = task.entity === 'team' ? extractTeamLinesFromText(bodyText) : extractPlayerLinesFromText(bodyText);
-    }
-    if (!ranking.length) throw new Error('No ranking extracted from stats page');
+    const ranking = table ? extractRankingFromRows(table.rows, task.entity) : [];
+    if (!ranking.length) throw new Error('No ranking extracted from stats table');
     return { ranking: task.top5 ? ranking.slice(0, 5) : ranking, extendedRanking: ranking };
   } catch (error) {
     await saveDebug(page, `fail_${task.key}`);
@@ -490,78 +463,69 @@ async function scrapeIplRanking(context, task) {
 }
 
 async function scrapePointsTable(context) {
-  let lastError = null;
-  for (const url of IPL_POINTS_URLS) {
-    const page = await makePage(context);
-    try {
-      await gotoSettled(page, url, `blocked_points_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
-      const tables = await extractVisibleTables(page);
-      const table = pickBestTable(tables, 'team');
-      let ranking = table ? extractRankingFromRows(table.rows, 'team') : [];
-      if (ranking.length < 6) {
-        const text = await page.locator('body').innerText().catch(() => '');
-        ranking = extractTeamLinesFromText(text);
-      }
-      if (ranking.length < 6) throw new Error('No visible points table found');
-      return { ranking, extendedRanking: ranking, playoffs: ranking.slice(0, 4), finalists: [], winner: null, source: url };
-    } catch (error) {
-      lastError = error;
-      await saveDebug(page, `fail_points_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
-    } finally {
-      await page.close().catch(() => {});
-    }
+  const page = await makePage(context);
+  try {
+    await gotoSettled(page, IPL_POINTS_URL, 'blocked_points');
+    const tables = await extractVisibleTables(page);
+    const table = pickBestTable(tables, 'team');
+    const ranking = table ? extractRankingFromRows(table.rows, 'team') : [];
+    if (ranking.length < 6) throw new Error('No visible points table found');
+    return { ranking, extendedRanking: ranking, playoffs: ranking.slice(0, 4), finalists: [], winner: null, source: IPL_POINTS_URL };
+  } catch (error) {
+    await saveDebug(page, 'fail_points_table');
+    throw error;
+  } finally {
+    await page.close().catch(() => {});
   }
-  throw lastError ?? new Error('Could not scrape points table');
 }
 
 async function scrapeHighestTeamScores(context) {
-  let lastError = null;
-  for (const url of IPL_RESULTS_URLS) {
-    const page = await makePage(context);
-    try {
-      await gotoSettled(page, url, `blocked_results_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
-      for (let i = 0; i < 10; i += 1) {
-        const more = await clickTextInPage(page, ['Load More', 'Show More', 'More'], false);
-        if (!more) break;
-      }
-      const text = await page.locator('body').innerText().catch(() => '');
-      const values = parseTeamScoresFromText(text);
-      const ranking = Object.entries(values).sort((a, b) => b[1] - a[1]).map(([team]) => team);
-      if (!ranking.length) throw new Error('Could not extract any team scores from results page');
-      return { ranking, extendedRanking: ranking, values, source: url };
-    } catch (error) {
-      lastError = error;
-      await saveDebug(page, `fail_results_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
-    } finally {
-      await page.close().catch(() => {});
+  const page = await makePage(context);
+  try {
+    await gotoSettled(page, IPL_RESULTS_URL, 'blocked_results');
+    for (let i = 0; i < 10; i += 1) {
+      const more = await page.evaluate(() => {
+        const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+        const visible = (el) => {
+          const r = el.getBoundingClientRect();
+          const s = getComputedStyle(el);
+          return r.width > 20 && r.height > 12 && s.display !== 'none' && s.visibility !== 'hidden';
+        };
+        const nodes = [...document.querySelectorAll('button, a, div, span')].filter(visible);
+        const btn = nodes.find((el) => ['load more','show more','more'].includes(norm(el.innerText || el.textContent)));
+        if (btn) { btn.click?.(); return true; }
+        return false;
+      }).catch(() => false);
+      if (!more) break;
+      await page.waitForTimeout(500);
     }
+    const text = await page.locator('body').innerText().catch(() => '');
+    const values = parseTeamScoresFromText(text);
+    const ranking = Object.entries(values).sort((a, b) => b[1] - a[1]).map(([team]) => team);
+    if (!ranking.length) throw new Error('Could not extract any team scores from results page');
+    return { ranking, extendedRanking: ranking, values, source: IPL_RESULTS_URL };
+  } catch (error) {
+    await saveDebug(page, 'fail_results');
+    throw error;
+  } finally {
+    await page.close().catch(() => {});
   }
-  throw lastError ?? new Error('Could not scrape results');
 }
 
 async function scrapeMostCatches(context) {
-  let lastError = null;
-  for (const url of ESPN_CATCHES_URLS) {
-    const page = await makePage(context);
-    try {
-      await gotoSettled(page, url, `blocked_catches_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
-      const text = await page.locator('body').innerText().catch(() => '');
-      let ranking = extractCatchesRankingFromText(text);
-      if (!ranking.length) {
-        const tables = await extractVisibleTables(page);
-        const table = pickBestTable(tables, 'player');
-        ranking = table ? extractRankingFromRows(table.rows, 'player') : [];
-      }
-      if (!ranking.length) throw new Error(`No visible catches table found at ${url}`);
-      return { ranking, extendedRanking: ranking, source: url };
-    } catch (error) {
-      lastError = error;
-      await saveDebug(page, `fail_catches_${normalize(url).replace(/\s+/g, '_').slice(0, 80)}`);
-    } finally {
-      await page.close().catch(() => {});
-    }
+  const page = await makePage(context);
+  try {
+    await gotoSettled(page, ESPN_SERIES_STATS_URL, 'blocked_catches');
+    const text = await page.locator('body').innerText().catch(() => '');
+    const ranking = extractCatchesRankingFromText(text);
+    if (!ranking.length) throw new Error(`No visible catches table found at ${ESPN_SERIES_STATS_URL}`);
+    return { ranking, extendedRanking: ranking, source: ESPN_SERIES_STATS_URL };
+  } catch (error) {
+    await saveDebug(page, 'fail_catches');
+    throw error;
+  } finally {
+    await page.close().catch(() => {});
   }
-  throw lastError ?? new Error('Could not scrape most catches from ESPN');
 }
 
 function majorCategoryCount(live) {
@@ -597,27 +561,27 @@ async function main() {
     try {
       live.titleWinner = await scrapePointsTable(context);
       live.tableBottom = { ranking: [...live.titleWinner.extendedRanking], extendedRanking: [...live.titleWinner.extendedRanking] };
-      live.scrapeReport.titleWinner = { ok: true, count: live.titleWinner.extendedRanking.length, source: live.titleWinner.source };
-      live.scrapeReport.tableBottom = { ok: true, count: live.tableBottom.extendedRanking.length, source: live.titleWinner.source };
+      live.scrapeReport.titleWinner = { ok: true, count: live.titleWinner.extendedRanking.length, source: IPL_POINTS_URL };
+      live.scrapeReport.tableBottom = { ok: true, count: live.tableBottom.extendedRanking.length, source: IPL_POINTS_URL };
     } catch (error) {
-      live.scrapeReport.titleWinner = { ok: false, error: error.message, source: IPL_POINTS_URLS[0] };
-      live.scrapeReport.tableBottom = { ok: false, error: error.message, source: IPL_POINTS_URLS[0] };
+      live.scrapeReport.titleWinner = { ok: false, error: error.message, source: IPL_POINTS_URL };
+      live.scrapeReport.tableBottom = { ok: false, error: error.message, source: IPL_POINTS_URL };
       errors.push(`points-table: ${error.message}`);
     }
 
     try {
       live.highestScoreTeam = await scrapeHighestTeamScores(context);
-      live.scrapeReport.highestScoreTeam = { ok: true, count: live.highestScoreTeam.extendedRanking.length, source: live.highestScoreTeam.source };
+      live.scrapeReport.highestScoreTeam = { ok: true, count: live.highestScoreTeam.extendedRanking.length, source: IPL_RESULTS_URL };
     } catch (error) {
-      live.scrapeReport.highestScoreTeam = { ok: false, error: error.message, source: IPL_RESULTS_URLS[0] };
+      live.scrapeReport.highestScoreTeam = { ok: false, error: error.message, source: IPL_RESULTS_URL };
       errors.push(`highestScoreTeam: ${error.message}`);
     }
 
     try {
       live.mostCatches = await scrapeMostCatches(context);
-      live.scrapeReport.mostCatches = { ok: true, count: live.mostCatches.extendedRanking.length, source: live.mostCatches.source };
+      live.scrapeReport.mostCatches = { ok: true, count: live.mostCatches.extendedRanking.length, source: ESPN_SERIES_STATS_URL };
     } catch (error) {
-      live.scrapeReport.mostCatches = { ok: false, error: error.message, source: ESPN_CATCHES_URLS[0] };
+      live.scrapeReport.mostCatches = { ok: false, error: error.message, source: ESPN_SERIES_STATS_URL };
       errors.push(`mostCatches: ${error.message}`);
     }
   } finally {
