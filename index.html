@@ -159,9 +159,12 @@
     .pick-name{display:inline-block;font-weight:900;font-size:15px;line-height:1.2;color:#fff}
     .live-pill{display:inline-flex;align-items:center;gap:6px;max-width:max-content;padding:5px 9px;border-radius:999px;border:1px solid transparent;font-size:11px;font-weight:900;letter-spacing:.01em;line-height:1.1}
     .live-pill::before{content:'';width:7px;height:7px;border-radius:999px;background:currentColor;opacity:.9}
-    .live-up{background:rgba(68,215,146,.14);border-color:rgba(68,215,146,.26);color:#aaf3cb}
+    .live-winner{background:rgba(68,215,146,.14);border-color:rgba(68,215,146,.26);color:#aaf3cb}
+    .live-mid{background:rgba(255,200,87,.12);border-color:rgba(255,200,87,.22);color:#ffe2a8}
+    .live-ranked{background:rgba(124,196,255,.12);border-color:rgba(124,196,255,.2);color:#cfe3ff}
     .live-down{background:rgba(255,127,150,.14);border-color:rgba(255,127,150,.22);color:#ffc3ce}
-    .live-neutral{background:rgba(124,196,255,.12);border-color:rgba(124,196,255,.2);color:#cfe3ff}
+    .live-neutral{background:rgba(124,196,255,.10);border-color:rgba(124,196,255,.16);color:#cfe3ff}
+    .live-muted{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:#d5def0}
     .note-box{display:inline-block;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);color:#dbe7ff;line-height:1.45}
     .note-box.note-wait{background:rgba(255,200,87,.08);border-color:rgba(255,200,87,.16);color:#ffe0a1}
     .note-box.note-win{background:rgba(68,215,146,.10);border-color:rgba(68,215,146,.18);color:#b6f2d0}
@@ -765,6 +768,10 @@
         if (posA && posB) {
           if (posA < posB) a = 1;
           else if (posB < posA) b = 1;
+        } else if (posA && !posB) {
+          a = 1;
+        } else if (posB && !posA) {
+          b = 1;
         }
       }
 
@@ -811,10 +818,16 @@
       const extA = rankOf(pickA, extendedRanking);
       const extB = rankOf(pickB, extendedRanking);
 
-      // Only one player gets +1 if both missed top-5 and one prediction is strictly closer.
-      if (!rA && !rB && extA && extB) {
-        if (extA < extB) a = 1;
-        else if (extB < extA) b = 1;
+      // If both missed the top-5, the better prediction still gets 1 point.
+      if (!rA && !rB) {
+        if (extA && extB) {
+          if (extA < extB) a = 1;
+          else if (extB < extA) b = 1;
+        } else if (extA && !extB) {
+          a = 1;
+        } else if (extB && !extA) {
+          b = 1;
+        }
       }
 
       return {
@@ -1077,8 +1090,15 @@
 
     function liveStateTone(state){
       const s = String(state || '').toLowerCase();
-      if (/#\d+/.test(s) || /winner|leader|finalist|top 5|#1/.test(s)) return 'up';
-      if (/trailing|outside frame|outside top|unranked|eliminated/.test(s)) return 'down';
+      if (/winner|current leader/.test(s)) return 'winner';
+      if (/finalist|playoffs/.test(s)) return 'mid';
+      if (/unranked/.test(s)) return 'muted';
+      if (/trailing|outside frame|outside top|eliminated/.test(s)) return 'down';
+      const rankMatch = s.match(/#(\d+)/);
+      if (rankMatch) {
+        const rank = Number(rankMatch[1]);
+        return rank <= 5 ? 'winner' : 'ranked';
+      }
       return 'neutral';
     }
 
