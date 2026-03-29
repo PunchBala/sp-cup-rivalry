@@ -121,13 +121,15 @@
     .roast-tag{flex:0 0 auto;display:inline-block;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
     .roast-tag.banter{background:rgba(124,196,255,.14);color:#bfe2ff}
     .roast-tag.extreme{background:rgba(255,127,150,.16);color:#ffd0d8}
-    .view-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .view-tabs{display:none}
     .view-tab{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.18s}
     .view-tab.active{background:linear-gradient(180deg,rgba(84,138,255,.22),rgba(84,138,255,.1));border-color:rgba(123,167,255,.45);box-shadow:0 0 0 1px rgba(123,167,255,.18) inset}
     .section-hidden{display:none !important}
     .stats-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
     .stats-toolbar label{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-    .stats-toolbar select{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:12px;font:inherit;min-width:240px}
+    .stats-toolbar select{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:12px;font:inherit;min-width:240px;appearance:none;-webkit-appearance:none;-moz-appearance:none}
+    .stats-toolbar select option{background:#0f1731;color:#f7f9ff}
+    .stats-toolbar select optgroup{background:#0f1731;color:#9ec5ff}
     .stats-summary{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.5}
     .stats-table th,.stats-table td{padding:12px 10px;vertical-align:top}
     .stats-table td.value-col{white-space:nowrap;font-weight:800}
@@ -144,6 +146,28 @@
     .status-bad{background:rgba(255,127,150,.16);color:#ffb5c3}
     .status-tie{background:rgba(255,200,87,.16);color:#ffd67e}
     .top-summary{margin-bottom:16px}
+
+    #breakdownTable tbody tr{transition:.18s ease}
+    #breakdownTable tbody tr:nth-child(even){background:rgba(255,255,255,.018)}
+    #breakdownTable tbody tr:hover{background:rgba(124,196,255,.06)}
+    #breakdownTable tbody tr.row-front-a{background:linear-gradient(90deg, rgba(68,215,146,.08), rgba(68,215,146,0) 34%)}
+    #breakdownTable tbody tr.row-front-b{background:linear-gradient(90deg, rgba(255,127,150,.08), rgba(255,127,150,0) 34%)}
+    #breakdownTable tbody tr.row-tied{background:linear-gradient(90deg, rgba(255,200,87,.06), rgba(255,200,87,0) 30%)}
+    #breakdownTable td:first-child{width:230px}
+    .category-main{display:block;font-size:15px;line-height:1.15}
+    .pick-card{display:flex;flex-direction:column;gap:8px}
+    .pick-name{display:inline-block;font-weight:900;font-size:15px;line-height:1.2;color:#fff}
+    .live-pill{display:inline-flex;align-items:center;gap:6px;max-width:max-content;padding:5px 9px;border-radius:999px;border:1px solid transparent;font-size:11px;font-weight:900;letter-spacing:.01em;line-height:1.1}
+    .live-pill::before{content:'';width:7px;height:7px;border-radius:999px;background:currentColor;opacity:.9}
+    .live-up{background:rgba(68,215,146,.14);border-color:rgba(68,215,146,.26);color:#aaf3cb}
+    .live-down{background:rgba(255,127,150,.14);border-color:rgba(255,127,150,.22);color:#ffc3ce}
+    .live-neutral{background:rgba(124,196,255,.12);border-color:rgba(124,196,255,.2);color:#cfe3ff}
+    .note-box{display:inline-block;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);color:#dbe7ff;line-height:1.45}
+    .note-box.note-wait{background:rgba(255,200,87,.08);border-color:rgba(255,200,87,.16);color:#ffe0a1}
+    .note-box.note-win{background:rgba(68,215,146,.10);border-color:rgba(68,215,146,.18);color:#b6f2d0}
+    .note-box.note-rank{background:rgba(124,196,255,.10);border-color:rgba(124,196,255,.18);color:#d4e8ff}
+    .score-stack{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
+
   </style>
 
 </head>
@@ -199,7 +223,7 @@
       </div>
       <div class="card span-8">
         <div class="section-title">Live category board</div>
-        <div class="table-wrap"><table id="breakdownTable"></table></div>
+        <div class="table-wrap"><table id="breakdownTable" class="breakdown-table"></table></div>
       </div>
       <div class="span-4" style="display:grid;gap:16px">
         <div class="card"><div class="section-title">Smart insights</div><div id="insights"></div></div>
@@ -951,24 +975,31 @@
 
     function renderTabs(){
       const el = document.getElementById('tabs');
-      el.innerHTML = MATCHUPS.map(m => `
-        <button class="tab ${m.id===activeId ? 'active':''}" data-id="${m.id}">${escapeHtml(m.label)}</button>
+      const tabs = [
+        ...MATCHUPS.map(m => ({ key: m.id, label: m.label, type: 'matchup' })),
+        { key:'stats', label:'Stats', type:'stats' }
+      ];
+      el.innerHTML = tabs.map(t => `
+        <button class="tab ${((t.type==='stats' && activeView==='stats') || (t.type==='matchup' && activeView==='warroom' && t.key===activeId)) ? 'active' : ''}" data-key="${t.key}" data-type="${t.type}">${escapeHtml(t.label)}</button>
       `).join('');
       el.querySelectorAll('.tab').forEach(btn => {
-        btn.onclick = () => { activeId = btn.dataset.id; render(); };
+        btn.onclick = () => {
+          const type = btn.dataset.type;
+          const key = btn.dataset.key;
+          if (type === 'stats') {
+            activeView = 'stats';
+          } else {
+            activeId = key;
+            activeView = 'warroom';
+          }
+          render();
+        };
       });
     }
 
     function renderViewTabs(){
       const el = document.getElementById('viewTabs');
-      const tabs = [
-        { key:'warroom', label:'War room' },
-        { key:'stats', label:'Stats' }
-      ];
-      el.innerHTML = tabs.map(t => `<button class="view-tab ${t.key===activeView ? 'active' : ''}" data-view="${t.key}">${escapeHtml(t.label)}</button>`).join('');
-      el.querySelectorAll('.view-tab').forEach(btn => {
-        btn.onclick = () => { activeView = btn.dataset.view; render(); };
-      });
+      if (el) el.innerHTML = '';
     }
 
     function renderScoreboard(matchup, totalA, totalB){
@@ -1034,6 +1065,31 @@
         : 'Swing point: likely indirect for your picks, so enjoy stress-free scouting for one evening. Briefly.';
     }
 
+
+    function breakdownRowClass(r){
+      if (r.a === r.b) return 'row-tied';
+      return r.a > r.b ? 'row-front-a' : 'row-front-b';
+    }
+
+    function liveStateTone(state){
+      const s = String(state || '').toLowerCase();
+      if (/#\d+/.test(s) || /winner|leader|finalist|top 5|#1/.test(s)) return 'up';
+      if (/trailing|outside frame|outside top|unranked|eliminated/.test(s)) return 'down';
+      return 'neutral';
+    }
+
+    function liveStateHtml(state){
+      const text = state || 'Live: waiting';
+      return `<span class="live-pill live-${liveStateTone(text)}">${escapeHtml(text)}</span>`;
+    }
+
+    function noteTone(note){
+      const s = String(note || '').toLowerCase();
+      if (!s || /waiting/.test(s)) return 'note-wait';
+      if (/winner|leader|top 5|top 5 uncapped|lowest 5/.test(s)) return 'note-win';
+      return 'note-rank';
+    }
+
     function renderBreakdown(matchup, rows){
       const table = document.getElementById('breakdownTable');
       table.innerHTML = `
@@ -1049,18 +1105,18 @@
         </thead>
         <tbody>
           ${rows.map(r => `
-            <tr>
-              <td><strong>${escapeHtml(r.category.label)}</strong><div class="small">${
+            <tr class="${breakdownRowClass(r)}">
+              <td class="category-col"><strong class="category-main">${escapeHtml(r.category.label)}</strong><div class="small">${
                 r.category.type === 'top5' ? 'Top-5 scoring category'
                 : r.category.type === 'better_rank_low' ? 'Better prediction category (lower rank wins)'
                 : r.category.type === 'better_rank' ? 'Better prediction category'
                 : 'Winner-takes-points category'
               }</div></td>
-              <td class="pick">${escapeHtml(r.pickA)}<div class="small" style="margin-top:6px">${escapeHtml(r.pickALiveState || 'Live: waiting')}</div></td>
-              <td class="pick">${escapeHtml(r.pickB)}<div class="small" style="margin-top:6px">${escapeHtml(r.pickBLiveState || 'Live: waiting')}</div></td>
+              <td><div class="pick-card"><span class="pick-name">${escapeHtml(r.pickA)}</span>${liveStateHtml(r.pickALiveState || 'Live: waiting')}</div></td>
+              <td><div class="pick-card"><span class="pick-name">${escapeHtml(r.pickB)}</span>${liveStateHtml(r.pickBLiveState || 'Live: waiting')}</div></td>
               <td class="mono score-cell"><div class="score-stack"><span class="score-num">${r.a}</span><span class="score-dash">-</span><span class="score-num">${r.b}</span></div></td>
               <td>${r.a===r.b ? '<span class="status-chip status-tie">Tied</span>' : r.a>r.b ? `<span class="status-chip status-good">${escapeHtml(matchup.a.name)}</span>` : `<span class="status-chip status-bad">${escapeHtml(matchup.b.name)}</span>`}</td>
-              <td class="small">${escapeHtml(r.note)}</td>
+              <td class="small"><span class="note-box ${noteTone(r.note)}">${escapeHtml(r.note)}</span></td>
             </tr>
           `).join('')}
         </tbody>
