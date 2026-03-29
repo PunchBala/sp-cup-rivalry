@@ -27,9 +27,9 @@ const STRIKER_MIN_RUNS = 100;
 const LIVE_SCORECARD_ENABLED = parseEnvBool(process.env.CRICKETDATA_ENABLE_LIVE_SCORECARD, false);
 const LIVE_SCORECARD_INTERVAL_MINUTES = parseEnvInt(process.env.CRICKETDATA_LIVE_SCORECARD_INTERVAL_MINUTES, 30);
 const MAX_BACKLOG_SCORECARDS_PER_RUN = parseEnvInt(process.env.CRICKETDATA_MAX_BACKLOG_SCORECARDS_PER_RUN, 2);
-const CRICMETRIC_BOWLING_URL = 'https://www.cricmetric.com/series.py?series=ipl2026&show=bowling#';
-const CRICMETRIC_DOTS_ENABLED = parseEnvBool(process.env.CRICMETRIC_DOTS_ENABLED, true);
-const CRICMETRIC_MIN_REFRESH_MINUTES = parseEnvInt(process.env.CRICMETRIC_MIN_REFRESH_MINUTES, 120);
+const IPLT20_MOST_DOTS_ENABLED = parseEnvBool(process.env.IPLT20_MOST_DOTS_ENABLED, true);
+const IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES = parseEnvInt(process.env.IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES, 120);
+const IPLT20_MOST_DOTS_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/284-mostdotballsbowledtournament.js?callback=onmostdotballsbowledtournament';
 const IPLT20_FAIRPLAY_ENABLED = parseEnvBool(process.env.IPLT20_FAIRPLAY_ENABLED, true);
 const IPLT20_FAIRPLAY_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/2026-fairplayList.js?callback=onFairplayAward';
 const AGGREGATE_SCHEMA_VERSION = 2;
@@ -161,9 +161,9 @@ function createEmptyLive() {
         lastLiveScorecardMatchId: null,
         lastBacklogProcessAt: null
       },
-      cricmetricDots: {
-        enabled: CRICMETRIC_DOTS_ENABLED,
-        minRefreshMinutes: CRICMETRIC_MIN_REFRESH_MINUTES,
+      officialMostDots: {
+        enabled: IPLT20_MOST_DOTS_ENABLED,
+        minRefreshMinutes: IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES,
         lastFetchedAt: null,
         lastAttemptAt: null,
         lastSource: null,
@@ -219,7 +219,7 @@ async function readExistingLive() {
         aggregates: { ...fresh.meta.aggregates, ...(parsed.meta?.aggregates || {}) },
         liveOverlay: { ...fresh.meta.liveOverlay, ...(parsed.meta?.liveOverlay || {}) },
         scorecardBudget: { ...fresh.meta.scorecardBudget, ...(parsed.meta?.scorecardBudget || {}) },
-        cricmetricDots: { ...fresh.meta.cricmetricDots, ...(parsed.meta?.cricmetricDots || {}) },
+        officialMostDots: { ...fresh.meta.officialMostDots, ...((parsed.meta?.officialMostDots || parsed.meta?.cricmetricDots) || {}) },
         lastRun: { ...fresh.meta.lastRun, ...(parsed.meta?.lastRun || {}) },
         aggregateSchemaVersion: Number(parsed.meta?.aggregateSchemaVersion || fresh.meta.aggregateSchemaVersion || 1)
       }
@@ -439,49 +439,14 @@ async function fetchOfficialFairPlay() {
   return parsed;
 }
 
-function extractCricmetricLeadersPath(pageHtml) {
-  const html = String(pageHtml || '');
-  const patterns = [
-    /url_string\s*=\s*["']([^"']*\/jscripts\/leadersdata\.py[^"']*role=Bowling[^"']*series=ipl2026[^"']*)["']/i,
-    /url_string\s*=\s*["']([^"']*\/jscripts\/leadersdata\.py[^"']*series=ipl2026[^"']*role=Bowling[^"']*)["']/i,
-    /(["'])(\/jscripts\/leadersdata\.py\?[^"']*series=ipl2026[^"']*role=Bowling[^"']*)/i,
-    /(["'])(\/jscripts\/leadersdata\.py\?[^"']*role=Bowling[^"']*series=ipl2026[^"']*)/i
-  ];
-
-  for (const pattern of patterns) {
-    const match = html.match(pattern);
-    if (match?.[1]) return match[1];
-    if (match?.[2]) return match[2];
-  }
-
-  return null;
-}
-
-function absoluteCricmetricUrl(urlOrPath) {
-  const raw = String(urlOrPath || '').trim();
-  if (!raw) return '';
-  if (/^https?:\/\//i.test(raw)) return raw;
-  if (raw.startsWith('//')) return `https:${raw}`;
-  if (raw.startsWith('/')) return `https://www.cricmetric.com${raw}`;
-  return `https://www.cricmetric.com/${raw.replace(/^\.\//, '')}`;
-}
-
-function rowsToDotsPayloadFromGoogleTable(jsonData, agg) {
-  const cols = safeArray(jsonData?.cols);
-  const rows = safeArray(jsonData?.rows);
-  if (!cols.length || !rows.length) return null;
-
-  const headers = cols.map((col) => normalizeLookupName(col?.label || col?.id || ''));
-  const playerIdx = headers.findIndex((header) => header === 'player');
-  const dotsIdx = headers.findIndex((header) => header === 'dots');
-  if (playerIdx < 0 || dotsIdx < 0) return null;
+function rowsToOfficialMostDotsPayload(payload, agg) {
+  const rows = safeArray(payload?.mostdotballsbowledtournament);
+  if (!rows.length) return null;
 
   const values = {};
   for (const row of rows) {
-    const cells = safeArray(row?.c);
-    const rawPlayer = cells[playerIdx]?.f ?? cells[playerIdx]?.v ?? '';
-    const rawDots = cells[dotsIdx]?.v ?? cells[dotsIdx]?.f ?? '';
-    const dotsValue = Number.parseInt(String(rawDots || '').replace(/[^0-9-]/g, ''), 10);
+    const rawPlayer = row?.BowlerName || row?.bowlerName || row?.PlayerName || row?.playerName || '';
+    const dotsValue = numOrNull(row?.DotBallsBowled ?? row?.dotBallsBowled ?? row?.Dots ?? row?.dots);
     if (!rawPlayer || !Number.isFinite(dotsValue)) continue;
     const player = resolveCricmetricPlayerName(rawPlayer, agg);
     if (!player) continue;
@@ -493,49 +458,33 @@ function rowsToDotsPayloadFromGoogleTable(jsonData, agg) {
     .map(([name]) => name);
 
   if (!ordered.length) return null;
-  return { ranking: ordered.slice(0, 10), extendedRanking: ordered, values };
+  return {
+    ranking: ordered.slice(0, 10),
+    extendedRanking: ordered,
+    values,
+    updatedAt: safeArray(payload?.dateModifiedOn)[0] || null,
+    source: "IPLT20 official most dots feed"
+  };
 }
 
-async function fetchCricmetricDots(agg) {
-  const directPageUrl = CRICMETRIC_BOWLING_URL.replace(/#$/, '');
-  const proxyPageUrl = `https://r.jina.ai/http://${directPageUrl.replace(/^https?:\/\//, '')}`;
-  const pageAttempts = [
-    { url: directPageUrl, source: 'cricmetric-page-direct' },
-    { url: proxyPageUrl, source: 'cricmetric-page-via-jina' }
-  ];
-
-  const errors = [];
-  for (const attempt of pageAttempts) {
-    try {
-      const pageHtml = await fetchText(attempt.url);
-      const leadersPath = extractCricmetricLeadersPath(pageHtml);
-      if (!leadersPath) {
-        errors.push(`${attempt.source}: leadersdata-url-not-found`);
-        continue;
-      }
-
-      const leadersUrl = absoluteCricmetricUrl(leadersPath);
-      const leadersJson = await fetchJson(leadersUrl);
-      const parsed = rowsToDotsPayloadFromGoogleTable(leadersJson, agg);
-      if (parsed?.extendedRanking?.length) {
-        return { ...parsed, source: `${attempt.source}:leadersdata` };
-      }
-      errors.push(`${attempt.source}: dots-data-not-found`);
-    } catch (error) {
-      errors.push(`${attempt.source}: ${error.message}`);
-    }
-  }
-
-  throw new Error(errors.join(' | '));
+async function fetchOfficialMostDots(agg) {
+  const text = await fetchText(IPLT20_MOST_DOTS_FEED_URL, {
+    accept: "application/javascript,text/javascript,*/*;q=0.8",
+    referer: "https://www.iplt20.com/stats/2026"
+  });
+  const payload = parseJsonpPayload(text);
+  const parsed = rowsToOfficialMostDotsPayload(payload, agg);
+  if (!parsed?.extendedRanking?.length) throw new Error("most-dots-data-not-found");
+  return parsed;
 }
 
-function shouldFetchCricmetricDots(live, decision, currentMs, backlogProcessed) {
-  if (!CRICMETRIC_DOTS_ENABLED) return { fetch: false, reason: 'cricmetric dots disabled' };
-  if (backlogProcessed > 0) return { fetch: true, reason: 'completed match backlog processed' };
-  if (decision.mode === 'live_window') return { fetch: false, reason: 'skip during live window without completed backlog' };
-  const minsSinceLast = minutesSince(live.meta.cricmetricDots?.lastFetchedAt, currentMs);
-  if (minsSinceLast >= CRICMETRIC_MIN_REFRESH_MINUTES) return { fetch: true, reason: 'refresh interval reached' };
-  return { fetch: false, reason: 'refresh interval not reached' };
+function shouldFetchOfficialMostDots(live, decision, currentMs, backlogProcessed) {
+  if (!IPLT20_MOST_DOTS_ENABLED) return { fetch: false, reason: "official most dots disabled" };
+  if (backlogProcessed > 0) return { fetch: true, reason: "completed match backlog processed" };
+  if (decision.mode === "live_window") return { fetch: false, reason: "skip during live window without completed backlog" };
+  const minsSinceLast = minutesSince(live.meta.officialMostDots?.lastFetchedAt, currentMs);
+  if (minsSinceLast >= IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES) return { fetch: true, reason: "refresh interval reached" };
+  return { fetch: false, reason: "refresh interval not reached" };
 }
 
 function resetDailySchedulerIfNeeded(live, currentMs = Date.now()) {
@@ -1115,8 +1064,8 @@ async function main() {
   live.meta.scorecardBudget.liveEnabled = LIVE_SCORECARD_ENABLED;
   live.meta.scorecardBudget.liveIntervalMinutes = LIVE_SCORECARD_INTERVAL_MINUTES;
   live.meta.scorecardBudget.maxBacklogPerRun = MAX_BACKLOG_SCORECARDS_PER_RUN;
-  live.meta.cricmetricDots.enabled = CRICMETRIC_DOTS_ENABLED;
-  live.meta.cricmetricDots.minRefreshMinutes = CRICMETRIC_MIN_REFRESH_MINUTES;
+  live.meta.officialMostDots.enabled = IPLT20_MOST_DOTS_ENABLED;
+  live.meta.officialMostDots.minRefreshMinutes = IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES;
   live.meta.lastRun = {
     seriesInfoCalls: 0,
     scorecardCalls: 0,
@@ -1230,36 +1179,36 @@ async function main() {
   const combinedAgg = combineAggregates(finalizedAgg, overlayAgg);
 
   let dotsPayload = live.mostDots || { ranking: [], extendedRanking: [], values: {} };
-  const dotsDecision = shouldFetchCricmetricDots(live, decision, currentMs, live.meta.lastRun.backlogProcessed);
+  const dotsDecision = shouldFetchOfficialMostDots(live, decision, currentMs, live.meta.lastRun.backlogProcessed);
   let dotsReport = {
     ok: false,
-    source: 'Cricmetric bowling leaderboard',
-    method: 'parsed Dots column from bowling table',
+    source: 'IPLT20 official most dots feed',
+    method: 'parsed JSONP mostdotballsbowledtournament feed from Sports Mechanic stats feed',
     reason: dotsDecision.reason
   };
 
   if (dotsDecision.fetch) {
-    live.meta.cricmetricDots.lastAttemptAt = isoNow();
+    live.meta.officialMostDots.lastAttemptAt = isoNow();
     try {
-      dotsPayload = await fetchCricmetricDots(combinedAgg);
-      live.meta.cricmetricDots.lastFetchedAt = isoNow();
-      live.meta.cricmetricDots.lastSource = dotsPayload.source;
-      live.meta.cricmetricDots.lastStatus = 'ok';
-      live.meta.cricmetricDots.lastError = null;
+      dotsPayload = await fetchOfficialMostDots(combinedAgg);
+      live.meta.officialMostDots.lastFetchedAt = isoNow();
+      live.meta.officialMostDots.lastSource = dotsPayload.source;
+      live.meta.officialMostDots.lastStatus = 'ok';
+      live.meta.officialMostDots.lastError = null;
       combinedAgg.bowlingDots = { ...(dotsPayload.values || {}) };
       dotsReport = {
         ok: true,
         source: dotsPayload.source,
-        method: 'parsed Dots column from Cricmetric bowling leaderboard',
+        method: 'parsed JSONP mostdotballsbowledtournament feed from Sports Mechanic stats feed',
         rows: dotsPayload.extendedRanking.length
       };
     } catch (error) {
-      live.meta.cricmetricDots.lastStatus = 'error';
-      live.meta.cricmetricDots.lastError = error.message;
+      live.meta.officialMostDots.lastStatus = 'error';
+      live.meta.officialMostDots.lastError = error.message;
       dotsReport = {
         ok: false,
-        source: 'Cricmetric bowling leaderboard',
-        method: 'parsed Dots column from bowling table',
+        source: 'IPLT20 official most dots feed',
+        method: 'parsed JSONP mostdotballsbowledtournament feed from Sports Mechanic stats feed',
         error: error.message,
         fallback: safeArray(live.mostDots?.extendedRanking).length ? 'kept previous mostDots snapshot' : 'no previous mostDots snapshot'
       };
@@ -1316,7 +1265,7 @@ async function main() {
     titleWinner: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     tableBottom: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     mostDots: dotsReport,
-    mvp: { ok: true, source: 'CricketData + Cricmetric', method: 'custom formula using runs, sixes, wickets, dot balls, catches, strike-rate bonus, economy bonus and milestone bonuses' },
+    mvp: { ok: true, source: 'CricketData + IPLT20 official Most Dots', method: 'custom formula using runs, sixes, wickets, dot balls, catches, strike-rate bonus, economy bonus and milestone bonuses' },
     uncappedMvp: { ok: true, source: 'custom MVP ranking', method: 'filtered to the provided uncapped player pool, then compares picks by their positions in the custom MVP ranking' },
     fairPlay: fairPlayReport,
     leastMvp: { ok: true, source: 'custom MVP ranking', method: `lower in custom MVP ranking wins, filtered to players with minimum ${LEAST_MVP_MIN_MATCHES} matches` },
