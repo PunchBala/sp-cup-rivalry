@@ -142,6 +142,7 @@
         <div class="pill" id="providerPill">Provider: Live / embedded official schedule</div>
         <div class="pill" id="seasonPill">Season: IPL 2026 only</div>
         <div class="pill" id="updatedPill">Last updated: --</div>
+        <div class="pill" id="nextUpdatePill">Next planned update: --</div>
       </div>
     </div>
 
@@ -1111,6 +1112,15 @@
       document.getElementById('metricConfidenceNote').textContent = `${matchup.a.name} confidence ${confidenceA}%, ${matchup.b.name} confidence ${confidenceB}%.`;
       const updatedAt = LIVE_2026.fetchedAt ? new Date(LIVE_2026.fetchedAt) : new Date();
       document.getElementById('updatedPill').textContent = `Last updated: ${new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(updatedAt)}`;
+      const nextPlannedAtRaw = LIVE_2026?.meta?.scheduler?.nextPlannedRefreshAt;
+      const nextUpdatePill = document.getElementById('nextUpdatePill');
+      if (nextPlannedAtRaw) {
+        const nextPlannedAt = new Date(nextPlannedAtRaw);
+        const nextLabel = new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(nextPlannedAt);
+        nextUpdatePill.textContent = `Next planned update: ${nextLabel}`;
+      } else {
+        nextUpdatePill.textContent = 'Next planned update: --';
+      }
     }
 
     function normalizeFetchedLiveData(data){

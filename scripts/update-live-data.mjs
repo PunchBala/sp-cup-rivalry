@@ -111,7 +111,11 @@ function createEmptyLive() {
         lastQuietRefreshAt: null,
         lastLiveRefreshAt: null,
         lastSeriesInfoAt: null,
-        lastDecision: null
+        lastDecision: null,
+        nextPlannedRefreshAt: null,
+        nextPlannedMode: null,
+        nextPlannedReason: null,
+        nextPlannedCalculatedAt: null
       },
       cache: { seriesId: SERIES_ID, matchList: [] },
       processedMatchIds: [],
@@ -508,8 +512,8 @@ function shouldFetchCricmetricDots(live, decision, currentMs, backlogProcessed) 
   return { fetch: false, reason: 'refresh interval not reached' };
 }
 
-function resetDailySchedulerIfNeeded(live) {
-  const today = londonDayKey();
+function resetDailySchedulerIfNeeded(live, currentMs = Date.now()) {
+  const today = londonDayKey(currentMs);
   if (live.meta.scheduler.dayKey !== today) {
     live.meta.scheduler.dayKey = today;
     live.meta.scheduler.quietRefreshesUsed = 0;
@@ -555,6 +559,32 @@ function decideRefreshMode(live, currentMs) {
   }
 
   return { shouldRefresh: false, mode: 'skip', reason: 'outside game time and quiet refresh budget exhausted or interval not reached' };
+}
+
+function calculateNextPlannedRefresh(live, currentMs, horizonHours = 48) {
+  const horizonMs = horizonHours * 60 * 60 * 1000;
+  const baseScheduler = JSON.parse(JSON.stringify(live.meta.scheduler || {}));
+  const cachedMatches = safeArray(live.meta?.cache?.matchList);
+
+  for (let probeMs = currentMs + 1000; probeMs <= currentMs + horizonMs; probeMs += 1000) {
+    const probeLive = {
+      meta: {
+        scheduler: JSON.parse(JSON.stringify(baseScheduler)),
+        cache: { matchList: cachedMatches }
+      }
+    };
+    resetDailySchedulerIfNeeded(probeLive, probeMs);
+    const decision = decideRefreshMode(probeLive, probeMs);
+    if (decision.shouldRefresh) {
+      return {
+        at: new Date(probeMs).toISOString(),
+        mode: decision.mode,
+        reason: decision.reason
+      };
+    }
+  }
+
+  return null;
 }
 
 function ensureStandingTeam(map, team) {
@@ -1085,6 +1115,12 @@ async function main() {
   } else {
     live.meta.scheduler.lastLiveRefreshAt = isoNow();
   }
+
+  const nextPlanned = calculateNextPlannedRefresh(live, nowMs());
+  live.meta.scheduler.nextPlannedRefreshAt = nextPlanned?.at || null;
+  live.meta.scheduler.nextPlannedMode = nextPlanned?.mode || null;
+  live.meta.scheduler.nextPlannedReason = nextPlanned?.reason || null;
+  live.meta.scheduler.nextPlannedCalculatedAt = isoNow();
 
   const processedIds = new Set(live.meta.processedMatchIds || []);
   let finalizedAgg = live.meta.aggregates || createEmptyAggregates();
