@@ -26,6 +26,14 @@ const STRIKER_MIN_RUNS = 100;
 const LIVE_SCORECARD_ENABLED = parseEnvBool(process.env.CRICKETDATA_ENABLE_LIVE_SCORECARD, false);
 const LIVE_SCORECARD_INTERVAL_MINUTES = parseEnvInt(process.env.CRICKETDATA_LIVE_SCORECARD_INTERVAL_MINUTES, 30);
 const MAX_BACKLOG_SCORECARDS_PER_RUN = parseEnvInt(process.env.CRICKETDATA_MAX_BACKLOG_SCORECARDS_PER_RUN, 2);
+const CRICMETRIC_BOWLING_URL = 'https://www.cricmetric.com/series.py?series=ipl2026&show=bowling#';
+const CRICMETRIC_DOTS_ENABLED = parseEnvBool(process.env.CRICMETRIC_DOTS_ENABLED, true);
+const CRICMETRIC_MIN_REFRESH_MINUTES = parseEnvInt(process.env.CRICMETRIC_MIN_REFRESH_MINUTES, 120);
+
+const CRICMETRIC_MANUAL_NAME_ALIASES = {
+  // Keep this tiny. Only use manual overrides for genuinely weird edge cases
+  // that the generated alias system cannot resolve safely.
+};
 
 function parseEnvBool(value, fallback = false) {
   if (value === undefined || value === null || value === '') return fallback;
@@ -70,7 +78,8 @@ function createEmptyAggregates() {
     catches: {},
     teamHighestScore: {},
     standings: {},
-    bestBowlingFigures: {}
+    bestBowlingFigures: {},
+    bowlingDots: {}
   };
 }
 
@@ -109,6 +118,15 @@ function createEmptyLive() {
         lastLiveScorecardMatchId: null,
         lastBacklogProcessAt: null
       },
+      cricmetricDots: {
+        enabled: CRICMETRIC_DOTS_ENABLED,
+        minRefreshMinutes: CRICMETRIC_MIN_REFRESH_MINUTES,
+        lastFetchedAt: null,
+        lastAttemptAt: null,
+        lastSource: null,
+        lastStatus: null,
+        lastError: null
+      },
       lastRun: {
         seriesInfoCalls: 0,
         scorecardCalls: 0,
@@ -123,7 +141,7 @@ function createEmptyLive() {
     orangeCap: { ranking: [], extendedRanking: [] },
     mostSixes: { ranking: [], extendedRanking: [] },
     purpleCap: { ranking: [], extendedRanking: [] },
-    mostDots: { ranking: [], extendedRanking: [] },
+    mostDots: { ranking: [], extendedRanking: [], values: {} },
     mvp: { ranking: [], extendedRanking: [] },
     uncappedMvp: { ranking: [], extendedRanking: [] },
     fairPlay: { ranking: [], extendedRanking: [] },
@@ -157,6 +175,7 @@ async function readExistingLive() {
         aggregates: { ...fresh.meta.aggregates, ...(parsed.meta?.aggregates || {}) },
         liveOverlay: { ...fresh.meta.liveOverlay, ...(parsed.meta?.liveOverlay || {}) },
         scorecardBudget: { ...fresh.meta.scorecardBudget, ...(parsed.meta?.scorecardBudget || {}) },
+        cricmetricDots: { ...fresh.meta.cricmetricDots, ...(parsed.meta?.cricmetricDots || {}) },
         lastRun: { ...fresh.meta.lastRun, ...(parsed.meta?.lastRun || {}) }
       }
     };
@@ -176,6 +195,234 @@ async function fetchJson(url) {
   const json = await res.json();
   if (json.status && json.status !== 'success') throw new Error(`API error: ${JSON.stringify(json)}`);
   return json;
+}
+
+async function fetchText(url, extraHeaders = {}) {
+  const res = await fetch(url, {
+    headers: {
+      accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'cache-control': 'no-cache',
+      pragma: 'no-cache',
+      referer: 'https://www.cricmetric.com/',
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+      ...extraHeaders
+    }
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return await res.text();
+}
+
+function decodeHtmlEntities(value) {
+  return String(value || '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n || 0)));
+}
+
+function stripTags(value) {
+  return decodeHtmlEntities(String(value || '').replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
+}
+
+function normalizeLookupName(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function titleCaseName(value) {
+  return String(value || '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
+function initialsForName(name) {
+  const parts = normalizeLookupName(name).split(' ').filter(Boolean);
+  if (!parts.length) return '';
+  return parts.slice(0, -1).map((part) => part[0]).join('');
+}
+
+function playerCandidateNames(agg) {
+  return [...new Set([
+    ...Object.keys(agg.bowlingWickets || {}),
+    ...Object.keys(agg.bestBowlingFigures || {}),
+    ...Object.keys(agg.battingRuns || {}),
+    ...Object.keys(agg.catches || {})
+  ].filter(Boolean))];
+}
+
+function addAlias(aliasMap, collisions, alias, fullName) {
+  const normAlias = normalizeLookupName(alias);
+  if (!normAlias) return;
+  if (!aliasMap.has(normAlias)) {
+    aliasMap.set(normAlias, fullName);
+    return;
+  }
+  if (aliasMap.get(normAlias) !== fullName) {
+    aliasMap.delete(normAlias);
+    collisions.add(normAlias);
+  }
+}
+
+function buildCricmetricAliasMap(fullNames) {
+  const aliasMap = new Map();
+  const collisions = new Set();
+
+  for (const fullName of fullNames) {
+    const normFull = normalizeLookupName(fullName);
+    const parts = normFull.split(' ').filter(Boolean);
+    if (!parts.length) continue;
+
+    const surname = parts.at(-1);
+    const given = parts.slice(0, -1);
+    const aliases = new Set([normFull]);
+
+    if (parts.length >= 2) {
+      aliases.add(`${parts[0]} ${surname}`);
+      aliases.add(`${parts[0][0]} ${surname}`);
+    }
+
+    if (given.length) {
+      const joinedInitials = given.map((part) => part[0]).join('');
+      const spacedInitials = given.map((part) => part[0]).join(' ');
+      aliases.add(`${joinedInitials} ${surname}`);
+      aliases.add(`${spacedInitials} ${surname}`);
+      aliases.add(`${given[0][0]} ${surname}`);
+      aliases.add(`${given[0]} ${surname}`);
+    }
+
+    if (parts.length === 3) {
+      aliases.add(`${parts[0]} ${parts[1][0]} ${surname}`);
+      aliases.add(`${parts[0][0]} ${parts[1][0]} ${surname}`);
+      aliases.add(`${parts[0][0]} ${parts[1]} ${surname}`);
+    }
+
+    for (const alias of aliases) addAlias(aliasMap, collisions, alias, fullName);
+  }
+
+  for (const alias of collisions) aliasMap.delete(alias);
+  return aliasMap;
+}
+
+function resolveCricmetricPlayerName(rawName, agg) {
+  const trimmed = stripTags(rawName);
+  if (!trimmed) return '';
+
+  const rawNorm = normalizeLookupName(trimmed);
+  const manualAlias = CRICMETRIC_MANUAL_NAME_ALIASES[rawNorm];
+  if (manualAlias) return manualAlias;
+
+  const candidates = playerCandidateNames(agg);
+  const aliasMap = buildCricmetricAliasMap(candidates);
+
+  const direct = candidates.find((candidate) => normalizeLookupName(candidate) === rawNorm);
+  if (direct) return direct;
+
+  const generatedAlias = aliasMap.get(rawNorm);
+  if (generatedAlias) return generatedAlias;
+
+  return titleCaseName(trimmed);
+}
+
+function parseHtmlTableRows(html) {
+  const tables = [...String(html || '').matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)];
+  for (const tableMatch of tables) {
+    const tableHtml = tableMatch[1];
+    const rowMatches = [...tableHtml.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)];
+    const rows = rowMatches.map((row) => {
+      const cells = [...row[1].matchAll(/<(td|th)\b[^>]*>([\s\S]*?)<\/\1>/gi)].map((cell) => stripTags(cell[2]));
+      return cells.filter((cell) => cell !== '');
+    }).filter((cells) => cells.length);
+    if (rows.length) return rows;
+  }
+  return [];
+}
+
+function parsePipeTableRows(text) {
+  const lines = String(text || '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  return lines
+    .filter((line) => line.includes('|'))
+    .map((line) => line.split('|').map((cell) => stripTags(cell)).filter(Boolean))
+    .filter((cells) => cells.length >= 3);
+}
+
+function rowsToDotsPayload(rows, agg) {
+  if (!rows.length) return null;
+
+  const headerIndex = rows.findIndex((cells) => {
+    const normalized = cells.map((cell) => normalizeLookupName(cell));
+    return normalized.includes('player') && normalized.includes('dots');
+  });
+  if (headerIndex < 0) return null;
+
+  const headers = rows[headerIndex].map((cell) => normalizeLookupName(cell));
+  const playerIdx = headers.indexOf('player');
+  const dotsIdx = headers.indexOf('dots');
+  if (playerIdx < 0 || dotsIdx < 0) return null;
+
+  const values = {};
+  for (const cells of rows.slice(headerIndex + 1)) {
+    if (cells.length <= Math.max(playerIdx, dotsIdx)) continue;
+    const rawPlayer = cells[playerIdx];
+    const dotsValue = Number.parseInt(String(cells[dotsIdx] || '').replace(/[^0-9-]/g, ''), 10);
+    if (!rawPlayer || !Number.isFinite(dotsValue)) continue;
+    const player = resolveCricmetricPlayerName(rawPlayer, agg);
+    if (!player) continue;
+    values[player] = Math.max(values[player] || 0, dotsValue);
+  }
+
+  const ordered = Object.entries(values)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([name]) => name);
+
+  if (!ordered.length) return null;
+  return { ranking: ordered.slice(0, 10), extendedRanking: ordered, values };
+}
+
+function parseCricmetricDots(text, agg) {
+  return rowsToDotsPayload(parseHtmlTableRows(text), agg) || rowsToDotsPayload(parsePipeTableRows(text), agg);
+}
+
+async function fetchCricmetricDots(agg) {
+  const directUrl = CRICMETRIC_BOWLING_URL.replace(/#$/, '');
+  const proxyUrl = `https://r.jina.ai/http://${directUrl.replace(/^https?:\/\//, '')}`;
+  const attempts = [
+    { url: directUrl, source: 'cricmetric-direct' },
+    { url: proxyUrl, source: 'cricmetric-via-jina' }
+  ];
+
+  const errors = [];
+  for (const attempt of attempts) {
+    try {
+      const text = await fetchText(attempt.url);
+      const parsed = parseCricmetricDots(text, agg);
+      if (parsed?.extendedRanking?.length) {
+        return { ...parsed, source: attempt.source };
+      }
+      errors.push(`${attempt.source}: table-not-found`);
+    } catch (error) {
+      errors.push(`${attempt.source}: ${error.message}`);
+    }
+  }
+
+  throw new Error(errors.join(' | '));
+}
+
+function shouldFetchCricmetricDots(live, decision, currentMs, backlogProcessed) {
+  if (!CRICMETRIC_DOTS_ENABLED) return { fetch: false, reason: 'cricmetric dots disabled' };
+  if (backlogProcessed > 0) return { fetch: true, reason: 'completed match backlog processed' };
+  if (decision.mode === 'live_window') return { fetch: false, reason: 'skip during live window without completed backlog' };
+  const minsSinceLast = minutesSince(live.meta.cricmetricDots?.lastFetchedAt, currentMs);
+  if (minsSinceLast >= CRICMETRIC_MIN_REFRESH_MINUTES) return { fetch: true, reason: 'refresh interval reached' };
+  return { fetch: false, reason: 'refresh interval not reached' };
 }
 
 function resetDailySchedulerIfNeeded(live) {
@@ -355,7 +602,7 @@ function combineAggregates(baseAgg, overlayAgg) {
   const out = clone(baseAgg);
   if (!overlayAgg) return out;
 
-  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'catches']) {
+  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'catches', 'bowlingDots']) {
     for (const [name, value] of Object.entries(overlayAgg[key] || {})) {
       out[key][name] = (out[key][name] || 0) + Number(value || 0);
     }
@@ -437,7 +684,7 @@ function buildStandingsRanking(agg) {
     .map(([team]) => team);
 }
 
-function fillDerivedOutputs(live, agg) {
+function fillDerivedOutputs(live, agg, dotsPayload = null) {
   const orange = sortByValueDesc(agg.battingRuns);
   const sixes = sortByValueDesc(agg.battingSixes);
   const wickets = sortByValueDesc(agg.bowlingWickets);
@@ -449,6 +696,7 @@ function fillDerivedOutputs(live, agg) {
   const bowlSr = buildBowlingStrikeRateRanking(agg);
   const standings = buildStandingsRanking(agg);
   const striker = buildStrikerRanking(agg);
+  const dots = dotsPayload?.extendedRanking?.length ? dotsPayload : (live.mostDots || { ranking: [], extendedRanking: [], values: {} });
 
   live.orangeCap = { ranking: orange.slice(0, 10), extendedRanking: orange };
   live.mostSixes = { ranking: sixes.slice(0, 10), extendedRanking: sixes };
@@ -474,7 +722,11 @@ function fillDerivedOutputs(live, agg) {
     extendedRanking: standings
   };
   live.tableBottom = { ranking: standings.slice(0, 10), extendedRanking: standings };
-  live.mostDots = { ranking: [], extendedRanking: [] };
+  live.mostDots = {
+    ranking: safeArray(dots.ranking).slice(0, 10),
+    extendedRanking: safeArray(dots.extendedRanking),
+    values: dots.values || {}
+  };
   live.mvp = { ranking: [], extendedRanking: [] };
   live.uncappedMvp = { ranking: [], extendedRanking: [] };
   live.fairPlay = { ranking: [], extendedRanking: [] };
@@ -526,6 +778,8 @@ async function main() {
   live.meta.scorecardBudget.liveEnabled = LIVE_SCORECARD_ENABLED;
   live.meta.scorecardBudget.liveIntervalMinutes = LIVE_SCORECARD_INTERVAL_MINUTES;
   live.meta.scorecardBudget.maxBacklogPerRun = MAX_BACKLOG_SCORECARDS_PER_RUN;
+  live.meta.cricmetricDots.enabled = CRICMETRIC_DOTS_ENABLED;
+  live.meta.cricmetricDots.minRefreshMinutes = CRICMETRIC_MIN_REFRESH_MINUTES;
   live.meta.lastRun = {
     seriesInfoCalls: 0,
     scorecardCalls: 0,
@@ -623,7 +877,50 @@ async function main() {
   live.meta.aggregates = finalizedAgg;
 
   const combinedAgg = combineAggregates(finalizedAgg, overlayAgg);
-  fillDerivedOutputs(live, combinedAgg);
+
+  let dotsPayload = live.mostDots || { ranking: [], extendedRanking: [], values: {} };
+  const dotsDecision = shouldFetchCricmetricDots(live, decision, currentMs, live.meta.lastRun.backlogProcessed);
+  let dotsReport = {
+    ok: false,
+    source: 'Cricmetric bowling leaderboard',
+    method: 'parsed Dots column from bowling table',
+    reason: dotsDecision.reason
+  };
+
+  if (dotsDecision.fetch) {
+    live.meta.cricmetricDots.lastAttemptAt = isoNow();
+    try {
+      dotsPayload = await fetchCricmetricDots(combinedAgg);
+      live.meta.cricmetricDots.lastFetchedAt = isoNow();
+      live.meta.cricmetricDots.lastSource = dotsPayload.source;
+      live.meta.cricmetricDots.lastStatus = 'ok';
+      live.meta.cricmetricDots.lastError = null;
+      combinedAgg.bowlingDots = { ...(dotsPayload.values || {}) };
+      dotsReport = {
+        ok: true,
+        source: dotsPayload.source,
+        method: 'parsed Dots column from Cricmetric bowling leaderboard',
+        rows: dotsPayload.extendedRanking.length
+      };
+    } catch (error) {
+      live.meta.cricmetricDots.lastStatus = 'error';
+      live.meta.cricmetricDots.lastError = error.message;
+      dotsReport = {
+        ok: false,
+        source: 'Cricmetric bowling leaderboard',
+        method: 'parsed Dots column from bowling table',
+        error: error.message,
+        fallback: safeArray(live.mostDots?.extendedRanking).length ? 'kept previous mostDots snapshot' : 'no previous mostDots snapshot'
+      };
+    }
+  } else {
+    if (safeArray(live.mostDots?.extendedRanking).length) {
+      combinedAgg.bowlingDots = { ...(live.mostDots.values || {}) };
+      dotsReport.cachedRows = live.mostDots.extendedRanking.length;
+    }
+  }
+
+  fillDerivedOutputs(live, combinedAgg, dotsPayload);
 
   live.scrapeReport = {
     orangeCap: { ok: true, source: 'CricketData scorecards', method: 'computed season total runs' },
@@ -636,7 +933,7 @@ async function main() {
     mostCatches: { ok: true, source: 'CricketData scorecards', method: 'computed season total catches' },
     titleWinner: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     tableBottom: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
-    mostDots: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
+    mostDots: dotsReport,
     mvp: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
     uncappedMvp: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
     fairPlay: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
