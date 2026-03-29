@@ -714,10 +714,6 @@
     function escapeHtml(s){
       return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
-      } catch (_err) {
-        // Fail silently; manual fallback still works.
-      }
-    }
 
     let activeId = MATCHUPS[0].id;
 
