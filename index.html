@@ -121,6 +121,18 @@
     .roast-tag{flex:0 0 auto;display:inline-block;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
     .roast-tag.banter{background:rgba(124,196,255,.14);color:#bfe2ff}
     .roast-tag.extreme{background:rgba(255,127,150,.16);color:#ffd0d8}
+    .view-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .view-tab{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.18s}
+    .view-tab.active{background:linear-gradient(180deg,rgba(84,138,255,.22),rgba(84,138,255,.1));border-color:rgba(123,167,255,.45);box-shadow:0 0 0 1px rgba(123,167,255,.18) inset}
+    .section-hidden{display:none !important}
+    .stats-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+    .stats-toolbar label{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .stats-toolbar select{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:12px;font:inherit;min-width:240px}
+    .stats-summary{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.5}
+    .stats-table th,.stats-table td{padding:12px 10px;vertical-align:top}
+    .stats-table td.value-col{white-space:nowrap;font-weight:800}
+    .stats-table td.rank-col{width:52px;white-space:nowrap;color:#cbd6ff;font-weight:800}
+    .stats-table td.context-col{color:var(--muted);font-size:12px;line-height:1.45}
     .footer-note{margin-top:14px;color:var(--muted);font-size:12px;line-height:1.5}
     .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
     .legend .pill{font-size:12px}
@@ -141,6 +153,7 @@
       <h1>IPL 2026 Prediction War Room</h1>
       <p class="sub">Live tracker for the season-long nonsense, delusion, and occasional genius. Scoring logic fixed. Season lock fixed. Next match card fixed.</p>
       <div class="tabs" id="tabs"></div>
+      <div class="view-tabs" id="viewTabs"></div>
       <div class="meta">
         <div class="pill" id="providerPill">Provider: Live / embedded official schedule</div>
         <div class="pill" id="seasonPill">Season: IPL 2026 only</div>
@@ -149,7 +162,7 @@
       </div>
     </div>
 
-    <div class="grid top-summary">
+    <div class="grid top-summary" id="warRoomSection">
       <div class="card span-3 metric-card"><div class="label">Overall score</div><div class="value" id="metricOverall">0 - 0</div><div class="note" id="metricLead">Waiting for the first swing.</div></div>
       <div class="card span-3 metric-card"><div class="label">Fronts won</div><div class="value" id="metricFronts">0 - 0</div><div class="note">Categories currently led by each side.</div></div>
       <div class="card span-3 metric-card"><div class="label">Likely winner</div><div class="value" id="metricWinner">Too early</div><div class="note" id="metricWinnerNote">Need more movement before calling it.</div></div>
@@ -191,6 +204,20 @@
       <div class="span-4" style="display:grid;gap:16px">
         <div class="card"><div class="section-title">Smart insights</div><div id="insights"></div></div>
         <div class="card roast"><div class="section-title">Roast corner</div><div id="roasts"></div></div>
+      </div>
+    </div>
+
+    <div id="statsSection" class="section-hidden">
+      <div class="card">
+        <div class="section-title">Stats explorer</div>
+        <div class="stats-toolbar">
+          <div>
+            <label for="statsCategorySelect">Category</label><br>
+            <select id="statsCategorySelect"></select>
+          </div>
+        </div>
+        <div class="stats-summary" id="statsSummary">Choose a category to inspect the full live board.</div>
+        <div class="table-wrap"><table id="statsTable" class="stats-table"></table></div>
       </div>
     </div>
   </div>
@@ -667,13 +694,14 @@
       };
     }
 
-    function scoreWinnerBetterCategory(pickA, pickB, actualWinner){
+    function scoreWinnerBetterCategory(pickA, pickB, live, categoryKey){
+      const actualWinner = live?.winner || null;
       const aWin = actualWinner && matchesPick(pickA, actualWinner);
       const bWin = actualWinner && matchesPick(pickB, actualWinner);
       return {
         a: aWin ? 1 : 0,
         b: bWin ? 1 : 0,
-        note: actualWinner ? `Winner: ${actualWinner}` : 'Waiting for result'
+        note: winnerBetterNote(categoryKey, live)
       };
     }
 
@@ -738,7 +766,7 @@
       let b = top5Points(rB);
       let note = 'Waiting for leaderboard';
       if (ranking.length) {
-        note = `Top 5: ${ranking.join(', ')}`;
+        note = `Top 5: ${ranking.slice(0,5).join(', ')}`;
       }
 
       // Fallback 1 point applies only if BOTH missed the top 5.
@@ -766,7 +794,7 @@
 
       return {
         a,b,rankA:rA,rankB:rB,
-        note: ranking.length ? `Top 5: ${ranking.join(', ')}` : 'Waiting for leaderboard'
+        note: ranking.length ? `Top 5: ${ranking.slice(0,5).join(', ')}` : 'Waiting for leaderboard'
       };
     }
 
@@ -784,7 +812,7 @@
       }
       return {
         a, b, rankA:rA, rankB:rB,
-        note: ranking.length ? `Ranking: ${ranking.join(', ')}` : 'Waiting for ranking'
+        note: ranking.length ? `Top 5: ${ranking.slice(0,5).join(', ')}` : 'Waiting for ranking'
       };
     }
 
@@ -802,7 +830,7 @@
       }
       return {
         a, b, rankA:rA, rankB:rB,
-        note: ranking.length ? `Least-MVP order (min 5 games, lower on page wins): ${ranking.slice(0, 20).join(', ')}${ranking.length > 20 ? ' …' : ''}` : 'Waiting for least-MVP ranking (min 5 games)'
+        note: ranking.length ? `Lowest 5 eligible: ${ranking.slice(-5).reverse().join(', ')}` : 'Waiting for least-MVP ranking (min 5 games)'
       };
     }
 
@@ -820,7 +848,7 @@
       }
 
       if (category.type === 'winner_better') {
-        return scoreWinnerBetterCategory(pickA, pickB, live.winner || null);
+        return scoreWinnerBetterCategory(pickA, pickB, live, category.key);
       }
 
       const ranking = Array.isArray(live.ranking) ? live.ranking : [];
@@ -872,6 +900,25 @@
       return SCHEDULE_2026.find(m => new Date(m.start).getTime() > now.getTime()) || null;
     }
 
+    function topListNote(label, ranking, limit = 5){
+      const names = Array.isArray(ranking) ? ranking.slice(0, limit) : [];
+      return names.length ? `${label}: ${names.join(', ')}` : `Waiting for ${label.toLowerCase()}`;
+    }
+
+    function bottomListNote(label, ranking, limit = 5){
+      const names = Array.isArray(ranking) ? ranking.slice(-limit).reverse() : [];
+      return names.length ? `${label}: ${names.join(', ')}` : `Waiting for ${label.toLowerCase()}`;
+    }
+
+    function winnerBetterNote(categoryKey, live){
+      const ranking = Array.isArray(live?.extendedRanking) && live.extendedRanking.length ? live.extendedRanking : (Array.isArray(live?.ranking) ? live.ranking : []);
+      if (categoryKey === 'uncappedMvp') return topListNote('Top 5 uncapped MVP', ranking);
+      if (categoryKey === 'fairPlay') return topListNote('Top 5 fair play', ranking);
+      if (categoryKey === 'highestScoreTeam') return topListNote('Top 5 team scores', ranking);
+      if (categoryKey === 'tableBottom') return bottomListNote('Bottom 5', ranking);
+      return live?.winner ? `Winner: ${live.winner}` : 'Waiting for result';
+    }
+
     function teamShort(name){
       const map = {
         'Mumbai Indians':'MI',
@@ -899,6 +946,8 @@
     }
 
     let activeId = MATCHUPS[0].id;
+    let activeView = 'warroom';
+    let activeStatsKey = 'orangeCap';
 
     function renderTabs(){
       const el = document.getElementById('tabs');
@@ -907,6 +956,18 @@
       `).join('');
       el.querySelectorAll('.tab').forEach(btn => {
         btn.onclick = () => { activeId = btn.dataset.id; render(); };
+      });
+    }
+
+    function renderViewTabs(){
+      const el = document.getElementById('viewTabs');
+      const tabs = [
+        { key:'warroom', label:'War room' },
+        { key:'stats', label:'Stats' }
+      ];
+      el.innerHTML = tabs.map(t => `<button class="view-tab ${t.key===activeView ? 'active' : ''}" data-view="${t.key}">${escapeHtml(t.label)}</button>`).join('');
+      el.querySelectorAll('.view-tab').forEach(btn => {
+        btn.onclick = () => { activeView = btn.dataset.view; render(); };
       });
     }
 
@@ -1194,8 +1255,162 @@
       `).join('')}</div>`;
     }
 
+    function playerTeamMap(){
+      const map = {};
+      const teamFields = ['battingByTeam','bowlingByTeam','fieldingByTeam'];
+      for (const field of teamFields) {
+        const source = LIVE_2026?.meta?.aggregates?.[field] || {};
+        for (const [team, names] of Object.entries(source)) {
+          for (const name of Object.keys(names || {})) map[canonicalCompareName(name)] = team;
+        }
+      }
+      return map;
+    }
+
+    function standingNrrValue(s){
+      const oversFor = Number(s?.ballsFaced || 0) / 6;
+      const oversAgainst = Number(s?.ballsBowled || 0) / 6;
+      if (!oversFor || !oversAgainst) return 0;
+      return ((Number(s?.runsFor || 0) / oversFor) - (Number(s?.runsAgainst || 0) / oversAgainst));
+    }
+
+    function mvpContextLine(obj){
+      if (!obj || typeof obj !== 'object') return '—';
+      return `Runs ${obj.runs || 0} • 6s ${obj.sixes || 0} • Wkts ${obj.wickets || 0} • Dots ${obj.dotBalls || 0} • Catches ${obj.catches || 0}`;
+    }
+
+    function statsRowsFor(categoryKey){
+      const live = LIVE_2026?.[categoryKey] || {};
+      const agg = getAggregates();
+      const teamsByPlayer = playerTeamMap();
+      const ext = Array.isArray(live.extendedRanking) && live.extendedRanking.length ? live.extendedRanking : (Array.isArray(live.ranking) ? live.ranking : []);
+      const ranking = Array.isArray(ext) ? ext : [];
+      const rows = [];
+
+      if (categoryKey === 'titleWinner' || categoryKey === 'tableBottom') {
+        const standings = agg.standings || {};
+        const ordered = ranking.length ? ranking : Object.keys(standings);
+        ordered.forEach((team, idx) => {
+          const s = standings[team] || {};
+          rows.push({ rank: idx + 1, name: team, value: `${s.points ?? 0} pts`, context: `Played ${s.played ?? 0} • W ${s.wins ?? 0} • L ${s.losses ?? 0} • NRR ${standingNrrValue(s).toFixed(3)}` });
+        });
+        return { summary: categoryKey === 'titleWinner' ? 'Current title-race order from the live standings.' : 'Current table order. For Bottom of table, the lowest side is the live target.', rows };
+      }
+
+      if (categoryKey === 'fairPlay') {
+        const values = live.values || {};
+        ranking.forEach((team, idx) => rows.push({ rank: idx + 1, name: team, value: values[team] ?? '—', context: live.updatedAt ? `Official feed updated ${live.updatedAt}` : 'Official fair-play feed' }));
+        return { summary: 'Official IPL Fair Play table.', rows };
+      }
+
+      if (categoryKey === 'highestScoreTeam') {
+        const values = live.values || {};
+        ranking.forEach((team, idx) => rows.push({ rank: idx + 1, name: team, value: values[team] ?? '—', context: 'Highest innings total so far' }));
+        return { summary: 'Team leaderboard by highest innings total.', rows };
+      }
+
+      if (categoryKey === 'bestBowlingFigures') {
+        const figures = live.figures || {};
+        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: figures[name] ?? '—', context: teamsByPlayer[canonicalCompareName(name)] || 'Player' }));
+        return { summary: 'Best single-spell figures this season.', rows };
+      }
+
+      if (categoryKey === 'bestBowlingStrikeRate') {
+        const values = live.values || {};
+        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: values[name] ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • min 12 overs` }));
+        return { summary: 'Bowling strike rate board for qualified bowlers only.', rows };
+      }
+
+      if (categoryKey === 'mvp' || categoryKey === 'uncappedMvp' || categoryKey === 'leastMvp') {
+        const values = live.values || {};
+        ranking.forEach((name, idx) => {
+          const obj = values[name] || {};
+          rows.push({ rank: idx + 1, name, value: obj.score ?? '—', context: mvpContextLine(obj) });
+        });
+        const summary = categoryKey === 'uncappedMvp' ? 'Uncapped-only MVP board.' : categoryKey === 'leastMvp' ? 'Eligible MVP board used for Least MVP (lower is better, minimum 5 games).' : 'Custom MVP board from live.json.';
+        return { summary, rows };
+      }
+
+      if (categoryKey === 'orangeCap') {
+        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: valueForPickFromObject(agg.battingRuns || {}, name) ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.battingBalls || {}, name) ?? 0} balls • ${valueForPickFromObject(agg.battingSixes || {}, name) ?? 0} sixes` }));
+        return { summary: 'Complete Orange Cap board from live data.', rows };
+      }
+
+      if (categoryKey === 'mostSixes') {
+        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: valueForPickFromObject(agg.battingSixes || {}, name) ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.battingRuns || {}, name) ?? 0} runs` }));
+        return { summary: 'Full six-hitting board from live data.', rows };
+      }
+
+      if (categoryKey === 'purpleCap') {
+        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: valueForPickFromObject(agg.bowlingWickets || {}, name) ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.bowlingBalls || {}, name) ?? 0} balls bowled` }));
+        return { summary: 'Full wickets board from live data.', rows };
+      }
+
+      if (categoryKey === 'mostDots') {
+        const values = live.values || agg.bowlingDots || {};
+        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: values[name] ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.bowlingWickets || {}, name) ?? 0} wickets` }));
+        return { summary: 'Dot-ball board from Cricmetric/derived live feed.', rows };
+      }
+
+      if (categoryKey === 'striker') {
+        ranking.forEach((name, idx) => {
+          const runs = Number(valueForPickFromObject(agg.battingRuns || {}, name) || 0);
+          const balls = Number(valueForPickFromObject(agg.battingBalls || {}, name) || 0);
+          const sr = balls ? ((100 * runs) / balls).toFixed(2) : '—';
+          rows.push({ rank: idx + 1, name, value: sr, context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${runs} runs from ${balls} balls` });
+        });
+        return { summary: 'Qualified striker board (minimum 100 runs).', rows };
+      }
+
+      if (categoryKey === 'mostCatches') {
+        const values = live.values || agg.catches || {};
+        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: values[name] ?? '—', context: teamsByPlayer[canonicalCompareName(name)] || 'Player' }));
+        return { summary: 'Catching leaderboard.', rows };
+      }
+
+      ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: '—', context: 'Live board entry' }));
+      return { summary: 'Live board from data/live.json.', rows };
+    }
+
+    function renderStatsTab(){
+      const select = document.getElementById('statsCategorySelect');
+      if (!select.dataset.bound) {
+        select.innerHTML = CATEGORIES.map(c => `<option value="${c.key}">${escapeHtml(c.label)}</option>`).join('');
+        select.value = activeStatsKey;
+        select.onchange = () => { activeStatsKey = select.value; renderStatsTab(); };
+        select.dataset.bound = '1';
+      }
+      if (select.value !== activeStatsKey) select.value = activeStatsKey;
+      const category = CATEGORIES.find(c => c.key === activeStatsKey) || CATEGORIES[0];
+      const data = statsRowsFor(activeStatsKey);
+      document.getElementById('statsSummary').textContent = data.summary || `Full ${category.label} board from live.json.`;
+      document.getElementById('statsTable').innerHTML = `
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>${escapeHtml(category.label.includes('award') || activeStatsKey==='fairPlay' || activeStatsKey==='highestScoreTeam' || activeStatsKey==='titleWinner' || activeStatsKey==='tableBottom' ? 'Team / Player' : 'Player / Team')}</th>
+            <th>Value</th>
+            <th>Context</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.rows.length ? data.rows.map(r => `
+            <tr>
+              <td class="rank-col">${escapeHtml(r.rank)}</td>
+              <td><strong>${escapeHtml(r.name)}</strong></td>
+              <td class="value-col">${escapeHtml(r.value)}</td>
+              <td class="context-col">${escapeHtml(r.context)}</td>
+            </tr>
+          `).join('') : `<tr><td colspan="4" class="small">Waiting for live data in this category.</td></tr>`}
+        </tbody>`;
+    }
+
     function render(){
       renderTabs();
+      renderViewTabs();
+      document.getElementById('warRoomSection').classList.toggle('section-hidden', activeView !== 'warroom');
+      document.getElementById('statsSection').classList.toggle('section-hidden', activeView !== 'stats');
+      renderStatsTab();
       const matchup = MATCHUPS.find(m => m.id === activeId) || MATCHUPS[0];
       const { rows, totalA, totalB } = computeMatchup(matchup);
       renderScoreboard(matchup, totalA, totalB);
