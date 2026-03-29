@@ -75,11 +75,19 @@ function createEmptyAggregates() {
     battingSixes: {},
     bowlingWickets: {},
     bowlingBalls: {},
+    bowlingRunsConceded: {},
     catches: {},
     teamHighestScore: {},
     standings: {},
     bestBowlingFigures: {},
-    bowlingDots: {}
+    bowlingDots: {},
+    battingFifties: {},
+    battingHundreds: {},
+    battingImpact30s: {},
+    bowling3w: {},
+    bowling4w: {},
+    bowling5w: {},
+    playerMatches: {}
   };
 }
 
@@ -142,7 +150,7 @@ function createEmptyLive() {
     mostSixes: { ranking: [], extendedRanking: [] },
     purpleCap: { ranking: [], extendedRanking: [] },
     mostDots: { ranking: [], extendedRanking: [], values: {} },
-    mvp: { ranking: [], extendedRanking: [] },
+    mvp: { ranking: [], extendedRanking: [], values: {}, formula: null },
     uncappedMvp: { ranking: [], extendedRanking: [] },
     fairPlay: { ranking: [], extendedRanking: [] },
     highestScoreTeam: { ranking: [], extendedRanking: [], values: {} },
@@ -495,6 +503,11 @@ function addNumberMap(map, key, amount) {
   map[key] = (map[key] || 0) + Number(amount || 0);
 }
 
+function incrementCountMap(map, key) {
+  if (!key) return;
+  map[key] = (map[key] || 0) + 1;
+}
+
 function updateBestBowlingFigure(bestMap, bowler, wickets, runs, balls) {
   if (!bowler) return;
   const cand = {
@@ -522,28 +535,46 @@ function parseTeamFromInningName(inningName) {
 function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true } = {}) {
   const inningsBlocks = safeArray(scorecardData.scorecard);
   const topScores = safeArray(scorecardData.score);
+  const participants = new Set();
 
   for (const innings of inningsBlocks) {
     for (const bat of safeArray(innings.batting)) {
       const batter = normalizeName(bat?.batsman?.name);
-      addNumberMap(aggregates.battingRuns, batter, bat?.r || 0);
-      addNumberMap(aggregates.battingBalls, batter, bat?.b || 0);
+      if (batter) participants.add(batter);
+      const runs = Number(bat?.r || 0);
+      const balls = Number(bat?.b || 0);
+      addNumberMap(aggregates.battingRuns, batter, runs);
+      addNumberMap(aggregates.battingBalls, batter, balls);
       addNumberMap(aggregates.battingSixes, batter, bat?.['6s'] || 0);
+      if (runs >= 100) incrementCountMap(aggregates.battingHundreds, batter);
+      if (runs >= 50) incrementCountMap(aggregates.battingFifties, batter);
+      if (runs >= 30 && balls > 0 && balls < 15) incrementCountMap(aggregates.battingImpact30s, batter);
     }
 
     for (const bowl of safeArray(innings.bowling)) {
       const bowler = normalizeName(bowl?.bowler?.name);
+      if (bowler) participants.add(bowler);
       const balls = oversToBalls(bowl?.o);
-      addNumberMap(aggregates.bowlingWickets, bowler, bowl?.w || 0);
+      const wickets = Number(bowl?.w || 0);
+      addNumberMap(aggregates.bowlingWickets, bowler, wickets);
       addNumberMap(aggregates.bowlingBalls, bowler, balls);
-      updateBestBowlingFigure(aggregates.bestBowlingFigures, bowler, bowl?.w || 0, bowl?.r || 0, balls);
+      addNumberMap(aggregates.bowlingRunsConceded, bowler, bowl?.r || 0);
+      updateBestBowlingFigure(aggregates.bestBowlingFigures, bowler, wickets, bowl?.r || 0, balls);
+      if (wickets >= 3) incrementCountMap(aggregates.bowling3w, bowler);
+      if (wickets >= 4) incrementCountMap(aggregates.bowling4w, bowler);
+      if (wickets >= 5) incrementCountMap(aggregates.bowling5w, bowler);
     }
 
     for (const field of safeArray(innings.catching)) {
       const catcher = normalizeName(field?.catcher?.name);
-      if (catcher) addNumberMap(aggregates.catches, catcher, field?.catch || 0);
+      if (catcher) {
+        participants.add(catcher);
+        addNumberMap(aggregates.catches, catcher, field?.catch || 0);
+      }
     }
   }
+
+  for (const player of participants) incrementCountMap(aggregates.playerMatches, player);
 
   for (const scoreLine of topScores) {
     const team = parseTeamFromInningName(scoreLine?.inning);
@@ -602,7 +633,7 @@ function combineAggregates(baseAgg, overlayAgg) {
   const out = clone(baseAgg);
   if (!overlayAgg) return out;
 
-  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'catches', 'bowlingDots']) {
+  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
     for (const [name, value] of Object.entries(overlayAgg[key] || {})) {
       out[key][name] = (out[key][name] || 0) + Number(value || 0);
     }
@@ -684,6 +715,90 @@ function buildStandingsRanking(agg) {
     .map(([team]) => team);
 }
 
+
+function battingStrikeRateBonus(runs, balls) {
+  if (runs < 30 || balls <= 0) return 0;
+  const sr = (100 * runs) / balls;
+  if (sr > 170) return 8;
+  if (sr > 150) return 5;
+  if (sr > 130) return 2;
+  if (sr < 100) return -5;
+  return 0;
+}
+
+function bowlingEconomyBonus(runsConceded, balls) {
+  if (balls < 12 || balls <= 0) return 0;
+  const econ = (runsConceded * 6) / balls;
+  if (econ < 6) return 8;
+  if (econ < 7) return 5;
+  if (econ < 8) return 2;
+  if (econ > 10) return -5;
+  return 0;
+}
+
+function buildMvpRanking(agg, dotsValues) {
+  const players = [...new Set([
+    ...Object.keys(agg.battingRuns || {}),
+    ...Object.keys(agg.battingSixes || {}),
+    ...Object.keys(agg.bowlingWickets || {}),
+    ...Object.keys(dotsValues || {}),
+    ...Object.keys(agg.catches || {})
+  ])].filter(Boolean);
+
+  const rows = players.map((player) => {
+    const runs = Number(agg.battingRuns[player] || 0);
+    const balls = Number(agg.battingBalls[player] || 0);
+    const sixes = Number(agg.battingSixes[player] || 0);
+    const wickets = Number(agg.bowlingWickets[player] || 0);
+    const dotBalls = Number(dotsValues[player] || 0);
+    const catches = Number(agg.catches[player] || 0);
+    const runsConceded = Number(agg.bowlingRunsConceded[player] || 0);
+
+    const battingBase = runs + (sixes * 2);
+    const bowlingBase = (wickets * 20) + (dotBalls * 1.5);
+    const fieldingBase = catches * 8;
+    const srBonus = battingStrikeRateBonus(runs, balls);
+    const econBonus = bowlingEconomyBonus(runsConceded, Number(agg.bowlingBalls[player] || 0));
+    const milestoneBonus =
+      (Number(agg.battingFifties[player] || 0) * 10) +
+      (Number(agg.battingHundreds[player] || 0) * 25) +
+      (Number(agg.battingImpact30s[player] || 0) * 8) +
+      (Number(agg.bowling3w[player] || 0) * 12) +
+      (Number(agg.bowling4w[player] || 0) * 20) +
+      (Number(agg.bowling5w[player] || 0) * 30);
+
+    const score = battingBase + bowlingBase + fieldingBase + srBonus + econBonus + milestoneBonus;
+
+    return [player, {
+      score: Number(score.toFixed(2)),
+      runs,
+      sixes,
+      wickets,
+      dotBalls,
+      catches,
+      battingStrikeRate: balls > 0 ? Number(((100 * runs) / balls).toFixed(2)) : null,
+      economy: Number(agg.bowlingBalls[player] || 0) > 0 ? Number((((runsConceded * 6) / Number(agg.bowlingBalls[player] || 0))).toFixed(2)) : null,
+      matches: Number(agg.playerMatches[player] || 0),
+      bonuses: {
+        sr: srBonus,
+        economy: econBonus,
+        batting50s: Number(agg.battingFifties[player] || 0),
+        batting100s: Number(agg.battingHundreds[player] || 0),
+        impact30s: Number(agg.battingImpact30s[player] || 0),
+        bowling3w: Number(agg.bowling3w[player] || 0),
+        bowling4w: Number(agg.bowling4w[player] || 0),
+        bowling5w: Number(agg.bowling5w[player] || 0)
+      }
+    }];
+  });
+
+  rows.sort((a, b) => b[1].score - a[1].score || a[0].localeCompare(b[0]));
+  return {
+    ranking: rows.map(([player]) => player),
+    values: Object.fromEntries(rows)
+  };
+}
+
 function fillDerivedOutputs(live, agg, dotsPayload = null) {
   const orange = sortByValueDesc(agg.battingRuns);
   const sixes = sortByValueDesc(agg.battingSixes);
@@ -727,7 +842,25 @@ function fillDerivedOutputs(live, agg, dotsPayload = null) {
     extendedRanking: safeArray(dots.extendedRanking),
     values: dots.values || {}
   };
-  live.mvp = { ranking: [], extendedRanking: [] };
+  const mvp = buildMvpRanking(agg, dots.values || {});
+  live.mvp = {
+    ranking: safeArray(mvp.ranking).slice(0, 10),
+    extendedRanking: safeArray(mvp.ranking),
+    values: mvp.values,
+    formula: 'Runs + (Sixes×2) + (Wickets×20) + (Dot balls×1.5) + (Catches×8) + batting SR bonus + bowling economy bonus + milestone bonuses',
+    milestoneRules: {
+      batting50: 10,
+      batting100: 25,
+      impact30Under15Balls: 8,
+      bowling3w: 12,
+      bowling4w: 20,
+      bowling5w: 30
+    },
+    bonusRules: {
+      battingStrikeRate: { gt170: 8, gt150: 5, gt130: 2, lt100: -5, minRuns: 30 },
+      economy: { lt6: 8, lt7: 5, lt8: 2, gt10: -5, minBalls: 12 }
+    }
+  };
   live.uncappedMvp = { ranking: [], extendedRanking: [] };
   live.fairPlay = { ranking: [], extendedRanking: [] };
   live.leastMvp = { ranking: [], extendedRanking: [] };
@@ -934,7 +1067,7 @@ async function main() {
     titleWinner: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     tableBottom: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     mostDots: dotsReport,
-    mvp: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
+    mvp: { ok: true, source: 'CricketData + Cricmetric', method: 'custom formula using runs, sixes, wickets, dot balls, catches, strike-rate bonus, economy bonus and milestone bonuses' },
     uncappedMvp: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
     fairPlay: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
     leastMvp: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },

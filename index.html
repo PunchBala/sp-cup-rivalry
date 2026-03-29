@@ -165,7 +165,9 @@
           <div class="pill">Title winner: 5 / 3 / 2, else better prediction 1</div>
           <div class="pill">Orange Cap, Most Sixes, Purple Cap, Most Dots, MVP: 4 / 3 / 2, else better prediction 1</div>
           <div class="pill">Categories 7-15: better prediction wins 1 point</div>
-          <div class="pill">Least MVP: lower on Cricinfo list wins</div>
+          <div class="pill">Least MVP: lower in custom MVP ranking wins</div>
+          <div class="pill">Custom MVP = Runs + (6s×2) + (Wkts×20) + (Dots×1.5) + (Catches×8)</div>
+          <div class="pill">MVP bonuses: batting SR, bowling economy, 50/100, quick 30+, 3w/4w/5w</div>
           <div class="pill">Striker: minimum 100 runs required</div>
           <div class="pill">Best bowling strike rate: minimum 12 overs required</div>
           <div class="pill">If both are equally wrong: 0 each</div>
@@ -393,7 +395,7 @@
       bestBowlingStrikeRate: { ranking: [] },
       mostCatches: { ranking: [] },
       tableBottom: { winner: null },
-      leastMvp: { ranking: [], source: 'https://www.espncricinfo.com/series/ipl-2026-1510719/most-valuable-players' }
+      leastMvp: { ranking: [] }
     };
 
     // ========= OPTIONAL LIVE SOURCE HOOKS =========
@@ -712,60 +714,6 @@
     function escapeHtml(s){
       return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
-
-
-    async function safeFetchText(url){
-      const attempts = [
-        `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
-      ];
-      for (const attempt of attempts){
-        try {
-          const res = await fetch(attempt, { cache:'no-store' });
-          if (!res.ok) continue;
-          const txt = await res.text();
-          if (txt && txt.length > 100) return txt;
-        } catch (_err) {}
-      }
-      throw new Error('Least MVP source fetch failed');
-    }
-
-    function uniq(arr){
-      return [...new Set(arr.filter(Boolean))];
-    }
-
-    function parseLeastMvpRankingFromText(text){
-      const names = [
-        'MS Dhoni','Cameron Green','Rajat Patidar','Rishabh Pant','KL Rahul','Shubman Gill','Nicholas Pooran',
-        'Yuzvendra Chahal','Rashid Khan','Prasidh Krishna','Trent Boult','Shreyas Iyer','Virat Kohli','Dewald Brevis',
-        'Josh Hazlewood','Harshal Patel','Phil Salt','Akeal Hosein','Abhishek Sharma','Arshdeep Singh','Jasprit Bumrah',
-        'Tilak Varma','Khaleel Ahmed','Rinku Singh','Vaibhav Suryavanshi','Vaibhav Suryavanshi','Sanju Samson',
-        'Ishan Kishan','Varun Chakravarthy','Prabhsimran Singh'
-      ];
-      const lines = String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-      const hits = [];
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        for (const name of names) {
-          const needle = normalizeName(name);
-          if (normalizeName(line).includes(needle)) {
-            hits.push({ name: name === 'Vaibhav Suryavanshi' ? 'Vaibhav Suryavanshi' : name, i });
-          }
-        }
-      }
-      const ordered = hits.sort((a,b) => a.i - b.i).map(x => x.name);
-      return uniq(ordered);
-    }
-
-    async function hydrateLeastMvp(){
-      try {
-        const text = await safeFetchText(LIVE_2026.leastMvp.source);
-        const ranking = parseLeastMvpRankingFromText(text);
-        if (ranking.length) {
-          LIVE_2026.leastMvp.ranking = ranking;
-          LIVE_2026.fetchedAt = new Date().toISOString();
-          render();
-        }
       } catch (_err) {
         // Fail silently; manual fallback still works.
       }
