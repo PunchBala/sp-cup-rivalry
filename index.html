@@ -110,14 +110,17 @@
     tbody tr:hover{background:rgba(255,255,255,.03)}
     .pick{font-weight:800;color:#fff}
     .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-weight:800}
-    .insight{padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03);margin-bottom:10px;line-height:1.45}
+    .insight{padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03);margin-bottom:10px;line-height:1.5}
     .roast{background:linear-gradient(180deg, rgba(255,123,150,.08), rgba(124,196,255,.09))}
-    .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-    .section-head .section-title{margin-bottom:0}
-    .mode-toggle{display:flex;gap:6px;flex-wrap:wrap}
-    .mode-btn{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800;cursor:pointer;transition:.15s ease}
-    .mode-btn:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.35);color:var(--text)}
-    .mode-btn.active{background:linear-gradient(180deg,#3a2540,#2a1a2f);border-color:rgba(255,127,150,.45);color:#ffd7df;box-shadow:0 8px 18px rgba(0,0,0,.18)}
+    .score-cell{white-space:nowrap;text-align:center;min-width:78px}
+    .score-stack{display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+    .score-num{display:inline-block;min-width:10px;text-align:center}
+    .score-dash{opacity:.8}
+    .roast-grid{display:grid;gap:10px}
+    .roast-item{display:flex;gap:10px;align-items:flex-start}
+    .roast-tag{flex:0 0 auto;display:inline-block;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .roast-tag.banter{background:rgba(124,196,255,.14);color:#bfe2ff}
+    .roast-tag.extreme{background:rgba(255,127,150,.16);color:#ffd0d8}
     .footer-note{margin-top:14px;color:var(--muted);font-size:12px;line-height:1.5}
     .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
     .legend .pill{font-size:12px}
@@ -186,8 +189,8 @@
         <div class="table-wrap"><table id="breakdownTable"></table></div>
       </div>
       <div class="span-4" style="display:grid;gap:16px">
-        <div class="card"><div class="section-head"><div class="section-title">Smart insights</div></div><div id="insights"></div></div>
-        <div class="card roast"><div class="section-head"><div class="section-title">Roast corner</div><div class="mode-toggle" id="roastToggle"><button class="mode-btn" data-mode="banter">Banter</button><button class="mode-btn" data-mode="extreme">Extreme roast</button></div></div><div id="roasts"></div></div>
+        <div class="card"><div class="section-title">Smart insights</div><div id="insights"></div></div>
+        <div class="card roast"><div class="section-title">Roast corner</div><div id="roasts"></div></div>
       </div>
     </div>
   </div>
@@ -896,7 +899,6 @@
     }
 
     let activeId = MATCHUPS[0].id;
-    let roastMode = localStorage.getItem('spCupRoastMode') || 'banter';
 
     function renderTabs(){
       const el = document.getElementById('tabs');
@@ -905,20 +907,6 @@
       `).join('');
       el.querySelectorAll('.tab').forEach(btn => {
         btn.onclick = () => { activeId = btn.dataset.id; render(); };
-      });
-    }
-
-
-    function renderRoastToggle(){
-      const el = document.getElementById('roastToggle');
-      if (!el) return;
-      el.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.mode === roastMode);
-        btn.onclick = () => {
-          roastMode = btn.dataset.mode;
-          localStorage.setItem('spCupRoastMode', roastMode);
-          render();
-        };
       });
     }
 
@@ -1009,8 +997,8 @@
               }</div></td>
               <td class="pick">${escapeHtml(r.pickA)}<div class="small" style="margin-top:6px">${escapeHtml(r.pickALiveState || 'Live: waiting')}</div></td>
               <td class="pick">${escapeHtml(r.pickB)}<div class="small" style="margin-top:6px">${escapeHtml(r.pickBLiveState || 'Live: waiting')}</div></td>
-              <td class="mono">${r.a} - ${r.b}</td>
-              <td>${r.a===r.b ? '<span class=\"status-chip status-tie\">Tied</span>' : r.a>r.b ? `<span class=\"status-chip status-good\">${escapeHtml(matchup.a.name)}</span>` : `<span class=\"status-chip status-bad\">${escapeHtml(matchup.b.name)}</span>`}</td>
+              <td class="mono score-cell"><div class="score-stack"><span class="score-num">${r.a}</span><span class="score-dash">-</span><span class="score-num">${r.b}</span></div></td>
+              <td>${r.a===r.b ? '<span class="status-chip status-tie">Tied</span>' : r.a>r.b ? `<span class="status-chip status-good">${escapeHtml(matchup.a.name)}</span>` : `<span class="status-chip status-bad">${escapeHtml(matchup.b.name)}</span>`}</td>
               <td class="small">${escapeHtml(r.note)}</td>
             </tr>
           `).join('')}
@@ -1018,35 +1006,142 @@
       `;
     }
 
-    function renderInsights(matchup, rows, totalA, totalB){
-      const scoredCatsA = rows.filter(r => r.a > r.b).length;
-      const scoredCatsB = rows.filter(r => r.b > r.a).length;
-      const cleanHitsA = rows.filter(r => r.a >= 2 && r.a > r.b).length;
-      const cleanHitsB = rows.filter(r => r.b >= 2 && r.b > r.a).length;
-      const leader = totalA === totalB ? null : totalA > totalB ? matchup.a.name : matchup.b.name;
-      const margin = Math.abs(totalA - totalB);
-      const list = [];
+    function pushUniqueMessage(list, text){
+      if (text && !list.includes(text)) list.push(text);
+    }
 
-      list.push(
-        leader
-          ? `${leader} leads by ${margin} point${margin === 1 ? '' : 's'}, but the board split is only ${scoredCatsA}-${scoredCatsB} on fronts won. This is not over; it is just noisier for one side.`
-          : `Dead level overall. Both prediction sheets are currently walking around with equal swagger and equal risk.`
-      );
+    function buildClosestBattleMessage(rows){
+      const ranked = [];
+      const numeric = [];
+      for (const row of rows) {
+        const live = LIVE_2026[row.category.key] || {};
+        const ranking = trackingRankingForLive(live);
+        const rankA = rankOf(row.pickA, ranking);
+        const rankB = rankOf(row.pickB, ranking);
+        if (rankA && rankB) {
+          ranked.push({
+            delta: Math.abs(rankA - rankB),
+            msg: `Closest live duel: ${row.category.label} is basically one good night away from mutiny — ${row.pickA} is #${rankA}, ${row.pickB} is #${rankB}.`
+          });
+          continue;
+        }
+        const valueA = numericCategoryValue(row.category.key, row.pickA);
+        const valueB = numericCategoryValue(row.category.key, row.pickB);
+        const config = categoryValueConfig(row.category.key);
+        if (valueA !== null && valueB !== null && (valueA > 0 || valueB > 0)) {
+          const gap = Math.abs(valueA - valueB);
+          numeric.push({
+            delta: gap,
+            msg: `Tightest raw chase: ${row.category.label} has ${row.pickA} on ${valueA} and ${row.pickB} on ${valueB}. That is only ${unitLabel(config.unit, Math.max(1, gap))} between them.`
+          });
+        }
+      }
+      ranked.sort((a,b) => a.delta - b.delta);
+      numeric.sort((a,b) => a.delta - b.delta);
+      return ranked[0]?.msg || numeric[0]?.msg || null;
+    }
 
-      const closest = buildClosestContestInsight(rows);
-      if (closest) list.push(closest);
+    function buildDamageReportMessage(matchup, rows){
+      const swingRows = rows.filter(r => r.a !== r.b).sort((x,y) => Math.abs(y.a-y.b) - Math.abs(x.a-x.b));
+      if (!swingRows.length) return 'Everything is still level, which means the board is calm only because chaos has not chosen a victim yet.';
+      const top = swingRows[0];
+      const winner = top.a > top.b ? matchup.a.name : matchup.b.name;
+      const liveState = top.a > top.b ? top.pickALiveState : top.pickBLiveState;
+      const pick = top.a > top.b ? top.pickA : top.pickB;
+      return `Current damage report: ${winner} is making the cleanest hit in ${top.category.label} — ${pick} is ${String(liveState || 'live').replace(/^Live:\s*/i,'').toLowerCase()}.`;
+    }
 
-      const pushes = buildThresholdPushes(matchup).slice(0, 2);
-      list.push(...pushes);
+    function buildQualificationWatchMessages(matchup){
+      const messages = [];
+      try {
+        const pushes = buildThresholdPushes(matchup).slice(0, 3);
+        pushes.forEach(msg => pushUniqueMessage(messages, `Qualification watch: ${msg}`));
+      } catch (_err) {}
 
-      const pressure = buildSwingPressureInsight(matchup, rows);
-      if (pressure) list.push(pressure);
-
-      if (list.length < 4) {
-        list.push(`Clean-hit count: ${matchup.a.name} has ${cleanHitsA}, ${matchup.b.name} has ${cleanHitsB}. Right now one hot evening can still vandalise the scoreboard.`);
+      const agg = getAggregates();
+      for (const pick of [matchup.a.picks.striker, matchup.b.picks.striker]) {
+        const runs = Number(valueForPickFromObject(agg.battingRuns || {}, pick) || 0);
+        if (runs > 0 && runs < 100) {
+          pushUniqueMessage(messages, `Threshold radar: ${pick} is on ${runs} runs, so ${100 - runs} more unlocks Striker and immediately changes that lane from theory to scoring threat.`);
+        }
       }
 
-      document.getElementById('insights').innerHTML = list.slice(0, 4).map(x => `<div class="insight">${escapeHtml(x)}</div>`).join('');
+      for (const pick of [matchup.a.picks.leastMvp, matchup.b.picks.leastMvp]) {
+        const matches = Number(valueForPickFromObject(agg.playerMatches || {}, pick) || 0);
+        if (matches < 5) {
+          pushUniqueMessage(messages, `Eligibility watch: ${pick} has only ${matches} game${matches===1?'':'s'} logged; Least MVP does not become legal until they hit 5.`);
+        }
+      }
+
+      return messages;
+    }
+
+    function buildHiddenSwingMessage(matchup, rows){
+      const sleeper = rows.find(r => r.a === 0 && r.b === 0 && (/unranked|outside frame|waiting/i.test((r.pickALiveState || '') + ' ' + (r.pickBLiveState || ''))));
+      if (sleeper) {
+        return `Hidden swing: ${sleeper.category.label} still sits 0-0, which is dangerous because one decent outing from ${sleeper.pickA} or ${sleeper.pickB} can turn polite silence into point theft.`;
+      }
+      const deadRows = rows.filter(r => r.a === 0 && r.b === 0).length;
+      return deadRows ? `${deadRows} categories are still sleeping at 0-0. That is not dead space; that is unused ammunition.` : null;
+    }
+
+    function buildBestLivePickMessage(matchup, rows){
+      const rankedStates = rows.flatMap(r => [
+        { owner: matchup.a.name, pick: r.pickA, state: r.pickALiveState, category: r.category.label },
+        { owner: matchup.b.name, pick: r.pickB, state: r.pickBLiveState, category: r.category.label }
+      ]).filter(x => /#\d+|winner|leader|finalist/i.test(x.state || ''));
+
+      if (!rankedStates.length) return null;
+
+      rankedStates.sort((x, y) => {
+        const rx = Number((x.state || '').match(/#(\d+)/)?.[1] || 999);
+        const ry = Number((y.state || '').match(/#(\d+)/)?.[1] || 999);
+        return rx - ry;
+      });
+      const top = rankedStates[0];
+      return `Sharpest live pick on the board: ${top.owner}'s ${top.pick} in ${top.category} is ${String(top.state || '').replace(/^Live:\s*/i,'').toLowerCase()}, which is doing real work already.`;
+    }
+
+    function renderInsights(matchup, rows, totalA, totalB){
+      const list = [];
+      try {
+        const leader = totalA === totalB ? null : totalA > totalB ? matchup.a.name : matchup.b.name;
+        const margin = Math.abs(totalA - totalB);
+        const frontsA = rows.filter(r => r.a > r.b).length;
+        const frontsB = rows.filter(r => r.b > r.a).length;
+        const unresolved = rows.filter(r => r.a === 0 && r.b === 0).length;
+
+        pushUniqueMessage(list,
+          leader
+            ? `${leader} leads by ${margin} point${margin === 1 ? '' : 's'}, but the fronts split is only ${frontsA}-${frontsB}. This board is still one hot match away from changing tone completely.`
+            : `Dead level overall. Both sides currently own the same amount of swagger and the same amount of exposure.`
+        );
+
+        pushUniqueMessage(list, buildClosestBattleMessage(rows));
+        pushUniqueMessage(list, buildDamageReportMessage(matchup, rows));
+
+        for (const msg of buildQualificationWatchMessages(matchup)) {
+          pushUniqueMessage(list, msg);
+        }
+
+        pushUniqueMessage(list, buildHiddenSwingMessage(matchup, rows));
+        pushUniqueMessage(list, buildBestLivePickMessage(matchup, rows));
+
+        if (unresolved > 0) {
+          pushUniqueMessage(list, `Board texture: ${unresolved} categories are unresolved, so the scoreboard looks settled only if you stop reading after the first line.`);
+        }
+      } catch (err) {
+        console.error('Insights render failed', err);
+      }
+
+      const fallback = [
+        `${matchup.a.name} has ${rows.filter(r => r.a > r.b).length} fronts, ${matchup.b.name} has ${rows.filter(r => r.b > r.a).length}. The scoreboard and the category map are not always the same story.`,
+        `The most dangerous categories are usually the quiet ones — the 0-0 lanes become lethal the moment one pick finally appears on a live board.`,
+        `This board is still young enough that one player climbing from unranked to top five can vandalise the whole mood in a single evening.`
+      ];
+      fallback.forEach(msg => pushUniqueMessage(list, msg));
+
+      document.getElementById('insights').innerHTML = list.slice(0, 5).map(x => `<div class="insight">${escapeHtml(x)}</div>`).join('');
     }
 
     function renderRoasts(matchup, rows, totalA, totalB){
@@ -1055,44 +1150,54 @@
       const leader = totalA === totalB ? null : totalA > totalB ? a : b;
       const loser = totalA === totalB ? null : totalA > totalB ? b : a;
       const losingRows = totalA === totalB ? [] : rows.filter(r => leader === a ? r.b > r.a : r.a > r.b).sort((x, y) => Math.abs((leader === a ? y.b - y.a : y.a - y.b)) - Math.abs((leader === a ? x.b - x.a : x.a - x.b)));
-      const worstRow = losingRows[0] || rows.find(r => /unranked|waiting/i.test((leader === a ? r.pickBLiveState : r.pickALiveState) || ''));
+      const worstRow = losingRows[0] || rows.find(r => /unranked|waiting|outside frame/i.test(((leader === a ? r.pickBLiveState : r.pickALiveState) || '')));
       const worstPick = worstRow ? (leader === a ? worstRow.pickB : worstRow.pickA) : null;
       const worstState = worstRow ? (leader === a ? worstRow.pickBLiveState : worstRow.pickALiveState) : null;
 
-      let lines;
+      let banterLines;
+      let extremeLines;
+
       if (totalA === totalB) {
-        lines = roastMode === 'extreme' ? [
-          `${a} and ${b} are tied, which is perfect because both prediction sheets still look like they were signed off by confidence rather than evidence.`,
-          `This is level only because the chaos has not finished choosing its favourite victim yet.`,
-          `${a} is talking like a selector, ${b} is talking like an insider, and the board is politely unimpressed by both.`,
-          `One bad matchday from here and this turns from rivalry into public paperwork.`
-        ] : [
-          `${a} and ${b} are level. Two loud prediction sheets, one very patient scoreboard.`,
-          `This rivalry is tied, which means the banter market is open but the evidence market is still thin.`,
-          `${a} has theories, ${b} has theories, and the table is currently billing both by the hour.`
+        banterLines = [
+          `${a} and ${b} are level. At the moment this rivalry is two TED Talks sharing one scoreboard.`,
+          `Both sides are still talking like visionaries. The numbers are politely asking for evidence.`,
+          `Right now the board is tied, which is cricket's way of saying both prediction sheets are still on probation.`
         ];
-      } else if (roastMode === 'extreme') {
-        lines = [
-          `${loser} is ${margin} point${margin===1?'':'s'} behind and moving like a man who brought vibes to a data fight.`,
-          `${leader} brought analysis. ${loser} brought confidence and a prediction sheet with the structural integrity of wet cardboard.`,
-          worstRow ? `${loser}'s ${worstRow.category.label} call on ${worstPick} is currently ${String(worstState || 'nowhere').toLowerCase()}. That is not a pick. That is a missing persons report.` : `${loser}'s board currently looks like it was built from nostalgia, chaos, and one very reckless shrug.`,
-          `${leader} is farming points while ${loser} is still drafting an emotional support explanation.`
+        extremeLines = [
+          `${a} and ${b} are tied because the season has not yet decided which prediction sheet deserves public humiliation first.`,
+          `This scoreboard is level only because chaos is still warming up. One bad evening and one of these boards becomes a crime scene.`,
+          `Both sides currently have the same score, which is adorable, because confidence-wise they are behaving like they have already won a trophy.`
         ];
       } else {
-        lines = [
-          `${loser} is ${margin} point${margin===1?'':'s'} behind and already rehearsing the phrase “long season” in the mirror.`,
-          `${leader} has the scoreboard. ${loser} currently has interpretive analysis and selective optimism.`,
-          worstRow ? `${loser}'s shakiest scene right now is ${worstRow.category.label}: ${worstPick} is ${String(worstState || 'off the board').toLowerCase()}.` : `${loser}'s prediction sheet is giving brave effort, loose suspension, and suspicious mileage.`
+        banterLines = [
+          `${loser} is ${margin} point${margin===1?'':'s'} behind and already practising the phrase “long season” like it is a legal defence.`,
+          `${leader} has the board. ${loser} currently has vibes, selective memory, and an optimism package with no warranty.`,
+          worstRow ? `${loser}'s softest spot right now is ${worstRow.category.label}: ${worstPick} is ${String(worstState || 'off the board').replace(/^Live:\s*/i,'').toLowerCase()}.` : `${loser}'s sheet is trying hard, but the suspension sounds expensive.`
+        ];
+        extremeLines = [
+          `${leader} brought a scoring plan. ${loser} brought confidence and a prediction sheet with the load-bearing strength of warm papad.`,
+          worstRow ? `${loser}'s ${worstRow.category.label} call on ${worstPick} is currently ${String(worstState || 'nowhere').replace(/^Live:\s*/i,'').toLowerCase()}. That is not a pick. That is a missing person bulletin.` : `${loser}'s board currently looks like it was assembled from nostalgia, panic, and one heroic disregard for evidence.`,
+          `${leader} is farming points. ${loser} is one press conference away from calling the process more important than the result.`
         ];
       }
-      document.getElementById('roasts').innerHTML = lines.map(x => `<div class="insight">${escapeHtml(x)}</div>`).join('');
+
+      const combined = [
+        ...banterLines.map(text => ({ tag: 'Banter', tone: 'banter', text })),
+        ...extremeLines.map(text => ({ tag: 'Demolition', tone: 'extreme', text }))
+      ];
+
+      document.getElementById('roasts').innerHTML = `<div class="roast-grid">${combined.map(item => `
+        <div class="insight roast-item">
+          <span class="roast-tag ${item.tone}">${item.tag}</span>
+          <span>${escapeHtml(item.text)}</span>
+        </div>
+      `).join('')}</div>`;
     }
 
     function render(){
       renderTabs();
       const matchup = MATCHUPS.find(m => m.id === activeId) || MATCHUPS[0];
       const { rows, totalA, totalB } = computeMatchup(matchup);
-      renderRoastToggle();
       renderScoreboard(matchup, totalA, totalB);
       renderNextMatch(matchup);
       renderBreakdown(matchup, rows);
