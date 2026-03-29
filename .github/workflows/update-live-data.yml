@@ -3,7 +3,7 @@ name: Update live IPL data
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/5 * * * *'
 
 permissions:
   contents: write
@@ -19,33 +19,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: package.json
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Install Playwright browser
-        run: npx playwright install chromium
-
-      - name: Run worker
-        run: npm run update-live-data
-
-      - name: Upload debug artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-debug
-          path: debug
-          if-no-files-found: ignore
+      - name: Run CricketData worker
+        env:
+          CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY }}
+        run: node scripts/update-live-data.mjs
 
       - name: Commit live data
         shell: powershell
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/live.json debug
-
+          git add data/live.json
           $changes = git diff --staged --name-only
           if ([string]::IsNullOrWhiteSpace($changes)) {
             Write-Host "No changes to commit"
