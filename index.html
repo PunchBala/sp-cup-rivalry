@@ -732,7 +732,6 @@
           LIVE_2026.leastMvp.ranking = ranking;
           LIVE_2026.fetchedAt = new Date().toISOString();
           render();
-    hydrateLeastMvp();
         }
       } catch (_err) {
         // Fail silently; manual fallback still works.
@@ -927,10 +926,66 @@
       document.getElementById('metricWinnerNote').textContent = totalA===totalB ? 'Still too early for swagger.' : totalA>totalB ? `${matchup.a.name} has the scoreboard and the vibes.` : `${matchup.b.name} has the scoreboard and the vibes.`;
       document.getElementById('metricConfidence').textContent = `${confidenceA}% - ${confidenceB}%`;
       document.getElementById('metricConfidenceNote').textContent = `${matchup.a.name} confidence ${confidenceA}%, ${matchup.b.name} confidence ${confidenceB}%.`;
-      document.getElementById('updatedPill').textContent = `Last updated: ${new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(new Date())}`;
+      const updatedAt = LIVE_2026.fetchedAt ? new Date(LIVE_2026.fetchedAt) : new Date();
+      document.getElementById('updatedPill').textContent = `Last updated: ${new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(updatedAt)}`;
     }
 
-    render();
+    function normalizeFetchedLiveData(data){
+      const normalized = { ...data };
+
+      if (normalized.highestScoreTeam && !normalized.highestScoreTeam.winner) {
+        const ranking = Array.isArray(normalized.highestScoreTeam.ranking) ? normalized.highestScoreTeam.ranking : [];
+        if (ranking.length) normalized.highestScoreTeam.winner = ranking[0];
+      }
+
+      if (normalized.tableBottom && !normalized.tableBottom.winner) {
+        const ranking = Array.isArray(normalized.tableBottom.ranking) ? normalized.tableBottom.ranking : [];
+        if (ranking.length) normalized.tableBottom.winner = ranking[ranking.length - 1];
+      }
+
+      if (normalized.fairPlay && !normalized.fairPlay.winner) {
+        const ranking = Array.isArray(normalized.fairPlay.ranking) ? normalized.fairPlay.ranking : [];
+        if (ranking.length) normalized.fairPlay.winner = ranking[0];
+      }
+
+      if (normalized.uncappedMvp && !normalized.uncappedMvp.winner) {
+        const ranking = Array.isArray(normalized.uncappedMvp.ranking) ? normalized.uncappedMvp.ranking : [];
+        if (ranking.length) normalized.uncappedMvp.winner = ranking[0];
+      }
+
+      return normalized;
+    }
+
+    async function loadLiveData(){
+      try {
+        const cacheBust = `t=${Date.now()}`;
+        const res = await fetch(`data/live.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch live data: HTTP ${res.status}`);
+        }
+
+        const fetched = normalizeFetchedLiveData(await res.json());
+        Object.assign(LIVE_2026, fetched);
+
+        const providerBits = [
+          fetched.provider || 'data/live.json',
+          fetched.scrapeStatus ? `status: ${fetched.scrapeStatus}` : null
+        ].filter(Boolean);
+
+        document.getElementById('providerPill').textContent = `Provider: Live / ${providerBits.join(' • ')}`;
+      } catch (err) {
+        console.error('Live data load failed:', err);
+        document.getElementById('providerPill').textContent = 'Provider: Fallback / embedded data';
+      }
+
+      render();
+    }
+
+    loadLiveData();
   </script>
 </body>
 </html>
