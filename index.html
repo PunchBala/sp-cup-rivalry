@@ -166,6 +166,7 @@
     .note-box.note-wait{background:rgba(255,200,87,.08);border-color:rgba(255,200,87,.16);color:#ffe0a1}
     .note-box.note-win{background:rgba(68,215,146,.10);border-color:rgba(68,215,146,.18);color:#b6f2d0}
     .note-box.note-rank{background:rgba(124,196,255,.10);border-color:rgba(124,196,255,.18);color:#d4e8ff}
+    .note-box.note-bottom{background:rgba(255,127,150,.10);border-color:rgba(255,127,150,.18);color:#ffc3ce}
     .score-stack{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
 
   </style>
@@ -822,7 +823,7 @@
       };
     }
 
-    function scoreBetterRankCategory(pickA, pickB, ranking){
+    function scoreBetterRankCategory(pickA, pickB, ranking, emptyNote = 'Waiting for ranking'){
       const rA = rankOf(pickA, ranking);
       const rB = rankOf(pickB, ranking);
       let a = 0, b = 0;
@@ -836,7 +837,7 @@
       }
       return {
         a, b, rankA:rA, rankB:rB,
-        note: ranking.length ? `Top 5: ${ranking.slice(0,5).join(', ')}` : 'Waiting for ranking'
+        note: ranking.length ? `Top 5: ${ranking.slice(0,5).join(', ')}` : emptyNote
       };
     }
 
@@ -879,9 +880,12 @@
       const extendedRanking = Array.isArray(live.extendedRanking) ? live.extendedRanking : null;
 
       if (category.type === 'better_rank') {
+        let emptyNote = 'Waiting for ranking';
+        if (category.key === 'striker') emptyNote = 'Waiting for ranking (min 100 runs)';
+        if (category.key === 'bestBowlingStrikeRate') emptyNote = 'Waiting for ranking (min 12 overs)';
         return extendedRanking
-          ? scoreBetterRankCategory(pickA, pickB, extendedRanking)
-          : scoreBetterRankCategory(pickA, pickB, ranking);
+          ? scoreBetterRankCategory(pickA, pickB, extendedRanking, emptyNote)
+          : scoreBetterRankCategory(pickA, pickB, ranking, emptyNote);
       }
 
       if (category.type === 'better_rank_low') {
@@ -937,9 +941,9 @@
     function winnerBetterNote(categoryKey, live){
       const ranking = Array.isArray(live?.extendedRanking) && live.extendedRanking.length ? live.extendedRanking : (Array.isArray(live?.ranking) ? live.ranking : []);
       if (categoryKey === 'uncappedMvp') return topListNote('Top 5 uncapped MVP', ranking);
-      if (categoryKey === 'fairPlay') return topListNote('Top 5 fair play', ranking);
+      if (categoryKey === 'fairPlay') return topListNote('Top 3 fair play', ranking, 3);
       if (categoryKey === 'highestScoreTeam') return topListNote('Top 5 team scores', ranking);
-      if (categoryKey === 'tableBottom') return bottomListNote('Bottom 5', ranking);
+      if (categoryKey === 'tableBottom') return bottomListNote('Bottom 3', ranking, 3);
       return live?.winner ? `Winner: ${live.winner}` : 'Waiting for result';
     }
 
@@ -1086,7 +1090,8 @@
     function noteTone(note){
       const s = String(note || '').toLowerCase();
       if (!s || /waiting/.test(s)) return 'note-wait';
-      if (/winner|leader|top 5|top 5 uncapped|lowest 5/.test(s)) return 'note-win';
+      if (/bottom 3/.test(s)) return 'note-bottom';
+      if (/winner|leader|top 5|top 3 fair play|top 5 uncapped|lowest 5/.test(s)) return 'note-win';
       return 'note-rank';
     }
 
