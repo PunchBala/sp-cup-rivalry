@@ -29,6 +29,8 @@ const MAX_BACKLOG_SCORECARDS_PER_RUN = parseEnvInt(process.env.CRICKETDATA_MAX_B
 const CRICMETRIC_BOWLING_URL = 'https://www.cricmetric.com/series.py?series=ipl2026&show=bowling#';
 const CRICMETRIC_DOTS_ENABLED = parseEnvBool(process.env.CRICMETRIC_DOTS_ENABLED, true);
 const CRICMETRIC_MIN_REFRESH_MINUTES = parseEnvInt(process.env.CRICMETRIC_MIN_REFRESH_MINUTES, 120);
+const AGGREGATE_SCHEMA_VERSION = 2;
+const LEAST_MVP_MIN_MATCHES = 5;
 
 const CRICMETRIC_MANUAL_NAME_ALIASES = {
   // Keep this tiny. Only use manual overrides for genuinely weird edge cases
@@ -143,7 +145,8 @@ function createEmptyLive() {
         liveOverlayFetched: false,
         liveOverlayReused: false,
         liveOverlaySkippedReason: null
-      }
+      },
+      aggregateSchemaVersion: AGGREGATE_SCHEMA_VERSION
     },
     titleWinner: { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [] },
     orangeCap: { ranking: [], extendedRanking: [] },
@@ -184,7 +187,8 @@ async function readExistingLive() {
         liveOverlay: { ...fresh.meta.liveOverlay, ...(parsed.meta?.liveOverlay || {}) },
         scorecardBudget: { ...fresh.meta.scorecardBudget, ...(parsed.meta?.scorecardBudget || {}) },
         cricmetricDots: { ...fresh.meta.cricmetricDots, ...(parsed.meta?.cricmetricDots || {}) },
-        lastRun: { ...fresh.meta.lastRun, ...(parsed.meta?.lastRun || {}) }
+        lastRun: { ...fresh.meta.lastRun, ...(parsed.meta?.lastRun || {}) },
+        aggregateSchemaVersion: Number(parsed.meta?.aggregateSchemaVersion || fresh.meta.aggregateSchemaVersion || 1)
       }
     };
   } catch {
@@ -843,9 +847,17 @@ function fillDerivedOutputs(live, agg, dotsPayload = null) {
     values: dots.values || {}
   };
   const mvp = buildMvpRanking(agg, dots.values || {});
+  const mvpExtendedRanking = safeArray(mvp.ranking);
+  const leastMvpExtendedRanking = mvpExtendedRanking.filter((player) => Number(agg.playerMatches?.[player] || 0) >= LEAST_MVP_MIN_MATCHES);
+  const leastMvpValues = Object.fromEntries(
+    leastMvpExtendedRanking
+      .filter((player) => mvp.values && mvp.values[player])
+      .map((player) => [player, mvp.values[player]])
+  );
+
   live.mvp = {
-    ranking: safeArray(mvp.ranking).slice(0, 10),
-    extendedRanking: safeArray(mvp.ranking),
+    ranking: mvpExtendedRanking.slice(0, 10),
+    extendedRanking: mvpExtendedRanking,
     values: mvp.values,
     formula: 'Runs + (Sixes×2) + (Wickets×20) + (Dot balls×1.5) + (Catches×8) + batting SR bonus + bowling economy bonus + milestone bonuses',
     milestoneRules: {
@@ -861,9 +873,20 @@ function fillDerivedOutputs(live, agg, dotsPayload = null) {
       economy: { lt6: 8, lt7: 5, lt8: 2, gt10: -5, minBalls: 12 }
     }
   };
-  live.uncappedMvp = { ranking: [], extendedRanking: [] };
+  live.uncappedMvp = {
+    ranking: mvpExtendedRanking.slice(0, 10),
+    extendedRanking: mvpExtendedRanking,
+    values: mvp.values,
+    assumption: 'Picks are already verified uncapped, so scoring compares their positions in the custom MVP ranking only'
+  };
   live.fairPlay = { ranking: [], extendedRanking: [] };
-  live.leastMvp = { ranking: [], extendedRanking: [] };
+  live.leastMvp = {
+    ranking: leastMvpExtendedRanking.slice(0, 10),
+    extendedRanking: leastMvpExtendedRanking,
+    values: leastMvpValues,
+    minMatches: LEAST_MVP_MIN_MATCHES,
+    formulaSource: 'custom MVP ranking filtered to players with minimum match requirement'
+  };
 }
 
 function endedUnprocessedMatches(matchList, processedIds) {
@@ -898,6 +921,39 @@ function reusableOverlayAggregates(live, activeMatch) {
   if (!activeMatch) return null;
   if (live.meta.liveOverlay?.matchId !== activeMatch.id) return null;
   return live.meta.liveOverlay?.aggregates || null;
+}
+
+
+function countKeys(mapObj) {
+  return Object.keys(mapObj || {}).length;
+}
+
+function needsHistoricalAggregateBackfill(live) {
+  const processedCount = safeArray(live.meta.processedMatchIds).length;
+  if (!processedCount) return false;
+  if (Number(live.meta.aggregateSchemaVersion || 0) < AGGREGATE_SCHEMA_VERSION) return true;
+
+  const agg = live.meta.aggregates || createEmptyAggregates();
+  const criticalMaps = [
+    agg.bowlingRunsConceded,
+    agg.playerMatches,
+    agg.battingFifties,
+    agg.battingHundreds,
+    agg.battingImpact30s,
+    agg.bowling3w,
+    agg.bowling4w,
+    agg.bowling5w
+  ];
+  return criticalMaps.some((mapObj) => countKeys(mapObj) === 0);
+}
+
+async function rebuildHistoricalAggregates(processedIds) {
+  const rebuilt = createEmptyAggregates();
+  for (const matchId of processedIds) {
+    const scorecard = await processScorecard(matchId);
+    applyScorecardToAggregates(rebuilt, scorecard, { isFinal: true });
+  }
+  return rebuilt;
 }
 
 async function main() {
@@ -947,7 +1003,14 @@ async function main() {
   }
 
   const processedIds = new Set(live.meta.processedMatchIds || []);
-  const finalizedAgg = live.meta.aggregates || createEmptyAggregates();
+  let finalizedAgg = live.meta.aggregates || createEmptyAggregates();
+
+  const requiresHistoricalBackfill = needsHistoricalAggregateBackfill(live);
+  if (requiresHistoricalBackfill) {
+    finalizedAgg = await rebuildHistoricalAggregates(live.meta.processedMatchIds || []);
+    live.meta.lastRun.scorecardCalls += safeArray(live.meta.processedMatchIds).length;
+    live.meta.aggregateSchemaVersion = AGGREGATE_SCHEMA_VERSION;
+  }
 
   const endedBacklog = endedUnprocessedMatches(matchList, live.meta.processedMatchIds);
   const backlogToProcess = endedBacklog.slice(0, MAX_BACKLOG_SCORECARDS_PER_RUN);
@@ -1008,6 +1071,7 @@ async function main() {
 
   live.meta.processedMatchIds = [...processedIds];
   live.meta.aggregates = finalizedAgg;
+  live.meta.aggregateSchemaVersion = AGGREGATE_SCHEMA_VERSION;
 
   const combinedAgg = combineAggregates(finalizedAgg, overlayAgg);
 
@@ -1068,9 +1132,9 @@ async function main() {
     tableBottom: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     mostDots: dotsReport,
     mvp: { ok: true, source: 'CricketData + Cricmetric', method: 'custom formula using runs, sixes, wickets, dot balls, catches, strike-rate bonus, economy bonus and milestone bonuses' },
-    uncappedMvp: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
+    uncappedMvp: { ok: true, source: 'custom MVP ranking', method: 'compares already-verified uncapped picks by their positions in the custom MVP ranking' },
     fairPlay: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
-    leastMvp: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
+    leastMvp: { ok: true, source: 'custom MVP ranking', method: `lower in custom MVP ranking wins, filtered to players with minimum ${LEAST_MVP_MIN_MATCHES} matches` },
     costControl: {
       ok: true,
       source: 'worker',

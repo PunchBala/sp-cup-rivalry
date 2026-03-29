@@ -165,7 +165,7 @@
           <div class="pill">Title winner: 5 / 3 / 2, else better prediction 1</div>
           <div class="pill">Orange Cap, Most Sixes, Purple Cap, Most Dots, MVP: 4 / 3 / 2, else better prediction 1</div>
           <div class="pill">Categories 7-15: better prediction wins 1 point</div>
-          <div class="pill">Least MVP: lower in custom MVP ranking wins</div>
+          <div class="pill">Least MVP: lower in custom MVP ranking wins (min 5 games)</div>
           <div class="pill">Custom MVP = Runs + (6s×2) + (Wkts×20) + (Dots×1.5) + (Catches×8)</div>
           <div class="pill">MVP bonuses: batting SR, bowling economy, 50/100, quick 30+, 3w/4w/5w</div>
           <div class="pill">Striker: minimum 100 runs required</div>
@@ -616,10 +616,14 @@
       if (rA && rB) {
         if (rA > rB) a = 1;
         else if (rB > rA) b = 1;
+      } else if (rA && !rB) {
+        a = 1;
+      } else if (rB && !rA) {
+        b = 1;
       }
       return {
         a, b, rankA:rA, rankB:rB,
-        note: ranking.length ? `Least-MVP order (lower on page wins): ${ranking.slice(0, 20).join(', ')}${ranking.length > 20 ? ' …' : ''}` : 'Waiting for least-MVP ranking'
+        note: ranking.length ? `Least-MVP order (min 5 games, lower on page wins): ${ranking.slice(0, 20).join(', ')}${ranking.length > 20 ? ' …' : ''}` : 'Waiting for least-MVP ranking (min 5 games)'
       };
     }
 
