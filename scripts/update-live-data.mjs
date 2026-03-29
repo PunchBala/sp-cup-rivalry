@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import vm from 'node:vm';
 
 const ROOT = process.cwd();
 const DATA_DIR = path.join(ROOT, 'data');
@@ -29,6 +30,8 @@ const MAX_BACKLOG_SCORECARDS_PER_RUN = parseEnvInt(process.env.CRICKETDATA_MAX_B
 const CRICMETRIC_BOWLING_URL = 'https://www.cricmetric.com/series.py?series=ipl2026&show=bowling#';
 const CRICMETRIC_DOTS_ENABLED = parseEnvBool(process.env.CRICMETRIC_DOTS_ENABLED, true);
 const CRICMETRIC_MIN_REFRESH_MINUTES = parseEnvInt(process.env.CRICMETRIC_MIN_REFRESH_MINUTES, 120);
+const IPLT20_FAIRPLAY_ENABLED = parseEnvBool(process.env.IPLT20_FAIRPLAY_ENABLED, true);
+const IPLT20_FAIRPLAY_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/2026-fairplayList.js?callback=onFairplayAward';
 const AGGREGATE_SCHEMA_VERSION = 2;
 const LEAST_MVP_MIN_MATCHES = 5;
 
@@ -342,6 +345,68 @@ function resolveCricmetricPlayerName(rawName, agg) {
   if (generatedAlias) return generatedAlias;
 
   return titleCaseName(trimmed);
+}
+
+
+function parseJsonpPayload(text) {
+  const source = String(text || '').trim();
+  const callbackMatch = source.match(/^([A-Za-z0-9_$]+)\s*\(/);
+  if (!callbackMatch) throw new Error('jsonp-callback-not-found');
+  const callbackName = callbackMatch[1];
+  let payload;
+  const sandbox = {
+    [callbackName]: (data) => {
+      payload = data;
+    }
+  };
+  vm.runInNewContext(source, sandbox, { timeout: 2000 });
+  if (!payload) throw new Error('jsonp-payload-not-found');
+  return payload;
+}
+
+function numOrNull(value) {
+  const n = Number.parseFloat(String(value ?? '').replace(/[^0-9.-]/g, ''));
+  return Number.isFinite(n) ? n : null;
+}
+
+function rowsToFairPlayPayload(payload) {
+  const rows = safeArray(payload?.fairplayTotal);
+  if (!rows.length) return null;
+
+  const ranking = [];
+  const values = {};
+  for (const row of rows) {
+    const team = normalizeName(row?.TeamFullName || row?.TeamName || row?.teamFullName || row?.teamName || '');
+    if (!team) continue;
+    ranking.push(team);
+    values[team] = {
+      matches: numOrNull(row?.No ?? row?.Matches ?? row?.matches),
+      average: numOrNull(row?.Average ?? row?.Avg ?? row?.average),
+      points: numOrNull(row?.Points ?? row?.Point ?? row?.TotalPoints ?? row?.TP ?? row?.points),
+      raw: row
+    };
+  }
+
+  if (!ranking.length) return null;
+  return {
+    winner: ranking[0] || null,
+    ranking: ranking.slice(0, 10),
+    extendedRanking: ranking,
+    values,
+    updatedAt: safeArray(payload?.dateModifiedOn)[0] || null,
+    source: 'IPLT20 official fairplay feed'
+  };
+}
+
+async function fetchOfficialFairPlay() {
+  const text = await fetchText(IPLT20_FAIRPLAY_FEED_URL, {
+    accept: 'application/javascript,text/javascript,*/*;q=0.8',
+    referer: 'https://www.iplt20.com/stats/2026'
+  });
+  const payload = parseJsonpPayload(text);
+  const parsed = rowsToFairPlayPayload(payload);
+  if (!parsed?.extendedRanking?.length) throw new Error('fairplay-data-not-found');
+  return parsed;
 }
 
 function extractCricmetricLeadersPath(pageHtml) {
@@ -809,7 +874,7 @@ function buildMvpRanking(agg, dotsValues) {
   };
 }
 
-function fillDerivedOutputs(live, agg, dotsPayload = null) {
+function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = null) {
   const orange = sortByValueDesc(agg.battingRuns);
   const sixes = sortByValueDesc(agg.battingSixes);
   const wickets = sortByValueDesc(agg.bowlingWickets);
@@ -885,7 +950,20 @@ function fillDerivedOutputs(live, agg, dotsPayload = null) {
     values: mvp.values,
     assumption: 'Picks are already verified uncapped, so scoring compares their positions in the custom MVP ranking only'
   };
-  live.fairPlay = { ranking: [], extendedRanking: [] };
+
+  const fairPlay = fairPlayPayload?.extendedRanking?.length
+    ? fairPlayPayload
+    : (live.fairPlay || { winner: null, ranking: [], extendedRanking: [], values: {} });
+
+  live.fairPlay = {
+    winner: fairPlay.winner || safeArray(fairPlay.extendedRanking)[0] || null,
+    ranking: safeArray(fairPlay.ranking).slice(0, 10),
+    extendedRanking: safeArray(fairPlay.extendedRanking),
+    values: fairPlay.values || {},
+    updatedAt: fairPlay.updatedAt || null,
+    source: fairPlay.source || null
+  };
+
   live.leastMvp = {
     ranking: leastMvpExtendedRanking.slice(0, 10),
     extendedRanking: leastMvpExtendedRanking,
@@ -1123,7 +1201,38 @@ async function main() {
     }
   }
 
-  fillDerivedOutputs(live, combinedAgg, dotsPayload);
+  let fairPlayPayload = live.fairPlay || { winner: null, ranking: [], extendedRanking: [], values: {} };
+  let fairPlayReport = {
+    ok: false,
+    source: 'IPLT20 official fairplay feed',
+    method: 'parsed JSONP fairplayTotal table from Sports Mechanic stats feed'
+  };
+
+  if (IPLT20_FAIRPLAY_ENABLED) {
+    try {
+      fairPlayPayload = await fetchOfficialFairPlay();
+      fairPlayReport = {
+        ok: true,
+        source: fairPlayPayload.source,
+        method: 'parsed JSONP fairplayTotal table from Sports Mechanic stats feed',
+        rows: fairPlayPayload.extendedRanking.length,
+        updatedAt: fairPlayPayload.updatedAt
+      };
+    } catch (error) {
+      fairPlayReport = {
+        ok: false,
+        source: 'IPLT20 official fairplay feed',
+        method: 'parsed JSONP fairplayTotal table from Sports Mechanic stats feed',
+        error: error.message,
+        fallback: safeArray(live.fairPlay?.extendedRanking).length ? 'kept previous fairPlay snapshot' : 'no previous fairPlay snapshot'
+      };
+    }
+  } else {
+    fairPlayReport.reason = 'fairplay feed disabled';
+    if (safeArray(live.fairPlay?.extendedRanking).length) fairPlayReport.fallback = 'kept previous fairPlay snapshot';
+  }
+
+  fillDerivedOutputs(live, combinedAgg, dotsPayload, fairPlayPayload);
 
   live.scrapeReport = {
     orangeCap: { ok: true, source: 'CricketData scorecards', method: 'computed season total runs' },
@@ -1139,7 +1248,7 @@ async function main() {
     mostDots: dotsReport,
     mvp: { ok: true, source: 'CricketData + Cricmetric', method: 'custom formula using runs, sixes, wickets, dot balls, catches, strike-rate bonus, economy bonus and milestone bonuses' },
     uncappedMvp: { ok: true, source: 'custom MVP ranking', method: 'compares already-verified uncapped picks by their positions in the custom MVP ranking' },
-    fairPlay: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
+    fairPlay: fairPlayReport,
     leastMvp: { ok: true, source: 'custom MVP ranking', method: `lower in custom MVP ranking wins, filtered to players with minimum ${LEAST_MVP_MIN_MATCHES} matches` },
     costControl: {
       ok: true,
