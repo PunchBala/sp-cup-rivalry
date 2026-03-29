@@ -18,10 +18,30 @@ const MATCH_WINDOW_MINUTES = 360;
 const BOWLING_SR_MIN_BALLS = 72;
 const STRIKER_MIN_RUNS = 100;
 
+// Credit optimisation knobs.
+// Defaults are conservative for the free plan:
+// - post-match scorecards are processed once and cached forever
+// - live scorecard polling is OFF unless you explicitly enable it
+// - backlog catch-up is capped so a missed day does not nuke credits in one run
+const LIVE_SCORECARD_ENABLED = parseEnvBool(process.env.CRICKETDATA_ENABLE_LIVE_SCORECARD, false);
+const LIVE_SCORECARD_INTERVAL_MINUTES = parseEnvInt(process.env.CRICKETDATA_LIVE_SCORECARD_INTERVAL_MINUTES, 30);
+const MAX_BACKLOG_SCORECARDS_PER_RUN = parseEnvInt(process.env.CRICKETDATA_MAX_BACKLOG_SCORECARDS_PER_RUN, 2);
+
+function parseEnvBool(value, fallback = false) {
+  if (value === undefined || value === null || value === '') return fallback;
+  return ['1', 'true', 'yes', 'y', 'on'].includes(String(value).trim().toLowerCase());
+}
+
+function parseEnvInt(value, fallback) {
+  const n = Number.parseInt(String(value ?? ''), 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
 function isoNow() { return new Date().toISOString(); }
 function nowMs() { return Date.now(); }
 function safeArray(v) { return Array.isArray(v) ? v : []; }
 function normalizeName(name) { return String(name || '').replace(/\s+/g, ' ').trim(); }
+function minutesSince(iso, currentMs = Date.now()) { return iso ? (currentMs - Date.parse(iso)) / 60000 : Infinity; }
 
 function londonDayKey(ms = Date.now()) {
   return new Intl.DateTimeFormat('en-CA', {
@@ -38,6 +58,20 @@ function oversToBalls(value) {
 
 function allOutUsesFullQuota(wickets, balls, quota = 120) {
   return Number(wickets || 0) >= 10 ? quota : balls;
+}
+
+function createEmptyAggregates() {
+  return {
+    battingRuns: {},
+    battingBalls: {},
+    battingSixes: {},
+    bowlingWickets: {},
+    bowlingBalls: {},
+    catches: {},
+    teamHighestScore: {},
+    standings: {},
+    bestBowlingFigures: {}
+  };
 }
 
 function createEmptyLive() {
@@ -59,12 +93,31 @@ function createEmptyLive() {
       },
       cache: { seriesId: SERIES_ID, matchList: [] },
       processedMatchIds: [],
-      aggregates: {
-        battingRuns: {}, battingBalls: {}, battingSixes: {},
-        bowlingWickets: {}, bowlingBalls: {}, catches: {},
-        teamHighestScore: {}, standings: {}, bestBowlingFigures: {}
+      aggregates: createEmptyAggregates(),
+      liveOverlay: {
+        matchId: null,
+        generatedAt: null,
+        aggregates: null,
+        status: null,
+        source: null
       },
-      liveOverlay: { matchId: null, generatedAt: null, aggregates: null }
+      scorecardBudget: {
+        liveEnabled: LIVE_SCORECARD_ENABLED,
+        liveIntervalMinutes: LIVE_SCORECARD_INTERVAL_MINUTES,
+        maxBacklogPerRun: MAX_BACKLOG_SCORECARDS_PER_RUN,
+        lastLiveScorecardAt: null,
+        lastLiveScorecardMatchId: null,
+        lastBacklogProcessAt: null
+      },
+      lastRun: {
+        seriesInfoCalls: 0,
+        scorecardCalls: 0,
+        backlogProcessed: 0,
+        backlogRemaining: 0,
+        liveOverlayFetched: false,
+        liveOverlayReused: false,
+        liveOverlaySkippedReason: null
+      }
     },
     titleWinner: { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [] },
     orangeCap: { ranking: [], extendedRanking: [] },
@@ -84,7 +137,9 @@ function createEmptyLive() {
   };
 }
 
-async function ensureDataDir() { await fs.mkdir(DATA_DIR, { recursive: true }); }
+async function ensureDataDir() {
+  await fs.mkdir(DATA_DIR, { recursive: true });
+}
 
 async function readExistingLive() {
   try {
@@ -100,7 +155,9 @@ async function readExistingLive() {
         cache: { ...fresh.meta.cache, ...(parsed.meta?.cache || {}) },
         processedMatchIds: Array.isArray(parsed.meta?.processedMatchIds) ? parsed.meta.processedMatchIds : [],
         aggregates: { ...fresh.meta.aggregates, ...(parsed.meta?.aggregates || {}) },
-        liveOverlay: { ...fresh.meta.liveOverlay, ...(parsed.meta?.liveOverlay || {}) }
+        liveOverlay: { ...fresh.meta.liveOverlay, ...(parsed.meta?.liveOverlay || {}) },
+        scorecardBudget: { ...fresh.meta.scorecardBudget, ...(parsed.meta?.scorecardBudget || {}) },
+        lastRun: { ...fresh.meta.lastRun, ...(parsed.meta?.lastRun || {}) }
       }
     };
   } catch {
@@ -109,7 +166,12 @@ async function readExistingLive() {
 }
 
 async function fetchJson(url) {
-  const res = await fetch(url, { headers: { accept: 'application/json', 'user-agent': 'sp-cup-rivalry/1.0' } });
+  const res = await fetch(url, {
+    headers: {
+      accept: 'application/json',
+      'user-agent': 'sp-cup-rivalry/1.1'
+    }
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   const json = await res.json();
   if (json.status && json.status !== 'success') throw new Error(`API error: ${JSON.stringify(json)}`);
@@ -166,7 +228,18 @@ function decideRefreshMode(live, currentMs) {
 }
 
 function ensureStandingTeam(map, team) {
-  if (!map[team]) map[team] = { played: 0, wins: 0, losses: 0, points: 0, runsFor: 0, ballsFaced: 0, runsAgainst: 0, ballsBowled: 0 };
+  if (!map[team]) {
+    map[team] = {
+      played: 0,
+      wins: 0,
+      losses: 0,
+      points: 0,
+      runsFor: 0,
+      ballsFaced: 0,
+      runsAgainst: 0,
+      ballsBowled: 0
+    };
+  }
   return map[team];
 }
 
@@ -177,9 +250,18 @@ function addNumberMap(map, key, amount) {
 
 function updateBestBowlingFigure(bestMap, bowler, wickets, runs, balls) {
   if (!bowler) return;
-  const cand = { wickets: Number(wickets || 0), runs: Number(runs || 0), balls: Number(balls || 0) };
+  const cand = {
+    wickets: Number(wickets || 0),
+    runs: Number(runs || 0),
+    balls: Number(balls || 0)
+  };
   const ex = bestMap[bowler];
-  if (!ex || cand.wickets > ex.wickets || (cand.wickets === ex.wickets && cand.runs < ex.runs) || (cand.wickets === ex.wickets && cand.runs === ex.runs && cand.balls < ex.balls)) {
+  if (
+    !ex ||
+    cand.wickets > ex.wickets ||
+    (cand.wickets === ex.wickets && cand.runs < ex.runs) ||
+    (cand.wickets === ex.wickets && cand.runs === ex.runs && cand.balls < ex.balls)
+  ) {
     bestMap[bowler] = cand;
   }
 }
@@ -190,7 +272,7 @@ function parseTeamFromInningName(inningName) {
   return normalizeName(idx >= 0 ? raw.slice(0, idx) : raw);
 }
 
-function applyScorecardToAggregates(aggregates, scorecardData) {
+function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true } = {}) {
   const inningsBlocks = safeArray(scorecardData.scorecard);
   const topScores = safeArray(scorecardData.score);
 
@@ -201,6 +283,7 @@ function applyScorecardToAggregates(aggregates, scorecardData) {
       addNumberMap(aggregates.battingBalls, batter, bat?.b || 0);
       addNumberMap(aggregates.battingSixes, batter, bat?.['6s'] || 0);
     }
+
     for (const bowl of safeArray(innings.bowling)) {
       const bowler = normalizeName(bowl?.bowler?.name);
       const balls = oversToBalls(bowl?.o);
@@ -208,6 +291,7 @@ function applyScorecardToAggregates(aggregates, scorecardData) {
       addNumberMap(aggregates.bowlingBalls, bowler, balls);
       updateBestBowlingFigure(aggregates.bestBowlingFigures, bowler, bowl?.w || 0, bowl?.r || 0, balls);
     }
+
     for (const field of safeArray(innings.catching)) {
       const catcher = normalizeName(field?.catcher?.name);
       if (catcher) addNumberMap(aggregates.catches, catcher, field?.catch || 0);
@@ -216,58 +300,96 @@ function applyScorecardToAggregates(aggregates, scorecardData) {
 
   for (const scoreLine of topScores) {
     const team = parseTeamFromInningName(scoreLine?.inning);
-    if (team) aggregates.teamHighestScore[team] = Math.max(Number(aggregates.teamHighestScore[team] || 0), Number(scoreLine?.r || 0));
+    if (team) {
+      aggregates.teamHighestScore[team] = Math.max(Number(aggregates.teamHighestScore[team] || 0), Number(scoreLine?.r || 0));
+    }
   }
+
+  if (!isFinal) return;
 
   const teams = safeArray(scorecardData.teams).map(normalizeName);
   if (teams.length === 2 && topScores.length >= 2) {
     const [teamA, teamB] = teams;
     const standingA = ensureStandingTeam(aggregates.standings, teamA);
     const standingB = ensureStandingTeam(aggregates.standings, teamB);
-    standingA.played += 1; standingB.played += 1;
+    standingA.played += 1;
+    standingB.played += 1;
+
     const inningMap = {};
     for (const s of topScores) inningMap[parseTeamFromInningName(s?.inning)] = s;
-    const sa = inningMap[teamA], sb = inningMap[teamB];
+
+    const sa = inningMap[teamA];
+    const sb = inningMap[teamB];
     if (sa && sb) {
       const ballsA = allOutUsesFullQuota(sa.w, oversToBalls(sa.o));
       const ballsB = allOutUsesFullQuota(sb.w, oversToBalls(sb.o));
-      standingA.runsFor += Number(sa.r || 0); standingA.ballsFaced += ballsA; standingA.runsAgainst += Number(sb.r || 0); standingA.ballsBowled += ballsB;
-      standingB.runsFor += Number(sb.r || 0); standingB.ballsFaced += ballsB; standingB.runsAgainst += Number(sa.r || 0); standingB.ballsBowled += ballsA;
+      standingA.runsFor += Number(sa.r || 0);
+      standingA.ballsFaced += ballsA;
+      standingA.runsAgainst += Number(sb.r || 0);
+      standingA.ballsBowled += ballsB;
+
+      standingB.runsFor += Number(sb.r || 0);
+      standingB.ballsFaced += ballsB;
+      standingB.runsAgainst += Number(sa.r || 0);
+      standingB.ballsBowled += ballsA;
     }
+
     const winner = normalizeName(scorecardData.matchWinner);
-    if (winner === teamA) { standingA.wins += 1; standingA.points += 2; standingB.losses += 1; }
-    else if (winner === teamB) { standingB.wins += 1; standingB.points += 2; standingA.losses += 1; }
+    if (winner === teamA) {
+      standingA.wins += 1;
+      standingA.points += 2;
+      standingB.losses += 1;
+    } else if (winner === teamB) {
+      standingB.wins += 1;
+      standingB.points += 2;
+      standingA.losses += 1;
+    }
   }
 }
 
-function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
+function clone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
 
 function combineAggregates(baseAgg, overlayAgg) {
   const out = clone(baseAgg);
   if (!overlayAgg) return out;
+
   for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'catches']) {
     for (const [name, value] of Object.entries(overlayAgg[key] || {})) {
       out[key][name] = (out[key][name] || 0) + Number(value || 0);
     }
   }
-  for (const [team, value] of Object.entries(overlayAgg.teamHighestScore || {})) out.teamHighestScore[team] = Math.max(out.teamHighestScore[team] || 0, value);
-  for (const [bowler, fig] of Object.entries(overlayAgg.bestBowlingFigures || {})) updateBestBowlingFigure(out.bestBowlingFigures, bowler, fig.wickets, fig.runs, fig.balls);
+
+  for (const [team, value] of Object.entries(overlayAgg.teamHighestScore || {})) {
+    out.teamHighestScore[team] = Math.max(out.teamHighestScore[team] || 0, value);
+  }
+
+  for (const [bowler, fig] of Object.entries(overlayAgg.bestBowlingFigures || {})) {
+    updateBestBowlingFigure(out.bestBowlingFigures, bowler, fig.wickets, fig.runs, fig.balls);
+  }
+
   for (const [team, standing] of Object.entries(overlayAgg.standings || {})) {
     const target = ensureStandingTeam(out.standings, team);
     for (const [k, v] of Object.entries(standing)) target[k] = (target[k] || 0) + Number(v || 0);
   }
+
   return out;
 }
 
 function sortByValueDesc(mapObj) {
-  return Object.entries(mapObj || {}).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([name]) => name);
+  return Object.entries(mapObj || {})
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([name]) => name);
 }
 
 function buildStrikerRanking(agg) {
   const rows = [];
   for (const [player, totalRuns] of Object.entries(agg.battingRuns || {})) {
     const totalBalls = Number(agg.battingBalls[player] || 0);
-    if (totalRuns >= STRIKER_MIN_RUNS && totalBalls > 0) rows.push([player, (100 * totalRuns) / totalBalls]);
+    if (totalRuns >= STRIKER_MIN_RUNS && totalBalls > 0) {
+      rows.push([player, (100 * totalRuns) / totalBalls]);
+    }
   }
   rows.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
   return rows.map(([player]) => player);
@@ -280,13 +402,25 @@ function buildBowlingStrikeRateRanking(agg) {
     if (balls >= BOWLING_SR_MIN_BALLS && Number(wickets) > 0) rows.push([bowler, balls / Number(wickets)]);
   }
   rows.sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]));
-  return { ranking: rows.map(([bowler]) => bowler), values: Object.fromEntries(rows.map(([bowler, sr]) => [bowler, Number(sr.toFixed(2))])) };
+  return {
+    ranking: rows.map(([bowler]) => bowler),
+    values: Object.fromEntries(rows.map(([bowler, sr]) => [bowler, Number(sr.toFixed(2))]))
+  };
 }
 
 function buildBestFiguresRanking(agg) {
   const rows = Object.entries(agg.bestBowlingFigures || {}).map(([bowler, fig]) => [bowler, fig]);
-  rows.sort((a, b) => b[1].wickets - a[1].wickets || a[1].runs - b[1].runs || a[1].balls - b[1].balls || a[0].localeCompare(b[0]));
-  return { ranking: rows.map(([bowler]) => bowler), figures: Object.fromEntries(rows.map(([bowler, fig]) => [bowler, `${fig.wickets}/${fig.runs}`])) };
+  rows.sort(
+    (a, b) =>
+      b[1].wickets - a[1].wickets ||
+      a[1].runs - b[1].runs ||
+      a[1].balls - b[1].balls ||
+      a[0].localeCompare(b[0])
+  );
+  return {
+    ranking: rows.map(([bowler]) => bowler),
+    figures: Object.fromEntries(rows.map(([bowler, fig]) => [bowler, `${fig.wickets}/${fig.runs}`]))
+  };
 }
 
 function standingNrr(s) {
@@ -297,7 +431,10 @@ function standingNrr(s) {
 }
 
 function buildStandingsRanking(agg) {
-  return Object.entries(agg.standings || {}).map(([team, s]) => [team, s, standingNrr(s)]).sort((a, b) => b[1].points - a[1].points || b[2] - a[2] || a[0].localeCompare(b[0])).map(([team]) => team);
+  return Object.entries(agg.standings || {})
+    .map(([team, s]) => [team, s, standingNrr(s)])
+    .sort((a, b) => b[1].points - a[1].points || b[2] - a[2] || a[0].localeCompare(b[0]))
+    .map(([team]) => team);
 }
 
 function fillDerivedOutputs(live, agg) {
@@ -305,7 +442,9 @@ function fillDerivedOutputs(live, agg) {
   const sixes = sortByValueDesc(agg.battingSixes);
   const wickets = sortByValueDesc(agg.bowlingWickets);
   const catches = sortByValueDesc(agg.catches);
-  const teamHighest = Object.entries(agg.teamHighestScore || {}).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([team]) => team);
+  const teamHighest = Object.entries(agg.teamHighestScore || {})
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([team]) => team);
   const bestFigures = buildBestFiguresRanking(agg);
   const bowlSr = buildBowlingStrikeRateRanking(agg);
   const standings = buildStandingsRanking(agg);
@@ -316,10 +455,24 @@ function fillDerivedOutputs(live, agg) {
   live.purpleCap = { ranking: wickets.slice(0, 10), extendedRanking: wickets };
   live.highestScoreTeam = { ranking: teamHighest, extendedRanking: teamHighest, values: agg.teamHighestScore || {} };
   live.striker = { ranking: striker.slice(0, 10), extendedRanking: striker };
-  live.bestBowlingFigures = { ranking: bestFigures.ranking.slice(0, 10), extendedRanking: bestFigures.ranking, figures: bestFigures.figures };
-  live.bestBowlingStrikeRate = { ranking: bowlSr.ranking.slice(0, 10), extendedRanking: bowlSr.ranking, values: bowlSr.values };
+  live.bestBowlingFigures = {
+    ranking: bestFigures.ranking.slice(0, 10),
+    extendedRanking: bestFigures.ranking,
+    figures: bestFigures.figures
+  };
+  live.bestBowlingStrikeRate = {
+    ranking: bowlSr.ranking.slice(0, 10),
+    extendedRanking: bowlSr.ranking,
+    values: bowlSr.values
+  };
   live.mostCatches = { ranking: catches.slice(0, 10), extendedRanking: catches, values: agg.catches || {} };
-  live.titleWinner = { winner: standings[0] || null, finalists: standings.slice(0, 2), playoffs: standings.slice(0, 4), ranking: standings.slice(0, 10), extendedRanking: standings };
+  live.titleWinner = {
+    winner: standings[0] || null,
+    finalists: standings.slice(0, 2),
+    playoffs: standings.slice(0, 4),
+    ranking: standings.slice(0, 10),
+    extendedRanking: standings
+  };
   live.tableBottom = { ranking: standings.slice(0, 10), extendedRanking: standings };
   live.mostDots = { ranking: [], extendedRanking: [] };
   live.mvp = { ranking: [], extendedRanking: [] };
@@ -330,7 +483,9 @@ function fillDerivedOutputs(live, agg) {
 
 function endedUnprocessedMatches(matchList, processedIds) {
   const set = new Set(processedIds || []);
-  return safeArray(matchList).filter((m) => m.matchEnded && !set.has(m.id));
+  return safeArray(matchList)
+    .filter((m) => m.matchEnded && !set.has(m.id))
+    .sort((a, b) => Date.parse(a.dateTimeGMT) - Date.parse(b.dateTimeGMT));
 }
 
 function liveMatchCandidate(matchList) {
@@ -342,23 +497,61 @@ async function processScorecard(matchId) {
   return json.data;
 }
 
+function shouldFetchLiveScorecard(live, activeMatch, currentMs) {
+  if (!activeMatch) return { fetch: false, reason: 'no active match' };
+  if (!LIVE_SCORECARD_ENABLED) return { fetch: false, reason: 'live scorecards disabled' };
+
+  const sameMatch = live.meta.scorecardBudget.lastLiveScorecardMatchId === activeMatch.id;
+  const minsSinceLast = minutesSince(live.meta.scorecardBudget.lastLiveScorecardAt, currentMs);
+
+  if (!sameMatch) return { fetch: true, reason: 'new active match' };
+  if (minsSinceLast >= LIVE_SCORECARD_INTERVAL_MINUTES) return { fetch: true, reason: 'live scorecard interval reached' };
+  return { fetch: false, reason: 'live scorecard interval not reached' };
+}
+
+function reusableOverlayAggregates(live, activeMatch) {
+  if (!activeMatch) return null;
+  if (live.meta.liveOverlay?.matchId !== activeMatch.id) return null;
+  return live.meta.liveOverlay?.aggregates || null;
+}
+
 async function main() {
   if (!API_KEY) throw new Error('Missing CRICKETDATA_API_KEY environment variable');
+
   await ensureDataDir();
+
   const live = await readExistingLive();
   resetDailySchedulerIfNeeded(live);
 
-  const decision = decideRefreshMode(live, nowMs());
+  live.meta.scorecardBudget.liveEnabled = LIVE_SCORECARD_ENABLED;
+  live.meta.scorecardBudget.liveIntervalMinutes = LIVE_SCORECARD_INTERVAL_MINUTES;
+  live.meta.scorecardBudget.maxBacklogPerRun = MAX_BACKLOG_SCORECARDS_PER_RUN;
+  live.meta.lastRun = {
+    seriesInfoCalls: 0,
+    scorecardCalls: 0,
+    backlogProcessed: 0,
+    backlogRemaining: 0,
+    liveOverlayFetched: false,
+    liveOverlayReused: false,
+    liveOverlaySkippedReason: null
+  };
+
+  const currentMs = nowMs();
+  const decision = decideRefreshMode(live, currentMs);
   live.meta.scheduler.lastDecision = { at: isoNow(), ...decision };
+
   if (!decision.shouldRefresh) {
     console.log(`Skip: ${decision.reason}`);
     return;
   }
 
   const seriesJson = await fetchJson(SERIES_INFO_URL);
+  live.meta.lastRun.seriesInfoCalls = 1;
+
   const matchList = safeArray(seriesJson.data?.matchList).map(toMinimalMatch);
   live.meta.cache.matchList = matchList;
   live.meta.scheduler.lastSeriesInfoAt = isoNow();
+
   if (decision.mode === 'quiet_window') {
     live.meta.scheduler.quietRefreshesUsed += 1;
     live.meta.scheduler.lastQuietRefreshAt = isoNow();
@@ -367,29 +560,68 @@ async function main() {
   }
 
   const processedIds = new Set(live.meta.processedMatchIds || []);
-  const finalizedAgg = live.meta.aggregates || createEmptyLive().meta.aggregates;
+  const finalizedAgg = live.meta.aggregates || createEmptyAggregates();
 
   const endedBacklog = endedUnprocessedMatches(matchList, live.meta.processedMatchIds);
+  const backlogToProcess = endedBacklog.slice(0, MAX_BACKLOG_SCORECARDS_PER_RUN);
+  const backlogRemaining = Math.max(0, endedBacklog.length - backlogToProcess.length);
   const activeMatch = liveMatchCandidate(matchList);
 
-  for (const match of endedBacklog) {
+  for (const match of backlogToProcess) {
     const scorecard = await processScorecard(match.id);
-    applyScorecardToAggregates(finalizedAgg, scorecard);
+    live.meta.lastRun.scorecardCalls += 1;
+    applyScorecardToAggregates(finalizedAgg, scorecard, { isFinal: true });
     processedIds.add(match.id);
+    live.meta.lastRun.backlogProcessed += 1;
+  }
+
+  live.meta.lastRun.backlogRemaining = backlogRemaining;
+  if (backlogToProcess.length > 0) {
+    live.meta.scorecardBudget.lastBacklogProcessAt = isoNow();
   }
 
   let overlayAgg = null;
-  if (activeMatch && !processedIds.has(activeMatch.id)) {
+  const liveScorecardDecision = shouldFetchLiveScorecard(live, activeMatch, currentMs);
+
+  if (activeMatch && !processedIds.has(activeMatch.id) && liveScorecardDecision.fetch) {
     const scorecard = await processScorecard(activeMatch.id);
-    overlayAgg = createEmptyLive().meta.aggregates;
-    applyScorecardToAggregates(overlayAgg, scorecard);
-    live.meta.liveOverlay = { matchId: activeMatch.id, generatedAt: isoNow(), aggregates: overlayAgg };
+    live.meta.lastRun.scorecardCalls += 1;
+    live.meta.lastRun.liveOverlayFetched = true;
+    overlayAgg = createEmptyAggregates();
+    applyScorecardToAggregates(overlayAgg, scorecard, { isFinal: false });
+    live.meta.liveOverlay = {
+      matchId: activeMatch.id,
+      generatedAt: isoNow(),
+      aggregates: overlayAgg,
+      status: activeMatch.status,
+      source: `match_scorecard (${liveScorecardDecision.reason})`
+    };
+    live.meta.scorecardBudget.lastLiveScorecardAt = isoNow();
+    live.meta.scorecardBudget.lastLiveScorecardMatchId = activeMatch.id;
+  } else if (activeMatch && !processedIds.has(activeMatch.id)) {
+    overlayAgg = reusableOverlayAggregates(live, activeMatch);
+    live.meta.lastRun.liveOverlayReused = !!overlayAgg;
+    live.meta.lastRun.liveOverlaySkippedReason = liveScorecardDecision.reason;
+    live.meta.liveOverlay = {
+      matchId: activeMatch.id,
+      generatedAt: overlayAgg ? live.meta.liveOverlay.generatedAt : isoNow(),
+      aggregates: overlayAgg,
+      status: activeMatch.status,
+      source: overlayAgg ? 'reused cached live overlay' : 'series_info only'
+    };
   } else {
-    live.meta.liveOverlay = { matchId: null, generatedAt: isoNow(), aggregates: null };
+    live.meta.liveOverlay = {
+      matchId: null,
+      generatedAt: isoNow(),
+      aggregates: null,
+      status: null,
+      source: null
+    };
   }
 
   live.meta.processedMatchIds = [...processedIds];
   live.meta.aggregates = finalizedAgg;
+
   const combinedAgg = combineAggregates(finalizedAgg, overlayAgg);
   fillDerivedOutputs(live, combinedAgg);
 
@@ -408,14 +640,27 @@ async function main() {
     mvp: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
     uncappedMvp: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
     fairPlay: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
-    leastMvp: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' }
+    leastMvp: { ok: false, source: 'unsupported', error: 'Not computed yet from this source' },
+    costControl: {
+      ok: true,
+      source: 'worker',
+      method: 'cached completed matches forever, capped backlog catch-up, throttled live scorecards',
+      liveScorecardsEnabled: LIVE_SCORECARD_ENABLED,
+      liveScorecardIntervalMinutes: LIVE_SCORECARD_INTERVAL_MINUTES,
+      maxBacklogScorecardsPerRun: MAX_BACKLOG_SCORECARDS_PER_RUN,
+      scorecardCallsThisRun: live.meta.lastRun.scorecardCalls,
+      backlogRemaining
+    }
   };
 
   live.fetchedAt = isoNow();
-  live.scrapeStatus = `ok (${live.meta.processedMatchIds.length} processed matches${activeMatch ? ', live overlay active' : ''})`;
+  live.scrapeStatus = `ok (${live.meta.processedMatchIds.length} processed matches${activeMatch ? ', live match tracked' : ''}, ${live.meta.lastRun.scorecardCalls} scorecard call${live.meta.lastRun.scorecardCalls === 1 ? '' : 's'} this run${backlogRemaining ? `, ${backlogRemaining} backlog remaining` : ''})`;
 
   await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
-  console.log(`Updated live.json using CricketData. Processed matches: ${live.meta.processedMatchIds.length}`);
+
+  console.log(
+    `Updated live.json. Series info calls: ${live.meta.lastRun.seriesInfoCalls}. Scorecard calls: ${live.meta.lastRun.scorecardCalls}. Backlog processed: ${live.meta.lastRun.backlogProcessed}. Backlog remaining: ${backlogRemaining}. Live overlay: ${live.meta.liveOverlay.source || 'none'}.`
+  );
 }
 
 main().catch((error) => {
