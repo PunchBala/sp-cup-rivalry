@@ -448,6 +448,34 @@
       return idx >= 0 ? idx + 1 : null;
     }
 
+    function trackingRankingForLive(live){
+      const extended = Array.isArray(live?.extendedRanking) ? live.extendedRanking : [];
+      if (extended.length) return extended;
+      return Array.isArray(live?.ranking) ? live.ranking : [];
+    }
+
+    function describePickLiveState(category, pick, live, explicitRank){
+      const trackingRanking = trackingRankingForLive(live);
+      const rank = explicitRank || (trackingRanking.length ? rankOf(pick, trackingRanking) : null);
+
+      if (category.type === 'title') {
+        if (live?.winner && matchesPick(pick, live.winner)) return 'Live: winner';
+        if (Array.isArray(live?.finalists) && live.finalists.some(name => matchesPick(name, pick))) return 'Live: finalist';
+        if (Array.isArray(live?.playoffs) && live.playoffs.some(name => matchesPick(name, pick))) return 'Live: playoffs';
+        if (rank) return `Live: #${rank}`;
+        const hasTitleBoard = Boolean(live?.winner) || (Array.isArray(live?.finalists) && live.finalists.length) || (Array.isArray(live?.playoffs) && live.playoffs.length) || trackingRanking.length;
+        return hasTitleBoard ? 'Live: outside frame' : 'Live: waiting';
+      }
+
+      if (rank) return `Live: #${rank}`;
+
+      if ((category.type === 'winner' || category.type === 'winner_better') && live?.winner) {
+        return matchesPick(pick, live.winner) ? 'Live: current leader' : 'Live: trailing';
+      }
+
+      return trackingRanking.length ? 'Live: unranked' : 'Live: waiting';
+    }
+
     function scoreWinnerCategory(pickA, pickB, actualWinner){
       const aWin = actualWinner && matchesPick(pickA, actualWinner);
       const bWin = actualWinner && matchesPick(pickB, actualWinner);
@@ -633,10 +661,15 @@
     function computeMatchup(matchup){
       const rows = CATEGORIES.map(category => {
         const result = getCategoryResult(category, matchup);
+        const pickA = matchup.a.picks[category.key] || '—';
+        const pickB = matchup.b.picks[category.key] || '—';
+        const live = LIVE_2026[category.key] || {};
         return {
           category,
-          pickA: matchup.a.picks[category.key] || '—',
-          pickB: matchup.b.picks[category.key] || '—',
+          pickA,
+          pickB,
+          pickALiveState: describePickLiveState(category, pickA, live, result.rankA),
+          pickBLiveState: describePickLiveState(category, pickB, live, result.rankB),
           a: result.a,
           b: result.b,
           note: result.note
@@ -835,8 +868,8 @@
                 : r.category.type === 'better_rank' ? 'Better prediction category'
                 : 'Winner-takes-points category'
               }</div></td>
-              <td class="pick">${escapeHtml(r.pickA)}</td>
-              <td class="pick">${escapeHtml(r.pickB)}</td>
+              <td class="pick">${escapeHtml(r.pickA)}<div class="small" style="margin-top:6px">${escapeHtml(r.pickALiveState || 'Live: waiting')}</div></td>
+              <td class="pick">${escapeHtml(r.pickB)}<div class="small" style="margin-top:6px">${escapeHtml(r.pickBLiveState || 'Live: waiting')}</div></td>
               <td class="mono">${r.a} - ${r.b}</td>
               <td>${r.a===r.b ? '<span class=\"status-chip status-tie\">Tied</span>' : r.a>r.b ? `<span class=\"status-chip status-good\">${escapeHtml(matchup.a.name)}</span>` : `<span class=\"status-chip status-bad\">${escapeHtml(matchup.b.name)}</span>`}</td>
               <td class="small">${escapeHtml(r.note)}</td>
