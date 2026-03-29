@@ -344,47 +344,49 @@ function resolveCricmetricPlayerName(rawName, agg) {
   return titleCaseName(trimmed);
 }
 
-function parseHtmlTableRows(html) {
-  const tables = [...String(html || '').matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)];
-  for (const tableMatch of tables) {
-    const tableHtml = tableMatch[1];
-    const rowMatches = [...tableHtml.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)];
-    const rows = rowMatches.map((row) => {
-      const cells = [...row[1].matchAll(/<(td|th)\b[^>]*>([\s\S]*?)<\/\1>/gi)].map((cell) => stripTags(cell[2]));
-      return cells.filter((cell) => cell !== '');
-    }).filter((cells) => cells.length);
-    if (rows.length) return rows;
+function extractCricmetricLeadersPath(pageHtml) {
+  const html = String(pageHtml || '');
+  const patterns = [
+    /url_string\s*=\s*["']([^"']*\/jscripts\/leadersdata\.py[^"']*role=Bowling[^"']*series=ipl2026[^"']*)["']/i,
+    /url_string\s*=\s*["']([^"']*\/jscripts\/leadersdata\.py[^"']*series=ipl2026[^"']*role=Bowling[^"']*)["']/i,
+    /(["'])(\/jscripts\/leadersdata\.py\?[^"']*series=ipl2026[^"']*role=Bowling[^"']*)/i,
+    /(["'])(\/jscripts\/leadersdata\.py\?[^"']*role=Bowling[^"']*series=ipl2026[^"']*)/i
+  ];
+
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    if (match?.[1]) return match[1];
+    if (match?.[2]) return match[2];
   }
-  return [];
+
+  return null;
 }
 
-function parsePipeTableRows(text) {
-  const lines = String(text || '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-  return lines
-    .filter((line) => line.includes('|'))
-    .map((line) => line.split('|').map((cell) => stripTags(cell)).filter(Boolean))
-    .filter((cells) => cells.length >= 3);
+function absoluteCricmetricUrl(urlOrPath) {
+  const raw = String(urlOrPath || '').trim();
+  if (!raw) return '';
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (raw.startsWith('//')) return `https:${raw}`;
+  if (raw.startsWith('/')) return `https://www.cricmetric.com${raw}`;
+  return `https://www.cricmetric.com/${raw.replace(/^\.\//, '')}`;
 }
 
-function rowsToDotsPayload(rows, agg) {
-  if (!rows.length) return null;
+function rowsToDotsPayloadFromGoogleTable(jsonData, agg) {
+  const cols = safeArray(jsonData?.cols);
+  const rows = safeArray(jsonData?.rows);
+  if (!cols.length || !rows.length) return null;
 
-  const headerIndex = rows.findIndex((cells) => {
-    const normalized = cells.map((cell) => normalizeLookupName(cell));
-    return normalized.includes('player') && normalized.includes('dots');
-  });
-  if (headerIndex < 0) return null;
-
-  const headers = rows[headerIndex].map((cell) => normalizeLookupName(cell));
-  const playerIdx = headers.indexOf('player');
-  const dotsIdx = headers.indexOf('dots');
+  const headers = cols.map((col) => normalizeLookupName(col?.label || col?.id || ''));
+  const playerIdx = headers.findIndex((header) => header === 'player');
+  const dotsIdx = headers.findIndex((header) => header === 'dots');
   if (playerIdx < 0 || dotsIdx < 0) return null;
 
   const values = {};
-  for (const cells of rows.slice(headerIndex + 1)) {
-    if (cells.length <= Math.max(playerIdx, dotsIdx)) continue;
-    const rawPlayer = cells[playerIdx];
-    const dotsValue = Number.parseInt(String(cells[dotsIdx] || '').replace(/[^0-9-]/g, ''), 10);
+  for (const row of rows) {
+    const cells = safeArray(row?.c);
+    const rawPlayer = cells[playerIdx]?.f ?? cells[playerIdx]?.v ?? '';
+    const rawDots = cells[dotsIdx]?.v ?? cells[dotsIdx]?.f ?? '';
+    const dotsValue = Number.parseInt(String(rawDots || '').replace(/[^0-9-]/g, ''), 10);
     if (!rawPlayer || !Number.isFinite(dotsValue)) continue;
     const player = resolveCricmetricPlayerName(rawPlayer, agg);
     if (!player) continue;
@@ -399,27 +401,31 @@ function rowsToDotsPayload(rows, agg) {
   return { ranking: ordered.slice(0, 10), extendedRanking: ordered, values };
 }
 
-function parseCricmetricDots(text, agg) {
-  return rowsToDotsPayload(parseHtmlTableRows(text), agg) || rowsToDotsPayload(parsePipeTableRows(text), agg);
-}
-
 async function fetchCricmetricDots(agg) {
-  const directUrl = CRICMETRIC_BOWLING_URL.replace(/#$/, '');
-  const proxyUrl = `https://r.jina.ai/http://${directUrl.replace(/^https?:\/\//, '')}`;
-  const attempts = [
-    { url: directUrl, source: 'cricmetric-direct' },
-    { url: proxyUrl, source: 'cricmetric-via-jina' }
+  const directPageUrl = CRICMETRIC_BOWLING_URL.replace(/#$/, '');
+  const proxyPageUrl = `https://r.jina.ai/http://${directPageUrl.replace(/^https?:\/\//, '')}`;
+  const pageAttempts = [
+    { url: directPageUrl, source: 'cricmetric-page-direct' },
+    { url: proxyPageUrl, source: 'cricmetric-page-via-jina' }
   ];
 
   const errors = [];
-  for (const attempt of attempts) {
+  for (const attempt of pageAttempts) {
     try {
-      const text = await fetchText(attempt.url);
-      const parsed = parseCricmetricDots(text, agg);
-      if (parsed?.extendedRanking?.length) {
-        return { ...parsed, source: attempt.source };
+      const pageHtml = await fetchText(attempt.url);
+      const leadersPath = extractCricmetricLeadersPath(pageHtml);
+      if (!leadersPath) {
+        errors.push(`${attempt.source}: leadersdata-url-not-found`);
+        continue;
       }
-      errors.push(`${attempt.source}: table-not-found`);
+
+      const leadersUrl = absoluteCricmetricUrl(leadersPath);
+      const leadersJson = await fetchJson(leadersUrl);
+      const parsed = rowsToDotsPayloadFromGoogleTable(leadersJson, agg);
+      if (parsed?.extendedRanking?.length) {
+        return { ...parsed, source: `${attempt.source}:leadersdata` };
+      }
+      errors.push(`${attempt.source}: dots-data-not-found`);
     } catch (error) {
       errors.push(`${attempt.source}: ${error.message}`);
     }
