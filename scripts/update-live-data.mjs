@@ -34,6 +34,31 @@ const IPLT20_FAIRPLAY_ENABLED = parseEnvBool(process.env.IPLT20_FAIRPLAY_ENABLED
 const IPLT20_FAIRPLAY_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/2026-fairplayList.js?callback=onFairplayAward';
 const AGGREGATE_SCHEMA_VERSION = 2;
 const LEAST_MVP_MIN_MATCHES = 5;
+const UNCAPPED_MVP_PLAYERS = [
+  'Ayush Mhatre', 'Kartik Sharma', 'Urvil Patel', 'Ramakrishna Ghosh', 'Prashant Veer', 'Aman Khan',
+  'Anshul Kamboj', 'Mukesh Choudhary', 'Shreyas Gopal', 'Gurjapneet Singh', 'Mahendra Singh Dhoni',
+  'Sahil Parakh', 'Abishek Porel', 'Sameer Rizvi', 'Ashutosh Sharma', 'Vipraj Nigam', 'Ajay Mandal',
+  'Tripurana Vijay', 'Madhav Tiwari', 'Auqib Nabi',
+  'Kumar Kushagra', 'Anuj Rawat', 'Nishant Sindhu', 'Mohd. Arshad Khan', 'Rahul Tewatia', 'Shahrukh Khan',
+  'Manav Suthar', 'Gurnoor Singh Brar', 'Ashok Sharma', 'Kulwant Khejroliya',
+  'Angkrish Raghuvanshi', 'Tejasvi Singh', 'Anukul Roy', 'Sarthak Ranjan', 'Daksh Kamra', 'Vaibhav Arora',
+  'Kartik Tyagi', 'Prashant Solanki', 'Saurabh Dubey',
+  'Himmat Singh', 'Mukul Choudhary', 'Akshat Raghuwanshi', 'Abdul Samad', 'Arshin Kulkarni', 'Ayush Badoni',
+  'M. Siddharth', 'Digvesh Singh', 'Akash Singh', 'Prince Yadav', 'Arjun Tendulkar', 'Naman Tiwari',
+  'Mohsin Khan',
+  'Robin Minz', 'Danish Malewar', 'Naman Dhir', 'Raj Angad Bawa', 'Atharva Ankolekar', 'Mayank Rawat',
+  'Ashwani Kumar', 'Raghu Sharma', 'Mohammad Izhar',
+  'Nehal Wadhera', 'Vishnu Vinod', 'Harnoor Pannu', 'Pyla Avinash', 'Prabhsimran Singh', 'Shashank Singh',
+  'Harpreet Brar', 'Priyansh Arya', 'Musheer Khan', 'Suryansh Shedge', 'Vyshak Vijaykumar', 'Yash Thakur',
+  'Pravin Dubey', 'Vishal Nishad',
+  'Shubham Dubey', 'Vaibhav Suryavanshi', 'Ravi Singh', 'Aman Rao Perala', 'Yudhvir Singh Charak',
+  'Sushant Mishra', 'Yash Raj Punja', 'Vignesh Puthur', 'Brijesh Sharma',
+  'Swapnil Singh', 'Satvik Deswal', 'Mangesh Yadav', 'Vicky Ostwal', 'Vihaan Malhotra', 'Kanishk Chouhan',
+  'Rasikh Dar', 'Suyash Sharma', 'Abhinandan Singh', 'Yash Dayal',
+  'Aniket Verma', 'Smaran Ravichandran', 'Salil Arora', 'Harsh Dubey', 'Shivang Kumar', 'Krains Fuletra',
+  'Zeeshan Ansari', 'Sakib Hussain', 'Onkar Tarmale', 'Amit Kumar', 'Praful Hinge'
+];
+const UNCAPPED_MVP_PLAYER_KEYS = new Set(UNCAPPED_MVP_PLAYERS.map((name) => normalizePlayerKey(name)));
 
 const CRICMETRIC_MANUAL_NAME_ALIASES = {
   // Keep this tiny. Only use manual overrides for genuinely weird edge cases
@@ -54,6 +79,7 @@ function isoNow() { return new Date().toISOString(); }
 function nowMs() { return Date.now(); }
 function safeArray(v) { return Array.isArray(v) ? v : []; }
 function normalizeName(name) { return String(name || '').replace(/\s+/g, ' ').trim(); }
+function normalizePlayerKey(name) { return normalizeName(name).toLowerCase().replace(/\./g, '').trim(); }
 function minutesSince(iso, currentMs = Date.now()) { return iso ? (currentMs - Date.parse(iso)) / 60000 : Infinity; }
 
 function londonDayKey(ms = Date.now()) {
@@ -974,11 +1000,19 @@ function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = nul
       economy: { lt6: 8, lt7: 5, lt8: 2, gt10: -5, minBalls: 12 }
     }
   };
+
+  const uncappedMvpExtendedRanking = mvpExtendedRanking.filter((player) => UNCAPPED_MVP_PLAYER_KEYS.has(normalizePlayerKey(player)));
+  const uncappedMvpValues = Object.fromEntries(
+    uncappedMvpExtendedRanking
+      .filter((player) => mvp.values && mvp.values[player])
+      .map((player) => [player, mvp.values[player]])
+  );
+
   live.uncappedMvp = {
-    ranking: mvpExtendedRanking.slice(0, 10),
-    extendedRanking: mvpExtendedRanking,
-    values: mvp.values,
-    assumption: 'Picks are already verified uncapped, so scoring compares their positions in the custom MVP ranking only'
+    ranking: uncappedMvpExtendedRanking.slice(0, 10),
+    extendedRanking: uncappedMvpExtendedRanking,
+    values: uncappedMvpValues,
+    source: 'custom MVP ranking filtered to user-provided uncapped player pool'
   };
 
   const fairPlay = fairPlayPayload?.extendedRanking?.length
@@ -1283,7 +1317,7 @@ async function main() {
     tableBottom: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     mostDots: dotsReport,
     mvp: { ok: true, source: 'CricketData + Cricmetric', method: 'custom formula using runs, sixes, wickets, dot balls, catches, strike-rate bonus, economy bonus and milestone bonuses' },
-    uncappedMvp: { ok: true, source: 'custom MVP ranking', method: 'compares already-verified uncapped picks by their positions in the custom MVP ranking' },
+    uncappedMvp: { ok: true, source: 'custom MVP ranking', method: 'filtered to the provided uncapped player pool, then compares picks by their positions in the custom MVP ranking' },
     fairPlay: fairPlayReport,
     leastMvp: { ok: true, source: 'custom MVP ranking', method: `lower in custom MVP ranking wins, filtered to players with minimum ${LEAST_MVP_MIN_MATCHES} matches` },
     costControl: {
