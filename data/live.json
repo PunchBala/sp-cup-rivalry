@@ -2,7 +2,7 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-03-29T14:05:04.758Z",
+  "fetchedAt": "2026-03-29T15:48:27.567Z",
   "scrapeStatus": "ok (1 processed matches, live match tracked, 1 scorecard call this run)",
   "scrapeReport": {
     "orangeCap": {
@@ -76,7 +76,7 @@
       "source": "IPLT20 official fairplay feed",
       "method": "parsed JSONP fairplayTotal table from Sports Mechanic stats feed",
       "rows": 2,
-      "updatedAt": "29-03-2026 : 13:53:36"
+      "updatedAt": "29-03-2026 : 20:00:01"
     },
     "leastMvp": {
       "ok": true,
@@ -99,18 +99,18 @@
       "dayKey": "2026-03-29",
       "quietRefreshesUsed": 3,
       "lastQuietRefreshAt": "2026-03-29T11:05:19.184Z",
-      "lastLiveRefreshAt": "2026-03-29T14:05:03.816Z",
-      "lastSeriesInfoAt": "2026-03-29T14:05:03.816Z",
+      "lastLiveRefreshAt": "2026-03-29T15:48:26.601Z",
+      "lastSeriesInfoAt": "2026-03-29T15:48:26.601Z",
       "lastDecision": {
-        "at": "2026-03-29T14:05:03.232Z",
+        "at": "2026-03-29T15:48:26.094Z",
         "shouldRefresh": true,
         "mode": "live_window",
         "reason": "within game window"
       },
-      "nextPlannedRefreshAt": "2026-03-29T14:10:03.816Z",
+      "nextPlannedRefreshAt": "2026-03-29T15:53:26.601Z",
       "nextPlannedMode": "live_window",
       "nextPlannedReason": "within game window",
-      "nextPlannedCalculatedAt": "2026-03-29T14:05:03.894Z"
+      "nextPlannedCalculatedAt": "2026-03-29T15:48:26.666Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -846,7 +846,7 @@
         {
           "id": "e02475c1-8f9a-4915-a9e8-d4dbc3441c96",
           "name": "Mumbai Indians vs Kolkata Knight Riders, 2nd Match, Indian Premier League 2026",
-          "status": "Mumbai Indians opt to bowl",
+          "status": "Innings Break",
           "dateTimeGMT": "2026-03-29T14:00:00",
           "teams": [
             "Mumbai Indians",
@@ -1272,9 +1272,9 @@
     },
     "liveOverlay": {
       "matchId": "e02475c1-8f9a-4915-a9e8-d4dbc3441c96",
-      "generatedAt": "2026-03-29T14:05:04.108Z",
+      "generatedAt": "2026-03-29T15:48:26.892Z",
       "aggregates": null,
-      "status": "Mumbai Indians opt to bowl",
+      "status": "Innings Break",
       "source": "series_info only"
     },
     "scorecardBudget": {
@@ -2587,7 +2587,7 @@
         }
       }
     },
-    "updatedAt": "29-03-2026 : 13:53:36",
+    "updatedAt": "29-03-2026 : 20:00:01",
     "source": "IPLT20 official fairplay feed"
   },
   "highestScoreTeam": {
