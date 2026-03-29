@@ -1,8 +1,8 @@
 {
   "season": 2026,
   "provider": "data/live.json",
-  "scrapeStatus": "partial (3 ok, 9 failed)",
-  "fetchedAt": "2026-03-28T23:28:48.227Z",
+  "scrapeStatus": "partial (2 ok, 10 failed)",
+  "fetchedAt": "2026-03-29T00:03:10.058Z",
   "scrapeReport": {
     "orangeCap": {
       "ok": false,
@@ -45,8 +45,8 @@
       "source": "https://www.iplt20.com/stats/2026"
     },
     "bestBowlingStrikeRate": {
-      "ok": true,
-      "count": 15,
+      "ok": false,
+      "error": "Could not select metric: Best Bowling Strike-Rate",
       "source": "https://www.iplt20.com/stats/2026"
     },
     "titleWinner": {
@@ -147,40 +147,8 @@
     "extendedRanking": []
   },
   "bestBowlingStrikeRate": {
-    "ranking": [
-      "Ishan Kishan",
-      "Virat Kohli",
-      "Devdutt Padikkal",
-      "Aniket Verma",
-      "Rajat Patidar",
-      "Heinrich Klaasen",
-      "Tim David",
-      "Travis Head",
-      "Salil Arora",
-      "Phil Salt",
-      "Abhishek Sharma",
-      "David Payne",
-      "Jaydev Unadkat",
-      "Harsh Dubey",
-      "Nitish Kumar Reddy"
-    ],
-    "extendedRanking": [
-      "Ishan Kishan",
-      "Virat Kohli",
-      "Devdutt Padikkal",
-      "Aniket Verma",
-      "Rajat Patidar",
-      "Heinrich Klaasen",
-      "Tim David",
-      "Travis Head",
-      "Salil Arora",
-      "Phil Salt",
-      "Abhishek Sharma",
-      "David Payne",
-      "Jaydev Unadkat",
-      "Harsh Dubey",
-      "Nitish Kumar Reddy"
-    ]
+    "ranking": [],
+    "extendedRanking": []
   },
   "mostCatches": {
     "ranking": [],
