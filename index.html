@@ -112,6 +112,12 @@
     .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-weight:800}
     .insight{padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03);margin-bottom:10px;line-height:1.45}
     .roast{background:linear-gradient(180deg, rgba(255,123,150,.08), rgba(124,196,255,.09))}
+    .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .section-head .section-title{margin-bottom:0}
+    .mode-toggle{display:flex;gap:6px;flex-wrap:wrap}
+    .mode-btn{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800;cursor:pointer;transition:.15s ease}
+    .mode-btn:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.35);color:var(--text)}
+    .mode-btn.active{background:linear-gradient(180deg,#3a2540,#2a1a2f);border-color:rgba(255,127,150,.45);color:#ffd7df;box-shadow:0 8px 18px rgba(0,0,0,.18)}
     .footer-note{margin-top:14px;color:var(--muted);font-size:12px;line-height:1.5}
     .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
     .legend .pill{font-size:12px}
@@ -179,8 +185,8 @@
         <div class="table-wrap"><table id="breakdownTable"></table></div>
       </div>
       <div class="span-4" style="display:grid;gap:16px">
-        <div class="card"><div class="section-title">Smart insights</div><div id="insights"></div></div>
-        <div class="card roast"><div class="section-title">Roast corner</div><div id="roasts"></div></div>
+        <div class="card"><div class="section-head"><div class="section-title">Smart insights</div></div><div id="insights"></div></div>
+        <div class="card roast"><div class="section-head"><div class="section-title">Roast corner</div><div class="mode-toggle" id="roastToggle"><button class="mode-btn" data-mode="banter">Banter</button><button class="mode-btn" data-mode="extreme">Extreme roast</button></div></div><div id="roasts"></div></div>
       </div>
     </div>
   </div>
@@ -478,6 +484,175 @@
       return trackingRanking.length ? 'Live: unranked' : 'Live: waiting';
     }
 
+
+    function getAggregates(){
+      return LIVE_2026?.meta?.aggregates || {};
+    }
+
+    function findMatchingKeyInObject(obj, pick){
+      const source = obj && typeof obj === 'object' ? obj : {};
+      return Object.keys(source).find(name => matchesPick(name, pick)) || null;
+    }
+
+    function valueForPickFromObject(obj, pick, nestedKey = null){
+      const key = findMatchingKeyInObject(obj, pick);
+      if (!key) return null;
+      const value = obj[key];
+      if (nestedKey && value && typeof value === 'object') {
+        return value[nestedKey] ?? null;
+      }
+      return value;
+    }
+
+    function unitLabel(unit, amount){
+      return `${amount} ${unit}${Math.abs(amount) === 1 ? '' : 's'}`;
+    }
+
+    function oversLabelFromBalls(balls){
+      const whole = Math.floor(balls / 6);
+      const remainder = balls % 6;
+      return remainder ? `${whole}.${remainder} overs` : `${whole} overs`;
+    }
+
+    function categoryValueConfig(categoryKey){
+      const agg = getAggregates();
+      switch (categoryKey) {
+        case 'orangeCap': return { map: agg.battingRuns || {}, unit: 'run', minInteresting: 1 };
+        case 'mostSixes': return { map: agg.battingSixes || {}, unit: 'six', minInteresting: 1 };
+        case 'purpleCap': return { map: agg.bowlingWickets || {}, unit: 'wicket', minInteresting: 1 };
+        case 'mostDots': return { map: LIVE_2026?.mostDots?.values || agg.bowlingDots || {}, unit: 'dot ball', minInteresting: 1 };
+        case 'mostCatches': return { map: agg.catches || {}, unit: 'catch', minInteresting: 1 };
+        case 'mvp': return { map: LIVE_2026?.mvp?.values || {}, unit: 'MVP point', nestedKey: 'score', minInteresting: 1 };
+        case 'uncappedMvp': return { map: LIVE_2026?.mvp?.values || {}, unit: 'MVP point', nestedKey: 'score', minInteresting: 1 };
+        case 'leastMvp': return { map: LIVE_2026?.mvp?.values || {}, unit: 'MVP point', nestedKey: 'score', minInteresting: 1 };
+        default: return { map: {}, unit: 'point', minInteresting: 1 };
+      }
+    }
+
+    function numericCategoryValue(categoryKey, pick){
+      const config = categoryValueConfig(categoryKey);
+      const raw = valueForPickFromObject(config.map, pick, config.nestedKey || null);
+      if (raw === null || raw === undefined || raw === '') return null;
+      const num = Number(raw);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function buildClosestContestInsight(rows){
+      const candidates = [];
+      for (const row of rows) {
+        const live = LIVE_2026[row.category.key] || {};
+        const ranking = trackingRankingForLive(live);
+        const rankA = rankOf(row.pickA, ranking);
+        const rankB = rankOf(row.pickB, ranking);
+        if (rankA && rankB) {
+          candidates.push({
+            weight: Math.abs(rankA - rankB),
+            message: `Closest duel: ${row.category.label} is still alive — ${row.pickA} sits #${rankA} and ${row.pickB} #${rankB}. One sharp match swings the bragging rights.`
+          });
+          continue;
+        }
+
+        const valueA = numericCategoryValue(row.category.key, row.pickA);
+        const valueB = numericCategoryValue(row.category.key, row.pickB);
+        const config = categoryValueConfig(row.category.key);
+        if (valueA !== null && valueB !== null && (valueA > 0 || valueB > 0)) {
+          const gap = Math.abs(valueA - valueB);
+          if (gap <= 20) {
+            candidates.push({
+              weight: gap + 0.5,
+              message: `Closest raw chase: ${row.category.label} — ${row.pickA} has ${valueA}, ${row.pickB} has ${valueB}. That is only ${unitLabel(config.unit, gap)} between them.`
+            });
+          }
+        }
+      }
+      candidates.sort((a,b) => a.weight - b.weight);
+      return candidates[0]?.message || null;
+    }
+
+    function buildThresholdPushes(matchup){
+      const pushes = [];
+      const seen = new Set();
+      const top5Categories = ['orangeCap','mostSixes','purpleCap','mostDots','mostCatches','mvp','uncappedMvp'];
+      for (const categoryKey of top5Categories) {
+        const live = LIVE_2026[categoryKey] || {};
+        const ranking = trackingRankingForLive(live);
+        if (!ranking.length) continue;
+        const config = categoryValueConfig(categoryKey);
+        const scoringIndex = Math.min(4, ranking.length - 1);
+        const boardIndex = Math.min(9, ranking.length - 1);
+        const scoringValue = numericCategoryValue(categoryKey, ranking[scoringIndex]);
+        const boardValue = numericCategoryValue(categoryKey, ranking[boardIndex]);
+        for (const pick of [matchup.a.picks[categoryKey], matchup.b.picks[categoryKey]]) {
+          const key = `${categoryKey}:${pick}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          const rank = rankOf(pick, ranking);
+          const currentValue = numericCategoryValue(categoryKey, pick);
+          if (currentValue === null || currentValue < (config.minInteresting || 1)) continue;
+          if (!rank && boardValue !== null && boardValue > currentValue) {
+            const need = Math.max(1, boardValue - currentValue + 1);
+            pushes.push({ priority: need, message: `${pick} is off the ${CATEGORIES.find(c => c.key === categoryKey)?.label || categoryKey} board for now, but ${unitLabel(config.unit, need)} gets them ranked and makes that front live.` });
+          } else if (rank && rank > 5 && scoringValue !== null && scoringValue >= currentValue) {
+            const need = Math.max(1, scoringValue - currentValue + 1);
+            pushes.push({ priority: need + 5, message: `${pick} is parked at #${rank} for ${CATEGORIES.find(c => c.key === categoryKey)?.label || categoryKey}; ${unitLabel(config.unit, need)} more gets into the scoring zone.` });
+          } else if (rank && rank > 1) {
+            const leaderValue = numericCategoryValue(categoryKey, ranking[0]);
+            if (leaderValue !== null && leaderValue > currentValue) {
+              const need = Math.max(1, leaderValue - currentValue);
+              if (need <= 20) pushes.push({ priority: need + 10, message: `${pick} is already on the ${CATEGORIES.find(c => c.key === categoryKey)?.label || categoryKey} board at #${rank}; ${unitLabel(config.unit, need)} closes on the leader.` });
+            }
+          }
+        }
+      }
+
+      const agg = getAggregates();
+      for (const pick of [matchup.a.picks.striker, matchup.b.picks.striker]) {
+        const runs = Number(valueForPickFromObject(agg.battingRuns || {}, pick) || 0);
+        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.striker || {}));
+        if (!rank && runs < 100) {
+          const need = 100 - runs;
+          pushes.push({ priority: need + 20, message: `${pick} still needs ${unitLabel('run', need)} just to qualify for Striker, so that category is still loading its drama.` });
+        }
+      }
+
+      for (const pick of [matchup.a.picks.bestBowlingStrikeRate, matchup.b.picks.bestBowlingStrikeRate]) {
+        const balls = Number(valueForPickFromObject(agg.bowlingBalls || {}, pick) || 0);
+        const wickets = Number(valueForPickFromObject(agg.bowlingWickets || {}, pick) || 0);
+        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.bestBowlingStrikeRate || {}));
+        if (!rank && balls < 72) {
+          const need = 72 - balls;
+          pushes.push({ priority: need + 25, message: wickets > 0 ? `${pick} needs ${need} more balls (${oversLabelFromBalls(need)}) to qualify for bowling strike rate.` : `${pick} needs ${need} more balls (${oversLabelFromBalls(need)}) and a wicket before bowling strike rate even wakes up.` });
+        }
+      }
+
+      for (const pick of [matchup.a.picks.leastMvp, matchup.b.picks.leastMvp]) {
+        const matches = Number(valueForPickFromObject(agg.playerMatches || {}, pick) || 0);
+        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.leastMvp || {}));
+        if (!rank && matches < 5) {
+          const need = 5 - matches;
+          pushes.push({ priority: need + 15, message: `${pick} still needs ${unitLabel('game', need)} before Least MVP becomes a real battlefield.` });
+        }
+      }
+
+      pushes.sort((a,b) => a.priority - b.priority);
+      return pushes.map(x => x.message);
+    }
+
+    function buildSwingPressureInsight(matchup, rows){
+      const deadRows = rows.filter(r => r.a === 0 && r.b === 0);
+      const vulnerable = deadRows.find(r => /unranked|outside frame/i.test(r.pickALiveState + r.pickBLiveState));
+      if (vulnerable) {
+        return `Hidden swing: ${vulnerable.category.label} is still 0-0, which means one decent outing from ${vulnerable.pickA} or ${vulnerable.pickB} can suddenly make this board look much less polite.`;
+      }
+      const swingRows = rows.filter(r => r.a !== r.b).sort((x,y) => Math.abs(y.a-y.b) - Math.abs(x.a-x.b));
+      if (swingRows.length) {
+        const top = swingRows[0];
+        const winner = top.a > top.b ? matchup.a.name : matchup.b.name;
+        return `Current pressure point: ${top.category.label} is where ${winner} is doing the most damage right now.`;
+      }
+      return null;
+    }
+
     function scoreWinnerCategory(pickA, pickB, actualWinner){
       const aWin = actualWinner && matchesPick(pickA, actualWinner);
       const bWin = actualWinner && matchesPick(pickB, actualWinner);
@@ -720,6 +895,7 @@
     }
 
     let activeId = MATCHUPS[0].id;
+    let roastMode = localStorage.getItem('spCupRoastMode') || 'banter';
 
     function renderTabs(){
       const el = document.getElementById('tabs');
@@ -728,6 +904,20 @@
       `).join('');
       el.querySelectorAll('.tab').forEach(btn => {
         btn.onclick = () => { activeId = btn.dataset.id; render(); };
+      });
+    }
+
+
+    function renderRoastToggle(){
+      const el = document.getElementById('roastToggle');
+      if (!el) return;
+      el.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === roastMode);
+        btn.onclick = () => {
+          roastMode = btn.dataset.mode;
+          localStorage.setItem('spCupRoastMode', roastMode);
+          render();
+        };
       });
     }
 
@@ -832,57 +1022,68 @@
       const scoredCatsB = rows.filter(r => r.b > r.a).length;
       const cleanHitsA = rows.filter(r => r.a >= 2 && r.a > r.b).length;
       const cleanHitsB = rows.filter(r => r.b >= 2 && r.b > r.a).length;
-      const unresolved = rows.filter(r => r.a === 0 && r.b === 0).length;
-      const swingRows = rows
-        .filter(r => r.a !== r.b)
-        .sort((x, y) => Math.abs(y.a - y.b) - Math.abs(x.a - x.b));
-
       const leader = totalA === totalB ? null : totalA > totalB ? matchup.a.name : matchup.b.name;
       const margin = Math.abs(totalA - totalB);
-
       const list = [];
 
       list.push(
         leader
-          ? `${leader} leads by ${margin} point${margin === 1 ? '' : 's'}.`
-          : `The scoreboard is tied. Nobody gets to act clever yet.`
+          ? `${leader} leads by ${margin} point${margin === 1 ? '' : 's'}, but the board split is only ${scoredCatsA}-${scoredCatsB} on fronts won. This is not over; it is just noisier for one side.`
+          : `Dead level overall. Both prediction sheets are currently walking around with equal swagger and equal risk.`
       );
 
-      list.push(
-        `${matchup.a.name} leads ${scoredCatsA} categor${scoredCatsA === 1 ? 'y' : 'ies'}; ${matchup.b.name} leads ${scoredCatsB}.`
-      );
+      const closest = buildClosestContestInsight(rows);
+      if (closest) list.push(closest);
 
-      list.push(
-        `Clean hits so far: ${matchup.a.name} ${cleanHitsA}, ${matchup.b.name} ${cleanHitsB}.`
-      );
+      const pushes = buildThresholdPushes(matchup).slice(0, 2);
+      list.push(...pushes);
 
-      if (swingRows.length) {
-        const topSwings = swingRows.slice(0, 2).map(r => {
-          const who = r.a > r.b ? matchup.a.name : matchup.b.name;
-          return `${r.category.label} (${who})`;
-        });
-        list.push(`Biggest live swing${topSwings.length === 1 ? '' : 's'}: ${topSwings.join(' and ')}.`);
-      } else {
-        list.push(`${unresolved} categor${unresolved === 1 ? 'y is' : 'ies are'} still sitting at 0-0.`);
+      const pressure = buildSwingPressureInsight(matchup, rows);
+      if (pressure) list.push(pressure);
+
+      if (list.length < 4) {
+        list.push(`Clean-hit count: ${matchup.a.name} has ${cleanHitsA}, ${matchup.b.name} has ${cleanHitsB}. Right now one hot evening can still vandalise the scoreboard.`);
       }
 
       document.getElementById('insights').innerHTML = list.slice(0, 4).map(x => `<div class="insight">${escapeHtml(x)}</div>`).join('');
     }
 
-    function renderRoasts(matchup, totalA, totalB){
+    function renderRoasts(matchup, rows, totalA, totalB){
       const a = matchup.a.name, b = matchup.b.name;
       const margin = Math.abs(totalA - totalB);
-      const winner = totalA > totalB ? a : b;
-      const loser = totalA > totalB ? b : a;
-      const lines = totalA === totalB ? [
-        `${a} and ${b} are level. Two masterplans, zero visible evidence so far.`,
-        `${a} talks like a selector and ${b} picks like a man arguing with destiny.`,
-        `This rivalry is tied, which means both sides are still one bad weekend away from becoming content.`
-      ] : [
-        `${loser} is ${margin} point${margin===1?'':'s'} behind and pretending it is all part of a long-term strategy.`,
-        `${winner} has the lead. ${loser} currently has explanations.`,
-        `${loser}'s prediction sheet is giving brave effort, loose suspension, and suspicious mileage.`
-      ];
+      const leader = totalA === totalB ? null : totalA > totalB ? a : b;
+      const loser = totalA === totalB ? null : totalA > totalB ? b : a;
+      const losingRows = totalA === totalB ? [] : rows.filter(r => leader === a ? r.b > r.a : r.a > r.b).sort((x, y) => Math.abs((leader === a ? y.b - y.a : y.a - y.b)) - Math.abs((leader === a ? x.b - x.a : x.a - x.b)));
+      const worstRow = losingRows[0] || rows.find(r => /unranked|waiting/i.test((leader === a ? r.pickBLiveState : r.pickALiveState) || ''));
+      const worstPick = worstRow ? (leader === a ? worstRow.pickB : worstRow.pickA) : null;
+      const worstState = worstRow ? (leader === a ? worstRow.pickBLiveState : worstRow.pickALiveState) : null;
+
+      let lines;
+      if (totalA === totalB) {
+        lines = roastMode === 'extreme' ? [
+          `${a} and ${b} are tied, which is perfect because both prediction sheets still look like they were signed off by confidence rather than evidence.`,
+          `This is level only because the chaos has not finished choosing its favourite victim yet.`,
+          `${a} is talking like a selector, ${b} is talking like an insider, and the board is politely unimpressed by both.`,
+          `One bad matchday from here and this turns from rivalry into public paperwork.`
+        ] : [
+          `${a} and ${b} are level. Two loud prediction sheets, one very patient scoreboard.`,
+          `This rivalry is tied, which means the banter market is open but the evidence market is still thin.`,
+          `${a} has theories, ${b} has theories, and the table is currently billing both by the hour.`
+        ];
+      } else if (roastMode === 'extreme') {
+        lines = [
+          `${loser} is ${margin} point${margin===1?'':'s'} behind and moving like a man who brought vibes to a data fight.`,
+          `${leader} brought analysis. ${loser} brought confidence and a prediction sheet with the structural integrity of wet cardboard.`,
+          worstRow ? `${loser}'s ${worstRow.category.label} call on ${worstPick} is currently ${String(worstState || 'nowhere').toLowerCase()}. That is not a pick. That is a missing persons report.` : `${loser}'s board currently looks like it was built from nostalgia, chaos, and one very reckless shrug.`,
+          `${leader} is farming points while ${loser} is still drafting an emotional support explanation.`
+        ];
+      } else {
+        lines = [
+          `${loser} is ${margin} point${margin===1?'':'s'} behind and already rehearsing the phrase “long season” in the mirror.`,
+          `${leader} has the scoreboard. ${loser} currently has interpretive analysis and selective optimism.`,
+          worstRow ? `${loser}'s shakiest scene right now is ${worstRow.category.label}: ${worstPick} is ${String(worstState || 'off the board').toLowerCase()}.` : `${loser}'s prediction sheet is giving brave effort, loose suspension, and suspicious mileage.`
+        ];
+      }
       document.getElementById('roasts').innerHTML = lines.map(x => `<div class="insight">${escapeHtml(x)}</div>`).join('');
     }
 
@@ -890,11 +1091,12 @@
       renderTabs();
       const matchup = MATCHUPS.find(m => m.id === activeId) || MATCHUPS[0];
       const { rows, totalA, totalB } = computeMatchup(matchup);
+      renderRoastToggle();
       renderScoreboard(matchup, totalA, totalB);
       renderNextMatch(matchup);
       renderBreakdown(matchup, rows);
       renderInsights(matchup, rows, totalA, totalB);
-      renderRoasts(matchup, totalA, totalB);
+      renderRoasts(matchup, rows, totalA, totalB);
 
       const frontsA = rows.filter(r => r.a > r.b).length;
       const frontsB = rows.filter(r => r.b > r.a).length;
