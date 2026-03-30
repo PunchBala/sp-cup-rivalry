@@ -468,28 +468,362 @@
     // Example expected shape for a top-5 category: { ranking: ['Player A','Player B','Player C','Player D','Player E'] }
     // Example winner category: { winner: 'MI' }
 
+    const SQUADS_2026 = {
+    "CSK": [
+        "Ruturaj Gaikwad",
+        "MS Dhoni",
+        "Sanju Samson",
+        "Dewald Brevis",
+        "Ayush Mhatre",
+        "Kartik Sharma",
+        "Sarfaraz Khan",
+        "Urvil Patel",
+        "Jamie Overton",
+        "Ramakrishna Ghosh",
+        "Prashant Veer",
+        "Matthew William Short",
+        "Aman Khan",
+        "Zak Foulkes",
+        "Shivam Dube",
+        "Khaleel Ahmed",
+        "Noor Ahmad",
+        "Anshul Kamboj",
+        "Mukesh Choudhary",
+        "Shreyas Gopal",
+        "Gurjapneet Singh",
+        "Akeal Hosein",
+        "Matt Henry",
+        "Rahul Chahar",
+        "Spencer Johnson"
+    ],
+    "DC": [
+        "KL Rahul",
+        "Karun Nair",
+        "David Miller",
+        "Ben Duckett",
+        "Pathum Nissanka",
+        "Sahil Parakh",
+        "Prithvi Shaw",
+        "Abishek Porel",
+        "Tristan Stubbs",
+        "Axar Patel",
+        "Sameer Rizvi",
+        "Ashutosh Sharma",
+        "Vipraj Nigam",
+        "Ajay Mandal",
+        "Tripurana Vijay",
+        "Madhav Tiwari",
+        "Nitish Rana",
+        "Mitchell Starc",
+        "T. Natarajan",
+        "Mukesh Kumar",
+        "Dushmantha Chameera",
+        "Auqib Nabi",
+        "Lungisani Ngidi",
+        "Kyle Jamieson",
+        "Kuldeep Yadav"
+    ],
+    "GT": [
+        "Shubman Gill",
+        "Jos Buttler",
+        "Kumar Kushagra",
+        "Anuj Rawat",
+        "Tom Banton",
+        "Glenn Phillips",
+        "Sai Sudharsan",
+        "Nishant Sindhu",
+        "Washington Sundar",
+        "Mohd. Arshad Khan",
+        "Sai Kishore",
+        "Jayant Yadav",
+        "Jason Holder",
+        "Rahul Tewatia",
+        "Shahrukh Khan",
+        "Kagiso Rabada",
+        "Mohammed Siraj",
+        "Prasidh Krishna",
+        "Manav Suthar",
+        "Gurnoor Singh Brar",
+        "Ishant Sharma",
+        "Ashok Sharma",
+        "Luke Wood",
+        "Kulwant Khejroliya",
+        "Rashid Khan"
+    ],
+    "KKR": [
+        "Ajinkya Rahane",
+        "Rinku Singh",
+        "Angkrish Raghuvanshi",
+        "Manish Pandey",
+        "Finn Allen",
+        "Tejasvi Singh",
+        "Rahul Tripathi",
+        "Tim Seifert",
+        "Rovman Powell",
+        "Anukul Roy",
+        "Cameron Green",
+        "Sarthak Ranjan",
+        "Daksh Kamra",
+        "Rachin Ravindra",
+        "Ramandeep Singh",
+        "Sunil Narine",
+        "Blessing Muzarabani",
+        "Vaibhav Arora",
+        "Matheesha Pathirana",
+        "Kartik Tyagi",
+        "Prashant Solanki",
+        "Saurabh Dubey",
+        "Navdeep Saini",
+        "Umran Malik",
+        "Varun Chakaravarthy"
+    ],
+    "LSG": [
+        "Rishabh Pant",
+        "Aiden Markram",
+        "Himmat Singh",
+        "Matthew Breetzke",
+        "Mukul Choudhary",
+        "Akshat Raghuwanshi",
+        "Josh Inglis",
+        "Nicholas Pooran",
+        "Mitchell Marsh",
+        "Abdul Samad",
+        "Shahbaz Ahamad",
+        "Arshin Kulkarni",
+        "Wanindu Hasaranga",
+        "Ayush Badoni",
+        "Mohammad Shami",
+        "Avesh Khan",
+        "M. Siddharth",
+        "Digvesh Singh",
+        "Akash Singh",
+        "Prince Yadav",
+        "Arjun Tendulkar",
+        "Anrich Nortje",
+        "Naman Tiwari",
+        "Mayank Yadav",
+        "Mohsin Khan"
+    ],
+    "MI": [
+        "Rohit Sharma",
+        "Surya Kumar Yadav",
+        "Robin Minz",
+        "Sherfane Rutherford",
+        "Ryan Rickelton",
+        "Quinton de Kock",
+        "Danish Malewar",
+        "N. Tilak Varma",
+        "Hardik Pandya",
+        "Naman Dhir",
+        "Mitchell Santner",
+        "Raj Angad Bawa",
+        "Atharva Ankolekar",
+        "Mayank Rawat",
+        "Corbin Bosch",
+        "Will Jacks",
+        "Shardul Thakur",
+        "Trent Boult",
+        "Mayank Markande",
+        "Deepak Chahar",
+        "Ashwani Kumar",
+        "Raghu Sharma",
+        "Mohammad Izhar",
+        "Allah Ghazanfar",
+        "Jasprit Bumrah"
+    ],
+    "PBKS": [
+        "Shreyas Iyer",
+        "Nehal Wadhera",
+        "Vishnu Vinod",
+        "Harnoor Pannu",
+        "Pyla Avinash",
+        "Prabhsimran Singh",
+        "Shashank Singh",
+        "Marcus Stoinis",
+        "Harpreet Brar",
+        "Marco Jansen",
+        "Azmatullah Omarzai",
+        "Priyansh Arya",
+        "Musheer Khan",
+        "Suryansh Shedge",
+        "Mitch Owen",
+        "Cooper Connolly",
+        "Ben Dwarshuis",
+        "Arshdeep Singh",
+        "Yuzvendra Chahal",
+        "Vyshak Vijaykumar",
+        "Yash Thakur",
+        "Xavier Bartlett",
+        "Pravin Dubey",
+        "Vishal Nishad",
+        "Lockie Ferguson"
+    ],
+    "RR": [
+        "Shubham Dubey",
+        "Vaibhav Suryavanshi",
+        "Donovan Ferreira",
+        "Lhuan-dre Pretorious",
+        "Ravi Singh",
+        "Aman Rao Perala",
+        "Shimron Hetmyer",
+        "Yashasvi Jaiswal",
+        "Dhruv Jurel",
+        "Riyan Parag",
+        "Yudhvir Singh Charak",
+        "Ravindra Jadeja",
+        "Dasun Shanaka",
+        "Jofra Archer",
+        "Tushar Deshpande",
+        "Kwena Maphaka",
+        "Ravi Bishnoi",
+        "Sushant Mishra",
+        "Yash Raj Punja",
+        "Vignesh Puthur",
+        "Brijesh Sharma",
+        "Adam Milne",
+        "Kuldeep Sen",
+        "Sandeep Sharma",
+        "Nandre Burger"
+    ],
+    "RCB": [
+        "Rajat Patidar",
+        "Devdutt Padikkal",
+        "Virat Kohli",
+        "Phil Salt",
+        "Jitesh Sharma",
+        "Jordan Cox",
+        "Krunal Pandya",
+        "Swapnil Singh",
+        "Tim David",
+        "Romario Shepherd",
+        "Jacob Bethell",
+        "Venkatesh Iyer",
+        "Satvik Deswal",
+        "Mangesh Yadav",
+        "Vicky Ostwal",
+        "Vihaan Malhotra",
+        "Kanishk Chouhan",
+        "Josh Hazlewood",
+        "Rasikh Dar",
+        "Suyash Sharma",
+        "Bhuvneshwar Kumar",
+        "Nuwan Thushara",
+        "Abhinandan Singh",
+        "Jacob Duffy",
+        "Yash Dayal"
+    ],
+    "SRH": [
+        "Ishan Kishan",
+        "Aniket Verma",
+        "Smaran Ravichandran",
+        "Salil Arora",
+        "Heinrich Klaasen",
+        "Travis Head",
+        "Harshal Patel",
+        "Kamindu Mendis",
+        "Harsh Dubey",
+        "Brydon Carse",
+        "Shivang Kumar",
+        "Krains Fuletra",
+        "Liam Livingstone",
+        "David Payne",
+        "Abhishek Sharma",
+        "Nitish Kumar Reddy",
+        "Pat Cummins",
+        "Zeeshan Ansari",
+        "Jaydev Unadkat",
+        "Eshan Malinga",
+        "Sakib Hussain",
+        "Onkar Tarmale",
+        "Amit Kumar",
+        "Praful Hinge",
+        "Shivam Mavi"
+    ]
+};
+
+    const TEAM_CODE_TO_NAME = {
+      CSK: 'Chennai Super Kings',
+      DC: 'Delhi Capitals',
+      GT: 'Gujarat Titans',
+      KKR: 'Kolkata Knight Riders',
+      LSG: 'Lucknow Super Giants',
+      MI: 'Mumbai Indians',
+      PBKS: 'Punjab Kings',
+      RR: 'Rajasthan Royals',
+      RCB: 'Royal Challengers Bengaluru',
+      SRH: 'Sunrisers Hyderabad'
+    };
+
     const TEAM_NAME_ALIASES = {
-      mi: 'mumbai indians',
-      'mumbai indians': 'mumbai indians',
-      rcb: 'royal challengers bengaluru',
-      'royal challengers bengaluru': 'royal challengers bengaluru',
-      'royal challengers bangalore': 'royal challengers bengaluru',
-      csk: 'chennai super kings',
-      'chennai super kings': 'chennai super kings',
-      srh: 'sunrisers hyderabad',
-      'sunrisers hyderabad': 'sunrisers hyderabad',
-      gt: 'gujarat titans',
-      'gujarat titans': 'gujarat titans',
-      lsg: 'lucknow super giants',
-      'lucknow super giants': 'lucknow super giants',
-      dc: 'delhi capitals',
-      'delhi capitals': 'delhi capitals',
-      pbks: 'punjab kings',
-      'punjab kings': 'punjab kings',
-      rr: 'rajasthan royals',
-      'rajasthan royals': 'rajasthan royals',
-      kkr: 'kolkata knight riders',
-      'kolkata knight riders': 'kolkata knight riders'
+      csk: 'CSK',
+      'chennai super kings': 'CSK',
+      dc: 'DC',
+      'delhi capitals': 'DC',
+      gt: 'GT',
+      'gujarat titans': 'GT',
+      kkr: 'KKR',
+      'kolkata knight riders': 'KKR',
+      lsg: 'LSG',
+      'lucknow super giants': 'LSG',
+      mi: 'MI',
+      'mumbai indians': 'MI',
+      pbks: 'PBKS',
+      'punjab kings': 'PBKS',
+      rr: 'RR',
+      'rajasthan royals': 'RR',
+      rcb: 'RCB',
+      'royal challengers bengaluru': 'RCB',
+      'royal challengers bangalore': 'RCB',
+      srh: 'SRH',
+      'sunrisers hyderabad': 'SRH'
+    };
+
+    const PLAYER_NAME_ALIASES = {
+      boult: 'Trent Boult',
+      bumrah: 'Jasprit Bumrah',
+      kohli: 'Virat Kohli',
+      gill: 'Shubman Gill',
+      kl: 'KL Rahul',
+      'kl rahul': 'KL Rahul',
+      pooran: 'Nicholas Pooran',
+      sanju: 'Sanju Samson',
+      iyer: 'Shreyas Iyer',
+      'shreyas iyer': 'Shreyas Iyer',
+      chahal: 'Yuzvendra Chahal',
+      rashid: 'Rashid Khan',
+      hazlewood: 'Josh Hazlewood',
+      'varun chakravarthy': 'Varun Chakaravarthy',
+      'varun chakaravarthy': 'Varun Chakaravarthy',
+      'tilak varma': 'N. Tilak Varma',
+      tilak: 'N. Tilak Varma',
+      surya: 'Surya Kumar Yadav',
+      'surya kumar yadav': 'Surya Kumar Yadav',
+      'suryakumar yadav': 'Surya Kumar Yadav',
+      brevis: 'Dewald Brevis',
+      'd brevis': 'Dewald Brevis',
+      'de brevis': 'Dewald Brevis',
+      'abishek sharma': 'Abhishek Sharma',
+      'abhishek sharma': 'Abhishek Sharma',
+      vaibhav: 'Vaibhav Suryavanshi',
+      sooryavanshi: 'Vaibhav Suryavanshi',
+      'v sooryavanshi': 'Vaibhav Suryavanshi',
+      'vaibhav sooryavanshi': 'Vaibhav Suryavanshi',
+      'vaibhav suryavanshi': 'Vaibhav Suryavanshi',
+      natarajan: 'T. Natarajan',
+      'm siddharth': 'M. Siddharth',
+      'shahbaz ahmed': 'Shahbaz Ahamad',
+      'nitish reddy': 'Nitish Kumar Reddy',
+      prasidh: 'Prasidh Krishna',
+      akeal: 'Akeal Hosein',
+      arshdeep: 'Arshdeep Singh',
+      khaleel: 'Khaleel Ahmed',
+      prabhsimran: 'Prabhsimran Singh',
+      salt: 'Phil Salt',
+      'philip salt': 'Phil Salt',
+      ishan: 'Ishan Kishan',
+      'allah ghazanfar': 'Allah Ghazanfar',
+      'am ghazanfar': 'Allah Ghazanfar',
+      'ms dhoni': 'MS Dhoni'
     };
 
     function normalizeName(v){
@@ -501,9 +835,140 @@
         .trim();
     }
 
-    function canonicalCompareName(v){
-      const normalized = normalizeName(v);
-      return TEAM_NAME_ALIASES[normalized] || normalized;
+    function slugifyEntity(value){
+      return String(value || '')
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    }
+
+    function normalizeEntityText(value){
+      return String(value || '')
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/&/g, ' and ')
+        .replace(/[.'’`]/g, '')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function titleCaseLoose(value){
+      return String(value || '')
+        .split(/\s+/)
+        .filter(Boolean)
+        .map(part => part[0] ? part[0].toUpperCase() + part.slice(1) : part)
+        .join(' ');
+    }
+
+    function createEntityIndex(squads){
+      const byTeamCode = new Map();
+      const byTeamId = new Map();
+      const byPlayerId = new Map();
+      const playersByNormalizedName = new Map();
+
+      for (const [teamCode, players] of Object.entries(squads || {})) {
+        const teamId = `team:${slugifyEntity(teamCode)}`;
+        const teamRecord = {
+          kind: 'team',
+          teamCode,
+          teamId,
+          name: TEAM_CODE_TO_NAME[teamCode] || teamCode,
+          displayName: TEAM_CODE_TO_NAME[teamCode] || teamCode
+        };
+        byTeamCode.set(teamCode, teamRecord);
+        byTeamId.set(teamId, teamRecord);
+
+        for (const playerName of players) {
+          const playerId = `player:${slugifyEntity(playerName)}`;
+          const record = {
+            kind: 'player',
+            playerId,
+            name: playerName,
+            displayName: playerName,
+            teamCode,
+            teamId
+          };
+          byPlayerId.set(playerId, record);
+
+          const normalized = normalizeEntityText(playerName);
+          if (!playersByNormalizedName.has(normalized)) playersByNormalizedName.set(normalized, []);
+          playersByNormalizedName.get(normalized).push(record);
+        }
+      }
+
+      function resolveTeam(value){
+        if (!value) return null;
+        const normalized = normalizeEntityText(value);
+        const aliasedCode = TEAM_NAME_ALIASES[normalized] || String(value || '').toUpperCase();
+        return byTeamCode.get(aliasedCode) || null;
+      }
+
+      function resolvePlayer(value, hint = {}){
+        if (!value) return null;
+
+        const rawNormalized = normalizeEntityText(value);
+        const aliasedName = PLAYER_NAME_ALIASES[rawNormalized] || titleCaseLoose(String(value).trim());
+        const normalized = normalizeEntityText(aliasedName);
+        let candidates = playersByNormalizedName.get(normalized) || [];
+
+        if (hint.teamCode) candidates = candidates.filter(player => player.teamCode === hint.teamCode);
+        if (hint.teamId) candidates = candidates.filter(player => player.teamId === hint.teamId);
+
+        if (candidates.length === 1) return candidates[0];
+
+        const loose = [...byPlayerId.values()].filter(player => {
+          const n = normalizeEntityText(player.name);
+          return n === rawNormalized || n.endsWith(` ${rawNormalized}`) || n.includes(` ${rawNormalized} `);
+        });
+
+        if (hint.teamCode) {
+          const filtered = loose.filter(player => player.teamCode === hint.teamCode);
+          if (filtered.length === 1) return filtered[0];
+        }
+        if (hint.teamId) {
+          const filtered = loose.filter(player => player.teamId === hint.teamId);
+          if (filtered.length === 1) return filtered[0];
+        }
+
+        if (loose.length === 1) return loose[0];
+        return null;
+      }
+
+      function resolveAny(value, hint = {}){
+        return resolvePlayer(value, hint) || resolveTeam(value) || null;
+      }
+
+      return {
+        resolveAny,
+        resolvePlayer,
+        resolveTeam
+      };
+    }
+
+    const ENTITY_INDEX = createEntityIndex(SQUADS_2026);
+    const ENTITY_RESOLUTION_CACHE = new Map();
+
+    function resolveEntity(value, hint = {}){
+      const cacheKey = JSON.stringify([value || '', hint.teamCode || '', hint.teamId || '']);
+      if (ENTITY_RESOLUTION_CACHE.has(cacheKey)) return ENTITY_RESOLUTION_CACHE.get(cacheKey);
+      const resolved = ENTITY_INDEX.resolveAny(value, hint);
+      ENTITY_RESOLUTION_CACHE.set(cacheKey, resolved);
+      return resolved;
+    }
+
+    function entityKeyFor(value, hint = {}){
+      const resolved = resolveEntity(value, hint);
+      if (resolved?.kind === 'player') return resolved.playerId;
+      if (resolved?.kind === 'team') return resolved.teamId;
+      return null;
+    }
+
+    function canonicalCompareName(v, hint = {}){
+      return entityKeyFor(v, hint) || normalizeName(v);
     }
 
     function matchesPick(a,b){
@@ -511,7 +976,8 @@
     }
 
     function rankOf(pick, ranking){
-      const idx = ranking.findIndex(name => matchesPick(name, pick));
+      const pickKey = canonicalCompareName(pick);
+      const idx = ranking.findIndex(name => canonicalCompareName(name) === pickKey);
       return idx >= 0 ? idx + 1 : null;
     }
 

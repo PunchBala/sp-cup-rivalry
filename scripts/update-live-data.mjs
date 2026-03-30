@@ -5,6 +5,7 @@ import vm from 'node:vm';
 const ROOT = process.cwd();
 const DATA_DIR = path.join(ROOT, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'live.json');
+const SQUADS_FILE = path.join(ROOT, 'ipl_2026_squads.json');
 
 const API_KEY = process.env.CRICKETDATA_API_KEY;
 const SERIES_ID = '87c62aac-bc3c-4738-ab93-19da0690488f';
@@ -281,6 +282,134 @@ function normalizeLookupName(value) {
     .trim();
 }
 
+
+const TEAM_NAME_TO_CODE = {
+  csk: 'CSK',
+  'chennai super kings': 'CSK',
+  dc: 'DC',
+  'delhi capitals': 'DC',
+  gt: 'GT',
+  'gujarat titans': 'GT',
+  kkr: 'KKR',
+  'kolkata knight riders': 'KKR',
+  lsg: 'LSG',
+  'lucknow super giants': 'LSG',
+  mi: 'MI',
+  'mumbai indians': 'MI',
+  pbks: 'PBKS',
+  'punjab kings': 'PBKS',
+  rr: 'RR',
+  'rajasthan royals': 'RR',
+  rcb: 'RCB',
+  'royal challengers bengaluru': 'RCB',
+  'royal challengers bangalore': 'RCB',
+  srh: 'SRH',
+  'sunrisers hyderabad': 'SRH'
+};
+
+const PLAYER_NAME_ALIASES = {
+  boult: 'Trent Boult',
+  bumrah: 'Jasprit Bumrah',
+  kohli: 'Virat Kohli',
+  gill: 'Shubman Gill',
+  kl: 'KL Rahul',
+  'kl rahul': 'KL Rahul',
+  pooran: 'Nicholas Pooran',
+  sanju: 'Sanju Samson',
+  iyer: 'Shreyas Iyer',
+  'shreyas iyer': 'Shreyas Iyer',
+  chahal: 'Yuzvendra Chahal',
+  rashid: 'Rashid Khan',
+  hazlewood: 'Josh Hazlewood',
+  'varun chakravarthy': 'Varun Chakaravarthy',
+  'varun chakaravarthy': 'Varun Chakaravarthy',
+  'tilak varma': 'N. Tilak Varma',
+  tilak: 'N. Tilak Varma',
+  surya: 'Surya Kumar Yadav',
+  'surya kumar yadav': 'Surya Kumar Yadav',
+  'suryakumar yadav': 'Surya Kumar Yadav',
+  brevis: 'Dewald Brevis',
+  'd brevis': 'Dewald Brevis',
+  'de brevis': 'Dewald Brevis',
+  'abishek sharma': 'Abhishek Sharma',
+  'abhishek sharma': 'Abhishek Sharma',
+  vaibhav: 'Vaibhav Suryavanshi',
+  sooryavanshi: 'Vaibhav Suryavanshi',
+  'v sooryavanshi': 'Vaibhav Suryavanshi',
+  'vaibhav sooryavanshi': 'Vaibhav Suryavanshi',
+  'vaibhav suryavanshi': 'Vaibhav Suryavanshi',
+  natarajan: 'T. Natarajan',
+  'm siddharth': 'M. Siddharth',
+  'shahbaz ahmed': 'Shahbaz Ahamad',
+  'nitish reddy': 'Nitish Kumar Reddy',
+  prasidh: 'Prasidh Krishna',
+  akeal: 'Akeal Hosein',
+  arshdeep: 'Arshdeep Singh',
+  khaleel: 'Khaleel Ahmed',
+  prabhsimran: 'Prabhsimran Singh',
+  salt: 'Phil Salt',
+  'philip salt': 'Phil Salt',
+  ishan: 'Ishan Kishan',
+  'allah ghazanfar': 'Allah Ghazanfar',
+  'am ghazanfar': 'Allah Ghazanfar',
+  'ms dhoni': 'MS Dhoni'
+};
+
+async function readSquadsFile() {
+  try {
+    return JSON.parse(await fs.readFile(SQUADS_FILE, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+function teamCodeForName(teamName) {
+  return TEAM_NAME_TO_CODE[normalizeLookupName(teamName)] || null;
+}
+
+function buildSquadPlayerIndex(squads) {
+  const byNormalizedName = new Map();
+
+  for (const [teamCode, players] of Object.entries(squads || {})) {
+    for (const playerName of players || []) {
+      const record = { name: playerName, teamCode };
+      const normalized = normalizeLookupName(playerName);
+      if (!byNormalizedName.has(normalized)) byNormalizedName.set(normalized, []);
+      byNormalizedName.get(normalized).push(record);
+    }
+  }
+
+  for (const [alias, canonicalName] of Object.entries(PLAYER_NAME_ALIASES)) {
+    const canonicalRecords = byNormalizedName.get(normalizeLookupName(canonicalName)) || [];
+    if (!canonicalRecords.length) continue;
+    byNormalizedName.set(normalizeLookupName(alias), canonicalRecords);
+  }
+
+  return byNormalizedName;
+}
+
+const SQUADS_2026 = await readSquadsFile();
+const SQUAD_PLAYER_INDEX = buildSquadPlayerIndex(SQUADS_2026);
+
+function canonicalizePlayerName(value, hint = {}) {
+  const cleaned = stripTags(value);
+  if (!cleaned) return '';
+
+  const normalized = normalizeLookupName(cleaned);
+  const teamCode = hint.teamCode || teamCodeForName(hint.teamName);
+  let candidates = SQUAD_PLAYER_INDEX.get(normalized) || [];
+
+  if (teamCode) {
+    const filtered = candidates.filter(candidate => candidate.teamCode === teamCode);
+    if (filtered.length === 1) return filtered[0].name;
+    if (filtered.length > 1) candidates = filtered;
+  }
+
+  if (candidates.length === 1) return candidates[0].name;
+
+  return normalizeName(cleaned);
+}
+
 function titleCaseName(value) {
   return String(value || '')
     .split(/\s+/)
@@ -373,6 +502,9 @@ function resolveCricmetricPlayerName(rawName, agg) {
 
   const generatedAlias = aliasMap.get(rawNorm);
   if (generatedAlias) return generatedAlias;
+
+  const squadCanonical = canonicalizePlayerName(trimmed);
+  if (squadCanonical) return squadCanonical;
 
   return titleCaseName(trimmed);
 }
@@ -616,10 +748,14 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
   const inningsBlocks = safeArray(scorecardData.scorecard);
   const topScores = safeArray(scorecardData.score);
   const participants = new Set();
+  const matchTeams = safeArray(scorecardData.teams).map(normalizeName);
 
   for (const innings of inningsBlocks) {
+    const battingTeam = parseTeamFromInningName(innings?.inning);
+    const bowlingTeam = matchTeams.find((team) => team && team !== battingTeam) || null;
+
     for (const bat of safeArray(innings.batting)) {
-      const batter = normalizeName(bat?.batsman?.name);
+      const batter = canonicalizePlayerName(bat?.batsman?.name, { teamName: battingTeam });
       if (batter) participants.add(batter);
       const runs = Number(bat?.r || 0);
       const balls = Number(bat?.b || 0);
@@ -632,7 +768,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
     }
 
     for (const bowl of safeArray(innings.bowling)) {
-      const bowler = normalizeName(bowl?.bowler?.name);
+      const bowler = canonicalizePlayerName(bowl?.bowler?.name, { teamName: bowlingTeam });
       if (bowler) participants.add(bowler);
       const balls = oversToBalls(bowl?.o);
       const wickets = Number(bowl?.w || 0);
@@ -646,7 +782,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
     }
 
     for (const field of safeArray(innings.catching)) {
-      const catcher = normalizeName(field?.catcher?.name);
+      const catcher = canonicalizePlayerName(field?.catcher?.name, { teamName: bowlingTeam });
       if (catcher) {
         participants.add(catcher);
         addNumberMap(aggregates.catches, catcher, field?.catch || 0);
