@@ -174,16 +174,38 @@
 
 
     .clutch-card{display:grid;gap:14px}
-    .clutch-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
-    .clutch-headline{font-size:clamp(22px,3vw,30px);font-weight:900;line-height:1.05;color:#fff}
-    .clutch-sub{font-size:13px;color:var(--muted);line-height:1.45;max-width:900px}
-    .momentum-track{position:relative;display:flex;width:100%;height:18px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+    .clutch-layout{display:grid;grid-template-columns:minmax(320px,.9fr) minmax(420px,1.3fr);gap:16px;align-items:stretch}
+    @media (max-width:1100px){.clutch-layout{grid-template-columns:1fr}}
+    .clutch-summary{display:grid;gap:10px;align-content:start}
+    .clutch-headline{font-size:clamp(20px,2.6vw,28px);font-weight:900;line-height:1.05;color:#fff}
+    .clutch-sub{font-size:12px;color:var(--muted);line-height:1.4;max-width:620px}
+    .clutch-meta-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .momentum-track{position:relative;display:flex;width:100%;height:12px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.05);border:1px solid var(--line)}
     .momentum-fill-a,.momentum-fill-b{height:100%;transition:width .25s ease}
     .momentum-fill-a{background:linear-gradient(90deg, rgba(124,196,255,.35), rgba(124,196,255,.8))}
     .momentum-fill-b{background:linear-gradient(90deg, rgba(255,127,150,.8), rgba(255,127,150,.35))}
     .momentum-fill-neutral{background:linear-gradient(90deg, rgba(255,200,87,.45), rgba(255,200,87,.18))}
     .clutch-labels{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-weight:800}
     .clutch-labels strong{color:#fff}
+    .worm-panel{display:grid;gap:10px;min-height:100%}
+    .worm-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .worm-title{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+    .worm-chart-shell{border:1px solid var(--line);border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.025)}
+    .worm-svg{display:block;width:100%;height:138px}
+    .worm-axis{stroke:rgba(255,255,255,.16);stroke-width:1}
+    .worm-grid{stroke:rgba(255,255,255,.08);stroke-width:1;stroke-dasharray:3 4}
+    .worm-line-a{fill:none;stroke:#7cc4ff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+    .worm-line-b{fill:none;stroke:#ff8ba2;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+    .worm-point-a{fill:#7cc4ff}
+    .worm-point-b{fill:#ff8ba2}
+    .worm-label{fill:rgba(255,255,255,.72);font-size:11px;font-weight:700}
+    .worm-score-label{fill:#eef4ff;font-size:10px;font-weight:900}
+    .worm-empty{display:flex;align-items:center;justify-content:center;height:138px;color:var(--muted);font-size:12px;text-align:center}
+    .worm-legend{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-weight:800}
+    .worm-legend-item{display:inline-flex;align-items:center;gap:8px}
+    .worm-swatch{width:10px;height:10px;border-radius:999px;display:inline-block}
+    .worm-swatch-a{background:#7cc4ff}
+    .worm-swatch-b{background:#ff8ba2}
 
   </style>
 
@@ -209,21 +231,37 @@
       <div class="card span-3 metric-card"><div class="label">Likely winner</div><div class="value" id="metricWinner">Too early</div><div class="note" id="metricWinnerNote">Need more movement before calling it.</div></div>
       <div class="card span-3 metric-card"><div class="label">Confidence</div><div class="value" id="metricConfidence">50% - 50%</div><div class="note" id="metricConfidenceNote">Right now the board is playing nice.</div></div>
       <div class="card span-12 clutch-card">
-        <div class="clutch-top">
-          <div>
+        <div class="clutch-layout">
+          <div class="clutch-summary">
             <div class="section-title">Clutch tracker</div>
-            <div class="clutch-headline" id="clutchHeadline">Recent momentum is still loading</div>
+            <div class="clutch-meta-row">
+              <div class="clutch-headline" id="clutchHeadline">Recent momentum is still loading</div>
+              <div class="small" id="clutchWindowMeta">Last 3 completed matches</div>
+            </div>
             <div class="clutch-sub" id="clutchNote">Need completed-match history before the app can start handing out recency swagger.</div>
+            <div class="momentum-track" id="clutchBar">
+              <div class="momentum-fill-a" id="clutchFillA" style="width:50%"></div>
+              <div class="momentum-fill-b" id="clutchFillB" style="width:50%"></div>
+            </div>
+            <div class="clutch-labels">
+              <span id="clutchLabelA"><strong>Senthil</strong> +0 recent points</span>
+              <span id="clutchLabelB"><strong>Sai</strong> +0 recent points</span>
+            </div>
           </div>
-          <div class="small" id="clutchWindowMeta">Last 3 completed matches</div>
-        </div>
-        <div class="momentum-track" id="clutchBar">
-          <div class="momentum-fill-a" id="clutchFillA" style="width:50%"></div>
-          <div class="momentum-fill-b" id="clutchFillB" style="width:50%"></div>
-        </div>
-        <div class="clutch-labels">
-          <span id="clutchLabelA"><strong>Senthil</strong> +0 recent points</span>
-          <span id="clutchLabelB"><strong>Sai</strong> +0 recent points</span>
+          <div class="worm-panel">
+            <div class="worm-top">
+              <div class="worm-title">Score worm</div>
+              <div class="small" id="wormMeta">Points at each completed-game checkpoint</div>
+            </div>
+            <div class="worm-chart-shell" id="wormChartShell">
+              <svg id="wormChart" class="worm-svg" viewBox="0 0 560 138" preserveAspectRatio="none" aria-label="Score worm chart"></svg>
+              <div class="worm-empty section-hidden" id="wormEmpty">Need at least one completed-game checkpoint before the worm graph starts slithering.</div>
+            </div>
+            <div class="worm-legend">
+              <span class="worm-legend-item" id="wormLegendA"><span class="worm-swatch worm-swatch-a"></span>Senthil</span>
+              <span class="worm-legend-item" id="wormLegendB"><span class="worm-swatch worm-swatch-b"></span>Sai</span>
+            </div>
+          </div>
         </div>
       </div>
       <div class="card span-12">
@@ -1704,14 +1742,14 @@
         .sort((a, b) => Math.abs(b.net) - Math.abs(a.net) || (b.gainA + b.gainB) - (a.gainA + a.gainB));
       const topSwing = swingRows[0] || null;
 
-      let headline = `Last ${effectiveWindow} match${effectiveWindow === 1 ? '' : 'es'} → level momentum`;
-      let note = `Recent points: ${matchup.a.name} +${gainA}, ${matchup.b.name} +${gainB}. Nobody has landed a clean recent edge yet.`;
+      let headline = `Last ${effectiveWindow} match${effectiveWindow === 1 ? '' : 'es'} → level`;
+      let note = `Recent points: ${matchup.a.name} +${gainA}, ${matchup.b.name} +${gainB}. No clean recent edge yet.`;
       if (net > 0) {
-        headline = `Last ${effectiveWindow} match${effectiveWindow === 1 ? '' : 'es'} → ${matchup.a.name} +${net} momentum`;
-        note = `Recent points: ${matchup.a.name} +${gainA}, ${matchup.b.name} +${gainB}. ${matchup.a.name} has been the hotter hand lately.`;
+        headline = `Last ${effectiveWindow} match${effectiveWindow === 1 ? '' : 'es'} → ${matchup.a.name} +${net}`;
+        note = `Recent points: ${matchup.a.name} +${gainA}, ${matchup.b.name} +${gainB}. ${matchup.a.name} has had the hotter recent run.`;
       } else if (net < 0) {
-        headline = `Last ${effectiveWindow} match${effectiveWindow === 1 ? '' : 'es'} → ${matchup.b.name} +${Math.abs(net)} momentum`;
-        note = `Recent points: ${matchup.a.name} +${gainA}, ${matchup.b.name} +${gainB}. ${matchup.b.name} has been the hotter hand lately.`;
+        headline = `Last ${effectiveWindow} match${effectiveWindow === 1 ? '' : 'es'} → ${matchup.b.name} +${Math.abs(net)}`;
+        note = `Recent points: ${matchup.a.name} +${gainA}, ${matchup.b.name} +${gainB}. ${matchup.b.name} has had the hotter recent run.`;
       }
 
       if (topSwing && Math.abs(topSwing.net) > 0) {
@@ -1731,6 +1769,102 @@
       };
     }
 
+    function computeWormTimeline(matchup){
+      const history = getScoreHistorySnapshots();
+      return history.map(entry => {
+        const score = computeMatchup(matchup, entry.snapshot);
+        return {
+          count: entry.count,
+          fetchedAt: entry.fetchedAt || null,
+          totalA: score.totalA,
+          totalB: score.totalB
+        };
+      }).sort((a,b) => a.count - b.count);
+    }
+
+    function renderWormChart(matchup){
+      const svg = document.getElementById('wormChart');
+      const empty = document.getElementById('wormEmpty');
+      const shell = document.getElementById('wormChartShell');
+      const meta = document.getElementById('wormMeta');
+      const legendA = document.getElementById('wormLegendA');
+      const legendB = document.getElementById('wormLegendB');
+      const points = computeWormTimeline(matchup);
+      const usablePoints = points.filter(point => point.count > 0 || point.totalA > 0 || point.totalB > 0);
+
+      legendA.innerHTML = `<span class="worm-swatch worm-swatch-a"></span>${escapeHtml(matchup.a.name)} ${usablePoints.length ? `${usablePoints[usablePoints.length - 1].totalA} pts` : '0 pts'}`;
+      legendB.innerHTML = `<span class="worm-swatch worm-swatch-b"></span>${escapeHtml(matchup.b.name)} ${usablePoints.length ? `${usablePoints[usablePoints.length - 1].totalB} pts` : '0 pts'}`;
+
+      if (points.length < 2) {
+        svg.innerHTML = '';
+        svg.classList.add('section-hidden');
+        empty.classList.remove('section-hidden');
+        shell.classList.add('worm-empty-mode');
+        meta.textContent = 'Waiting for completed-game checkpoints';
+        return;
+      }
+
+      svg.classList.remove('section-hidden');
+      empty.classList.add('section-hidden');
+      shell.classList.remove('worm-empty-mode');
+      meta.textContent = 'Points after each completed-game checkpoint';
+
+      const width = 560;
+      const height = 138;
+      const padLeft = 18;
+      const padRight = 18;
+      const padTop = 14;
+      const padBottom = 24;
+      const innerW = width - padLeft - padRight;
+      const innerH = height - padTop - padBottom;
+      const maxCount = Math.max(...points.map(point => point.count), 1);
+      const maxScore = Math.max(...points.map(point => Math.max(point.totalA, point.totalB)), 1);
+      const countRange = maxCount || 1;
+
+      const project = (count, score) => ({
+        x: padLeft + ((count / countRange) * innerW),
+        y: padTop + innerH - ((score / maxScore) * innerH)
+      });
+
+      const aCoords = points.map(point => ({ ...project(point.count, point.totalA), point }));
+      const bCoords = points.map(point => ({ ...project(point.count, point.totalB), point }));
+      const linePath = coords => coords.map((coord, index) => `${index === 0 ? 'M' : 'L'}${coord.x.toFixed(2)} ${coord.y.toFixed(2)}`).join(' ');
+
+      const xLabelCounts = points.length <= 10
+        ? points.map(point => point.count)
+        : Array.from(new Set(points.map((point, index) => index === 0 || index === points.length - 1 || point.count % 5 === 0 ? point.count : null).filter(v => v !== null)));
+
+      const xLabels = xLabelCounts.map(count => {
+        const { x } = project(count, 0);
+        const text = count === 0 ? 'Start' : `G${count}`;
+        return `<text class="worm-label" x="${x.toFixed(2)}" y="${(height - 6).toFixed(2)}" text-anchor="middle">${escapeHtml(text)}</text>`;
+      }).join('');
+
+      const yTicks = Array.from(new Set([0, Math.round(maxScore / 2), maxScore])).sort((a,b) => a-b);
+      const yGuides = yTicks.map(value => {
+        const y = project(0, value).y;
+        return `<line class="${value === 0 ? 'worm-axis' : 'worm-grid'}" x1="${padLeft}" y1="${y.toFixed(2)}" x2="${(width - padRight)}" y2="${y.toFixed(2)}"></line><text class="worm-label" x="${(width - padRight).toFixed(2)}" y="${(y - 4).toFixed(2)}" text-anchor="end">${value}</text>`;
+      }).join('');
+
+      const pointDots = (coords, pointClass, labelAnchor) => coords.map((coord, index) => {
+        const labelDy = pointClass === 'worm-point-a' ? -8 : 14;
+        const textAnchor = (index === coords.length - 1 && labelAnchor === 'end') ? 'end' : 'middle';
+        const title = `${coord.point.count === 0 ? 'Start' : `Game ${coord.point.count}`}: ${matchup.a.name} ${coord.point.totalA}, ${matchup.b.name} ${coord.point.totalB}`;
+        const scoreLabel = pointClass === 'worm-point-a' ? coord.point.totalA : coord.point.totalB;
+        return `<g><circle class="${pointClass}" cx="${coord.x.toFixed(2)}" cy="${coord.y.toFixed(2)}" r="4.2"><title>${escapeHtml(title)}</title></circle>${index === coords.length - 1 ? `<text class="worm-score-label" x="${coord.x.toFixed(2)}" y="${(coord.y + labelDy).toFixed(2)}" text-anchor="${textAnchor}">${scoreLabel}</text>` : ''}</g>`;
+      }).join('');
+
+      svg.innerHTML = `
+        <line class="worm-axis" x1="${padLeft}" y1="${(height - padBottom).toFixed(2)}" x2="${(width - padRight)}" y2="${(height - padBottom).toFixed(2)}"></line>
+        ${yGuides}
+        <path class="worm-line-a" d="${linePath(aCoords)}"></path>
+        <path class="worm-line-b" d="${linePath(bCoords)}"></path>
+        ${pointDots(aCoords, 'worm-point-a', 'end')}
+        ${pointDots(bCoords, 'worm-point-b', 'end')}
+        ${xLabels}
+      `;
+    }
+
     function renderClutchTracker(matchup){
       const clutch = computeClutchTracker(matchup, 3);
       document.getElementById('clutchHeadline').textContent = clutch.headline;
@@ -1742,6 +1876,7 @@
       document.getElementById('clutchFillB').style.width = `${clutch.widthB.toFixed(1)}%`;
       const bar = document.getElementById('clutchBar');
       bar.classList.toggle('momentum-fill-neutral', !clutch.available);
+      renderWormChart(matchup);
     }
 
     function renderStatsTab(){
