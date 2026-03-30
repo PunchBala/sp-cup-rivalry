@@ -1990,6 +1990,8 @@
                 r.category.type === 'top5' ? 'Top-5 scoring category'
                 : r.category.type === 'better_rank_low' ? 'Better prediction category (lower rank wins)'
                 : r.category.type === 'better_rank' ? 'Better prediction category'
+                : r.category.type === 'winner_better' ? 'Better prediction category'
+                : r.category.type === 'title' ? 'Title-race scoring category'
                 : 'Winner-takes-points category'
               }</div></td>
               <td><div class="pick-card"><span class="pick-name">${escapeHtml(r.pickA)}</span>${liveStateBlock(r.category, r.pickA, r.pickALiveState || 'Live: waiting')}</div></td>
