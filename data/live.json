@@ -2,7 +2,7 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-03-29T19:45:52.527Z",
+  "fetchedAt": "2026-03-30T06:25:09.312Z",
   "scrapeStatus": "ok (2 processed matches, 2 scorecard calls this run)",
   "scrapeReport": {
     "orangeCap": {
@@ -72,11 +72,11 @@
       "method": "filtered to the provided uncapped player pool, then compares picks by their positions in the custom MVP ranking"
     },
     "fairPlay": {
-      "ok": false,
+      "ok": true,
       "source": "IPLT20 official fairplay feed",
       "method": "parsed JSONP fairplayTotal table from Sports Mechanic stats feed",
-      "error": "jsonp-callback-not-found",
-      "fallback": "kept previous fairPlay snapshot"
+      "rows": 4,
+      "updatedAt": "30-03-2026 : 08:50:02"
     },
     "leastMvp": {
       "ok": true,
@@ -96,21 +96,21 @@
   },
   "meta": {
     "scheduler": {
-      "dayKey": "2026-03-29",
-      "quietRefreshesUsed": 4,
-      "lastQuietRefreshAt": "2026-03-29T19:45:48.458Z",
-      "lastLiveRefreshAt": "2026-03-29T18:02:03.297Z",
-      "lastSeriesInfoAt": "2026-03-29T19:45:48.458Z",
+      "dayKey": "2026-03-30",
+      "quietRefreshesUsed": 1,
+      "lastQuietRefreshAt": "2026-03-30T06:25:01.649Z",
+      "lastLiveRefreshAt": null,
+      "lastSeriesInfoAt": "2026-03-30T06:25:01.649Z",
       "lastDecision": {
-        "at": "2026-03-29T19:45:47.387Z",
+        "at": "2026-03-30T06:25:00.780Z",
         "shouldRefresh": true,
         "mode": "quiet_window",
         "reason": "quiet refresh slot available"
       },
-      "nextPlannedRefreshAt": "2026-03-29T23:00:00.458Z",
+      "nextPlannedRefreshAt": "2026-03-30T11:13:01.649Z",
       "nextPlannedMode": "quiet_window",
       "nextPlannedReason": "quiet refresh slot available",
-      "nextPlannedCalculatedAt": "2026-03-29T19:45:50.506Z"
+      "nextPlannedCalculatedAt": "2026-03-30T06:25:07.648Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -1463,7 +1463,7 @@
     },
     "liveOverlay": {
       "matchId": null,
-      "generatedAt": "2026-03-29T19:45:51.289Z",
+      "generatedAt": "2026-03-30T06:25:08.013Z",
       "aggregates": null,
       "status": null,
       "source": null
@@ -1479,8 +1479,8 @@
     "officialMostDots": {
       "enabled": true,
       "minRefreshMinutes": 120,
-      "lastFetchedAt": "2026-03-29T19:45:51.937Z",
-      "lastAttemptAt": "2026-03-29T19:45:51.291Z",
+      "lastFetchedAt": "2026-03-30T06:25:08.680Z",
+      "lastAttemptAt": "2026-03-30T06:25:08.013Z",
       "lastSource": "IPLT20 official most dots feed",
       "lastStatus": "ok",
       "lastError": null
@@ -3109,16 +3109,54 @@
     "source": "custom MVP ranking filtered to user-provided uncapped player pool"
   },
   "fairPlay": {
-    "winner": "Sunrisers Hyderabad",
+    "winner": "Kolkata Knight Riders",
     "ranking": [
+      "Kolkata Knight Riders",
+      "Mumbai Indians",
       "Sunrisers Hyderabad",
       "Royal Challengers Bengaluru"
     ],
     "extendedRanking": [
+      "Kolkata Knight Riders",
+      "Mumbai Indians",
       "Sunrisers Hyderabad",
       "Royal Challengers Bengaluru"
     ],
     "values": {
+      "Kolkata Knight Riders": {
+        "matches": 1,
+        "average": null,
+        "points": 10,
+        "raw": {
+          "TeamID": "3",
+          "TeamName": "KKR",
+          "TeamFullName": "Kolkata Knight Riders",
+          "No": "1",
+          "HM": "0",
+          "HP": "0",
+          "AM": "1",
+          "AP": "10",
+          "Points": "10",
+          "AvePoints": "10.00"
+        }
+      },
+      "Mumbai Indians": {
+        "matches": 1,
+        "average": null,
+        "points": 10,
+        "raw": {
+          "TeamID": "1",
+          "TeamName": "MI",
+          "TeamFullName": "Mumbai Indians",
+          "No": "1",
+          "HM": "1",
+          "HP": "10",
+          "AM": "0",
+          "AP": "0",
+          "Points": "10",
+          "AvePoints": "10.00"
+        }
+      },
       "Sunrisers Hyderabad": {
         "matches": 1,
         "average": null,
@@ -3154,7 +3192,7 @@
         }
       }
     },
-    "updatedAt": "29-03-2026 : 20:00:01",
+    "updatedAt": "30-03-2026 : 08:50:02",
     "source": "IPLT20 official fairplay feed"
   },
   "highestScoreTeam": {
