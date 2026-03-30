@@ -2,8 +2,8 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-03-30T06:25:09.312Z",
-  "scrapeStatus": "ok (2 processed matches, 2 scorecard calls this run)",
+  "fetchedAt": "2026-03-30T20:07:07.069Z",
+  "scrapeStatus": "ok (3 processed matches, 3 scorecard calls this run)",
   "scrapeReport": {
     "orangeCap": {
       "ok": true,
@@ -59,7 +59,7 @@
       "ok": true,
       "source": "IPLT20 official most dots feed",
       "method": "parsed JSONP mostdotballsbowledtournament feed from Sports Mechanic stats feed",
-      "rows": 24
+      "rows": 36
     },
     "mvp": {
       "ok": true,
@@ -75,8 +75,8 @@
       "ok": true,
       "source": "IPLT20 official fairplay feed",
       "method": "parsed JSONP fairplayTotal table from Sports Mechanic stats feed",
-      "rows": 4,
-      "updatedAt": "30-03-2026 : 08:50:02"
+      "rows": 6,
+      "updatedAt": "31-03-2026 : 01:00:01"
     },
     "leastMvp": {
       "ok": true,
@@ -90,27 +90,27 @@
       "liveScorecardsEnabled": false,
       "liveScorecardIntervalMinutes": 30,
       "maxBacklogScorecardsPerRun": 2,
-      "scorecardCallsThisRun": 2,
+      "scorecardCallsThisRun": 3,
       "backlogRemaining": 0
     }
   },
   "meta": {
     "scheduler": {
       "dayKey": "2026-03-30",
-      "quietRefreshesUsed": 1,
-      "lastQuietRefreshAt": "2026-03-30T06:25:01.649Z",
+      "quietRefreshesUsed": 2,
+      "lastQuietRefreshAt": "2026-03-30T20:07:03.489Z",
       "lastLiveRefreshAt": null,
-      "lastSeriesInfoAt": "2026-03-30T06:25:01.649Z",
+      "lastSeriesInfoAt": "2026-03-30T20:07:03.489Z",
       "lastDecision": {
-        "at": "2026-03-30T06:25:00.780Z",
+        "at": "2026-03-30T20:07:02.859Z",
         "shouldRefresh": true,
         "mode": "quiet_window",
         "reason": "quiet refresh slot available"
       },
-      "nextPlannedRefreshAt": "2026-03-30T11:13:01.649Z",
+      "nextPlannedRefreshAt": "2026-03-30T23:00:00.489Z",
       "nextPlannedMode": "quiet_window",
       "nextPlannedReason": "quiet refresh slot available",
-      "nextPlannedCalculatedAt": "2026-03-30T06:25:07.648Z"
+      "nextPlannedCalculatedAt": "2026-03-30T20:07:05.065Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -677,14 +677,14 @@
         {
           "id": "d788e9f9-99bf-4650-a035-92a7e21b3d08",
           "name": "Rajasthan Royals vs Chennai Super Kings, 3rd Match, Indian Premier League 2026",
-          "status": "Match starts at Mar 30, 14:00 GMT",
+          "status": "Rajasthan Royals won by 8 wkts",
           "dateTimeGMT": "2026-03-30T14:00:00",
           "teams": [
             "Rajasthan Royals",
             "Chennai Super Kings"
           ],
-          "matchStarted": false,
-          "matchEnded": false,
+          "matchStarted": true,
+          "matchEnded": true,
           "venue": "Barsapara Cricket Stadium, Guwahati"
         },
         {
@@ -1029,7 +1029,8 @@
     },
     "processedMatchIds": [
       "55fe0f15-6eb0-4ad5-835b-5564be4f6a21",
-      "e02475c1-8f9a-4915-a9e8-d4dbc3441c96"
+      "e02475c1-8f9a-4915-a9e8-d4dbc3441c96",
+      "d788e9f9-99bf-4650-a035-92a7e21b3d08"
     ],
     "aggregates": {
       "battingRuns": {
@@ -1044,7 +1045,7 @@
         "Harshal Patel": 0,
         "David Payne": 6,
         "Jaydev Unadkat": 4,
-        "Philip Salt": 8,
+        "Phil Salt": 8,
         "Virat Kohli": 69,
         "Devdutt Padikkal": 61,
         "Rajat Patidar": 31,
@@ -1058,10 +1059,25 @@
         "Ramandeep Singh": 4,
         "Ryan Rickelton": 81,
         "Rohit Sharma": 78,
-        "Suryakumar Yadav": 16,
-        "Tilak Varma": 20,
+        "Surya Kumar Yadav": 16,
+        "N. Tilak Varma": 20,
         "Hardik Pandya": 18,
-        "Naman Dhir": 5
+        "Naman Dhir": 5,
+        "Sanju Samson": 6,
+        "Ruturaj Gaikwad": 6,
+        "Ayush Mhatre": 0,
+        "Matthew Short": 2,
+        "Sarfaraz Khan": 17,
+        "Kartik Sharma": 18,
+        "Shivam Dube": 6,
+        "Jamie Overton": 43,
+        "Noor Ahmad": 1,
+        "Matt Henry": 5,
+        "Anshul Kamboj": 7,
+        "Yashasvi Jaiswal": 38,
+        "Vaibhav Suryavanshi": 52,
+        "Dhruv Jurel": 18,
+        "Riyan Parag": 14
       },
       "battingBalls": {
         "Travis Head": 9,
@@ -1075,7 +1091,7 @@
         "Harshal Patel": 2,
         "David Payne": 5,
         "Jaydev Unadkat": 3,
-        "Philip Salt": 7,
+        "Phil Salt": 7,
         "Virat Kohli": 38,
         "Devdutt Padikkal": 26,
         "Rajat Patidar": 12,
@@ -1089,10 +1105,25 @@
         "Ramandeep Singh": 4,
         "Ryan Rickelton": 43,
         "Rohit Sharma": 38,
-        "Suryakumar Yadav": 8,
-        "Tilak Varma": 14,
+        "Surya Kumar Yadav": 8,
+        "N. Tilak Varma": 14,
         "Hardik Pandya": 11,
-        "Naman Dhir": 2
+        "Naman Dhir": 2,
+        "Sanju Samson": 7,
+        "Ruturaj Gaikwad": 11,
+        "Ayush Mhatre": 1,
+        "Matthew Short": 7,
+        "Sarfaraz Khan": 12,
+        "Kartik Sharma": 15,
+        "Shivam Dube": 4,
+        "Jamie Overton": 36,
+        "Noor Ahmad": 9,
+        "Matt Henry": 7,
+        "Anshul Kamboj": 10,
+        "Yashasvi Jaiswal": 36,
+        "Vaibhav Suryavanshi": 17,
+        "Dhruv Jurel": 9,
+        "Riyan Parag": 11
       },
       "battingSixes": {
         "Travis Head": 0,
@@ -1106,7 +1137,7 @@
         "Harshal Patel": 0,
         "David Payne": 0,
         "Jaydev Unadkat": 0,
-        "Philip Salt": 0,
+        "Phil Salt": 0,
         "Virat Kohli": 5,
         "Devdutt Padikkal": 4,
         "Rajat Patidar": 3,
@@ -1120,10 +1151,25 @@
         "Ramandeep Singh": 0,
         "Ryan Rickelton": 8,
         "Rohit Sharma": 6,
-        "Suryakumar Yadav": 0,
-        "Tilak Varma": 0,
+        "Surya Kumar Yadav": 0,
+        "N. Tilak Varma": 0,
         "Hardik Pandya": 0,
-        "Naman Dhir": 0
+        "Naman Dhir": 0,
+        "Sanju Samson": 0,
+        "Ruturaj Gaikwad": 0,
+        "Ayush Mhatre": 0,
+        "Matthew Short": 0,
+        "Sarfaraz Khan": 1,
+        "Kartik Sharma": 1,
+        "Shivam Dube": 1,
+        "Jamie Overton": 2,
+        "Noor Ahmad": 0,
+        "Matt Henry": 0,
+        "Anshul Kamboj": 0,
+        "Yashasvi Jaiswal": 1,
+        "Vaibhav Suryavanshi": 5,
+        "Dhruv Jurel": 0,
+        "Riyan Parag": 1
       },
       "bowlingWickets": {
         "Jacob Duffy": 3,
@@ -1140,7 +1186,7 @@
         "Harshal Patel": 0,
         "Trent Boult": 0,
         "Hardik Pandya": 1,
-        "AM Ghazanfar": 0,
+        "Allah Ghazanfar": 0,
         "Jasprit Bumrah": 0,
         "Shardul Thakur": 3,
         "Mayank Markande": 0,
@@ -1149,7 +1195,19 @@
         "Varun Chakaravarthy": 0,
         "Kartik Tyagi": 1,
         "Sunil Narine": 1,
-        "Anukul Roy": 0
+        "Anukul Roy": 0,
+        "Jofra Archer": 2,
+        "Nandre Burger": 2,
+        "Brijesh Sharma": 1,
+        "Sandeep Sharma": 1,
+        "Ravi Bishnoi": 1,
+        "Ravindra Jadeja": 2,
+        "Matt Henry": 0,
+        "Khaleel Ahmed": 0,
+        "Anshul Kamboj": 2,
+        "Noor Ahmad": 0,
+        "Jamie Overton": 0,
+        "Matthew Short": 0
       },
       "bowlingBalls": {
         "Jacob Duffy": 24,
@@ -1166,7 +1224,7 @@
         "Harshal Patel": 16,
         "Trent Boult": 24,
         "Hardik Pandya": 18,
-        "AM Ghazanfar": 24,
+        "Allah Ghazanfar": 24,
         "Jasprit Bumrah": 24,
         "Shardul Thakur": 24,
         "Mayank Markande": 6,
@@ -1175,7 +1233,19 @@
         "Varun Chakaravarthy": 24,
         "Kartik Tyagi": 24,
         "Sunil Narine": 18,
-        "Anukul Roy": 7
+        "Anukul Roy": 7,
+        "Jofra Archer": 24,
+        "Nandre Burger": 24,
+        "Brijesh Sharma": 18,
+        "Sandeep Sharma": 16,
+        "Ravi Bishnoi": 18,
+        "Ravindra Jadeja": 18,
+        "Matt Henry": 18,
+        "Khaleel Ahmed": 18,
+        "Anshul Kamboj": 18,
+        "Noor Ahmad": 12,
+        "Jamie Overton": 6,
+        "Matthew Short": 1
       },
       "bowlingRunsConceded": {
         "Jacob Duffy": 22,
@@ -1192,7 +1262,7 @@
         "Harshal Patel": 39,
         "Trent Boult": 38,
         "Hardik Pandya": 39,
-        "AM Ghazanfar": 51,
+        "Allah Ghazanfar": 51,
         "Jasprit Bumrah": 35,
         "Shardul Thakur": 39,
         "Mayank Markande": 16,
@@ -1201,7 +1271,19 @@
         "Varun Chakaravarthy": 48,
         "Kartik Tyagi": 43,
         "Sunil Narine": 30,
-        "Anukul Roy": 15
+        "Anukul Roy": 15,
+        "Jofra Archer": 19,
+        "Nandre Burger": 26,
+        "Brijesh Sharma": 17,
+        "Sandeep Sharma": 22,
+        "Ravi Bishnoi": 16,
+        "Ravindra Jadeja": 18,
+        "Matt Henry": 40,
+        "Khaleel Ahmed": 17,
+        "Anshul Kamboj": 27,
+        "Noor Ahmad": 24,
+        "Jamie Overton": 14,
+        "Matthew Short": 1
       },
       "catches": {
         "Jitesh Sharma": 1,
@@ -1212,17 +1294,28 @@
         "Harsh Dubey": 1,
         "Jaydev Unadkat": 1,
         "Hardik Pandya": 1,
-        "Tilak Varma": 2,
+        "N. Tilak Varma": 2,
         "Sherfane Rutherford": 1,
         "Anukul Roy": 1,
         "Rinku Singh": 1,
-        "Manish Pandey": 1
+        "Manish Pandey": 1,
+        "Dhruv Jurel": 2,
+        "Yashasvi Jaiswal": 1,
+        "Ravi Bishnoi": 1,
+        "Nandre Burger": 0,
+        "Jofra Archer": 0,
+        "Ravindra Jadeja": 0,
+        "Brijesh Sharma": 0,
+        "Sarfaraz Khan": 1,
+        "Anshul Kamboj": 0
       },
       "teamHighestScore": {
         "Sunrisers Hyderabad": 201,
         "Royal Challengers Bengaluru": 203,
         "Kolkata Knight Riders": 220,
-        "Mumbai Indians": 224
+        "Mumbai Indians": 224,
+        "Chennai Super Kings": 127,
+        "Rajasthan Royals": 128
       },
       "standings": {
         "Royal Challengers Bengaluru": {
@@ -1264,6 +1357,26 @@
           "ballsFaced": 120,
           "runsAgainst": 224,
           "ballsBowled": 115
+        },
+        "Rajasthan Royals": {
+          "played": 1,
+          "wins": 1,
+          "losses": 0,
+          "points": 2,
+          "runsFor": 128,
+          "ballsFaced": 73,
+          "runsAgainst": 127,
+          "ballsBowled": 120
+        },
+        "Chennai Super Kings": {
+          "played": 1,
+          "wins": 0,
+          "losses": 1,
+          "points": 0,
+          "runsFor": 127,
+          "ballsFaced": 120,
+          "runsAgainst": 128,
+          "ballsBowled": 73
         }
       },
       "bestBowlingFigures": {
@@ -1337,7 +1450,7 @@
           "runs": 39,
           "balls": 18
         },
-        "AM Ghazanfar": {
+        "Allah Ghazanfar": {
           "wickets": 0,
           "runs": 51,
           "balls": 24
@@ -1386,6 +1499,66 @@
           "wickets": 0,
           "runs": 15,
           "balls": 7
+        },
+        "Jofra Archer": {
+          "wickets": 2,
+          "runs": 19,
+          "balls": 24
+        },
+        "Nandre Burger": {
+          "wickets": 2,
+          "runs": 26,
+          "balls": 24
+        },
+        "Brijesh Sharma": {
+          "wickets": 1,
+          "runs": 17,
+          "balls": 18
+        },
+        "Sandeep Sharma": {
+          "wickets": 1,
+          "runs": 22,
+          "balls": 16
+        },
+        "Ravi Bishnoi": {
+          "wickets": 1,
+          "runs": 16,
+          "balls": 18
+        },
+        "Ravindra Jadeja": {
+          "wickets": 2,
+          "runs": 18,
+          "balls": 18
+        },
+        "Matt Henry": {
+          "wickets": 0,
+          "runs": 40,
+          "balls": 18
+        },
+        "Khaleel Ahmed": {
+          "wickets": 0,
+          "runs": 17,
+          "balls": 18
+        },
+        "Anshul Kamboj": {
+          "wickets": 2,
+          "runs": 27,
+          "balls": 18
+        },
+        "Noor Ahmad": {
+          "wickets": 0,
+          "runs": 24,
+          "balls": 12
+        },
+        "Jamie Overton": {
+          "wickets": 0,
+          "runs": 14,
+          "balls": 6
+        },
+        "Matthew Short": {
+          "wickets": 0,
+          "runs": 1,
+          "balls": 1
         }
       },
       "bowlingDots": {},
@@ -1396,7 +1569,8 @@
         "Ajinkya Rahane": 1,
         "Angkrish Raghuvanshi": 1,
         "Ryan Rickelton": 1,
-        "Rohit Sharma": 1
+        "Rohit Sharma": 1,
+        "Vaibhav Suryavanshi": 1
       },
       "battingHundreds": {},
       "battingImpact30s": {
@@ -1430,7 +1604,7 @@
         "Jitesh Sharma": 1,
         "Devdutt Padikkal": 1,
         "Virat Kohli": 1,
-        "Philip Salt": 1,
+        "Phil Salt": 1,
         "Rajat Patidar": 1,
         "Tim David": 1,
         "Eshan Malinga": 1,
@@ -1442,15 +1616,15 @@
         "Ramandeep Singh": 1,
         "Trent Boult": 1,
         "Hardik Pandya": 1,
-        "AM Ghazanfar": 1,
+        "Allah Ghazanfar": 1,
         "Jasprit Bumrah": 1,
         "Shardul Thakur": 1,
         "Mayank Markande": 1,
-        "Tilak Varma": 1,
+        "N. Tilak Varma": 1,
         "Sherfane Rutherford": 1,
         "Ryan Rickelton": 1,
         "Rohit Sharma": 1,
-        "Suryakumar Yadav": 1,
+        "Surya Kumar Yadav": 1,
         "Naman Dhir": 1,
         "Vaibhav Arora": 1,
         "Blessing Muzarabani": 1,
@@ -1458,12 +1632,34 @@
         "Kartik Tyagi": 1,
         "Sunil Narine": 1,
         "Anukul Roy": 1,
-        "Manish Pandey": 1
+        "Manish Pandey": 1,
+        "Sanju Samson": 1,
+        "Ruturaj Gaikwad": 1,
+        "Ayush Mhatre": 1,
+        "Matthew Short": 1,
+        "Sarfaraz Khan": 1,
+        "Kartik Sharma": 1,
+        "Shivam Dube": 1,
+        "Jamie Overton": 1,
+        "Noor Ahmad": 1,
+        "Matt Henry": 1,
+        "Anshul Kamboj": 1,
+        "Jofra Archer": 1,
+        "Nandre Burger": 1,
+        "Brijesh Sharma": 1,
+        "Sandeep Sharma": 1,
+        "Ravi Bishnoi": 1,
+        "Ravindra Jadeja": 1,
+        "Dhruv Jurel": 1,
+        "Yashasvi Jaiswal": 1,
+        "Vaibhav Suryavanshi": 1,
+        "Riyan Parag": 1,
+        "Khaleel Ahmed": 1
       }
     },
     "liveOverlay": {
       "matchId": null,
-      "generatedAt": "2026-03-30T06:25:08.013Z",
+      "generatedAt": "2026-03-30T20:07:05.636Z",
       "aggregates": null,
       "status": null,
       "source": null
@@ -1474,35 +1670,25 @@
       "maxBacklogPerRun": 2,
       "lastLiveScorecardAt": null,
       "lastLiveScorecardMatchId": null,
-      "lastBacklogProcessAt": "2026-03-29T18:02:03.693Z"
+      "lastBacklogProcessAt": "2026-03-30T20:07:05.636Z"
     },
     "officialMostDots": {
       "enabled": true,
       "minRefreshMinutes": 120,
-      "lastFetchedAt": "2026-03-30T06:25:08.680Z",
-      "lastAttemptAt": "2026-03-30T06:25:08.013Z",
+      "lastFetchedAt": "2026-03-30T20:07:06.472Z",
+      "lastAttemptAt": "2026-03-30T20:07:05.637Z",
       "lastSource": "IPLT20 official most dots feed",
       "lastStatus": "ok",
       "lastError": null
     },
     "lastRun": {
       "seriesInfoCalls": 1,
-      "scorecardCalls": 2,
-      "backlogProcessed": 0,
+      "scorecardCalls": 3,
+      "backlogProcessed": 1,
       "backlogRemaining": 0,
       "liveOverlayFetched": false,
       "liveOverlayReused": false,
       "liveOverlaySkippedReason": null
-    },
-    "aggregateSchemaVersion": 2,
-    "cricmetricDots": {
-      "enabled": true,
-      "minRefreshMinutes": 120,
-      "lastFetchedAt": null,
-      "lastAttemptAt": "2026-03-29T18:02:03.694Z",
-      "lastSource": null,
-      "lastStatus": "error",
-      "lastError": "cricmetric-page-direct: HTTP 403 for https://www.cricmetric.com/jscripts/leadersdata.py?show=Player&type=Standard&format=All_T20&category=Men&start=1800-01-01&role=Bowling&sortby=W&series=ipl2026&sig=6fcf9b2618b11d1245fd00060540ec29505a97102c26d97ff48258b08d7bfdb1 | cricmetric-page-via-jina: leadersdata-url-not-found"
     },
     "scoreHistory": [
       {
@@ -2929,7 +3115,7 @@
                 }
               }
             },
-            "formula": "Runs + (Sixes\u00d72) + (Wickets\u00d720) + (Dot balls\u00d71.5) + (Catches\u00d78) + batting SR bonus + bowling economy bonus + milestone bonuses",
+            "formula": "Runs + (Sixes×2) + (Wickets×20) + (Dot balls×1.5) + (Catches×8) + batting SR bonus + bowling economy bonus + milestone bonuses",
             "milestoneRules": {
               "batting50": 10,
               "batting100": 25,
@@ -3442,32 +3628,2634 @@
             "formulaSource": "custom MVP ranking filtered to players with minimum match requirement"
           }
         }
+      },
+      {
+        "processedMatchCount": 3,
+        "fetchedAt": "2026-03-30T20:07:07.069Z",
+        "snapshot": {
+          "titleWinner": {
+            "winner": "Rajasthan Royals",
+            "finalists": [
+              "Rajasthan Royals",
+              "Royal Challengers Bengaluru"
+            ],
+            "playoffs": [
+              "Rajasthan Royals",
+              "Royal Challengers Bengaluru",
+              "Mumbai Indians",
+              "Kolkata Knight Riders"
+            ],
+            "ranking": [
+              "Rajasthan Royals",
+              "Royal Challengers Bengaluru",
+              "Mumbai Indians",
+              "Kolkata Knight Riders",
+              "Sunrisers Hyderabad",
+              "Chennai Super Kings"
+            ],
+            "extendedRanking": [
+              "Rajasthan Royals",
+              "Royal Challengers Bengaluru",
+              "Mumbai Indians",
+              "Kolkata Knight Riders",
+              "Sunrisers Hyderabad",
+              "Chennai Super Kings"
+            ]
+          },
+          "orangeCap": {
+            "ranking": [
+              "Ryan Rickelton",
+              "Ishan Kishan",
+              "Rohit Sharma",
+              "Virat Kohli",
+              "Ajinkya Rahane",
+              "Devdutt Padikkal",
+              "Vaibhav Suryavanshi",
+              "Angkrish Raghuvanshi",
+              "Aniket Verma",
+              "Jamie Overton"
+            ],
+            "extendedRanking": [
+              "Ryan Rickelton",
+              "Ishan Kishan",
+              "Rohit Sharma",
+              "Virat Kohli",
+              "Ajinkya Rahane",
+              "Devdutt Padikkal",
+              "Vaibhav Suryavanshi",
+              "Angkrish Raghuvanshi",
+              "Aniket Verma",
+              "Jamie Overton",
+              "Yashasvi Jaiswal",
+              "Finn Allen",
+              "Rinku Singh",
+              "Heinrich Klaasen",
+              "Rajat Patidar",
+              "N. Tilak Varma",
+              "Cameron Green",
+              "Dhruv Jurel",
+              "Hardik Pandya",
+              "Kartik Sharma",
+              "Sarfaraz Khan",
+              "Surya Kumar Yadav",
+              "Tim David",
+              "Riyan Parag",
+              "Travis Head",
+              "Salil Arora",
+              "Phil Salt",
+              "Abhishek Sharma",
+              "Anshul Kamboj",
+              "David Payne",
+              "Ruturaj Gaikwad",
+              "Sanju Samson",
+              "Shivam Dube",
+              "Matt Henry",
+              "Naman Dhir",
+              "Jaydev Unadkat",
+              "Ramandeep Singh",
+              "Harsh Dubey",
+              "Matthew Short",
+              "Nitish Kumar Reddy",
+              "Noor Ahmad",
+              "Ayush Mhatre",
+              "Harshal Patel",
+              "Jitesh Sharma"
+            ]
+          },
+          "mostSixes": {
+            "ranking": [
+              "Ryan Rickelton",
+              "Rohit Sharma",
+              "Ajinkya Rahane",
+              "Ishan Kishan",
+              "Vaibhav Suryavanshi",
+              "Virat Kohli",
+              "Aniket Verma",
+              "Devdutt Padikkal",
+              "Rajat Patidar",
+              "Angkrish Raghuvanshi"
+            ],
+            "extendedRanking": [
+              "Ryan Rickelton",
+              "Rohit Sharma",
+              "Ajinkya Rahane",
+              "Ishan Kishan",
+              "Vaibhav Suryavanshi",
+              "Virat Kohli",
+              "Aniket Verma",
+              "Devdutt Padikkal",
+              "Rajat Patidar",
+              "Angkrish Raghuvanshi",
+              "Finn Allen",
+              "Jamie Overton",
+              "Abhishek Sharma",
+              "Cameron Green",
+              "Heinrich Klaasen",
+              "Kartik Sharma",
+              "Riyan Parag",
+              "Salil Arora",
+              "Sarfaraz Khan",
+              "Shivam Dube",
+              "Tim David",
+              "Yashasvi Jaiswal",
+              "Anshul Kamboj",
+              "Ayush Mhatre",
+              "David Payne",
+              "Dhruv Jurel",
+              "Hardik Pandya",
+              "Harsh Dubey",
+              "Harshal Patel",
+              "Jaydev Unadkat",
+              "Jitesh Sharma",
+              "Matt Henry",
+              "Matthew Short",
+              "N. Tilak Varma",
+              "Naman Dhir",
+              "Nitish Kumar Reddy",
+              "Noor Ahmad",
+              "Phil Salt",
+              "Ramandeep Singh",
+              "Rinku Singh",
+              "Ruturaj Gaikwad",
+              "Sanju Samson",
+              "Surya Kumar Yadav",
+              "Travis Head"
+            ]
+          },
+          "purpleCap": {
+            "ranking": [
+              "Jacob Duffy",
+              "Romario Shepherd",
+              "Shardul Thakur",
+              "Anshul Kamboj",
+              "David Payne",
+              "Jofra Archer",
+              "Nandre Burger",
+              "Ravindra Jadeja",
+              "Abhinandan Singh",
+              "Bhuvneshwar Kumar"
+            ],
+            "extendedRanking": [
+              "Jacob Duffy",
+              "Romario Shepherd",
+              "Shardul Thakur",
+              "Anshul Kamboj",
+              "David Payne",
+              "Jofra Archer",
+              "Nandre Burger",
+              "Ravindra Jadeja",
+              "Abhinandan Singh",
+              "Bhuvneshwar Kumar",
+              "Brijesh Sharma",
+              "Hardik Pandya",
+              "Harsh Dubey",
+              "Jaydev Unadkat",
+              "Kartik Tyagi",
+              "Ravi Bishnoi",
+              "Sandeep Sharma",
+              "Sunil Narine",
+              "Suyash Sharma",
+              "Vaibhav Arora",
+              "Allah Ghazanfar",
+              "Anukul Roy",
+              "Blessing Muzarabani",
+              "Eshan Malinga",
+              "Harshal Patel",
+              "Jamie Overton",
+              "Jasprit Bumrah",
+              "Khaleel Ahmed",
+              "Krunal Pandya",
+              "Matt Henry",
+              "Matthew Short",
+              "Mayank Markande",
+              "Nitish Kumar Reddy",
+              "Noor Ahmad",
+              "Trent Boult",
+              "Varun Chakaravarthy"
+            ]
+          },
+          "mostDots": {
+            "ranking": [
+              "Jofra Archer",
+              "Nandre Burger",
+              "Jacob Duffy",
+              "Ravindra Jadeja",
+              "Brijesh Sharma",
+              "Khaleel Ahmed",
+              "Bhuvneshwar Kumar",
+              "Kartik Tyagi",
+              "Anshul Kamboj",
+              "Ravi Bishnoi"
+            ],
+            "extendedRanking": [
+              "Jofra Archer",
+              "Nandre Burger",
+              "Jacob Duffy",
+              "Ravindra Jadeja",
+              "Brijesh Sharma",
+              "Khaleel Ahmed",
+              "Bhuvneshwar Kumar",
+              "Kartik Tyagi",
+              "Anshul Kamboj",
+              "Ravi Bishnoi",
+              "Vaibhav Arora",
+              "Abhinandan Singh",
+              "Hardik Pandya",
+              "Shardul Thakur",
+              "Trent Boult",
+              "Allah Ghazanfar",
+              "Blessing Muzarabani",
+              "Jaydev Unadkat",
+              "Sunil Narine",
+              "Suyash Sharma",
+              "David Payne",
+              "Nitish Kumar Reddy",
+              "Romario Shepherd",
+              "Varun Chakaravarthy",
+              "Harsh Dubey",
+              "Jasprit Bumrah",
+              "Noor Ahmad",
+              "Eshan Malinga",
+              "Harshal Patel",
+              "Sandeep Sharma",
+              "Matt Henry",
+              "Anukul Roy",
+              "Jamie Overton",
+              "Krunal Pandya",
+              "Mayank Markande",
+              "Matthew Short"
+            ],
+            "values": {
+              "Jofra Archer": 17,
+              "Nandre Burger": 14,
+              "Jacob Duffy": 13,
+              "Ravindra Jadeja": 11,
+              "Khaleel Ahmed": 10,
+              "Brijesh Sharma": 10,
+              "Bhuvneshwar Kumar": 9,
+              "Kartik Tyagi": 9,
+              "Ravi Bishnoi": 8,
+              "Anshul Kamboj": 8,
+              "Vaibhav Arora": 8,
+              "Abhinandan Singh": 7,
+              "Hardik Pandya": 7,
+              "Trent Boult": 7,
+              "Shardul Thakur": 7,
+              "Suyash Sharma": 6,
+              "Jaydev Unadkat": 6,
+              "Sunil Narine": 6,
+              "Blessing Muzarabani": 6,
+              "Allah Ghazanfar": 6,
+              "Nitish Kumar Reddy": 5,
+              "David Payne": 5,
+              "Varun Chakaravarthy": 5,
+              "Romario Shepherd": 5,
+              "Noor Ahmad": 4,
+              "Harsh Dubey": 4,
+              "Jasprit Bumrah": 4,
+              "Eshan Malinga": 3,
+              "Sandeep Sharma": 3,
+              "Harshal Patel": 3,
+              "Matt Henry": 2,
+              "Jamie Overton": 1,
+              "Mayank Markande": 1,
+              "Anukul Roy": 1,
+              "Krunal Pandya": 1,
+              "Matthew Short": 0
+            }
+          },
+          "mvp": {
+            "ranking": [
+              "Ryan Rickelton",
+              "Devdutt Padikkal",
+              "Ishan Kishan",
+              "Rohit Sharma",
+              "Virat Kohli",
+              "Jacob Duffy",
+              "Ajinkya Rahane",
+              "Shardul Thakur",
+              "Vaibhav Suryavanshi",
+              "Romario Shepherd"
+            ],
+            "extendedRanking": [
+              "Ryan Rickelton",
+              "Devdutt Padikkal",
+              "Ishan Kishan",
+              "Rohit Sharma",
+              "Virat Kohli",
+              "Jacob Duffy",
+              "Ajinkya Rahane",
+              "Shardul Thakur",
+              "Vaibhav Suryavanshi",
+              "Romario Shepherd",
+              "Jofra Archer",
+              "Angkrish Raghuvanshi",
+              "Nandre Burger",
+              "Ravindra Jadeja",
+              "Aniket Verma",
+              "Anshul Kamboj",
+              "Rajat Patidar",
+              "Hardik Pandya",
+              "Heinrich Klaasen",
+              "Finn Allen",
+              "David Payne",
+              "Jamie Overton",
+              "Ravi Bishnoi",
+              "Yashasvi Jaiswal",
+              "Rinku Singh",
+              "Brijesh Sharma",
+              "Jaydev Unadkat",
+              "N. Tilak Varma",
+              "Bhuvneshwar Kumar",
+              "Dhruv Jurel",
+              "Abhinandan Singh",
+              "Harsh Dubey",
+              "Sunil Narine",
+              "Suyash Sharma",
+              "Kartik Tyagi",
+              "Sarfaraz Khan",
+              "Vaibhav Arora",
+              "Sandeep Sharma",
+              "Khaleel Ahmed",
+              "Cameron Green",
+              "Kartik Sharma",
+              "Tim David",
+              "Riyan Parag",
+              "Surya Kumar Yadav",
+              "Salil Arora",
+              "Travis Head",
+              "Trent Boult",
+              "Anukul Roy",
+              "Abhishek Sharma",
+              "Nitish Kumar Reddy",
+              "Jitesh Sharma",
+              "Manish Pandey",
+              "Phil Salt",
+              "Sherfane Rutherford",
+              "Shivam Dube",
+              "Jasprit Bumrah",
+              "Ruturaj Gaikwad",
+              "Sanju Samson",
+              "Naman Dhir",
+              "Allah Ghazanfar",
+              "Blessing Muzarabani",
+              "Ramandeep Singh",
+              "Matt Henry",
+              "Varun Chakaravarthy",
+              "Matthew Short",
+              "Noor Ahmad",
+              "Mayank Markande",
+              "Ayush Mhatre",
+              "Eshan Malinga",
+              "Harshal Patel",
+              "Krunal Pandya"
+            ],
+            "values": {
+              "Ryan Rickelton": {
+                "score": 115,
+                "runs": 81,
+                "sixes": 8,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 188.37,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 1,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Devdutt Padikkal": {
+                "score": 111,
+                "runs": 61,
+                "sixes": 4,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 3,
+                "battingStrikeRate": 234.62,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 1,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Ishan Kishan": {
+                "score": 108,
+                "runs": 80,
+                "sixes": 5,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 210.53,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 1,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Rohit Sharma": {
+                "score": 108,
+                "runs": 78,
+                "sixes": 6,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 205.26,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 1,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Virat Kohli": {
+                "score": 105,
+                "runs": 69,
+                "sixes": 5,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 1,
+                "battingStrikeRate": 181.58,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 1,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Jacob Duffy": {
+                "score": 99.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 3,
+                "dotBalls": 13,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 5.5,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 8,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 1,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Ajinkya Rahane": {
+                "score": 92,
+                "runs": 67,
+                "sixes": 5,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 167.5,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 5,
+                  "economy": 0,
+                  "batting50s": 1,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Shardul Thakur": {
+                "score": 82.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 3,
+                "dotBalls": 7,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 9.75,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 1,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Vaibhav Suryavanshi": {
+                "score": 80,
+                "runs": 52,
+                "sixes": 5,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 305.88,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 1,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Romario Shepherd": {
+                "score": 74.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 3,
+                "dotBalls": 5,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 13.5,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 1,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Jofra Archer": {
+                "score": 73.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 2,
+                "dotBalls": 17,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 4.75,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 8,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Angkrish Raghuvanshi": {
+                "score": 73,
+                "runs": 51,
+                "sixes": 2,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 175.86,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 1,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Nandre Burger": {
+                "score": 66,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 2,
+                "dotBalls": 14,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 6.5,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Ravindra Jadeja": {
+                "score": 61.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 2,
+                "dotBalls": 11,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 6,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Aniket Verma": {
+                "score": 59,
+                "runs": 43,
+                "sixes": 4,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 238.89,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Anshul Kamboj": {
+                "score": 59,
+                "runs": 7,
+                "sixes": 0,
+                "wickets": 2,
+                "dotBalls": 8,
+                "catches": 0,
+                "battingStrikeRate": 70,
+                "economy": 9,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Rajat Patidar": {
+                "score": 53,
+                "runs": 31,
+                "sixes": 3,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 258.33,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 1,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Hardik Pandya": {
+                "score": 51.5,
+                "runs": 18,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 7,
+                "catches": 1,
+                "battingStrikeRate": 163.64,
+                "economy": 13,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Heinrich Klaasen": {
+                "score": 51,
+                "runs": 31,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 2,
+                "battingStrikeRate": 140.91,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 2,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Finn Allen": {
+                "score": 49,
+                "runs": 37,
+                "sixes": 2,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 217.65,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "David Payne": {
+                "score": 48.5,
+                "runs": 6,
+                "sixes": 0,
+                "wickets": 2,
+                "dotBalls": 5,
+                "catches": 0,
+                "battingStrikeRate": 120,
+                "economy": 11.67,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Jamie Overton": {
+                "score": 48.5,
+                "runs": 43,
+                "sixes": 2,
+                "wickets": 0,
+                "dotBalls": 1,
+                "catches": 0,
+                "battingStrikeRate": 119.44,
+                "economy": 14,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Ravi Bishnoi": {
+                "score": 48,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 8,
+                "catches": 1,
+                "battingStrikeRate": null,
+                "economy": 5.33,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 8,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Yashasvi Jaiswal": {
+                "score": 48,
+                "runs": 38,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 1,
+                "battingStrikeRate": 105.56,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Rinku Singh": {
+                "score": 46,
+                "runs": 33,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 1,
+                "battingStrikeRate": 157.14,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 5,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Brijesh Sharma": {
+                "score": 43,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 10,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 5.67,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 8,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Jaydev Unadkat": {
+                "score": 41,
+                "runs": 4,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 6,
+                "catches": 1,
+                "battingStrikeRate": 133.33,
+                "economy": 9.67,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "N. Tilak Varma": {
+                "score": 36,
+                "runs": 20,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 2,
+                "battingStrikeRate": 142.86,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Bhuvneshwar Kumar": {
+                "score": 35.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 9,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 7.75,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 2,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Dhruv Jurel": {
+                "score": 34,
+                "runs": 18,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 2,
+                "battingStrikeRate": 200,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Abhinandan Singh": {
+                "score": 33.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 7,
+                "catches": 1,
+                "battingStrikeRate": null,
+                "economy": 12.67,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Harsh Dubey": {
+                "score": 32,
+                "runs": 3,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 4,
+                "catches": 1,
+                "battingStrikeRate": 100,
+                "economy": 11.67,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Sunil Narine": {
+                "score": 29,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 6,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 10,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Suyash Sharma": {
+                "score": 29,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 6,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 9.33,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Kartik Tyagi": {
+                "score": 28.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 9,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 10.75,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Sarfaraz Khan": {
+                "score": 27,
+                "runs": 17,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 1,
+                "battingStrikeRate": 141.67,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Vaibhav Arora": {
+                "score": 27,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 8,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 13,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Sandeep Sharma": {
+                "score": 24.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 3,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 8.25,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Khaleel Ahmed": {
+                "score": 23,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 10,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 5.67,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 8,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Cameron Green": {
+                "score": 20,
+                "runs": 18,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 180,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Kartik Sharma": {
+                "score": 20,
+                "runs": 18,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 120,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Tim David": {
+                "score": 18,
+                "runs": 16,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 160,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Riyan Parag": {
+                "score": 16,
+                "runs": 14,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 127.27,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Surya Kumar Yadav": {
+                "score": 16,
+                "runs": 16,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 200,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Salil Arora": {
+                "score": 11,
+                "runs": 9,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 150,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Travis Head": {
+                "score": 11,
+                "runs": 11,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 122.22,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Trent Boult": {
+                "score": 10.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 7,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 9.5,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Anukul Roy": {
+                "score": 9.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 1,
+                "catches": 1,
+                "battingStrikeRate": null,
+                "economy": 12.86,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Abhishek Sharma": {
+                "score": 9,
+                "runs": 7,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 87.5,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Nitish Kumar Reddy": {
+                "score": 8.5,
+                "runs": 1,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 5,
+                "catches": 0,
+                "battingStrikeRate": 16.67,
+                "economy": 9.5,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Jitesh Sharma": {
+                "score": 8,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 1,
+                "battingStrikeRate": 0,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Manish Pandey": {
+                "score": 8,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 1,
+                "battingStrikeRate": null,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Phil Salt": {
+                "score": 8,
+                "runs": 8,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 114.29,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Sherfane Rutherford": {
+                "score": 8,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 1,
+                "battingStrikeRate": null,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Shivam Dube": {
+                "score": 8,
+                "runs": 6,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 150,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Jasprit Bumrah": {
+                "score": 6,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 4,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 8.75,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Ruturaj Gaikwad": {
+                "score": 6,
+                "runs": 6,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 54.55,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Sanju Samson": {
+                "score": 6,
+                "runs": 6,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 85.71,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Naman Dhir": {
+                "score": 5,
+                "runs": 5,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 250,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Allah Ghazanfar": {
+                "score": 4,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 6,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 12.75,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Blessing Muzarabani": {
+                "score": 4,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 6,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 11.33,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Ramandeep Singh": {
+                "score": 4,
+                "runs": 4,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 100,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Matt Henry": {
+                "score": 3,
+                "runs": 5,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 2,
+                "catches": 0,
+                "battingStrikeRate": 71.43,
+                "economy": 13.33,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Varun Chakaravarthy": {
+                "score": 2.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 5,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 12,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Matthew Short": {
+                "score": 2,
+                "runs": 2,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 28.57,
+                "economy": 6,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Noor Ahmad": {
+                "score": 2,
+                "runs": 1,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 4,
+                "catches": 0,
+                "battingStrikeRate": 11.11,
+                "economy": 12,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Mayank Markande": {
+                "score": 1.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 1,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 16,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Ayush Mhatre": {
+                "score": 0,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 0,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Eshan Malinga": {
+                "score": -0.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 3,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 17.5,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Harshal Patel": {
+                "score": -0.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 3,
+                "catches": 0,
+                "battingStrikeRate": 0,
+                "economy": 14.63,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Krunal Pandya": {
+                "score": -3.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 1,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 13,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              }
+            },
+            "formula": "Runs + (Sixes×2) + (Wickets×20) + (Dot balls×1.5) + (Catches×8) + batting SR bonus + bowling economy bonus + milestone bonuses",
+            "milestoneRules": {
+              "batting50": 10,
+              "batting100": 25,
+              "impact30Under15Balls": 8,
+              "bowling3w": 12,
+              "bowling4w": 20,
+              "bowling5w": 30
+            },
+            "bonusRules": {
+              "battingStrikeRate": {
+                "gt170": 8,
+                "gt150": 5,
+                "gt130": 2,
+                "lt100": -5,
+                "minRuns": 30
+              },
+              "economy": {
+                "lt6": 8,
+                "lt7": 5,
+                "lt8": 2,
+                "gt10": -5,
+                "minBalls": 12
+              }
+            }
+          },
+          "uncappedMvp": {
+            "ranking": [
+              "Vaibhav Suryavanshi",
+              "Angkrish Raghuvanshi",
+              "Aniket Verma",
+              "Anshul Kamboj",
+              "Brijesh Sharma",
+              "Abhinandan Singh",
+              "Harsh Dubey",
+              "Suyash Sharma",
+              "Kartik Tyagi",
+              "Vaibhav Arora"
+            ],
+            "extendedRanking": [
+              "Vaibhav Suryavanshi",
+              "Angkrish Raghuvanshi",
+              "Aniket Verma",
+              "Anshul Kamboj",
+              "Brijesh Sharma",
+              "Abhinandan Singh",
+              "Harsh Dubey",
+              "Suyash Sharma",
+              "Kartik Tyagi",
+              "Vaibhav Arora",
+              "Kartik Sharma",
+              "Salil Arora",
+              "Anukul Roy",
+              "Naman Dhir",
+              "Ayush Mhatre"
+            ],
+            "values": {
+              "Vaibhav Suryavanshi": {
+                "score": 80,
+                "runs": 52,
+                "sixes": 5,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 305.88,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 1,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Angkrish Raghuvanshi": {
+                "score": 73,
+                "runs": 51,
+                "sixes": 2,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 175.86,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 1,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Aniket Verma": {
+                "score": 59,
+                "runs": 43,
+                "sixes": 4,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 238.89,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 8,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Anshul Kamboj": {
+                "score": 59,
+                "runs": 7,
+                "sixes": 0,
+                "wickets": 2,
+                "dotBalls": 8,
+                "catches": 0,
+                "battingStrikeRate": 70,
+                "economy": 9,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Brijesh Sharma": {
+                "score": 43,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 10,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 5.67,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 8,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Abhinandan Singh": {
+                "score": 33.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 7,
+                "catches": 1,
+                "battingStrikeRate": null,
+                "economy": 12.67,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Harsh Dubey": {
+                "score": 32,
+                "runs": 3,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 4,
+                "catches": 1,
+                "battingStrikeRate": 100,
+                "economy": 11.67,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Suyash Sharma": {
+                "score": 29,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 6,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 9.33,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Kartik Tyagi": {
+                "score": 28.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 9,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 10.75,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Vaibhav Arora": {
+                "score": 27,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 1,
+                "dotBalls": 8,
+                "catches": 0,
+                "battingStrikeRate": null,
+                "economy": 13,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": -5,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Kartik Sharma": {
+                "score": 20,
+                "runs": 18,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 120,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Salil Arora": {
+                "score": 11,
+                "runs": 9,
+                "sixes": 1,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 150,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Anukul Roy": {
+                "score": 9.5,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 1,
+                "catches": 1,
+                "battingStrikeRate": null,
+                "economy": 12.86,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Naman Dhir": {
+                "score": 5,
+                "runs": 5,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 250,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              },
+              "Ayush Mhatre": {
+                "score": 0,
+                "runs": 0,
+                "sixes": 0,
+                "wickets": 0,
+                "dotBalls": 0,
+                "catches": 0,
+                "battingStrikeRate": 0,
+                "economy": null,
+                "matches": 1,
+                "bonuses": {
+                  "sr": 0,
+                  "economy": 0,
+                  "batting50s": 0,
+                  "batting100s": 0,
+                  "impact30s": 0,
+                  "bowling3w": 0,
+                  "bowling4w": 0,
+                  "bowling5w": 0
+                }
+              }
+            },
+            "source": "custom MVP ranking filtered to user-provided uncapped player pool"
+          },
+          "fairPlay": {
+            "winner": "Chennai Super Kings",
+            "ranking": [
+              "Chennai Super Kings",
+              "Kolkata Knight Riders",
+              "Mumbai Indians",
+              "Rajasthan Royals",
+              "Sunrisers Hyderabad",
+              "Royal Challengers Bengaluru"
+            ],
+            "extendedRanking": [
+              "Chennai Super Kings",
+              "Kolkata Knight Riders",
+              "Mumbai Indians",
+              "Rajasthan Royals",
+              "Sunrisers Hyderabad",
+              "Royal Challengers Bengaluru"
+            ],
+            "values": {
+              "Chennai Super Kings": {
+                "matches": 1,
+                "average": null,
+                "points": 10,
+                "raw": {
+                  "TeamID": "11",
+                  "TeamName": "CSK",
+                  "TeamFullName": "Chennai Super Kings",
+                  "No": "1",
+                  "HM": "0",
+                  "HP": "0",
+                  "AM": "1",
+                  "AP": "10",
+                  "Points": "10",
+                  "AvePoints": "10.00"
+                }
+              },
+              "Kolkata Knight Riders": {
+                "matches": 1,
+                "average": null,
+                "points": 10,
+                "raw": {
+                  "TeamID": "3",
+                  "TeamName": "KKR",
+                  "TeamFullName": "Kolkata Knight Riders",
+                  "No": "1",
+                  "HM": "0",
+                  "HP": "0",
+                  "AM": "1",
+                  "AP": "10",
+                  "Points": "10",
+                  "AvePoints": "10.00"
+                }
+              },
+              "Mumbai Indians": {
+                "matches": 1,
+                "average": null,
+                "points": 10,
+                "raw": {
+                  "TeamID": "1",
+                  "TeamName": "MI",
+                  "TeamFullName": "Mumbai Indians",
+                  "No": "1",
+                  "HM": "1",
+                  "HP": "10",
+                  "AM": "0",
+                  "AP": "0",
+                  "Points": "10",
+                  "AvePoints": "10.00"
+                }
+              },
+              "Rajasthan Royals": {
+                "matches": 1,
+                "average": null,
+                "points": 10,
+                "raw": {
+                  "TeamID": "12",
+                  "TeamName": "RR",
+                  "TeamFullName": "Rajasthan Royals",
+                  "No": "1",
+                  "HM": "1",
+                  "HP": "10",
+                  "AM": "0",
+                  "AP": "0",
+                  "Points": "10",
+                  "AvePoints": "10.00"
+                }
+              },
+              "Sunrisers Hyderabad": {
+                "matches": 1,
+                "average": null,
+                "points": 10,
+                "raw": {
+                  "TeamID": "8",
+                  "TeamName": "SRH",
+                  "TeamFullName": "Sunrisers Hyderabad",
+                  "No": "1",
+                  "HM": "0",
+                  "HP": "0",
+                  "AM": "1",
+                  "AP": "10",
+                  "Points": "10",
+                  "AvePoints": "10.00"
+                }
+              },
+              "Royal Challengers Bengaluru": {
+                "matches": 1,
+                "average": null,
+                "points": 9,
+                "raw": {
+                  "TeamID": "7",
+                  "TeamName": "RCB",
+                  "TeamFullName": "Royal Challengers Bengaluru",
+                  "No": "1",
+                  "HM": "1",
+                  "HP": "9",
+                  "AM": "0",
+                  "AP": "0",
+                  "Points": "9",
+                  "AvePoints": "9.00"
+                }
+              }
+            },
+            "updatedAt": "31-03-2026 : 01:00:01",
+            "source": "IPLT20 official fairplay feed"
+          },
+          "highestScoreTeam": {
+            "ranking": [
+              "Mumbai Indians",
+              "Kolkata Knight Riders",
+              "Royal Challengers Bengaluru",
+              "Sunrisers Hyderabad",
+              "Rajasthan Royals",
+              "Chennai Super Kings"
+            ],
+            "extendedRanking": [
+              "Mumbai Indians",
+              "Kolkata Knight Riders",
+              "Royal Challengers Bengaluru",
+              "Sunrisers Hyderabad",
+              "Rajasthan Royals",
+              "Chennai Super Kings"
+            ],
+            "values": {
+              "Sunrisers Hyderabad": 201,
+              "Royal Challengers Bengaluru": 203,
+              "Kolkata Knight Riders": 220,
+              "Mumbai Indians": 224,
+              "Chennai Super Kings": 127,
+              "Rajasthan Royals": 128
+            }
+          },
+          "striker": {
+            "ranking": [],
+            "extendedRanking": []
+          },
+          "bestBowlingFigures": {
+            "ranking": [
+              "Jacob Duffy",
+              "Shardul Thakur",
+              "Romario Shepherd",
+              "Ravindra Jadeja",
+              "Jofra Archer",
+              "Nandre Burger",
+              "Anshul Kamboj",
+              "David Payne",
+              "Ravi Bishnoi",
+              "Brijesh Sharma"
+            ],
+            "extendedRanking": [
+              "Jacob Duffy",
+              "Shardul Thakur",
+              "Romario Shepherd",
+              "Ravindra Jadeja",
+              "Jofra Archer",
+              "Nandre Burger",
+              "Anshul Kamboj",
+              "David Payne",
+              "Ravi Bishnoi",
+              "Brijesh Sharma",
+              "Sandeep Sharma",
+              "Suyash Sharma",
+              "Jaydev Unadkat",
+              "Sunil Narine",
+              "Bhuvneshwar Kumar",
+              "Harsh Dubey",
+              "Abhinandan Singh",
+              "Hardik Pandya",
+              "Kartik Tyagi",
+              "Vaibhav Arora",
+              "Matthew Short",
+              "Jamie Overton",
+              "Anukul Roy",
+              "Mayank Markande",
+              "Khaleel Ahmed",
+              "Nitish Kumar Reddy",
+              "Noor Ahmad",
+              "Krunal Pandya",
+              "Blessing Muzarabani",
+              "Eshan Malinga",
+              "Jasprit Bumrah",
+              "Trent Boult",
+              "Harshal Patel",
+              "Matt Henry",
+              "Varun Chakaravarthy",
+              "Allah Ghazanfar"
+            ],
+            "figures": {
+              "Jacob Duffy": "3/22",
+              "Shardul Thakur": "3/39",
+              "Romario Shepherd": "3/54",
+              "Ravindra Jadeja": "2/18",
+              "Jofra Archer": "2/19",
+              "Nandre Burger": "2/26",
+              "Anshul Kamboj": "2/27",
+              "David Payne": "2/35",
+              "Ravi Bishnoi": "1/16",
+              "Brijesh Sharma": "1/17",
+              "Sandeep Sharma": "1/22",
+              "Suyash Sharma": "1/28",
+              "Jaydev Unadkat": "1/29",
+              "Sunil Narine": "1/30",
+              "Bhuvneshwar Kumar": "1/31",
+              "Harsh Dubey": "1/35",
+              "Abhinandan Singh": "1/38",
+              "Hardik Pandya": "1/39",
+              "Kartik Tyagi": "1/43",
+              "Vaibhav Arora": "1/52",
+              "Matthew Short": "0/1",
+              "Jamie Overton": "0/14",
+              "Anukul Roy": "0/15",
+              "Mayank Markande": "0/16",
+              "Khaleel Ahmed": "0/17",
+              "Nitish Kumar Reddy": "0/19",
+              "Noor Ahmad": "0/24",
+              "Krunal Pandya": "0/26",
+              "Blessing Muzarabani": "0/34",
+              "Eshan Malinga": "0/35",
+              "Jasprit Bumrah": "0/35",
+              "Trent Boult": "0/38",
+              "Harshal Patel": "0/39",
+              "Matt Henry": "0/40",
+              "Varun Chakaravarthy": "0/48",
+              "Allah Ghazanfar": "0/51"
+            }
+          },
+          "bestBowlingStrikeRate": {
+            "ranking": [],
+            "extendedRanking": [],
+            "values": {}
+          },
+          "mostCatches": {
+            "ranking": [
+              "Devdutt Padikkal",
+              "Dhruv Jurel",
+              "Heinrich Klaasen",
+              "N. Tilak Varma",
+              "Abhinandan Singh",
+              "Anukul Roy",
+              "Hardik Pandya",
+              "Harsh Dubey",
+              "Jaydev Unadkat",
+              "Jitesh Sharma"
+            ],
+            "extendedRanking": [
+              "Devdutt Padikkal",
+              "Dhruv Jurel",
+              "Heinrich Klaasen",
+              "N. Tilak Varma",
+              "Abhinandan Singh",
+              "Anukul Roy",
+              "Hardik Pandya",
+              "Harsh Dubey",
+              "Jaydev Unadkat",
+              "Jitesh Sharma",
+              "Manish Pandey",
+              "Ravi Bishnoi",
+              "Rinku Singh",
+              "Sarfaraz Khan",
+              "Sherfane Rutherford",
+              "Virat Kohli",
+              "Yashasvi Jaiswal",
+              "Anshul Kamboj",
+              "Brijesh Sharma",
+              "Jofra Archer",
+              "Nandre Burger",
+              "Ravindra Jadeja"
+            ],
+            "values": {
+              "Jitesh Sharma": 1,
+              "Abhinandan Singh": 1,
+              "Devdutt Padikkal": 3,
+              "Virat Kohli": 1,
+              "Heinrich Klaasen": 2,
+              "Harsh Dubey": 1,
+              "Jaydev Unadkat": 1,
+              "Hardik Pandya": 1,
+              "N. Tilak Varma": 2,
+              "Sherfane Rutherford": 1,
+              "Anukul Roy": 1,
+              "Rinku Singh": 1,
+              "Manish Pandey": 1,
+              "Dhruv Jurel": 2,
+              "Yashasvi Jaiswal": 1,
+              "Ravi Bishnoi": 1,
+              "Nandre Burger": 0,
+              "Jofra Archer": 0,
+              "Ravindra Jadeja": 0,
+              "Brijesh Sharma": 0,
+              "Sarfaraz Khan": 1,
+              "Anshul Kamboj": 0
+            }
+          },
+          "tableBottom": {
+            "ranking": [
+              "Rajasthan Royals",
+              "Royal Challengers Bengaluru",
+              "Mumbai Indians",
+              "Kolkata Knight Riders",
+              "Sunrisers Hyderabad",
+              "Chennai Super Kings"
+            ],
+            "extendedRanking": [
+              "Rajasthan Royals",
+              "Royal Challengers Bengaluru",
+              "Mumbai Indians",
+              "Kolkata Knight Riders",
+              "Sunrisers Hyderabad",
+              "Chennai Super Kings"
+            ]
+          },
+          "leastMvp": {
+            "ranking": [],
+            "extendedRanking": [],
+            "values": {},
+            "minMatches": 5,
+            "formulaSource": "custom MVP ranking filtered to players with minimum match requirement"
+          }
+        }
       }
-    ]
+    ],
+    "aggregateSchemaVersion": 2,
+    "cricmetricDots": {
+      "enabled": true,
+      "minRefreshMinutes": 120,
+      "lastFetchedAt": null,
+      "lastAttemptAt": "2026-03-29T18:02:03.694Z",
+      "lastSource": null,
+      "lastStatus": "error",
+      "lastError": "cricmetric-page-direct: HTTP 403 for https://www.cricmetric.com/jscripts/leadersdata.py?show=Player&type=Standard&format=All_T20&category=Men&start=1800-01-01&role=Bowling&sortby=W&series=ipl2026&sig=6fcf9b2618b11d1245fd00060540ec29505a97102c26d97ff48258b08d7bfdb1 | cricmetric-page-via-jina: leadersdata-url-not-found"
+    }
   },
   "titleWinner": {
-    "winner": "Royal Challengers Bengaluru",
+    "winner": "Rajasthan Royals",
     "finalists": [
-      "Royal Challengers Bengaluru",
-      "Mumbai Indians"
+      "Rajasthan Royals",
+      "Royal Challengers Bengaluru"
     ],
     "playoffs": [
+      "Rajasthan Royals",
       "Royal Challengers Bengaluru",
       "Mumbai Indians",
-      "Kolkata Knight Riders",
-      "Sunrisers Hyderabad"
+      "Kolkata Knight Riders"
     ],
     "ranking": [
+      "Rajasthan Royals",
       "Royal Challengers Bengaluru",
       "Mumbai Indians",
       "Kolkata Knight Riders",
-      "Sunrisers Hyderabad"
+      "Sunrisers Hyderabad",
+      "Chennai Super Kings"
     ],
     "extendedRanking": [
+      "Rajasthan Royals",
       "Royal Challengers Bengaluru",
       "Mumbai Indians",
       "Kolkata Knight Riders",
-      "Sunrisers Hyderabad"
+      "Sunrisers Hyderabad",
+      "Chennai Super Kings"
     ]
   },
   "orangeCap": {
@@ -3478,10 +6266,10 @@
       "Virat Kohli",
       "Ajinkya Rahane",
       "Devdutt Padikkal",
+      "Vaibhav Suryavanshi",
       "Angkrish Raghuvanshi",
       "Aniket Verma",
-      "Finn Allen",
-      "Rinku Singh"
+      "Jamie Overton"
     ],
     "extendedRanking": [
       "Ryan Rickelton",
@@ -3490,27 +6278,42 @@
       "Virat Kohli",
       "Ajinkya Rahane",
       "Devdutt Padikkal",
+      "Vaibhav Suryavanshi",
       "Angkrish Raghuvanshi",
       "Aniket Verma",
+      "Jamie Overton",
+      "Yashasvi Jaiswal",
       "Finn Allen",
       "Rinku Singh",
       "Heinrich Klaasen",
       "Rajat Patidar",
-      "Tilak Varma",
+      "N. Tilak Varma",
       "Cameron Green",
+      "Dhruv Jurel",
       "Hardik Pandya",
-      "Suryakumar Yadav",
+      "Kartik Sharma",
+      "Sarfaraz Khan",
+      "Surya Kumar Yadav",
       "Tim David",
+      "Riyan Parag",
       "Travis Head",
       "Salil Arora",
-      "Philip Salt",
+      "Phil Salt",
       "Abhishek Sharma",
+      "Anshul Kamboj",
       "David Payne",
+      "Ruturaj Gaikwad",
+      "Sanju Samson",
+      "Shivam Dube",
+      "Matt Henry",
       "Naman Dhir",
       "Jaydev Unadkat",
       "Ramandeep Singh",
       "Harsh Dubey",
+      "Matthew Short",
       "Nitish Kumar Reddy",
+      "Noor Ahmad",
+      "Ayush Mhatre",
       "Harshal Patel",
       "Jitesh Sharma"
     ]
@@ -3521,42 +6324,57 @@
       "Rohit Sharma",
       "Ajinkya Rahane",
       "Ishan Kishan",
+      "Vaibhav Suryavanshi",
       "Virat Kohli",
       "Aniket Verma",
       "Devdutt Padikkal",
       "Rajat Patidar",
-      "Angkrish Raghuvanshi",
-      "Finn Allen"
+      "Angkrish Raghuvanshi"
     ],
     "extendedRanking": [
       "Ryan Rickelton",
       "Rohit Sharma",
       "Ajinkya Rahane",
       "Ishan Kishan",
+      "Vaibhav Suryavanshi",
       "Virat Kohli",
       "Aniket Verma",
       "Devdutt Padikkal",
       "Rajat Patidar",
       "Angkrish Raghuvanshi",
       "Finn Allen",
+      "Jamie Overton",
       "Abhishek Sharma",
       "Cameron Green",
       "Heinrich Klaasen",
+      "Kartik Sharma",
+      "Riyan Parag",
       "Salil Arora",
+      "Sarfaraz Khan",
+      "Shivam Dube",
       "Tim David",
+      "Yashasvi Jaiswal",
+      "Anshul Kamboj",
+      "Ayush Mhatre",
       "David Payne",
+      "Dhruv Jurel",
       "Hardik Pandya",
       "Harsh Dubey",
       "Harshal Patel",
       "Jaydev Unadkat",
       "Jitesh Sharma",
+      "Matt Henry",
+      "Matthew Short",
+      "N. Tilak Varma",
       "Naman Dhir",
       "Nitish Kumar Reddy",
-      "Philip Salt",
+      "Noor Ahmad",
+      "Phil Salt",
       "Ramandeep Singh",
       "Rinku Singh",
-      "Suryakumar Yadav",
-      "Tilak Varma",
+      "Ruturaj Gaikwad",
+      "Sanju Samson",
+      "Surya Kumar Yadav",
       "Travis Head"
     ]
   },
@@ -3565,58 +6383,77 @@
       "Jacob Duffy",
       "Romario Shepherd",
       "Shardul Thakur",
+      "Anshul Kamboj",
       "David Payne",
+      "Jofra Archer",
+      "Nandre Burger",
+      "Ravindra Jadeja",
       "Abhinandan Singh",
-      "Bhuvneshwar Kumar",
-      "Hardik Pandya",
-      "Harsh Dubey",
-      "Jaydev Unadkat",
-      "Kartik Tyagi"
+      "Bhuvneshwar Kumar"
     ],
     "extendedRanking": [
       "Jacob Duffy",
       "Romario Shepherd",
       "Shardul Thakur",
+      "Anshul Kamboj",
       "David Payne",
+      "Jofra Archer",
+      "Nandre Burger",
+      "Ravindra Jadeja",
       "Abhinandan Singh",
       "Bhuvneshwar Kumar",
+      "Brijesh Sharma",
       "Hardik Pandya",
       "Harsh Dubey",
       "Jaydev Unadkat",
       "Kartik Tyagi",
+      "Ravi Bishnoi",
+      "Sandeep Sharma",
       "Sunil Narine",
       "Suyash Sharma",
       "Vaibhav Arora",
-      "AM Ghazanfar",
+      "Allah Ghazanfar",
       "Anukul Roy",
       "Blessing Muzarabani",
       "Eshan Malinga",
       "Harshal Patel",
+      "Jamie Overton",
       "Jasprit Bumrah",
+      "Khaleel Ahmed",
       "Krunal Pandya",
+      "Matt Henry",
+      "Matthew Short",
       "Mayank Markande",
       "Nitish Kumar Reddy",
+      "Noor Ahmad",
       "Trent Boult",
       "Varun Chakaravarthy"
     ]
   },
   "mostDots": {
     "ranking": [
+      "Jofra Archer",
+      "Nandre Burger",
       "Jacob Duffy",
+      "Ravindra Jadeja",
+      "Brijesh Sharma",
+      "Khaleel Ahmed",
       "Bhuvneshwar Kumar",
       "Kartik Tyagi",
-      "Vaibhav Arora",
-      "Abhinandan Singh",
-      "Hardik Pandya",
-      "Shardul Thakur",
-      "Trent Boult",
-      "Allah Ghazanfar",
-      "Blessing Muzarabani"
+      "Anshul Kamboj",
+      "Ravi Bishnoi"
     ],
     "extendedRanking": [
+      "Jofra Archer",
+      "Nandre Burger",
       "Jacob Duffy",
+      "Ravindra Jadeja",
+      "Brijesh Sharma",
+      "Khaleel Ahmed",
       "Bhuvneshwar Kumar",
       "Kartik Tyagi",
+      "Anshul Kamboj",
+      "Ravi Bishnoi",
       "Vaibhav Arora",
       "Abhinandan Singh",
       "Hardik Pandya",
@@ -3633,16 +6470,28 @@
       "Varun Chakaravarthy",
       "Harsh Dubey",
       "Jasprit Bumrah",
+      "Noor Ahmad",
       "Eshan Malinga",
       "Harshal Patel",
+      "Sandeep Sharma",
+      "Matt Henry",
       "Anukul Roy",
+      "Jamie Overton",
       "Krunal Pandya",
-      "Mayank Markande"
+      "Mayank Markande",
+      "Matthew Short"
     ],
     "values": {
+      "Jofra Archer": 17,
+      "Nandre Burger": 14,
       "Jacob Duffy": 13,
+      "Ravindra Jadeja": 11,
+      "Khaleel Ahmed": 10,
+      "Brijesh Sharma": 10,
       "Bhuvneshwar Kumar": 9,
       "Kartik Tyagi": 9,
+      "Ravi Bishnoi": 8,
+      "Anshul Kamboj": 8,
       "Vaibhav Arora": 8,
       "Abhinandan Singh": 7,
       "Hardik Pandya": 7,
@@ -3657,13 +6506,18 @@
       "David Payne": 5,
       "Varun Chakaravarthy": 5,
       "Romario Shepherd": 5,
+      "Noor Ahmad": 4,
       "Harsh Dubey": 4,
       "Jasprit Bumrah": 4,
       "Eshan Malinga": 3,
+      "Sandeep Sharma": 3,
       "Harshal Patel": 3,
+      "Matt Henry": 2,
+      "Jamie Overton": 1,
       "Mayank Markande": 1,
       "Anukul Roy": 1,
-      "Krunal Pandya": 1
+      "Krunal Pandya": 1,
+      "Matthew Short": 0
     }
   },
   "mvp": {
@@ -3676,8 +6530,8 @@
       "Jacob Duffy",
       "Ajinkya Rahane",
       "Shardul Thakur",
-      "Romario Shepherd",
-      "Angkrish Raghuvanshi"
+      "Vaibhav Suryavanshi",
+      "Romario Shepherd"
     ],
     "extendedRanking": [
       "Ryan Rickelton",
@@ -3688,48 +6542,69 @@
       "Jacob Duffy",
       "Ajinkya Rahane",
       "Shardul Thakur",
+      "Vaibhav Suryavanshi",
       "Romario Shepherd",
+      "Jofra Archer",
       "Angkrish Raghuvanshi",
+      "Nandre Burger",
+      "Ravindra Jadeja",
       "Aniket Verma",
+      "Anshul Kamboj",
       "Rajat Patidar",
       "Hardik Pandya",
       "Heinrich Klaasen",
       "Finn Allen",
       "David Payne",
+      "Jamie Overton",
+      "Ravi Bishnoi",
+      "Yashasvi Jaiswal",
       "Rinku Singh",
+      "Brijesh Sharma",
       "Jaydev Unadkat",
-      "Tilak Varma",
+      "N. Tilak Varma",
       "Bhuvneshwar Kumar",
+      "Dhruv Jurel",
       "Abhinandan Singh",
       "Harsh Dubey",
       "Sunil Narine",
       "Suyash Sharma",
       "Kartik Tyagi",
+      "Sarfaraz Khan",
       "Vaibhav Arora",
+      "Sandeep Sharma",
+      "Khaleel Ahmed",
       "Cameron Green",
+      "Kartik Sharma",
       "Tim David",
-      "Suryakumar Yadav",
+      "Riyan Parag",
+      "Surya Kumar Yadav",
       "Salil Arora",
       "Travis Head",
       "Trent Boult",
       "Anukul Roy",
       "Abhishek Sharma",
-      "Allah Ghazanfar",
       "Nitish Kumar Reddy",
       "Jitesh Sharma",
       "Manish Pandey",
-      "Philip Salt",
+      "Phil Salt",
       "Sherfane Rutherford",
+      "Shivam Dube",
       "Jasprit Bumrah",
+      "Ruturaj Gaikwad",
+      "Sanju Samson",
       "Naman Dhir",
+      "Allah Ghazanfar",
       "Blessing Muzarabani",
       "Ramandeep Singh",
+      "Matt Henry",
       "Varun Chakaravarthy",
+      "Matthew Short",
+      "Noor Ahmad",
       "Mayank Markande",
+      "Ayush Mhatre",
       "Eshan Malinga",
       "Harshal Patel",
-      "Krunal Pandya",
-      "AM Ghazanfar"
+      "Krunal Pandya"
     ],
     "values": {
       "Ryan Rickelton": {
@@ -3900,6 +6775,27 @@
           "bowling5w": 0
         }
       },
+      "Vaibhav Suryavanshi": {
+        "score": 80,
+        "runs": 52,
+        "sixes": 5,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 305.88,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 1,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
       "Romario Shepherd": {
         "score": 74.5,
         "runs": 0,
@@ -3917,6 +6813,27 @@
           "batting100s": 0,
           "impact30s": 0,
           "bowling3w": 1,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Jofra Archer": {
+        "score": 73.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 2,
+        "dotBalls": 17,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 4.75,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 8,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
           "bowling4w": 0,
           "bowling5w": 0
         }
@@ -3942,6 +6859,48 @@
           "bowling5w": 0
         }
       },
+      "Nandre Burger": {
+        "score": 66,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 2,
+        "dotBalls": 14,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 6.5,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Ravindra Jadeja": {
+        "score": 61.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 2,
+        "dotBalls": 11,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 6,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
       "Aniket Verma": {
         "score": 59,
         "runs": 43,
@@ -3954,6 +6913,27 @@
         "matches": 1,
         "bonuses": {
           "sr": 8,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Anshul Kamboj": {
+        "score": 59,
+        "runs": 7,
+        "sixes": 0,
+        "wickets": 2,
+        "dotBalls": 8,
+        "catches": 0,
+        "battingStrikeRate": 70,
+        "economy": 9,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
           "economy": 0,
           "batting50s": 0,
           "batting100s": 0,
@@ -4068,6 +7048,69 @@
           "bowling5w": 0
         }
       },
+      "Jamie Overton": {
+        "score": 48.5,
+        "runs": 43,
+        "sixes": 2,
+        "wickets": 0,
+        "dotBalls": 1,
+        "catches": 0,
+        "battingStrikeRate": 119.44,
+        "economy": 14,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Ravi Bishnoi": {
+        "score": 48,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 8,
+        "catches": 1,
+        "battingStrikeRate": null,
+        "economy": 5.33,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 8,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Yashasvi Jaiswal": {
+        "score": 48,
+        "runs": 38,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 1,
+        "battingStrikeRate": 105.56,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
       "Rinku Singh": {
         "score": 46,
         "runs": 33,
@@ -4081,6 +7124,27 @@
         "bonuses": {
           "sr": 5,
           "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Brijesh Sharma": {
+        "score": 43,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 10,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 5.67,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 8,
           "batting50s": 0,
           "batting100s": 0,
           "impact30s": 0,
@@ -4110,7 +7174,7 @@
           "bowling5w": 0
         }
       },
-      "Tilak Varma": {
+      "N. Tilak Varma": {
         "score": 36,
         "runs": 20,
         "sixes": 0,
@@ -4144,6 +7208,27 @@
         "bonuses": {
           "sr": 0,
           "economy": 2,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Dhruv Jurel": {
+        "score": 34,
+        "runs": 18,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 2,
+        "battingStrikeRate": 200,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
           "batting50s": 0,
           "batting100s": 0,
           "impact30s": 0,
@@ -4257,6 +7342,27 @@
           "bowling5w": 0
         }
       },
+      "Sarfaraz Khan": {
+        "score": 27,
+        "runs": 17,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 1,
+        "battingStrikeRate": 141.67,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
       "Vaibhav Arora": {
         "score": 27,
         "runs": 0,
@@ -4278,6 +7384,48 @@
           "bowling5w": 0
         }
       },
+      "Sandeep Sharma": {
+        "score": 24.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 3,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 8.25,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Khaleel Ahmed": {
+        "score": 23,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 10,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 5.67,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 8,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
       "Cameron Green": {
         "score": 20,
         "runs": 18,
@@ -4286,6 +7434,27 @@
         "dotBalls": 0,
         "catches": 0,
         "battingStrikeRate": 180,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Kartik Sharma": {
+        "score": 20,
+        "runs": 18,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 120,
         "economy": null,
         "matches": 1,
         "bonuses": {
@@ -4320,7 +7489,28 @@
           "bowling5w": 0
         }
       },
-      "Suryakumar Yadav": {
+      "Riyan Parag": {
+        "score": 16,
+        "runs": 14,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 127.27,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Surya Kumar Yadav": {
         "score": 16,
         "runs": 16,
         "sixes": 0,
@@ -4446,27 +7636,6 @@
           "bowling5w": 0
         }
       },
-      "Allah Ghazanfar": {
-        "score": 9,
-        "runs": 0,
-        "sixes": 0,
-        "wickets": 0,
-        "dotBalls": 6,
-        "catches": 0,
-        "battingStrikeRate": null,
-        "economy": null,
-        "matches": 0,
-        "bonuses": {
-          "sr": 0,
-          "economy": 0,
-          "batting50s": 0,
-          "batting100s": 0,
-          "impact30s": 0,
-          "bowling3w": 0,
-          "bowling4w": 0,
-          "bowling5w": 0
-        }
-      },
       "Nitish Kumar Reddy": {
         "score": 8.5,
         "runs": 1,
@@ -4530,7 +7699,7 @@
           "bowling5w": 0
         }
       },
-      "Philip Salt": {
+      "Phil Salt": {
         "score": 8,
         "runs": 8,
         "sixes": 0,
@@ -4572,6 +7741,27 @@
           "bowling5w": 0
         }
       },
+      "Shivam Dube": {
+        "score": 8,
+        "runs": 6,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 150,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
       "Jasprit Bumrah": {
         "score": 6,
         "runs": 0,
@@ -4581,6 +7771,48 @@
         "catches": 0,
         "battingStrikeRate": null,
         "economy": 8.75,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Ruturaj Gaikwad": {
+        "score": 6,
+        "runs": 6,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 54.55,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Sanju Samson": {
+        "score": 6,
+        "runs": 6,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 85.71,
+        "economy": null,
         "matches": 1,
         "bonuses": {
           "sr": 0,
@@ -4606,6 +7838,27 @@
         "bonuses": {
           "sr": 0,
           "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Allah Ghazanfar": {
+        "score": 4,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 6,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 12.75,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
           "batting50s": 0,
           "batting100s": 0,
           "impact30s": 0,
@@ -4656,6 +7909,27 @@
           "bowling5w": 0
         }
       },
+      "Matt Henry": {
+        "score": 3,
+        "runs": 5,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 2,
+        "catches": 0,
+        "battingStrikeRate": 71.43,
+        "economy": 13.33,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
       "Varun Chakaravarthy": {
         "score": 2.5,
         "runs": 0,
@@ -4664,6 +7938,48 @@
         "dotBalls": 5,
         "catches": 0,
         "battingStrikeRate": null,
+        "economy": 12,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Matthew Short": {
+        "score": 2,
+        "runs": 2,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 28.57,
+        "economy": 6,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Noor Ahmad": {
+        "score": 2,
+        "runs": 1,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 4,
+        "catches": 0,
+        "battingStrikeRate": 11.11,
         "economy": 12,
         "matches": 1,
         "bonuses": {
@@ -4686,6 +8002,27 @@
         "catches": 0,
         "battingStrikeRate": null,
         "economy": 16,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Ayush Mhatre": {
+        "score": 0,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 0,
+        "economy": null,
         "matches": 1,
         "bonuses": {
           "sr": 0,
@@ -4760,30 +8097,9 @@
           "bowling4w": 0,
           "bowling5w": 0
         }
-      },
-      "AM Ghazanfar": {
-        "score": -5,
-        "runs": 0,
-        "sixes": 0,
-        "wickets": 0,
-        "dotBalls": 0,
-        "catches": 0,
-        "battingStrikeRate": null,
-        "economy": 12.75,
-        "matches": 1,
-        "bonuses": {
-          "sr": 0,
-          "economy": -5,
-          "batting50s": 0,
-          "batting100s": 0,
-          "impact30s": 0,
-          "bowling3w": 0,
-          "bowling4w": 0,
-          "bowling5w": 0
-        }
       }
     },
-    "formula": "Runs + (Sixes\u00d72) + (Wickets\u00d720) + (Dot balls\u00d71.5) + (Catches\u00d78) + batting SR bonus + bowling economy bonus + milestone bonuses",
+    "formula": "Runs + (Sixes×2) + (Wickets×20) + (Dot balls×1.5) + (Catches×8) + batting SR bonus + bowling economy bonus + milestone bonuses",
     "milestoneRules": {
       "batting50": 10,
       "batting100": 25,
@@ -4811,30 +8127,56 @@
   },
   "uncappedMvp": {
     "ranking": [
+      "Vaibhav Suryavanshi",
       "Angkrish Raghuvanshi",
       "Aniket Verma",
+      "Anshul Kamboj",
+      "Brijesh Sharma",
       "Abhinandan Singh",
       "Harsh Dubey",
       "Suyash Sharma",
       "Kartik Tyagi",
-      "Vaibhav Arora",
-      "Salil Arora",
-      "Anukul Roy",
-      "Naman Dhir"
+      "Vaibhav Arora"
     ],
     "extendedRanking": [
+      "Vaibhav Suryavanshi",
       "Angkrish Raghuvanshi",
       "Aniket Verma",
+      "Anshul Kamboj",
+      "Brijesh Sharma",
       "Abhinandan Singh",
       "Harsh Dubey",
       "Suyash Sharma",
       "Kartik Tyagi",
       "Vaibhav Arora",
+      "Kartik Sharma",
       "Salil Arora",
       "Anukul Roy",
-      "Naman Dhir"
+      "Naman Dhir",
+      "Ayush Mhatre"
     ],
     "values": {
+      "Vaibhav Suryavanshi": {
+        "score": 80,
+        "runs": 52,
+        "sixes": 5,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 305.88,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 1,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
       "Angkrish Raghuvanshi": {
         "score": 73,
         "runs": 51,
@@ -4869,6 +8211,48 @@
         "bonuses": {
           "sr": 8,
           "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Anshul Kamboj": {
+        "score": 59,
+        "runs": 7,
+        "sixes": 0,
+        "wickets": 2,
+        "dotBalls": 8,
+        "catches": 0,
+        "battingStrikeRate": 70,
+        "economy": 9,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Brijesh Sharma": {
+        "score": 43,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 10,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 5.67,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 8,
           "batting50s": 0,
           "batting100s": 0,
           "impact30s": 0,
@@ -4982,6 +8366,27 @@
           "bowling5w": 0
         }
       },
+      "Kartik Sharma": {
+        "score": 20,
+        "runs": 18,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 120,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
       "Salil Arora": {
         "score": 11,
         "runs": 9,
@@ -5044,25 +8449,67 @@
           "bowling4w": 0,
           "bowling5w": 0
         }
+      },
+      "Ayush Mhatre": {
+        "score": 0,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 0,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
       }
     },
     "source": "custom MVP ranking filtered to user-provided uncapped player pool"
   },
   "fairPlay": {
-    "winner": "Kolkata Knight Riders",
+    "winner": "Chennai Super Kings",
     "ranking": [
+      "Chennai Super Kings",
       "Kolkata Knight Riders",
       "Mumbai Indians",
+      "Rajasthan Royals",
       "Sunrisers Hyderabad",
       "Royal Challengers Bengaluru"
     ],
     "extendedRanking": [
+      "Chennai Super Kings",
       "Kolkata Knight Riders",
       "Mumbai Indians",
+      "Rajasthan Royals",
       "Sunrisers Hyderabad",
       "Royal Challengers Bengaluru"
     ],
     "values": {
+      "Chennai Super Kings": {
+        "matches": 1,
+        "average": null,
+        "points": 10,
+        "raw": {
+          "TeamID": "11",
+          "TeamName": "CSK",
+          "TeamFullName": "Chennai Super Kings",
+          "No": "1",
+          "HM": "0",
+          "HP": "0",
+          "AM": "1",
+          "AP": "10",
+          "Points": "10",
+          "AvePoints": "10.00"
+        }
+      },
       "Kolkata Knight Riders": {
         "matches": 1,
         "average": null,
@@ -5088,6 +8535,23 @@
           "TeamID": "1",
           "TeamName": "MI",
           "TeamFullName": "Mumbai Indians",
+          "No": "1",
+          "HM": "1",
+          "HP": "10",
+          "AM": "0",
+          "AP": "0",
+          "Points": "10",
+          "AvePoints": "10.00"
+        }
+      },
+      "Rajasthan Royals": {
+        "matches": 1,
+        "average": null,
+        "points": 10,
+        "raw": {
+          "TeamID": "12",
+          "TeamName": "RR",
+          "TeamFullName": "Rajasthan Royals",
           "No": "1",
           "HM": "1",
           "HP": "10",
@@ -5132,7 +8596,7 @@
         }
       }
     },
-    "updatedAt": "30-03-2026 : 08:50:02",
+    "updatedAt": "31-03-2026 : 01:00:01",
     "source": "IPLT20 official fairplay feed"
   },
   "highestScoreTeam": {
@@ -5140,19 +8604,25 @@
       "Mumbai Indians",
       "Kolkata Knight Riders",
       "Royal Challengers Bengaluru",
-      "Sunrisers Hyderabad"
+      "Sunrisers Hyderabad",
+      "Rajasthan Royals",
+      "Chennai Super Kings"
     ],
     "extendedRanking": [
       "Mumbai Indians",
       "Kolkata Knight Riders",
       "Royal Challengers Bengaluru",
-      "Sunrisers Hyderabad"
+      "Sunrisers Hyderabad",
+      "Rajasthan Royals",
+      "Chennai Super Kings"
     ],
     "values": {
       "Sunrisers Hyderabad": 201,
       "Royal Challengers Bengaluru": 203,
       "Kolkata Knight Riders": 220,
-      "Mumbai Indians": 224
+      "Mumbai Indians": 224,
+      "Chennai Super Kings": 127,
+      "Rajasthan Royals": 128
     }
   },
   "striker": {
@@ -5164,19 +8634,26 @@
       "Jacob Duffy",
       "Shardul Thakur",
       "Romario Shepherd",
+      "Ravindra Jadeja",
+      "Jofra Archer",
+      "Nandre Burger",
+      "Anshul Kamboj",
       "David Payne",
-      "Suyash Sharma",
-      "Jaydev Unadkat",
-      "Sunil Narine",
-      "Bhuvneshwar Kumar",
-      "Harsh Dubey",
-      "Abhinandan Singh"
+      "Ravi Bishnoi",
+      "Brijesh Sharma"
     ],
     "extendedRanking": [
       "Jacob Duffy",
       "Shardul Thakur",
       "Romario Shepherd",
+      "Ravindra Jadeja",
+      "Jofra Archer",
+      "Nandre Burger",
+      "Anshul Kamboj",
       "David Payne",
+      "Ravi Bishnoi",
+      "Brijesh Sharma",
+      "Sandeep Sharma",
       "Suyash Sharma",
       "Jaydev Unadkat",
       "Sunil Narine",
@@ -5186,23 +8663,35 @@
       "Hardik Pandya",
       "Kartik Tyagi",
       "Vaibhav Arora",
+      "Matthew Short",
+      "Jamie Overton",
       "Anukul Roy",
       "Mayank Markande",
+      "Khaleel Ahmed",
       "Nitish Kumar Reddy",
+      "Noor Ahmad",
       "Krunal Pandya",
       "Blessing Muzarabani",
       "Eshan Malinga",
       "Jasprit Bumrah",
       "Trent Boult",
       "Harshal Patel",
+      "Matt Henry",
       "Varun Chakaravarthy",
-      "AM Ghazanfar"
+      "Allah Ghazanfar"
     ],
     "figures": {
       "Jacob Duffy": "3/22",
       "Shardul Thakur": "3/39",
       "Romario Shepherd": "3/54",
+      "Ravindra Jadeja": "2/18",
+      "Jofra Archer": "2/19",
+      "Nandre Burger": "2/26",
+      "Anshul Kamboj": "2/27",
       "David Payne": "2/35",
+      "Ravi Bishnoi": "1/16",
+      "Brijesh Sharma": "1/17",
+      "Sandeep Sharma": "1/22",
       "Suyash Sharma": "1/28",
       "Jaydev Unadkat": "1/29",
       "Sunil Narine": "1/30",
@@ -5212,17 +8701,22 @@
       "Hardik Pandya": "1/39",
       "Kartik Tyagi": "1/43",
       "Vaibhav Arora": "1/52",
+      "Matthew Short": "0/1",
+      "Jamie Overton": "0/14",
       "Anukul Roy": "0/15",
       "Mayank Markande": "0/16",
+      "Khaleel Ahmed": "0/17",
       "Nitish Kumar Reddy": "0/19",
+      "Noor Ahmad": "0/24",
       "Krunal Pandya": "0/26",
       "Blessing Muzarabani": "0/34",
       "Eshan Malinga": "0/35",
       "Jasprit Bumrah": "0/35",
       "Trent Boult": "0/38",
       "Harshal Patel": "0/39",
+      "Matt Henry": "0/40",
       "Varun Chakaravarthy": "0/48",
-      "AM Ghazanfar": "0/51"
+      "Allah Ghazanfar": "0/51"
     }
   },
   "bestBowlingStrikeRate": {
@@ -5233,20 +8727,21 @@
   "mostCatches": {
     "ranking": [
       "Devdutt Padikkal",
+      "Dhruv Jurel",
       "Heinrich Klaasen",
-      "Tilak Varma",
+      "N. Tilak Varma",
       "Abhinandan Singh",
       "Anukul Roy",
       "Hardik Pandya",
       "Harsh Dubey",
       "Jaydev Unadkat",
-      "Jitesh Sharma",
-      "Manish Pandey"
+      "Jitesh Sharma"
     ],
     "extendedRanking": [
       "Devdutt Padikkal",
+      "Dhruv Jurel",
       "Heinrich Klaasen",
-      "Tilak Varma",
+      "N. Tilak Varma",
       "Abhinandan Singh",
       "Anukul Roy",
       "Hardik Pandya",
@@ -5254,9 +8749,17 @@
       "Jaydev Unadkat",
       "Jitesh Sharma",
       "Manish Pandey",
+      "Ravi Bishnoi",
       "Rinku Singh",
+      "Sarfaraz Khan",
       "Sherfane Rutherford",
-      "Virat Kohli"
+      "Virat Kohli",
+      "Yashasvi Jaiswal",
+      "Anshul Kamboj",
+      "Brijesh Sharma",
+      "Jofra Archer",
+      "Nandre Burger",
+      "Ravindra Jadeja"
     ],
     "values": {
       "Jitesh Sharma": 1,
@@ -5267,25 +8770,38 @@
       "Harsh Dubey": 1,
       "Jaydev Unadkat": 1,
       "Hardik Pandya": 1,
-      "Tilak Varma": 2,
+      "N. Tilak Varma": 2,
       "Sherfane Rutherford": 1,
       "Anukul Roy": 1,
       "Rinku Singh": 1,
-      "Manish Pandey": 1
+      "Manish Pandey": 1,
+      "Dhruv Jurel": 2,
+      "Yashasvi Jaiswal": 1,
+      "Ravi Bishnoi": 1,
+      "Nandre Burger": 0,
+      "Jofra Archer": 0,
+      "Ravindra Jadeja": 0,
+      "Brijesh Sharma": 0,
+      "Sarfaraz Khan": 1,
+      "Anshul Kamboj": 0
     }
   },
   "tableBottom": {
     "ranking": [
+      "Rajasthan Royals",
       "Royal Challengers Bengaluru",
       "Mumbai Indians",
       "Kolkata Knight Riders",
-      "Sunrisers Hyderabad"
+      "Sunrisers Hyderabad",
+      "Chennai Super Kings"
     ],
     "extendedRanking": [
+      "Rajasthan Royals",
       "Royal Challengers Bengaluru",
       "Mumbai Indians",
       "Kolkata Knight Riders",
-      "Sunrisers Hyderabad"
+      "Sunrisers Hyderabad",
+      "Chennai Super Kings"
     ]
   },
   "leastMvp": {
