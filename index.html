@@ -1493,9 +1493,34 @@
       const actualWinner = live?.winner || null;
       const aWin = actualWinner && matchesPick(pickA, actualWinner);
       const bWin = actualWinner && matchesPick(pickB, actualWinner);
+
+      let a = aWin ? 1 : 0;
+      let b = bWin ? 1 : 0;
+      let rankA = null;
+      let rankB = null;
+
+      if (categoryKey === 'tableBottom' && a === 0 && b === 0) {
+        const bottomRanking = Array.isArray(live?.extendedRanking) && live.extendedRanking.length
+          ? live.extendedRanking
+          : (Array.isArray(live?.ranking) ? live.ranking : []);
+        rankA = rankOf(pickA, bottomRanking);
+        rankB = rankOf(pickB, bottomRanking);
+
+        if (rankA && rankB) {
+          if (rankA > rankB) a = 1;
+          else if (rankB > rankA) b = 1;
+        } else if (rankA && !rankB) {
+          a = 1;
+        } else if (rankB && !rankA) {
+          b = 1;
+        }
+      }
+
       return {
-        a: aWin ? 1 : 0,
-        b: bWin ? 1 : 0,
+        a,
+        b,
+        rankA,
+        rankB,
         note: winnerBetterNote(categoryKey, live)
       };
     }
@@ -2658,7 +2683,9 @@
       }
 
       if (normalized.tableBottom && !normalized.tableBottom.winner) {
-        const ranking = Array.isArray(normalized.tableBottom.ranking) ? normalized.tableBottom.ranking : [];
+        const ranking = Array.isArray(normalized.tableBottom.extendedRanking) && normalized.tableBottom.extendedRanking.length
+          ? normalized.tableBottom.extendedRanking
+          : (Array.isArray(normalized.tableBottom.ranking) ? normalized.tableBottom.ranking : []);
         if (ranking.length) normalized.tableBottom.winner = ranking[ranking.length - 1];
       }
 
