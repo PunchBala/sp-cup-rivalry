@@ -468,362 +468,28 @@
     // Example expected shape for a top-5 category: { ranking: ['Player A','Player B','Player C','Player D','Player E'] }
     // Example winner category: { winner: 'MI' }
 
-    const SQUADS_2026 = {
-    "CSK": [
-        "Ruturaj Gaikwad",
-        "MS Dhoni",
-        "Sanju Samson",
-        "Dewald Brevis",
-        "Ayush Mhatre",
-        "Kartik Sharma",
-        "Sarfaraz Khan",
-        "Urvil Patel",
-        "Jamie Overton",
-        "Ramakrishna Ghosh",
-        "Prashant Veer",
-        "Matthew William Short",
-        "Aman Khan",
-        "Zak Foulkes",
-        "Shivam Dube",
-        "Khaleel Ahmed",
-        "Noor Ahmad",
-        "Anshul Kamboj",
-        "Mukesh Choudhary",
-        "Shreyas Gopal",
-        "Gurjapneet Singh",
-        "Akeal Hosein",
-        "Matt Henry",
-        "Rahul Chahar",
-        "Spencer Johnson"
-    ],
-    "DC": [
-        "KL Rahul",
-        "Karun Nair",
-        "David Miller",
-        "Ben Duckett",
-        "Pathum Nissanka",
-        "Sahil Parakh",
-        "Prithvi Shaw",
-        "Abishek Porel",
-        "Tristan Stubbs",
-        "Axar Patel",
-        "Sameer Rizvi",
-        "Ashutosh Sharma",
-        "Vipraj Nigam",
-        "Ajay Mandal",
-        "Tripurana Vijay",
-        "Madhav Tiwari",
-        "Nitish Rana",
-        "Mitchell Starc",
-        "T. Natarajan",
-        "Mukesh Kumar",
-        "Dushmantha Chameera",
-        "Auqib Nabi",
-        "Lungisani Ngidi",
-        "Kyle Jamieson",
-        "Kuldeep Yadav"
-    ],
-    "GT": [
-        "Shubman Gill",
-        "Jos Buttler",
-        "Kumar Kushagra",
-        "Anuj Rawat",
-        "Tom Banton",
-        "Glenn Phillips",
-        "Sai Sudharsan",
-        "Nishant Sindhu",
-        "Washington Sundar",
-        "Mohd. Arshad Khan",
-        "Sai Kishore",
-        "Jayant Yadav",
-        "Jason Holder",
-        "Rahul Tewatia",
-        "Shahrukh Khan",
-        "Kagiso Rabada",
-        "Mohammed Siraj",
-        "Prasidh Krishna",
-        "Manav Suthar",
-        "Gurnoor Singh Brar",
-        "Ishant Sharma",
-        "Ashok Sharma",
-        "Luke Wood",
-        "Kulwant Khejroliya",
-        "Rashid Khan"
-    ],
-    "KKR": [
-        "Ajinkya Rahane",
-        "Rinku Singh",
-        "Angkrish Raghuvanshi",
-        "Manish Pandey",
-        "Finn Allen",
-        "Tejasvi Singh",
-        "Rahul Tripathi",
-        "Tim Seifert",
-        "Rovman Powell",
-        "Anukul Roy",
-        "Cameron Green",
-        "Sarthak Ranjan",
-        "Daksh Kamra",
-        "Rachin Ravindra",
-        "Ramandeep Singh",
-        "Sunil Narine",
-        "Blessing Muzarabani",
-        "Vaibhav Arora",
-        "Matheesha Pathirana",
-        "Kartik Tyagi",
-        "Prashant Solanki",
-        "Saurabh Dubey",
-        "Navdeep Saini",
-        "Umran Malik",
-        "Varun Chakaravarthy"
-    ],
-    "LSG": [
-        "Rishabh Pant",
-        "Aiden Markram",
-        "Himmat Singh",
-        "Matthew Breetzke",
-        "Mukul Choudhary",
-        "Akshat Raghuwanshi",
-        "Josh Inglis",
-        "Nicholas Pooran",
-        "Mitchell Marsh",
-        "Abdul Samad",
-        "Shahbaz Ahamad",
-        "Arshin Kulkarni",
-        "Wanindu Hasaranga",
-        "Ayush Badoni",
-        "Mohammad Shami",
-        "Avesh Khan",
-        "M. Siddharth",
-        "Digvesh Singh",
-        "Akash Singh",
-        "Prince Yadav",
-        "Arjun Tendulkar",
-        "Anrich Nortje",
-        "Naman Tiwari",
-        "Mayank Yadav",
-        "Mohsin Khan"
-    ],
-    "MI": [
-        "Rohit Sharma",
-        "Surya Kumar Yadav",
-        "Robin Minz",
-        "Sherfane Rutherford",
-        "Ryan Rickelton",
-        "Quinton de Kock",
-        "Danish Malewar",
-        "N. Tilak Varma",
-        "Hardik Pandya",
-        "Naman Dhir",
-        "Mitchell Santner",
-        "Raj Angad Bawa",
-        "Atharva Ankolekar",
-        "Mayank Rawat",
-        "Corbin Bosch",
-        "Will Jacks",
-        "Shardul Thakur",
-        "Trent Boult",
-        "Mayank Markande",
-        "Deepak Chahar",
-        "Ashwani Kumar",
-        "Raghu Sharma",
-        "Mohammad Izhar",
-        "Allah Ghazanfar",
-        "Jasprit Bumrah"
-    ],
-    "PBKS": [
-        "Shreyas Iyer",
-        "Nehal Wadhera",
-        "Vishnu Vinod",
-        "Harnoor Pannu",
-        "Pyla Avinash",
-        "Prabhsimran Singh",
-        "Shashank Singh",
-        "Marcus Stoinis",
-        "Harpreet Brar",
-        "Marco Jansen",
-        "Azmatullah Omarzai",
-        "Priyansh Arya",
-        "Musheer Khan",
-        "Suryansh Shedge",
-        "Mitch Owen",
-        "Cooper Connolly",
-        "Ben Dwarshuis",
-        "Arshdeep Singh",
-        "Yuzvendra Chahal",
-        "Vyshak Vijaykumar",
-        "Yash Thakur",
-        "Xavier Bartlett",
-        "Pravin Dubey",
-        "Vishal Nishad",
-        "Lockie Ferguson"
-    ],
-    "RR": [
-        "Shubham Dubey",
-        "Vaibhav Suryavanshi",
-        "Donovan Ferreira",
-        "Lhuan-dre Pretorious",
-        "Ravi Singh",
-        "Aman Rao Perala",
-        "Shimron Hetmyer",
-        "Yashasvi Jaiswal",
-        "Dhruv Jurel",
-        "Riyan Parag",
-        "Yudhvir Singh Charak",
-        "Ravindra Jadeja",
-        "Dasun Shanaka",
-        "Jofra Archer",
-        "Tushar Deshpande",
-        "Kwena Maphaka",
-        "Ravi Bishnoi",
-        "Sushant Mishra",
-        "Yash Raj Punja",
-        "Vignesh Puthur",
-        "Brijesh Sharma",
-        "Adam Milne",
-        "Kuldeep Sen",
-        "Sandeep Sharma",
-        "Nandre Burger"
-    ],
-    "RCB": [
-        "Rajat Patidar",
-        "Devdutt Padikkal",
-        "Virat Kohli",
-        "Phil Salt",
-        "Jitesh Sharma",
-        "Jordan Cox",
-        "Krunal Pandya",
-        "Swapnil Singh",
-        "Tim David",
-        "Romario Shepherd",
-        "Jacob Bethell",
-        "Venkatesh Iyer",
-        "Satvik Deswal",
-        "Mangesh Yadav",
-        "Vicky Ostwal",
-        "Vihaan Malhotra",
-        "Kanishk Chouhan",
-        "Josh Hazlewood",
-        "Rasikh Dar",
-        "Suyash Sharma",
-        "Bhuvneshwar Kumar",
-        "Nuwan Thushara",
-        "Abhinandan Singh",
-        "Jacob Duffy",
-        "Yash Dayal"
-    ],
-    "SRH": [
-        "Ishan Kishan",
-        "Aniket Verma",
-        "Smaran Ravichandran",
-        "Salil Arora",
-        "Heinrich Klaasen",
-        "Travis Head",
-        "Harshal Patel",
-        "Kamindu Mendis",
-        "Harsh Dubey",
-        "Brydon Carse",
-        "Shivang Kumar",
-        "Krains Fuletra",
-        "Liam Livingstone",
-        "David Payne",
-        "Abhishek Sharma",
-        "Nitish Kumar Reddy",
-        "Pat Cummins",
-        "Zeeshan Ansari",
-        "Jaydev Unadkat",
-        "Eshan Malinga",
-        "Sakib Hussain",
-        "Onkar Tarmale",
-        "Amit Kumar",
-        "Praful Hinge",
-        "Shivam Mavi"
-    ]
-};
-
-    const TEAM_CODE_TO_NAME = {
-      CSK: 'Chennai Super Kings',
-      DC: 'Delhi Capitals',
-      GT: 'Gujarat Titans',
-      KKR: 'Kolkata Knight Riders',
-      LSG: 'Lucknow Super Giants',
-      MI: 'Mumbai Indians',
-      PBKS: 'Punjab Kings',
-      RR: 'Rajasthan Royals',
-      RCB: 'Royal Challengers Bengaluru',
-      SRH: 'Sunrisers Hyderabad'
-    };
-
     const TEAM_NAME_ALIASES = {
-      csk: 'CSK',
-      'chennai super kings': 'CSK',
-      dc: 'DC',
-      'delhi capitals': 'DC',
-      gt: 'GT',
-      'gujarat titans': 'GT',
-      kkr: 'KKR',
-      'kolkata knight riders': 'KKR',
-      lsg: 'LSG',
-      'lucknow super giants': 'LSG',
-      mi: 'MI',
-      'mumbai indians': 'MI',
-      pbks: 'PBKS',
-      'punjab kings': 'PBKS',
-      rr: 'RR',
-      'rajasthan royals': 'RR',
-      rcb: 'RCB',
-      'royal challengers bengaluru': 'RCB',
-      'royal challengers bangalore': 'RCB',
-      srh: 'SRH',
-      'sunrisers hyderabad': 'SRH'
-    };
-
-    const PLAYER_NAME_ALIASES = {
-      boult: 'Trent Boult',
-      bumrah: 'Jasprit Bumrah',
-      kohli: 'Virat Kohli',
-      gill: 'Shubman Gill',
-      kl: 'KL Rahul',
-      'kl rahul': 'KL Rahul',
-      pooran: 'Nicholas Pooran',
-      sanju: 'Sanju Samson',
-      iyer: 'Shreyas Iyer',
-      'shreyas iyer': 'Shreyas Iyer',
-      chahal: 'Yuzvendra Chahal',
-      rashid: 'Rashid Khan',
-      hazlewood: 'Josh Hazlewood',
-      'varun chakravarthy': 'Varun Chakaravarthy',
-      'varun chakaravarthy': 'Varun Chakaravarthy',
-      'tilak varma': 'N. Tilak Varma',
-      tilak: 'N. Tilak Varma',
-      surya: 'Surya Kumar Yadav',
-      'surya kumar yadav': 'Surya Kumar Yadav',
-      'suryakumar yadav': 'Surya Kumar Yadav',
-      brevis: 'Dewald Brevis',
-      'd brevis': 'Dewald Brevis',
-      'de brevis': 'Dewald Brevis',
-      'abishek sharma': 'Abhishek Sharma',
-      'abhishek sharma': 'Abhishek Sharma',
-      vaibhav: 'Vaibhav Suryavanshi',
-      sooryavanshi: 'Vaibhav Suryavanshi',
-      'v sooryavanshi': 'Vaibhav Suryavanshi',
-      'vaibhav sooryavanshi': 'Vaibhav Suryavanshi',
-      'vaibhav suryavanshi': 'Vaibhav Suryavanshi',
-      natarajan: 'T. Natarajan',
-      'm siddharth': 'M. Siddharth',
-      'shahbaz ahmed': 'Shahbaz Ahamad',
-      'nitish reddy': 'Nitish Kumar Reddy',
-      prasidh: 'Prasidh Krishna',
-      akeal: 'Akeal Hosein',
-      arshdeep: 'Arshdeep Singh',
-      khaleel: 'Khaleel Ahmed',
-      prabhsimran: 'Prabhsimran Singh',
-      salt: 'Phil Salt',
-      'philip salt': 'Phil Salt',
-      ishan: 'Ishan Kishan',
-      'allah ghazanfar': 'Allah Ghazanfar',
-      'am ghazanfar': 'Allah Ghazanfar',
-      'ms dhoni': 'MS Dhoni'
+      mi: 'mumbai indians',
+      'mumbai indians': 'mumbai indians',
+      rcb: 'royal challengers bengaluru',
+      'royal challengers bengaluru': 'royal challengers bengaluru',
+      'royal challengers bangalore': 'royal challengers bengaluru',
+      csk: 'chennai super kings',
+      'chennai super kings': 'chennai super kings',
+      srh: 'sunrisers hyderabad',
+      'sunrisers hyderabad': 'sunrisers hyderabad',
+      gt: 'gujarat titans',
+      'gujarat titans': 'gujarat titans',
+      lsg: 'lucknow super giants',
+      'lucknow super giants': 'lucknow super giants',
+      dc: 'delhi capitals',
+      'delhi capitals': 'delhi capitals',
+      pbks: 'punjab kings',
+      'punjab kings': 'punjab kings',
+      rr: 'rajasthan royals',
+      'rajasthan royals': 'rajasthan royals',
+      kkr: 'kolkata knight riders',
+      'kolkata knight riders': 'kolkata knight riders'
     };
 
     function normalizeName(v){
@@ -835,140 +501,9 @@
         .trim();
     }
 
-    function slugifyEntity(value){
-      return String(value || '')
-        .toLowerCase()
-        .normalize('NFKD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-    }
-
-    function normalizeEntityText(value){
-      return String(value || '')
-        .toLowerCase()
-        .normalize('NFKD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/&/g, ' and ')
-        .replace(/[.'’`]/g, '')
-        .replace(/[^a-z0-9]+/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
-
-    function titleCaseLoose(value){
-      return String(value || '')
-        .split(/\s+/)
-        .filter(Boolean)
-        .map(part => part[0] ? part[0].toUpperCase() + part.slice(1) : part)
-        .join(' ');
-    }
-
-    function createEntityIndex(squads){
-      const byTeamCode = new Map();
-      const byTeamId = new Map();
-      const byPlayerId = new Map();
-      const playersByNormalizedName = new Map();
-
-      for (const [teamCode, players] of Object.entries(squads || {})) {
-        const teamId = `team:${slugifyEntity(teamCode)}`;
-        const teamRecord = {
-          kind: 'team',
-          teamCode,
-          teamId,
-          name: TEAM_CODE_TO_NAME[teamCode] || teamCode,
-          displayName: TEAM_CODE_TO_NAME[teamCode] || teamCode
-        };
-        byTeamCode.set(teamCode, teamRecord);
-        byTeamId.set(teamId, teamRecord);
-
-        for (const playerName of players) {
-          const playerId = `player:${slugifyEntity(playerName)}`;
-          const record = {
-            kind: 'player',
-            playerId,
-            name: playerName,
-            displayName: playerName,
-            teamCode,
-            teamId
-          };
-          byPlayerId.set(playerId, record);
-
-          const normalized = normalizeEntityText(playerName);
-          if (!playersByNormalizedName.has(normalized)) playersByNormalizedName.set(normalized, []);
-          playersByNormalizedName.get(normalized).push(record);
-        }
-      }
-
-      function resolveTeam(value){
-        if (!value) return null;
-        const normalized = normalizeEntityText(value);
-        const aliasedCode = TEAM_NAME_ALIASES[normalized] || String(value || '').toUpperCase();
-        return byTeamCode.get(aliasedCode) || null;
-      }
-
-      function resolvePlayer(value, hint = {}){
-        if (!value) return null;
-
-        const rawNormalized = normalizeEntityText(value);
-        const aliasedName = PLAYER_NAME_ALIASES[rawNormalized] || titleCaseLoose(String(value).trim());
-        const normalized = normalizeEntityText(aliasedName);
-        let candidates = playersByNormalizedName.get(normalized) || [];
-
-        if (hint.teamCode) candidates = candidates.filter(player => player.teamCode === hint.teamCode);
-        if (hint.teamId) candidates = candidates.filter(player => player.teamId === hint.teamId);
-
-        if (candidates.length === 1) return candidates[0];
-
-        const loose = [...byPlayerId.values()].filter(player => {
-          const n = normalizeEntityText(player.name);
-          return n === rawNormalized || n.endsWith(` ${rawNormalized}`) || n.includes(` ${rawNormalized} `);
-        });
-
-        if (hint.teamCode) {
-          const filtered = loose.filter(player => player.teamCode === hint.teamCode);
-          if (filtered.length === 1) return filtered[0];
-        }
-        if (hint.teamId) {
-          const filtered = loose.filter(player => player.teamId === hint.teamId);
-          if (filtered.length === 1) return filtered[0];
-        }
-
-        if (loose.length === 1) return loose[0];
-        return null;
-      }
-
-      function resolveAny(value, hint = {}){
-        return resolvePlayer(value, hint) || resolveTeam(value) || null;
-      }
-
-      return {
-        resolveAny,
-        resolvePlayer,
-        resolveTeam
-      };
-    }
-
-    const ENTITY_INDEX = createEntityIndex(SQUADS_2026);
-    const ENTITY_RESOLUTION_CACHE = new Map();
-
-    function resolveEntity(value, hint = {}){
-      const cacheKey = JSON.stringify([value || '', hint.teamCode || '', hint.teamId || '']);
-      if (ENTITY_RESOLUTION_CACHE.has(cacheKey)) return ENTITY_RESOLUTION_CACHE.get(cacheKey);
-      const resolved = ENTITY_INDEX.resolveAny(value, hint);
-      ENTITY_RESOLUTION_CACHE.set(cacheKey, resolved);
-      return resolved;
-    }
-
-    function entityKeyFor(value, hint = {}){
-      const resolved = resolveEntity(value, hint);
-      if (resolved?.kind === 'player') return resolved.playerId;
-      if (resolved?.kind === 'team') return resolved.teamId;
-      return null;
-    }
-
-    function canonicalCompareName(v, hint = {}){
-      return entityKeyFor(v, hint) || normalizeName(v);
+    function canonicalCompareName(v){
+      const normalized = normalizeName(v);
+      return TEAM_NAME_ALIASES[normalized] || normalized;
     }
 
     function matchesPick(a,b){
@@ -976,8 +511,7 @@
     }
 
     function rankOf(pick, ranking){
-      const pickKey = canonicalCompareName(pick);
-      const idx = ranking.findIndex(name => canonicalCompareName(name) === pickKey);
+      const idx = ranking.findIndex(name => matchesPick(name, pick));
       return idx >= 0 ? idx + 1 : null;
     }
 
@@ -1756,15 +1290,141 @@
       document.getElementById('insights').innerHTML = list.slice(0, 5).map(x => `<div class="insight">${escapeHtml(x)}</div>`).join('');
     }
 
+    function roastStateText(state){
+      return String(state || 'off the board').replace(/^Live:\s*/i,'').toLowerCase();
+    }
+
+    function stateRankNumber(state){
+      const match = String(state || '').match(/#(\d+)/);
+      return match ? Number(match[1]) : null;
+    }
+
+    function roastQuantityText(categoryKey, pick){
+      const agg = getAggregates();
+      if (categoryKey === 'orangeCap') {
+        const runs = Number(valueForPickFromObject(agg.battingRuns || {}, pick) || 0);
+        return `${runs} run${runs===1?'':'s'}`;
+      }
+      if (categoryKey === 'mostSixes') {
+        const sixes = Number(valueForPickFromObject(agg.battingSixes || {}, pick) || 0);
+        return `${sixes} six${sixes===1?'':'es'}`;
+      }
+      if (categoryKey === 'purpleCap') {
+        const wickets = Number(valueForPickFromObject(agg.bowlingWickets || {}, pick) || 0);
+        return `${wickets} wicket${wickets===1?'':'s'}`;
+      }
+      if (categoryKey === 'mostDots') {
+        const dots = Number(valueForPickFromObject(LIVE_2026?.mostDots?.values || agg.bowlingDots || {}, pick) || 0);
+        return `${dots} dot ball${dots===1?'':'s'}`;
+      }
+      if (categoryKey === 'mostCatches') {
+        const catches = Number(valueForPickFromObject(agg.catches || {}, pick) || 0);
+        return `${catches} catch${catches===1?'':'es'}`;
+      }
+      if (categoryKey === 'striker') {
+        const runs = Number(valueForPickFromObject(agg.battingRuns || {}, pick) || 0);
+        const balls = Number(valueForPickFromObject(agg.battingBalls || {}, pick) || 0);
+        const sr = balls ? ((100 * runs) / balls).toFixed(2) : '—';
+        return `${runs} runs at ${sr} SR`;
+      }
+      if (categoryKey === 'bestBowlingStrikeRate') {
+        const wickets = Number(valueForPickFromObject(agg.bowlingWickets || {}, pick) || 0);
+        const balls = Number(valueForPickFromObject(agg.bowlingBalls || {}, pick) || 0);
+        const sr = wickets > 0 ? (balls / wickets).toFixed(2) : '—';
+        return `${balls} balls, ${wickets} wicket${wickets===1?'':'s'}, SR ${sr}`;
+      }
+      if (categoryKey === 'bestBowlingFigures') {
+        const figures = LIVE_2026?.bestBowlingFigures?.figures || {};
+        return figures[findMatchingKeyInObject(figures, pick)] || 'no spell worth framing yet';
+      }
+      if (categoryKey === 'mvp' || categoryKey === 'uncappedMvp' || categoryKey === 'leastMvp') {
+        const score = numericCategoryValue(categoryKey, pick);
+        return score === null ? 'no MVP points worth bragging about yet' : `${score} MVP pts`;
+      }
+      return null;
+    }
+
+    function buildCategoryRoast(row, leaderIsA, leader, loser){
+      const winnerPick = leaderIsA ? row.pickA : row.pickB;
+      const loserPick = leaderIsA ? row.pickB : row.pickA;
+      const winnerState = leaderIsA ? row.pickALiveState : row.pickBLiveState;
+      const loserState = leaderIsA ? row.pickBLiveState : row.pickALiveState;
+      const winnerRank = stateRankNumber(winnerState);
+      const loserRank = stateRankNumber(loserState);
+      const loserValue = roastQuantityText(row.category.key, loserPick);
+      const winnerValue = roastQuantityText(row.category.key, winnerPick);
+
+      switch (row.category.key) {
+        case 'mostDots':
+          return winnerRank && loserRank
+            ? `${leader} picked ${winnerPick} for dots and got #${winnerRank}. ${loser}'s ${loserPick} is sitting at #${loserRank} on ${loserValue}. That is not pressure bowling. That is decorative seam movement.`
+            : `${loser} picked ${loserPick} for dots and he is currently serving up ${loserValue}. ${leader}'s ${winnerPick} is doing actual shift work.`;
+        case 'orangeCap':
+          return `${loser} backed ${loserPick} for Orange Cap and is getting ${loserValue}. ${leader}'s ${winnerPick} is on ${winnerValue}. One side brought a bat, the other brought a brochure.`;
+        case 'mostSixes':
+          return `${loser} wanted ${loserPick} to own Most Sixes. Right now it is ${loserValue}. ${leader}'s ${winnerPick} has ${winnerValue}, so this category currently sounds like cleaner ball contact.`;
+        case 'purpleCap':
+          return `${loser}'s Purple Cap dream is leaning on ${loserPick}, who has ${loserValue}. ${leader}'s ${winnerPick} has ${winnerValue}. That gap already has rent and utilities.`;
+        case 'mvp':
+          return `${loser} called ${loserPick} for MVP and is getting ${loserValue}. ${leader}'s ${winnerPick} is on ${winnerValue}. That is not a debate; that is a leaderboard reading.`;
+        case 'uncappedMvp':
+          return `${loser}'s uncapped genius pick ${loserPick} is currently ${roastStateText(loserState)}. ${leader}'s ${winnerPick} is ${roastStateText(winnerState)}. Scouting department needs a wellness check.`;
+        case 'highestScoreTeam':
+          return `${loser} trusted ${loserPick} for the biggest total and the board currently says ${roastStateText(loserState)}. ${leader}'s ${winnerPick} looks far healthier in that lane.`;
+        case 'striker':
+          return `${loser} picked ${loserPick} for Striker and right now it reads ${loserValue}. ${winnerRank ? `${leader}'s ${winnerPick} is already #${winnerRank}.` : `${leader}'s ${winnerPick} is at least moving like a qualified adult.`}`;
+        case 'bestBowlingFigures':
+          return `${loser} trusted ${loserPick} for best figures and so far the receipt says ${loserValue}. ${leader}'s ${winnerPick} is returning ${winnerValue}. That is a rough box score to defend in public.`;
+        case 'bestBowlingStrikeRate':
+          return `${loser}'s strike-rate punt on ${loserPick} is sitting on ${loserValue}. ${leader}'s ${winnerPick} is on ${winnerValue}. One pick is cutting through wickets; the other is filling overs.`;
+        case 'mostCatches':
+          return `${loser} backed ${loserPick} for catches and currently has ${loserValue}. ${leader}'s ${winnerPick} has ${winnerValue}. Even the outfield has chosen sides.`;
+        case 'titleWinner':
+          return `${loser} went with ${loserPick} for the title and the live state is ${roastStateText(loserState)}. ${leader}'s ${winnerPick} looks ${roastStateText(winnerState)}. That is an early smoke alarm, not a prophecy.`;
+        case 'fairPlay':
+          return `${loser}'s Fair Play pick ${loserPick} is ${roastStateText(loserState)}. Congratulations on managing to lose the nice-guy table as well.`;
+        case 'tableBottom':
+          return `${loser} even missed the misery lane: ${loserPick} is ${roastStateText(loserState)} for Bottom of table, while ${leader}'s ${winnerPick} looks much closer to the basement.`;
+        case 'leastMvp':
+          return `${loser} tried to galaxy-brain Least MVP with ${loserPick} and is currently getting ${roastStateText(loserState)}. ${leader}'s ${winnerPick} is handling the underachievement brief with far more discipline.`;
+        default:
+          return `${loser}'s ${row.category.label} call on ${loserPick} is currently ${roastStateText(loserState)}. ${leader}'s ${winnerPick} is making that choice look expensive.`;
+      }
+    }
+
+    function buildDynamicRoastLines(matchup, rows, totalA, totalB){
+      const a = matchup.a.name, b = matchup.b.name;
+      const leaderIsA = totalA > totalB;
+      const leader = leaderIsA ? a : b;
+      const loser = leaderIsA ? b : a;
+      const margin = Math.abs(totalA - totalB);
+      const losingRows = rows
+        .filter(r => leaderIsA ? r.a > r.b : r.b > r.a)
+        .sort((x, y) => Math.abs((leaderIsA ? y.a - y.b : y.b - y.a)) - Math.abs((leaderIsA ? x.a - x.b : x.b - x.a)));
+
+      const banter = [];
+      const demolition = [];
+
+      banter.push(`${leader} is ${margin} point${margin===1?'':'s'} up, so ${loser} has officially entered the “sample size is still small” phase of public speaking.`);
+      if (losingRows[0]) banter.push(buildCategoryRoast(losingRows[0], leaderIsA, leader, loser));
+      if (losingRows[1]) banter.push(buildCategoryRoast(losingRows[1], leaderIsA, leader, loser));
+
+      demolition.push(`${leader} brought a scoreboard. ${loser} brought confidence, nostalgia, and a prediction sheet held together by cricket romance.`);
+      if (losingRows[2]) demolition.push(buildCategoryRoast(losingRows[2], leaderIsA, leader, loser));
+
+      const sleeping = rows.find(r => (leaderIsA ? r.pickBLiveState : r.pickALiveState) && /waiting|unranked|outside frame/i.test(leaderIsA ? r.pickBLiveState : r.pickALiveState));
+      demolition.push(sleeping
+        ? `${loser} still has ${sleeping.category.label} hanging on ${leaderIsA ? sleeping.pickB : sleeping.pickA}, which is currently ${roastStateText(leaderIsA ? sleeping.pickBLiveState : sleeping.pickALiveState)}. That pick is basically buffering.`
+        : `${leader} is farming fronts while ${loser} is one interview away from saying the process mattered more than the result.`);
+
+      return {
+        banter: banter.filter(Boolean).slice(0, 3),
+        demolition: demolition.filter(Boolean).slice(0, 3)
+      };
+    }
+
     function renderRoasts(matchup, rows, totalA, totalB){
       const a = matchup.a.name, b = matchup.b.name;
-      const margin = Math.abs(totalA - totalB);
-      const leader = totalA === totalB ? null : totalA > totalB ? a : b;
-      const loser = totalA === totalB ? null : totalA > totalB ? b : a;
-      const losingRows = totalA === totalB ? [] : rows.filter(r => leader === a ? r.b > r.a : r.a > r.b).sort((x, y) => Math.abs((leader === a ? y.b - y.a : y.a - y.b)) - Math.abs((leader === a ? x.b - x.a : x.a - x.b)));
-      const worstRow = losingRows[0] || rows.find(r => /unranked|waiting|outside frame/i.test(((leader === a ? r.pickBLiveState : r.pickALiveState) || '')));
-      const worstPick = worstRow ? (leader === a ? worstRow.pickB : worstRow.pickA) : null;
-      const worstState = worstRow ? (leader === a ? worstRow.pickBLiveState : worstRow.pickALiveState) : null;
 
       let banterLines;
       let extremeLines;
@@ -1781,16 +1441,9 @@
           `Both sides currently have the same score, which is adorable, because confidence-wise they are behaving like they have already won a trophy.`
         ];
       } else {
-        banterLines = [
-          `${loser} is ${margin} point${margin===1?'':'s'} behind and already practising the phrase “long season” like it is a legal defence.`,
-          `${leader} has the board. ${loser} currently has vibes, selective memory, and an optimism package with no warranty.`,
-          worstRow ? `${loser}'s softest spot right now is ${worstRow.category.label}: ${worstPick} is ${String(worstState || 'off the board').replace(/^Live:\s*/i,'').toLowerCase()}.` : `${loser}'s sheet is trying hard, but the suspension sounds expensive.`
-        ];
-        extremeLines = [
-          `${leader} brought a scoring plan. ${loser} brought confidence and a prediction sheet with the load-bearing strength of warm papad.`,
-          worstRow ? `${loser}'s ${worstRow.category.label} call on ${worstPick} is currently ${String(worstState || 'nowhere').replace(/^Live:\s*/i,'').toLowerCase()}. That is not a pick. That is a missing person bulletin.` : `${loser}'s board currently looks like it was assembled from nostalgia, panic, and one heroic disregard for evidence.`,
-          `${leader} is farming points. ${loser} is one press conference away from calling the process more important than the result.`
-        ];
+        const dynamic = buildDynamicRoastLines(matchup, rows, totalA, totalB);
+        banterLines = dynamic.banter;
+        extremeLines = dynamic.demolition;
       }
 
       const combined = [
