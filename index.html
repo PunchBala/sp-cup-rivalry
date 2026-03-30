@@ -172,6 +172,19 @@
     .note-box.note-bottom{background:rgba(255,127,150,.10);border-color:rgba(255,127,150,.18);color:#ffc3ce}
     .score-stack{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
 
+
+    .clutch-card{display:grid;gap:14px}
+    .clutch-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+    .clutch-headline{font-size:clamp(22px,3vw,30px);font-weight:900;line-height:1.05;color:#fff}
+    .clutch-sub{font-size:13px;color:var(--muted);line-height:1.45;max-width:900px}
+    .momentum-track{position:relative;display:flex;width:100%;height:18px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+    .momentum-fill-a,.momentum-fill-b{height:100%;transition:width .25s ease}
+    .momentum-fill-a{background:linear-gradient(90deg, rgba(124,196,255,.35), rgba(124,196,255,.8))}
+    .momentum-fill-b{background:linear-gradient(90deg, rgba(255,127,150,.8), rgba(255,127,150,.35))}
+    .momentum-fill-neutral{background:linear-gradient(90deg, rgba(255,200,87,.45), rgba(255,200,87,.18))}
+    .clutch-labels{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-weight:800}
+    .clutch-labels strong{color:#fff}
+
   </style>
 
 </head>
@@ -195,6 +208,24 @@
       <div class="card span-3 metric-card"><div class="label">Fronts won</div><div class="value" id="metricFronts">0 - 0</div><div class="note">Categories currently led by each side.</div></div>
       <div class="card span-3 metric-card"><div class="label">Likely winner</div><div class="value" id="metricWinner">Too early</div><div class="note" id="metricWinnerNote">Need more movement before calling it.</div></div>
       <div class="card span-3 metric-card"><div class="label">Confidence</div><div class="value" id="metricConfidence">50% - 50%</div><div class="note" id="metricConfidenceNote">Right now the board is playing nice.</div></div>
+      <div class="card span-12 clutch-card">
+        <div class="clutch-top">
+          <div>
+            <div class="section-title">Clutch tracker</div>
+            <div class="clutch-headline" id="clutchHeadline">Recent momentum is still loading</div>
+            <div class="clutch-sub" id="clutchNote">Need completed-match history before the app can start handing out recency swagger.</div>
+          </div>
+          <div class="small" id="clutchWindowMeta">Last 3 completed matches</div>
+        </div>
+        <div class="momentum-track" id="clutchBar">
+          <div class="momentum-fill-a" id="clutchFillA" style="width:50%"></div>
+          <div class="momentum-fill-b" id="clutchFillB" style="width:50%"></div>
+        </div>
+        <div class="clutch-labels">
+          <span id="clutchLabelA"><strong>Senthil</strong> +0 recent points</span>
+          <span id="clutchLabelB"><strong>Sai</strong> +0 recent points</span>
+        </div>
+      </div>
       <div class="card span-12">
         <div class="layout-side">
           <div>
@@ -876,10 +907,10 @@
       };
     }
 
-    function getCategoryResult(category, matchup){
+    function getCategoryResult(category, matchup, liveSource = LIVE_2026){
       const pickA = matchup.a.picks[category.key];
       const pickB = matchup.b.picks[category.key];
-      const live = LIVE_2026[category.key] || {};
+      const live = (liveSource && liveSource[category.key]) || {};
 
       if (category.type === 'title') {
         return scoreTitleCategory(pickA, pickB, live);
@@ -916,12 +947,12 @@
         : scoreTop5Category(pickA, pickB, ranking);
     }
 
-    function computeMatchup(matchup){
+    function computeMatchup(matchup, liveSource = LIVE_2026){
       const rows = CATEGORIES.map(category => {
-        const result = getCategoryResult(category, matchup);
+        const result = getCategoryResult(category, matchup, liveSource);
         const pickA = matchup.a.picks[category.key] || '—';
         const pickB = matchup.b.picks[category.key] || '—';
-        const live = LIVE_2026[category.key] || {};
+        const live = (liveSource && liveSource[category.key]) || {};
         return {
           category,
           pickA,
@@ -1576,6 +1607,143 @@
       return { summary: 'Live board from data/live.json.', rows };
     }
 
+    function emptyLiveSnapshot(){
+      return {
+        titleWinner: { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [] },
+        orangeCap: { ranking: [], extendedRanking: [] },
+        mostSixes: { ranking: [], extendedRanking: [] },
+        purpleCap: { ranking: [], extendedRanking: [] },
+        mostDots: { ranking: [], extendedRanking: [], values: {} },
+        mvp: { ranking: [], extendedRanking: [], values: {} },
+        uncappedMvp: { winner: null, ranking: [], extendedRanking: [], values: {} },
+        fairPlay: { winner: null, ranking: [], extendedRanking: [], values: {} },
+        highestScoreTeam: { winner: null, ranking: [], extendedRanking: [], values: {} },
+        striker: { ranking: [], extendedRanking: [] },
+        bestBowlingFigures: { ranking: [], extendedRanking: [], figures: {} },
+        bestBowlingStrikeRate: { ranking: [], extendedRanking: [], values: {} },
+        mostCatches: { ranking: [], extendedRanking: [], values: {} },
+        tableBottom: { winner: null, ranking: [], extendedRanking: [] },
+        leastMvp: { ranking: [], extendedRanking: [], values: {} },
+        meta: { processedMatchIds: [], scoreHistory: [] }
+      };
+    }
+
+    function historyCount(entry){
+      const count = Number(entry?.processedMatchCount ?? entry?.matchCount ?? entry?.completedMatches ?? entry?.processedMatches ?? 0);
+      return Number.isFinite(count) && count >= 0 ? count : 0;
+    }
+
+    function normalizeHistorySnapshot(snapshot){
+      return normalizeFetchedLiveData({ ...emptyLiveSnapshot(), ...(snapshot || {}) });
+    }
+
+    function getScoreHistorySnapshots(){
+      const raw = Array.isArray(LIVE_2026?.meta?.scoreHistory) ? LIVE_2026.meta.scoreHistory : [];
+      const map = new Map();
+      raw.forEach(entry => {
+        const count = historyCount(entry);
+        const snapshot = normalizeHistorySnapshot(entry?.snapshot || entry?.live || entry?.categories || entry?.data || {});
+        map.set(count, {
+          count,
+          fetchedAt: entry?.fetchedAt || entry?.at || null,
+          snapshot
+        });
+      });
+      if (!map.has(0)) {
+        map.set(0, { count: 0, fetchedAt: null, snapshot: emptyLiveSnapshot() });
+      }
+      const currentCount = Array.isArray(LIVE_2026?.meta?.processedMatchIds) ? LIVE_2026.meta.processedMatchIds.length : 0;
+      if (currentCount > 0 && !map.has(currentCount)) {
+        map.set(currentCount, { count: currentCount, fetchedAt: LIVE_2026?.fetchedAt || null, snapshot: normalizeHistorySnapshot(LIVE_2026) });
+      }
+      return Array.from(map.values()).sort((a, b) => a.count - b.count);
+    }
+
+    function scoreDiffRows(startRows, endRows){
+      return endRows.map(endRow => {
+        const startRow = startRows.find(r => r.category.key === endRow.category.key) || { a: 0, b: 0 };
+        return {
+          category: endRow.category,
+          gainA: endRow.a - startRow.a,
+          gainB: endRow.b - startRow.b,
+          net: (endRow.a - startRow.a) - (endRow.b - startRow.b)
+        };
+      });
+    }
+
+    function computeClutchTracker(matchup, windowSize = 3){
+      const history = getScoreHistorySnapshots();
+      const latest = history[history.length - 1] || { count: 0, snapshot: emptyLiveSnapshot() };
+      const latestCount = latest.count;
+      if (latestCount <= 0) {
+        return {
+          available: false,
+          headline: 'No completed-match momentum yet',
+          note: 'The Clutch Tracker wakes up after the first completed match snapshot lands.',
+          labelA: `${matchup.a.name} +0 recent points`,
+          labelB: `${matchup.b.name} +0 recent points`,
+          widthA: 50,
+          widthB: 50,
+          windowText: `Last ${windowSize} completed matches`
+        };
+      }
+
+      const startCount = Math.max(0, latestCount - windowSize);
+      const startEntry = history.find(entry => entry.count === startCount) || history.filter(entry => entry.count < latestCount).slice(-1)[0] || { count: 0, snapshot: emptyLiveSnapshot() };
+      const effectiveWindow = Math.max(1, latestCount - startEntry.count);
+      const startScore = computeMatchup(matchup, startEntry.snapshot);
+      const latestScore = computeMatchup(matchup, latest.snapshot);
+      const gainA = latestScore.totalA - startScore.totalA;
+      const gainB = latestScore.totalB - startScore.totalB;
+      const totalGain = gainA + gainB;
+      const widthA = totalGain > 0 ? Math.max(0, (gainA / totalGain) * 100) : 50;
+      const widthB = totalGain > 0 ? Math.max(0, (gainB / totalGain) * 100) : 50;
+      const net = gainA - gainB;
+      const swingRows = scoreDiffRows(startScore.rows, latestScore.rows)
+        .filter(row => row.gainA !== 0 || row.gainB !== 0)
+        .sort((a, b) => Math.abs(b.net) - Math.abs(a.net) || (b.gainA + b.gainB) - (a.gainA + a.gainB));
+      const topSwing = swingRows[0] || null;
+
+      let headline = `Last ${effectiveWindow} match${effectiveWindow === 1 ? '' : 'es'} → level momentum`;
+      let note = `Recent points: ${matchup.a.name} +${gainA}, ${matchup.b.name} +${gainB}. Nobody has landed a clean recent edge yet.`;
+      if (net > 0) {
+        headline = `Last ${effectiveWindow} match${effectiveWindow === 1 ? '' : 'es'} → ${matchup.a.name} +${net} momentum`;
+        note = `Recent points: ${matchup.a.name} +${gainA}, ${matchup.b.name} +${gainB}. ${matchup.a.name} has been the hotter hand lately.`;
+      } else if (net < 0) {
+        headline = `Last ${effectiveWindow} match${effectiveWindow === 1 ? '' : 'es'} → ${matchup.b.name} +${Math.abs(net)} momentum`;
+        note = `Recent points: ${matchup.a.name} +${gainA}, ${matchup.b.name} +${gainB}. ${matchup.b.name} has been the hotter hand lately.`;
+      }
+
+      if (topSwing && Math.abs(topSwing.net) > 0) {
+        const swingLeader = topSwing.net > 0 ? matchup.a.name : matchup.b.name;
+        note += ` Biggest recent shove: ${topSwing.category.label} leaned toward ${swingLeader}.`;
+      }
+
+      return {
+        available: true,
+        headline,
+        note,
+        labelA: `${matchup.a.name} +${gainA} recent points`,
+        labelB: `${matchup.b.name} +${gainB} recent points`,
+        widthA,
+        widthB,
+        windowText: `Last ${effectiveWindow} completed match${effectiveWindow === 1 ? '' : 'es'}`
+      };
+    }
+
+    function renderClutchTracker(matchup){
+      const clutch = computeClutchTracker(matchup, 3);
+      document.getElementById('clutchHeadline').textContent = clutch.headline;
+      document.getElementById('clutchNote').textContent = clutch.note;
+      document.getElementById('clutchWindowMeta').textContent = clutch.windowText;
+      document.getElementById('clutchLabelA').innerHTML = `<strong>${escapeHtml(matchup.a.name)}</strong> ${escapeHtml(clutch.labelA.replace(`${matchup.a.name} `, ''))}`;
+      document.getElementById('clutchLabelB').innerHTML = `<strong>${escapeHtml(matchup.b.name)}</strong> ${escapeHtml(clutch.labelB.replace(`${matchup.b.name} `, ''))}`;
+      document.getElementById('clutchFillA').style.width = `${clutch.widthA.toFixed(1)}%`;
+      document.getElementById('clutchFillB').style.width = `${clutch.widthB.toFixed(1)}%`;
+      const bar = document.getElementById('clutchBar');
+      bar.classList.toggle('momentum-fill-neutral', !clutch.available);
+    }
+
     function renderStatsTab(){
       const select = document.getElementById('statsCategorySelect');
       if (!select.dataset.bound) {
@@ -1622,6 +1790,7 @@
       renderBreakdown(matchup, rows);
       renderInsights(matchup, rows, totalA, totalB);
       renderRoasts(matchup, rows, totalA, totalB);
+      renderClutchTracker(matchup);
 
       const frontsA = rows.filter(r => r.a > r.b).length;
       const frontsB = rows.filter(r => r.b > r.a).length;

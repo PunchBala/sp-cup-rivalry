@@ -180,6 +180,7 @@ function createEmptyLive() {
         liveOverlayReused: false,
         liveOverlaySkippedReason: null
       },
+      scoreHistory: [],
       aggregateSchemaVersion: AGGREGATE_SCHEMA_VERSION
     },
     titleWinner: { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [] },
@@ -222,6 +223,7 @@ async function readExistingLive() {
         scorecardBudget: { ...fresh.meta.scorecardBudget, ...(parsed.meta?.scorecardBudget || {}) },
         officialMostDots: { ...fresh.meta.officialMostDots, ...((parsed.meta?.officialMostDots || parsed.meta?.cricmetricDots) || {}) },
         lastRun: { ...fresh.meta.lastRun, ...(parsed.meta?.lastRun || {}) },
+        scoreHistory: Array.isArray(parsed.meta?.scoreHistory) ? parsed.meta.scoreHistory : [],
         aggregateSchemaVersion: Number(parsed.meta?.aggregateSchemaVersion || fresh.meta.aggregateSchemaVersion || 1)
       }
     };
@@ -1189,6 +1191,73 @@ async function rebuildHistoricalAggregates(processedIds) {
   return rebuilt;
 }
 
+function createEmptyHistorySnapshot() {
+  return {
+    titleWinner: { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [] },
+    orangeCap: { ranking: [], extendedRanking: [] },
+    mostSixes: { ranking: [], extendedRanking: [] },
+    purpleCap: { ranking: [], extendedRanking: [] },
+    mostDots: { ranking: [], extendedRanking: [], values: {} },
+    mvp: { ranking: [], extendedRanking: [], values: {} },
+    uncappedMvp: { winner: null, ranking: [], extendedRanking: [], values: {} },
+    fairPlay: { winner: null, ranking: [], extendedRanking: [], values: {} },
+    highestScoreTeam: { winner: null, ranking: [], extendedRanking: [], values: {} },
+    striker: { ranking: [], extendedRanking: [] },
+    bestBowlingFigures: { ranking: [], extendedRanking: [], figures: {} },
+    bestBowlingStrikeRate: { ranking: [], extendedRanking: [], values: {} },
+    mostCatches: { ranking: [], extendedRanking: [], values: {} },
+    tableBottom: { winner: null, ranking: [], extendedRanking: [] },
+    leastMvp: { ranking: [], extendedRanking: [], values: {} }
+  };
+}
+
+function buildScoreHistorySnapshot(live) {
+  return {
+    processedMatchCount: safeArray(live.meta?.processedMatchIds).length,
+    fetchedAt: live.fetchedAt || isoNow(),
+    snapshot: JSON.parse(JSON.stringify({
+      titleWinner: live.titleWinner || { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [] },
+      orangeCap: live.orangeCap || { ranking: [], extendedRanking: [] },
+      mostSixes: live.mostSixes || { ranking: [], extendedRanking: [] },
+      purpleCap: live.purpleCap || { ranking: [], extendedRanking: [] },
+      mostDots: live.mostDots || { ranking: [], extendedRanking: [], values: {} },
+      mvp: live.mvp || { ranking: [], extendedRanking: [], values: {} },
+      uncappedMvp: live.uncappedMvp || { winner: null, ranking: [], extendedRanking: [], values: {} },
+      fairPlay: live.fairPlay || { winner: null, ranking: [], extendedRanking: [], values: {} },
+      highestScoreTeam: live.highestScoreTeam || { winner: null, ranking: [], extendedRanking: [], values: {} },
+      striker: live.striker || { ranking: [], extendedRanking: [] },
+      bestBowlingFigures: live.bestBowlingFigures || { ranking: [], extendedRanking: [], figures: {} },
+      bestBowlingStrikeRate: live.bestBowlingStrikeRate || { ranking: [], extendedRanking: [], values: {} },
+      mostCatches: live.mostCatches || { ranking: [], extendedRanking: [], values: {} },
+      tableBottom: live.tableBottom || { winner: null, ranking: [], extendedRanking: [] },
+      leastMvp: live.leastMvp || { ranking: [], extendedRanking: [], values: {} }
+    }))
+  };
+}
+
+function updateScoreHistory(live) {
+  const existing = Array.isArray(live.meta?.scoreHistory) ? live.meta.scoreHistory : [];
+  const history = existing.filter(Boolean).map((entry) => ({ ...entry }));
+  if (!history.some((entry) => Number(entry?.processedMatchCount || 0) === 0)) {
+    history.unshift({
+      processedMatchCount: 0,
+      fetchedAt: isoNow(),
+      snapshot: createEmptyHistorySnapshot()
+    });
+  }
+
+  const latest = buildScoreHistorySnapshot(live);
+  const existingIndex = history.findIndex((entry) => Number(entry?.processedMatchCount || 0) === latest.processedMatchCount);
+  if (existingIndex >= 0) {
+    history[existingIndex] = latest;
+  } else {
+    history.push(latest);
+  }
+
+  history.sort((a, b) => Number(a?.processedMatchCount || 0) - Number(b?.processedMatchCount || 0));
+  live.meta.scoreHistory = history.slice(-80);
+}
+
 async function main() {
   if (!API_KEY) throw new Error('Missing CRICKETDATA_API_KEY environment variable');
 
@@ -1419,6 +1488,7 @@ async function main() {
 
   live.fetchedAt = isoNow();
   live.scrapeStatus = `ok (${live.meta.processedMatchIds.length} processed matches${activeMatch ? ', live match tracked' : ''}, ${live.meta.lastRun.scorecardCalls} scorecard call${live.meta.lastRun.scorecardCalls === 1 ? '' : 's'} this run${backlogRemaining ? `, ${backlogRemaining} backlog remaining` : ''})`;
+  updateScoreHistory(live);
 
   await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
 
