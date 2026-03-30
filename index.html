@@ -1469,7 +1469,6 @@
       const seen = new Set();
       const top5Categories = ['orangeCap','mostSixes','purpleCap','mostDots','mostCatches','mvp','uncappedMvp'];
       for (const categoryKey of top5Categories) {
-        const category = CATEGORIES.find(c => c.key === categoryKey);
         const live = LIVE_2026[categoryKey] || {};
         const ranking = trackingRankingForLive(live);
         if (!ranking.length) continue;
@@ -1478,29 +1477,24 @@
         const boardIndex = Math.min(9, ranking.length - 1);
         const scoringValue = numericCategoryValue(categoryKey, ranking[scoringIndex]);
         const boardValue = numericCategoryValue(categoryKey, ranking[boardIndex]);
-        const rowResult = category ? getCategoryResult(category, matchup) : { a: 0, b: 0 };
-        for (const [side, pick] of [['a', matchup.a.picks[categoryKey]], ['b', matchup.b.picks[categoryKey]]]) {
+        for (const pick of [matchup.a.picks[categoryKey], matchup.b.picks[categoryKey]]) {
           const key = `${categoryKey}:${pick}`;
           if (seen.has(key)) continue;
           seen.add(key);
           const rank = rankOf(pick, ranking);
           const currentValue = numericCategoryValue(categoryKey, pick);
-          const alreadyLeadingThisFront = side === 'a' ? rowResult.a > rowResult.b : rowResult.b > rowResult.a;
           if (currentValue === null || currentValue < (config.minInteresting || 1)) continue;
           if (!rank && boardValue !== null && boardValue > currentValue) {
             const need = Math.max(1, boardValue - currentValue + 1);
-            pushes.push({ priority: need, message: `${pick} is off the ${category?.label || categoryKey} board for now, but ${unitLabel(config.unit, need)} gets to the current board line and brings that front into range.` });
+            pushes.push({ priority: need, message: `${pick} is off the ${CATEGORIES.find(c => c.key === categoryKey)?.label || categoryKey} board for now, but ${unitLabel(config.unit, need)} gets them ranked and makes that front live.` });
           } else if (rank && rank > 5 && scoringValue !== null && scoringValue >= currentValue) {
             const need = Math.max(1, scoringValue - currentValue + 1);
-            const message = alreadyLeadingThisFront
-              ? `${pick} is already edging ${category?.label || categoryKey} from #${rank}; ${unitLabel(config.unit, need)} more pushes them onto the live top-5 board.`
-              : `${pick} is parked at #${rank} for ${category?.label || categoryKey}; ${unitLabel(config.unit, need)} more reaches the current top-5 cut-line.`;
-            pushes.push({ priority: need + 5, message });
+            pushes.push({ priority: need + 5, message: `${pick} is parked at #${rank} for ${CATEGORIES.find(c => c.key === categoryKey)?.label || categoryKey}; ${unitLabel(config.unit, need)} more gets into the scoring zone.` });
           } else if (rank && rank > 1) {
             const leaderValue = numericCategoryValue(categoryKey, ranking[0]);
             if (leaderValue !== null && leaderValue > currentValue) {
               const need = Math.max(1, leaderValue - currentValue);
-              if (need <= 20) pushes.push({ priority: need + 10, message: `${pick} is already on the ${category?.label || categoryKey} board at #${rank}; ${unitLabel(config.unit, need)} closes on the leader.` });
+              if (need <= 20) pushes.push({ priority: need + 10, message: `${pick} is already on the ${CATEGORIES.find(c => c.key === categoryKey)?.label || categoryKey} board at #${rank}; ${unitLabel(config.unit, need)} closes on the leader.` });
             }
           }
         }
