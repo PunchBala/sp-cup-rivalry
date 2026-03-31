@@ -26,6 +26,9 @@ test('home page renders live board from fixture data without runtime errors', as
   await expect(page.locator('#providerPill')).toContainText('Provider: Live /');
   await expect(page.locator('#updatedPill')).not.toHaveText('Last updated: --');
   await expect(page.locator('#nextMatchTeams')).not.toHaveText('--');
+  await expect(page.locator('#breakdownTable tbody tr').nth(1).locator('.live-value-pill')).toHaveCount(2);
+  await expect(page.locator('#breakdownTable tbody tr').nth(1).locator('.live-value-pill').first()).toContainText('runs');
+  await expect(page.locator('#breakdownTable tbody tr').first().locator('.live-value-pill')).toHaveCount(0);
   await expect(page.locator('#clutchHeadline')).toBeVisible();
   await expect(page.locator('#wormChartShell')).toBeVisible();
 

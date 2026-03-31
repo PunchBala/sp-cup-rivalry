@@ -1057,23 +1057,19 @@ function scoreWinnerBetterCategory(pickA, pickB, live, categoryKey){
       const aWin = actualWinner && matchesPick(pickA, actualWinner);
       const bWin = actualWinner && matchesPick(pickB, actualWinner);
 
-      const rankA = rankOf(pickA, ranking);
-      const rankB = rankOf(pickB, ranking);
+      let rankA = rankOf(pickA, ranking);
+      let rankB = rankOf(pickB, ranking);
       let a = aWin ? betterPredictionPoints(rankA || 1, categoryKey) : 0;
       let b = bWin ? betterPredictionPoints(rankB || 1, categoryKey) : 0;
 
-      if (a === 0 && b === 0 && ranking.length) {
-        const lowerRankWins = categoryKey !== 'tableBottom';
+      if (categoryKey === 'tableBottom' && a === 0 && b === 0) {
         if (rankA && rankB) {
-          if (rankA !== rankB) {
-            const aBetter = lowerRankWins ? rankA < rankB : rankA > rankB;
-            if (aBetter) a = betterPredictionPoints(rankA, categoryKey);
-            else b = betterPredictionPoints(rankB, categoryKey);
-          }
+          if (rankA > rankB) a = 1;
+          else if (rankB > rankA) b = 1;
         } else if (rankA && !rankB) {
-          a = betterPredictionPoints(rankA, categoryKey);
+          a = 1;
         } else if (rankB && !rankA) {
-          b = betterPredictionPoints(rankB, categoryKey);
+          b = 1;
         }
       }
 

@@ -173,6 +173,9 @@
     .live-down{background:rgba(255,127,150,.14);border-color:rgba(255,127,150,.22);color:#ffc3ce}
     .live-neutral{background:rgba(124,196,255,.10);border-color:rgba(124,196,255,.16);color:#cfe3ff}
     .live-muted{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:#d5def0}
+    .pick-live-stack{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+    .live-value-pill{display:inline-flex;align-items:center;max-width:max-content;padding:5px 9px;border-radius:999px;border:1px solid rgba(124,196,255,.16);background:linear-gradient(180deg, rgba(124,196,255,.12), rgba(95,240,200,.08));color:#e9f5ff;font-size:11px;font-weight:800;letter-spacing:.01em;line-height:1.1;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
+    .live-value-pill.value-soft{border-color:rgba(255,255,255,.10);background:rgba(255,255,255,.045);color:#dbe8ff}
     .note-box{display:inline-block;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);color:#dbe7ff;line-height:1.45}
     .note-box.note-wait{background:rgba(255,200,87,.08);border-color:rgba(255,200,87,.16);color:#ffe0a1}
     .note-box.note-win{background:rgba(68,215,146,.10);border-color:rgba(68,215,146,.18);color:#b6f2d0}
@@ -451,6 +454,8 @@
       { key:'tableBottom', label:'Bottom of table', type:'winner_better' },
       { key:'leastMvp', label:'Least MVP', type:'better_rank_low' }
     ];
+
+    const BONUS_TOP_RANK_BETTER_PREDICTION_KEYS = new Set(['uncappedMvp','striker','bestBowlingFigures','bestBowlingStrikeRate','mostCatches']);
 
     // ========= LEAGUE-STAGE SCHEDULE (UTC) =========
     const LEAGUE_STAGE_SCHEDULE_FALLBACK = [
@@ -1316,6 +1321,62 @@
       return Number.isFinite(num) ? num : null;
     }
 
+    function formatLiveValueBadge(categoryKey, pick){
+      const agg = getAggregates();
+      if (!pick) return null;
+
+      if (categoryKey === 'orangeCap') {
+        const runs = Number(valueForPickFromObject(agg.battingRuns || {}, pick) || 0);
+        return { text: `${runs} run${runs===1?'':'s'}`, soft: runs === 0 };
+      }
+      if (categoryKey === 'mostSixes') {
+        const sixes = Number(valueForPickFromObject(agg.battingSixes || {}, pick) || 0);
+        return { text: `${sixes} six${sixes===1?'':'es'}`, soft: sixes === 0 };
+      }
+      if (categoryKey === 'purpleCap') {
+        const wickets = Number(valueForPickFromObject(agg.bowlingWickets || {}, pick) || 0);
+        return { text: `${wickets} wicket${wickets===1?'':'s'}`, soft: wickets === 0 };
+      }
+      if (categoryKey === 'mostDots') {
+        const dots = Number(valueForPickFromObject(LIVE_2026?.mostDots?.values || agg.bowlingDots || {}, pick) || 0);
+        return { text: `${dots} dot${dots===1?'':'s'}`, soft: dots === 0 };
+      }
+      if (categoryKey === 'mostCatches') {
+        const catches = Number(valueForPickFromObject(agg.catches || {}, pick) || 0);
+        return { text: `${catches} catch${catches===1?'':'es'}`, soft: catches === 0 };
+      }
+      if (categoryKey === 'striker') {
+        const runs = Number(valueForPickFromObject(agg.battingRuns || {}, pick) || 0);
+        const balls = Number(valueForPickFromObject(agg.battingBalls || {}, pick) || 0);
+        if (runs <= 0 && balls <= 0) return { text: '0 runs', soft: true };
+        const sr = balls > 0 ? ((100 * runs) / balls).toFixed(1) : '—';
+        return { text: `${runs} runs • SR ${sr}`, soft: runs < 100 };
+      }
+      if (categoryKey === 'bestBowlingFigures') {
+        const figures = LIVE_2026?.bestBowlingFigures?.figures || {};
+        const key = findMatchingKeyInObject(figures, pick);
+        if (!key) return null;
+        return { text: `${figures[key]} figures`, soft: false };
+      }
+      if (categoryKey === 'bestBowlingStrikeRate') {
+        const wickets = Number(valueForPickFromObject(agg.bowlingWickets || {}, pick) || 0);
+        const balls = Number(valueForPickFromObject(agg.bowlingBalls || {}, pick) || 0);
+        if (wickets <= 0 && balls <= 0) return null;
+        const sr = wickets > 0 ? (balls / wickets).toFixed(1) : '—';
+        return { text: `${wickets} wkts • SR ${sr}`, soft: balls < 72 };
+      }
+      if (categoryKey === 'mvp' || categoryKey === 'uncappedMvp' || categoryKey === 'leastMvp') {
+        const score = numericCategoryValue(categoryKey, pick);
+        return { text: `${Number(score || 0).toFixed(score ? 1 : 0)} MVP pts`, soft: !score };
+      }
+      return null;
+    }
+
+    function liveStateBlock(category, pick, state){
+      const metric = formatLiveValueBadge(category.key, pick);
+      return `<div class="pick-live-stack">${liveStateHtml(state)}${metric ? `<span class="live-value-pill${metric.soft ? ' value-soft' : ''}">${escapeHtml(metric.text)}</span>` : ''}</div>`;
+    }
+
     function buildClosestContestInsight(rows){
       const candidates = [];
       for (const row of rows) {
@@ -1444,11 +1505,45 @@
 
     function scoreWinnerBetterCategory(pickA, pickB, live, categoryKey){
       const actualWinner = live?.winner || null;
+      const ranking = Array.isArray(live?.extendedRanking) && live.extendedRanking.length
+        ? live.extendedRanking
+        : (Array.isArray(live?.ranking) ? live.ranking : []);
+
       const aWin = actualWinner && matchesPick(pickA, actualWinner);
       const bWin = actualWinner && matchesPick(pickB, actualWinner);
+      const rankA = rankOf(pickA, ranking);
+      const rankB = rankOf(pickB, ranking);
+
+      let a = aWin ? betterPredictionPoints(rankA || 1, categoryKey) : 0;
+      let b = bWin ? betterPredictionPoints(rankB || 1, categoryKey) : 0;
+
+      if (a === 0 && b === 0) {
+        if (categoryKey === 'tableBottom') {
+          if (rankA && rankB) {
+            if (rankA > rankB) a = 1;
+            else if (rankB > rankA) b = 1;
+          } else if (rankA && !rankB) {
+            a = 1;
+          } else if (rankB && !rankA) {
+            b = 1;
+          }
+        } else {
+          if (rankA && rankB) {
+            if (rankA < rankB) a = betterPredictionPoints(rankA, categoryKey);
+            else if (rankB < rankA) b = betterPredictionPoints(rankB, categoryKey);
+          } else if (rankA && !rankB) {
+            a = betterPredictionPoints(rankA, categoryKey);
+          } else if (rankB && !rankA) {
+            b = betterPredictionPoints(rankB, categoryKey);
+          }
+        }
+      }
+
       return {
-        a: aWin ? 1 : 0,
-        b: bWin ? 1 : 0,
+        a,
+        b,
+        rankA,
+        rankB,
         note: winnerBetterNote(categoryKey, live)
       };
     }
@@ -1508,6 +1603,12 @@
       if (rank === 2 || rank === 3) return 3;
       if (rank === 4 || rank === 5) return 2;
       return 0;
+    }
+
+    function betterPredictionPoints(rank, categoryKey){
+      if (!rank) return 1;
+      if (BONUS_TOP_RANK_BETTER_PREDICTION_KEYS.has(categoryKey) && rank === 1) return 2;
+      return 1;
     }
 
     function scoreTop5Category(pickA, pickB, ranking){
@@ -1938,13 +2039,14 @@
           ${rows.map(r => `
             <tr class="${breakdownRowClass(r)}">
               <td class="category-col"><strong class="category-main">${escapeHtml(r.category.label)}</strong><div class="small">${
-                r.category.type === 'top5' ? 'Top-5 scoring category'
+                r.category.type === 'title' ? 'Title-race scoring category'
+                : r.category.type === 'top5' ? 'Top-5 scoring category'
                 : r.category.type === 'better_rank_low' ? 'Better prediction category (lower rank wins)'
-                : r.category.type === 'better_rank' ? 'Better prediction category'
+                : (r.category.type === 'better_rank' || r.category.type === 'winner_better') ? 'Better prediction category'
                 : 'Winner-takes-points category'
               }</div></td>
-              <td><div class="pick-card"><span class="pick-name">${escapeHtml(r.pickA)}</span>${liveStateHtml(r.pickALiveState || 'Live: waiting')}</div></td>
-              <td><div class="pick-card"><span class="pick-name">${escapeHtml(r.pickB)}</span>${liveStateHtml(r.pickBLiveState || 'Live: waiting')}</div></td>
+              <td><div class="pick-card"><span class="pick-name">${escapeHtml(r.pickA)}</span>${liveStateBlock(r.category, r.pickA, r.pickALiveState || 'Live: waiting')}</div></td>
+              <td><div class="pick-card"><span class="pick-name">${escapeHtml(r.pickB)}</span>${liveStateBlock(r.category, r.pickB, r.pickBLiveState || 'Live: waiting')}</div></td>
               <td class="mono score-cell"><div class="score-stack"><span class="score-num">${r.a}</span><span class="score-dash">-</span><span class="score-num">${r.b}</span></div></td>
               <td>${r.a===r.b ? '<span class="status-chip status-tie">Tied</span>' : r.a>r.b ? `<span class="status-chip status-good">${escapeHtml(matchup.a.name)}</span>` : `<span class="status-chip status-bad">${escapeHtml(matchup.b.name)}</span>`}</td>
               <td class="small"><span class="note-box ${noteTone(r.note)}">${escapeHtml(r.note)}</span></td>
