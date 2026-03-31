@@ -26,6 +26,8 @@ test('home page renders live board from fixture data without runtime errors', as
   await expect(page.locator('#providerPill')).toContainText('Provider: Live /');
   await expect(page.locator('#updatedPill')).not.toHaveText('Last updated: --');
   await expect(page.locator('#nextMatchTeams')).not.toHaveText('--');
+  await expect(page.locator('#clutchHeadline')).toBeVisible();
+  await expect(page.locator('#wormChartShell')).toBeVisible();
 
   await page.getByRole('button', { name: 'Nerd Room' }).click();
   await expect(page.locator('#statsSummary')).toContainText('board');
@@ -36,6 +38,8 @@ test('home page renders live board from fixture data without runtime errors', as
   await expect(page.locator('#scheduleSummary')).toContainText('League-stage schedule');
   const scheduleRows = await page.locator('#scheduleTable tbody tr').count();
   expect(scheduleRows).toBeGreaterThan(50);
+  await expect(page.locator('#scheduleTable tbody tr').first()).toContainText('vs');
+  await expect(page.locator('#scheduleTable tbody tr').first()).not.toContainText('@');
 
   expect(pageErrors).toEqual([]);
 });
