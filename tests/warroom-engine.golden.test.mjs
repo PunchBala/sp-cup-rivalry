@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 function loadEngine() {
-  const enginePath = path.resolve(__dirname, '../../warroom-engine.js');
+  const enginePath = path.resolve(__dirname, '../warroom-engine.js');
   const source = fs.readFileSync(enginePath, 'utf8');
   const context = {
     window: {},
