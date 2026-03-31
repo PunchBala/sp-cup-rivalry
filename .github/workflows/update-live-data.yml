@@ -3,14 +3,21 @@ name: Update live IPL data
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '0 9,13,14,15,18,19 28-31 3 *'
+    - cron: '0 9,13,14,15,18,19 * 4 *'
+    - cron: '0 9,13,14,15,18,19 1-24 5 *'
 
 permissions:
   contents: write
 
+concurrency:
+  group: update-live-data
+  cancel-in-progress: false
+
 jobs:
   update-live-data:
     runs-on: [self-hosted, Windows, X64]
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4

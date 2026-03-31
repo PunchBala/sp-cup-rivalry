@@ -27,10 +27,15 @@ test('home page renders live board from fixture data without runtime errors', as
   await expect(page.locator('#updatedPill')).not.toHaveText('Last updated: --');
   await expect(page.locator('#nextMatchTeams')).not.toHaveText('--');
 
-  await page.getByRole('button', { name: 'Stats' }).click();
+  await page.getByRole('button', { name: 'Nerd Room' }).click();
   await expect(page.locator('#statsSummary')).toContainText('board');
   const statRows = await page.locator('#statsTable tbody tr').count();
   expect(statRows).toBeGreaterThan(0);
+
+  await page.getByRole('button', { name: 'Schedule' }).click();
+  await expect(page.locator('#scheduleSummary')).toContainText('League-stage schedule');
+  const scheduleRows = await page.locator('#scheduleTable tbody tr').count();
+  expect(scheduleRows).toBeGreaterThan(50);
 
   expect(pageErrors).toEqual([]);
 });

@@ -1,115 +1,72 @@
-# IPL 2026 Prediction War Room
+# CricketData pipeline notes
 
-Live IPL 2026 prediction tracker for head-to-head season bets.
+Replace these files in your repo:
 
-This version uses a CricketData-powered worker for live data refreshes and a canonical entity-matching layer for player and team picks, so scoring no longer depends on fragile raw string matching.
-
-## Files to replace in your repo
-
-- `index.html`
 - `scripts/update-live-data.mjs`
 - `.github/workflows/update-live-data.yml`
-- `ipl_2026_squads.json`
+- `.github/workflows/warroom-tests.yml`
+- `tests/update-live-data.quota.test.mjs`
+- `tests/update-live-data.schedule.test.mjs`
+- `index.html`
+- `ipl_2026_schedule.json`
+- `README.md`
+- `WARROOM_ENGINE_TESTS.md`
 
-## New file required
+Before running:
 
-Add this file to the repo root:
-
-- `ipl_2026_squads.json`
-
-This squad map is now the source of truth for player-team tagging.
-
-## Before running
-
-1. Regenerate your CricketData API key.
+1. Regenerate your CricketData API key if needed.
 2. In GitHub repo settings, create a secret named `CRICKETDATA_API_KEY`.
 3. Keep the self-hosted runner running.
-4. Add `ipl_2026_squads.json` to the repo root.
-5. Run the workflow once manually.
+4. Push the files, then manually run **Update live IPL data** once.
 
 ## What this version does
 
-- uses CricketData instead of brittle scraping for core season stats
-- refreshes every 5 minutes during live match windows
-- limits quiet refreshes to roughly 5 per day outside live windows
-- incrementally processes completed matches instead of recomputing everything every run
-- computes these categories:
-  - orange cap
-  - most sixes
-  - purple cap
-  - most dots
-  - MVP
-  - uncapped MVP
-  - fair play
-  - highest team score
-  - striker
-  - best bowling figures
-  - best bowling strike rate
-  - most catches
-  - title standings
-  - bottom standings
-  - least MVP
+- keeps graceful quota handling instead of failing the workflow red
+- uses a **league-stage refresh plan** instead of aggressive every-15-minute polling
+- only attempts provider updates inside these match windows:
+  - 1 hour before a match
+  - 4 hours after a match start
+  - 5 hours after a match start
+- handles double-headers cleanly by merging overlapping hourly windows
+- stops the scheduled workflow after the announced league-stage schedule ends
+- shows the league-stage schedule in the site
+- renames the stats tab to **Nerd Room**
 
-## Architecture change: canonical entity matching
+## Workflow cadence
 
-This update changes the app from string-based comparison to identity-based comparison.
+GitHub Actions cannot express a different cron entry for every individual match date/time cleanly, so the workflow now uses a small fixed set of hourly cron buckets during the league stage:
 
-### Before
-- picks and live data were compared using raw or lightly normalized text
-- abbreviations and alternate spellings could score incorrectly
-- examples of drift:
-  - `Boult` vs `Trent Boult`
-  - `Phil Salt` vs `Philip Salt`
-  - `Abishek Sharma` vs `Abhishek Sharma`
-  - `Varun Chakravarthy` vs `Varun Chakaravarthy`
-  - `MI` vs `Mumbai Indians`
+- 09:00 UTC
+- 13:00 UTC
+- 14:00 UTC
+- 15:00 UTC
+- 18:00 UTC
+- 19:00 UTC
 
-### Now
-- each pick is resolved to a canonical `playerId` or `teamId`
-- each live row is resolved the same way before ranking and scoring
-- UI still shows friendly names, but scoring uses canonical identity underneath
+The worker then checks the official league-stage schedule in `ipl_2026_schedule.json` and immediately skips unless the current run falls inside a real planned refresh window.
 
-## What the entity layer fixes
+That means:
 
-- top-5 and better-rank categories no longer break because of naming drift
-- one-ranked-vs-one-unranked logic is more reliable because both sides are tagged first
-- team abbreviation picks now match full team names from live feeds
-- worker aggregates are normalized toward canonical squad names before they reach the frontend
+- no CricketData hit on a skipped bucket
+- one-match days only fetch in the relevant windows
+- double-header days fetch in the merged windows
+- after the final league-stage window, the workflow has no further scheduled runs
 
-## Alias handling included
+## New schedule file
 
-Common live-data drift is handled automatically, including cases like:
+`ipl_2026_schedule.json` is now the shared league-stage source for:
 
-- `Boult` -> `Trent Boult`
-- `Phil Salt` / `Philip Salt`
-- `Abishek Sharma` / `Abhishek Sharma`
-- `Varun Chakravarthy` / `Varun Chakaravarthy`
-- `AM Ghazanfar` / `Allah Ghazanfar`
-- team abbreviations like `MI`, `RCB`, `PBKS`, `SRH`
+- worker refresh planning
+- the site schedule tab
+- the “next planned update” pill
 
-## Worker behaviour
+## Tests
 
-The worker now:
+This patch adds worker schedule coverage on top of the existing quota test.
 
-- loads `ipl_2026_squads.json`
-- canonicalizes player names from scorecards before updating aggregates
-- keeps the existing live refresh budgeting and cached completed-match behaviour
-- continues writing output to `data/live.json`
+Run locally from the repo root:
 
-## Frontend behaviour
+```bash
+node --test tests/update-live-data.quota.test.mjs tests/update-live-data.schedule.test.mjs
+```
 
-The frontend now:
-
-- resolves both locked picks and live leaderboard rows through the entity index
-- compares picks by canonical identity instead of plain text
-- keeps your current UI and scoring system while making the matching layer more robust
-
-## Validation done
-
-- `node --check` passed for the updated worker
-- script extraction plus syntax check passed for the updated `index.html`
-
-## Practical repo note
-
-For GitHub Pages, your deployed site should still use the repo root `index.html`.
-If you downloaded a differently named file during patching, copy its contents into the root `index.html` before pushing.

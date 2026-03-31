@@ -1,11 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import vm from 'node:vm';
+import { pathToFileURL } from 'node:url';
 
 const ROOT = process.cwd();
 const DATA_DIR = path.join(ROOT, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'live.json');
-const SQUADS_FILE = path.join(ROOT, 'ipl_2026_squads.json');
+const SCHEDULE_FILE = path.join(ROOT, 'ipl_2026_schedule.json');
 
 const API_KEY = process.env.CRICKETDATA_API_KEY;
 const SERIES_ID = '87c62aac-bc3c-4738-ab93-19da0690488f';
@@ -75,6 +76,97 @@ function parseEnvInt(value, fallback) {
   const n = Number.parseInt(String(value ?? ''), 10);
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
+
+
+const SCHEDULE_REFRESH_OFFSETS_HOURS = [-1, 4, 5];
+
+export async function readLeagueStageSchedule(scheduleFile = SCHEDULE_FILE) {
+  const raw = await fs.readFile(scheduleFile, 'utf8');
+  const parsed = JSON.parse(raw);
+  if (!Array.isArray(parsed)) throw new Error('ipl_2026_schedule.json must be an array');
+  return parsed.filter(Boolean);
+}
+
+export function buildScheduledRefreshInstants(scheduleEntries, offsetsHours = SCHEDULE_REFRESH_OFFSETS_HOURS) {
+  const seen = new Set();
+  const instants = [];
+  for (const match of scheduleEntries || []) {
+    const startMs = Date.parse(match?.datetime_utc || '');
+    if (!Number.isFinite(startMs)) continue;
+    for (const offsetHours of offsetsHours) {
+      const refreshMs = startMs + (offsetHours * 60 * 60 * 1000);
+      const bucket = refreshBucketKey(refreshMs);
+      if (seen.has(bucket)) continue;
+      seen.add(bucket);
+      instants.push(new Date(refreshMs));
+    }
+  }
+  instants.sort((a, b) => a - b);
+  return instants;
+}
+
+export function refreshBucketKey(value) {
+  const dt = value instanceof Date ? value : new Date(value);
+  return Number.isFinite(dt.getTime()) ? dt.toISOString().slice(0, 13) : '';
+}
+
+export function isScheduledRefreshBucket(scheduleEntries, currentValue) {
+  const currentBucket = refreshBucketKey(currentValue);
+  if (!currentBucket) return false;
+  return buildScheduledRefreshInstants(scheduleEntries).some((dt) => refreshBucketKey(dt) === currentBucket);
+}
+
+export function nextScheduledRefreshAt(scheduleEntries, currentValue) {
+  const now = currentValue instanceof Date ? currentValue : new Date(currentValue);
+  return buildScheduledRefreshInstants(scheduleEntries).find((dt) => dt.getTime() > now.getTime()) || null;
+}
+
+export function lastScheduledRefreshAt(scheduleEntries) {
+  const plan = buildScheduledRefreshInstants(scheduleEntries);
+  return plan.length ? plan[plan.length - 1] : null;
+}
+
+export function createScheduleDecision(scheduleEntries, currentValue) {
+  const now = currentValue instanceof Date ? currentValue : new Date(currentValue);
+  const last = lastScheduledRefreshAt(scheduleEntries);
+  const next = nextScheduledRefreshAt(scheduleEntries, now);
+  const inBucket = isScheduledRefreshBucket(scheduleEntries, now);
+
+  if (!scheduleEntries?.length) {
+    return {
+      shouldRefresh: false,
+      mode: 'schedule_missing',
+      reason: 'league-stage refresh schedule is missing',
+      nextPlannedAt: null
+    };
+  }
+
+  if (last && now.getTime() > last.getTime() + (59 * 60 * 1000)) {
+    return {
+      shouldRefresh: false,
+      mode: 'schedule_complete',
+      reason: 'league-stage refresh plan has completed',
+      nextPlannedAt: null
+    };
+  }
+
+  if (!inBucket) {
+    return {
+      shouldRefresh: false,
+      mode: 'outside_scheduled_window',
+      reason: 'outside planned refresh windows',
+      nextPlannedAt: next ? next.toISOString() : null
+    };
+  }
+
+  return {
+    shouldRefresh: true,
+    mode: 'scheduled_window',
+    reason: 'inside planned refresh window',
+    nextPlannedAt: next ? next.toISOString() : null
+  };
+}
+
 
 function isoNow() { return new Date().toISOString(); }
 function nowMs() { return Date.now(); }
@@ -180,8 +272,15 @@ function createEmptyLive() {
         liveOverlayReused: false,
         liveOverlaySkippedReason: null
       },
-      scoreHistory: [],
-      aggregateSchemaVersion: AGGREGATE_SCHEMA_VERSION
+      aggregateSchemaVersion: AGGREGATE_SCHEMA_VERSION,
+      providerStatus: {
+        state: 'ok',
+        lastAttemptAt: null,
+        lastErrorAt: null,
+        reason: null,
+        hitsToday: null,
+        hitsLimit: null
+      }
     },
     titleWinner: { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [] },
     orangeCap: { ranking: [], extendedRanking: [] },
@@ -223,13 +322,91 @@ async function readExistingLive() {
         scorecardBudget: { ...fresh.meta.scorecardBudget, ...(parsed.meta?.scorecardBudget || {}) },
         officialMostDots: { ...fresh.meta.officialMostDots, ...((parsed.meta?.officialMostDots || parsed.meta?.cricmetricDots) || {}) },
         lastRun: { ...fresh.meta.lastRun, ...(parsed.meta?.lastRun || {}) },
-        scoreHistory: Array.isArray(parsed.meta?.scoreHistory) ? parsed.meta.scoreHistory : [],
+        providerStatus: { ...fresh.meta.providerStatus, ...(parsed.meta?.providerStatus || {}) },
         aggregateSchemaVersion: Number(parsed.meta?.aggregateSchemaVersion || fresh.meta.aggregateSchemaVersion || 1)
       }
     };
   } catch {
     return createEmptyLive();
   }
+}
+
+function makeApiError(json) {
+  const error = new Error(`API error: ${JSON.stringify(json)}`);
+  error.code = 'CRICKETDATA_API_ERROR';
+  error.api = json;
+  return error;
+}
+
+function tryParseApiPayloadFromError(error) {
+  if (error?.api && typeof error.api === 'object') return error.api;
+  const message = String(error?.message || '');
+  const marker = 'API error:';
+  const index = message.indexOf(marker);
+  if (index < 0) return null;
+  try {
+    return JSON.parse(message.slice(index + marker.length).trim());
+  } catch {
+    return null;
+  }
+}
+
+export function parseCricketDataQuotaDetails(error) {
+  const payload = tryParseApiPayloadFromError(error);
+  if (!payload) return null;
+  if (String(payload?.reason || '') !== 'hits_today_exceeded_hits_limit') return null;
+  return {
+    reason: payload.reason,
+    hitsToday: Number(payload.hitsToday ?? 0) || null,
+    hitsUsed: Number(payload.hitsUsed ?? 0) || null,
+    hitsLimit: Number(payload.hitsLimit ?? 0) || null,
+    status: String(payload.status || 'failure'),
+    apikey: payload.apikey || null
+  };
+}
+
+export function isCricketDataQuotaError(error) {
+  return Boolean(parseCricketDataQuotaDetails(error));
+}
+
+function setProviderStatusOk(live) {
+  live.meta.providerStatus = {
+    ...(live.meta.providerStatus || {}),
+    state: 'ok',
+    lastErrorAt: null,
+    reason: null,
+    hitsToday: null,
+    hitsLimit: null
+  };
+}
+
+function applyProviderDelayState(live, details) {
+  const delayAt = isoNow();
+  live.meta.providerStatus = {
+    ...(live.meta.providerStatus || {}),
+    state: 'quota_exceeded',
+    lastErrorAt: delayAt,
+    reason: details.reason,
+    hitsToday: details.hitsToday,
+    hitsLimit: details.hitsLimit
+  };
+
+  const lastGoodAt = live.fetchedAt ? new Date(live.fetchedAt).toISOString() : null;
+  const fallbackText = lastGoodAt ? `showing last good data from ${lastGoodAt}` : 'no previous successful live snapshot yet';
+  live.scrapeStatus = `delayed (CricketData quota reached; ${fallbackText})`;
+  live.scrapeReport = {
+    ...(live.scrapeReport || {}),
+    costControl: {
+      ok: false,
+      source: 'worker',
+      method: 'provider quota exceeded; kept previous live snapshot',
+      quotaExceeded: true,
+      hitsToday: details.hitsToday,
+      hitsLimit: details.hitsLimit,
+      scorecardCallsThisRun: live.meta?.lastRun?.scorecardCalls || 0,
+      backlogRemaining: live.meta?.lastRun?.backlogRemaining || 0
+    }
+  };
 }
 
 async function fetchJson(url) {
@@ -241,7 +418,7 @@ async function fetchJson(url) {
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   const json = await res.json();
-  if (json.status && json.status !== 'success') throw new Error(`API error: ${JSON.stringify(json)}`);
+  if (json.status && json.status !== 'success') throw makeApiError(json);
   return json;
 }
 
@@ -282,134 +459,6 @@ function normalizeLookupName(value) {
     .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-}
-
-
-const TEAM_NAME_TO_CODE = {
-  csk: 'CSK',
-  'chennai super kings': 'CSK',
-  dc: 'DC',
-  'delhi capitals': 'DC',
-  gt: 'GT',
-  'gujarat titans': 'GT',
-  kkr: 'KKR',
-  'kolkata knight riders': 'KKR',
-  lsg: 'LSG',
-  'lucknow super giants': 'LSG',
-  mi: 'MI',
-  'mumbai indians': 'MI',
-  pbks: 'PBKS',
-  'punjab kings': 'PBKS',
-  rr: 'RR',
-  'rajasthan royals': 'RR',
-  rcb: 'RCB',
-  'royal challengers bengaluru': 'RCB',
-  'royal challengers bangalore': 'RCB',
-  srh: 'SRH',
-  'sunrisers hyderabad': 'SRH'
-};
-
-const PLAYER_NAME_ALIASES = {
-  boult: 'Trent Boult',
-  bumrah: 'Jasprit Bumrah',
-  kohli: 'Virat Kohli',
-  gill: 'Shubman Gill',
-  kl: 'KL Rahul',
-  'kl rahul': 'KL Rahul',
-  pooran: 'Nicholas Pooran',
-  sanju: 'Sanju Samson',
-  iyer: 'Shreyas Iyer',
-  'shreyas iyer': 'Shreyas Iyer',
-  chahal: 'Yuzvendra Chahal',
-  rashid: 'Rashid Khan',
-  hazlewood: 'Josh Hazlewood',
-  'varun chakravarthy': 'Varun Chakaravarthy',
-  'varun chakaravarthy': 'Varun Chakaravarthy',
-  'tilak varma': 'N. Tilak Varma',
-  tilak: 'N. Tilak Varma',
-  surya: 'Surya Kumar Yadav',
-  'surya kumar yadav': 'Surya Kumar Yadav',
-  'suryakumar yadav': 'Surya Kumar Yadav',
-  brevis: 'Dewald Brevis',
-  'd brevis': 'Dewald Brevis',
-  'de brevis': 'Dewald Brevis',
-  'abishek sharma': 'Abhishek Sharma',
-  'abhishek sharma': 'Abhishek Sharma',
-  vaibhav: 'Vaibhav Suryavanshi',
-  sooryavanshi: 'Vaibhav Suryavanshi',
-  'v sooryavanshi': 'Vaibhav Suryavanshi',
-  'vaibhav sooryavanshi': 'Vaibhav Suryavanshi',
-  'vaibhav suryavanshi': 'Vaibhav Suryavanshi',
-  natarajan: 'T. Natarajan',
-  'm siddharth': 'M. Siddharth',
-  'shahbaz ahmed': 'Shahbaz Ahamad',
-  'nitish reddy': 'Nitish Kumar Reddy',
-  prasidh: 'Prasidh Krishna',
-  akeal: 'Akeal Hosein',
-  arshdeep: 'Arshdeep Singh',
-  khaleel: 'Khaleel Ahmed',
-  prabhsimran: 'Prabhsimran Singh',
-  salt: 'Phil Salt',
-  'philip salt': 'Phil Salt',
-  ishan: 'Ishan Kishan',
-  'allah ghazanfar': 'Allah Ghazanfar',
-  'am ghazanfar': 'Allah Ghazanfar',
-  'ms dhoni': 'MS Dhoni'
-};
-
-async function readSquadsFile() {
-  try {
-    return JSON.parse(await fs.readFile(SQUADS_FILE, 'utf8'));
-  } catch {
-    return {};
-  }
-}
-
-function teamCodeForName(teamName) {
-  return TEAM_NAME_TO_CODE[normalizeLookupName(teamName)] || null;
-}
-
-function buildSquadPlayerIndex(squads) {
-  const byNormalizedName = new Map();
-
-  for (const [teamCode, players] of Object.entries(squads || {})) {
-    for (const playerName of players || []) {
-      const record = { name: playerName, teamCode };
-      const normalized = normalizeLookupName(playerName);
-      if (!byNormalizedName.has(normalized)) byNormalizedName.set(normalized, []);
-      byNormalizedName.get(normalized).push(record);
-    }
-  }
-
-  for (const [alias, canonicalName] of Object.entries(PLAYER_NAME_ALIASES)) {
-    const canonicalRecords = byNormalizedName.get(normalizeLookupName(canonicalName)) || [];
-    if (!canonicalRecords.length) continue;
-    byNormalizedName.set(normalizeLookupName(alias), canonicalRecords);
-  }
-
-  return byNormalizedName;
-}
-
-const SQUADS_2026 = await readSquadsFile();
-const SQUAD_PLAYER_INDEX = buildSquadPlayerIndex(SQUADS_2026);
-
-function canonicalizePlayerName(value, hint = {}) {
-  const cleaned = stripTags(value);
-  if (!cleaned) return '';
-
-  const normalized = normalizeLookupName(cleaned);
-  const teamCode = hint.teamCode || teamCodeForName(hint.teamName);
-  let candidates = SQUAD_PLAYER_INDEX.get(normalized) || [];
-
-  if (teamCode) {
-    const filtered = candidates.filter(candidate => candidate.teamCode === teamCode);
-    if (filtered.length === 1) return filtered[0].name;
-    if (filtered.length > 1) candidates = filtered;
-  }
-
-  if (candidates.length === 1) return candidates[0].name;
-
-  return normalizeName(cleaned);
 }
 
 function titleCaseName(value) {
@@ -504,9 +553,6 @@ function resolveCricmetricPlayerName(rawName, agg) {
 
   const generatedAlias = aliasMap.get(rawNorm);
   if (generatedAlias) return generatedAlias;
-
-  const squadCanonical = canonicalizePlayerName(trimmed);
-  if (squadCanonical) return squadCanonical;
 
   return titleCaseName(trimmed);
 }
@@ -750,14 +796,10 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
   const inningsBlocks = safeArray(scorecardData.scorecard);
   const topScores = safeArray(scorecardData.score);
   const participants = new Set();
-  const matchTeams = safeArray(scorecardData.teams).map(normalizeName);
 
   for (const innings of inningsBlocks) {
-    const battingTeam = parseTeamFromInningName(innings?.inning);
-    const bowlingTeam = matchTeams.find((team) => team && team !== battingTeam) || null;
-
     for (const bat of safeArray(innings.batting)) {
-      const batter = canonicalizePlayerName(bat?.batsman?.name, { teamName: battingTeam });
+      const batter = normalizeName(bat?.batsman?.name);
       if (batter) participants.add(batter);
       const runs = Number(bat?.r || 0);
       const balls = Number(bat?.b || 0);
@@ -770,7 +812,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
     }
 
     for (const bowl of safeArray(innings.bowling)) {
-      const bowler = canonicalizePlayerName(bowl?.bowler?.name, { teamName: bowlingTeam });
+      const bowler = normalizeName(bowl?.bowler?.name);
       if (bowler) participants.add(bowler);
       const balls = oversToBalls(bowl?.o);
       const wickets = Number(bowl?.w || 0);
@@ -784,7 +826,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
     }
 
     for (const field of safeArray(innings.catching)) {
-      const catcher = canonicalizePlayerName(field?.catcher?.name, { teamName: bowlingTeam });
+      const catcher = normalizeName(field?.catcher?.name);
       if (catcher) {
         participants.add(catcher);
         addNumberMap(aggregates.catches, catcher, field?.catch || 0);
@@ -1191,73 +1233,6 @@ async function rebuildHistoricalAggregates(processedIds) {
   return rebuilt;
 }
 
-function createEmptyHistorySnapshot() {
-  return {
-    titleWinner: { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [] },
-    orangeCap: { ranking: [], extendedRanking: [] },
-    mostSixes: { ranking: [], extendedRanking: [] },
-    purpleCap: { ranking: [], extendedRanking: [] },
-    mostDots: { ranking: [], extendedRanking: [], values: {} },
-    mvp: { ranking: [], extendedRanking: [], values: {} },
-    uncappedMvp: { winner: null, ranking: [], extendedRanking: [], values: {} },
-    fairPlay: { winner: null, ranking: [], extendedRanking: [], values: {} },
-    highestScoreTeam: { winner: null, ranking: [], extendedRanking: [], values: {} },
-    striker: { ranking: [], extendedRanking: [] },
-    bestBowlingFigures: { ranking: [], extendedRanking: [], figures: {} },
-    bestBowlingStrikeRate: { ranking: [], extendedRanking: [], values: {} },
-    mostCatches: { ranking: [], extendedRanking: [], values: {} },
-    tableBottom: { winner: null, ranking: [], extendedRanking: [] },
-    leastMvp: { ranking: [], extendedRanking: [], values: {} }
-  };
-}
-
-function buildScoreHistorySnapshot(live) {
-  return {
-    processedMatchCount: safeArray(live.meta?.processedMatchIds).length,
-    fetchedAt: live.fetchedAt || isoNow(),
-    snapshot: JSON.parse(JSON.stringify({
-      titleWinner: live.titleWinner || { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [] },
-      orangeCap: live.orangeCap || { ranking: [], extendedRanking: [] },
-      mostSixes: live.mostSixes || { ranking: [], extendedRanking: [] },
-      purpleCap: live.purpleCap || { ranking: [], extendedRanking: [] },
-      mostDots: live.mostDots || { ranking: [], extendedRanking: [], values: {} },
-      mvp: live.mvp || { ranking: [], extendedRanking: [], values: {} },
-      uncappedMvp: live.uncappedMvp || { winner: null, ranking: [], extendedRanking: [], values: {} },
-      fairPlay: live.fairPlay || { winner: null, ranking: [], extendedRanking: [], values: {} },
-      highestScoreTeam: live.highestScoreTeam || { winner: null, ranking: [], extendedRanking: [], values: {} },
-      striker: live.striker || { ranking: [], extendedRanking: [] },
-      bestBowlingFigures: live.bestBowlingFigures || { ranking: [], extendedRanking: [], figures: {} },
-      bestBowlingStrikeRate: live.bestBowlingStrikeRate || { ranking: [], extendedRanking: [], values: {} },
-      mostCatches: live.mostCatches || { ranking: [], extendedRanking: [], values: {} },
-      tableBottom: live.tableBottom || { winner: null, ranking: [], extendedRanking: [] },
-      leastMvp: live.leastMvp || { ranking: [], extendedRanking: [], values: {} }
-    }))
-  };
-}
-
-function updateScoreHistory(live) {
-  const existing = Array.isArray(live.meta?.scoreHistory) ? live.meta.scoreHistory : [];
-  const history = existing.filter(Boolean).map((entry) => ({ ...entry }));
-  if (!history.some((entry) => Number(entry?.processedMatchCount || 0) === 0)) {
-    history.unshift({
-      processedMatchCount: 0,
-      fetchedAt: isoNow(),
-      snapshot: createEmptyHistorySnapshot()
-    });
-  }
-
-  const latest = buildScoreHistorySnapshot(live);
-  const existingIndex = history.findIndex((entry) => Number(entry?.processedMatchCount || 0) === latest.processedMatchCount);
-  if (existingIndex >= 0) {
-    history[existingIndex] = latest;
-  } else {
-    history.push(latest);
-  }
-
-  history.sort((a, b) => Number(a?.processedMatchCount || 0) - Number(b?.processedMatchCount || 0));
-  live.meta.scoreHistory = history.slice(-80);
-}
-
 async function main() {
   if (!API_KEY) throw new Error('Missing CRICKETDATA_API_KEY environment variable');
 
@@ -1280,34 +1255,40 @@ async function main() {
     liveOverlayReused: false,
     liveOverlaySkippedReason: null
   };
+  live.meta.providerStatus = {
+    ...(live.meta.providerStatus || {}),
+    lastAttemptAt: isoNow()
+  };
 
-  const currentMs = nowMs();
-  const decision = decideRefreshMode(live, currentMs);
+  const scheduleEntries = await readLeagueStageSchedule();
+  const now = new Date();
+  const currentMs = now.getTime();
+  const decision = createScheduleDecision(scheduleEntries, now);
   live.meta.scheduler.lastDecision = { at: isoNow(), ...decision };
+  live.meta.scheduler.nextPlannedRefreshAt = decision.nextPlannedAt || null;
+  live.meta.scheduler.nextPlannedMode = decision.nextPlannedAt ? 'scheduled_window' : null;
+  live.meta.scheduler.nextPlannedReason = decision.nextPlannedAt ? 'league-stage refresh plan' : decision.reason;
+  live.meta.scheduler.nextPlannedCalculatedAt = isoNow();
 
   if (!decision.shouldRefresh) {
     console.log(`Skip: ${decision.reason}`);
     return;
   }
 
-  const seriesJson = await fetchJson(SERIES_INFO_URL);
+  try {
+    const seriesJson = await fetchJson(SERIES_INFO_URL);
   live.meta.lastRun.seriesInfoCalls = 1;
 
   const matchList = safeArray(seriesJson.data?.matchList).map(toMinimalMatch);
   live.meta.cache.matchList = matchList;
   live.meta.scheduler.lastSeriesInfoAt = isoNow();
 
-  if (decision.mode === 'quiet_window') {
-    live.meta.scheduler.quietRefreshesUsed += 1;
-    live.meta.scheduler.lastQuietRefreshAt = isoNow();
-  } else {
-    live.meta.scheduler.lastLiveRefreshAt = isoNow();
-  }
+  live.meta.scheduler.lastLiveRefreshAt = isoNow();
 
-  const nextPlanned = calculateNextPlannedRefresh(live, nowMs());
-  live.meta.scheduler.nextPlannedRefreshAt = nextPlanned?.at || null;
-  live.meta.scheduler.nextPlannedMode = nextPlanned?.mode || null;
-  live.meta.scheduler.nextPlannedReason = nextPlanned?.reason || null;
+  const nextPlanned = nextScheduledRefreshAt(scheduleEntries, new Date());
+  live.meta.scheduler.nextPlannedRefreshAt = nextPlanned ? nextPlanned.toISOString() : null;
+  live.meta.scheduler.nextPlannedMode = nextPlanned ? 'scheduled_window' : null;
+  live.meta.scheduler.nextPlannedReason = nextPlanned ? 'league-stage refresh plan' : 'league-stage refresh plan completed';
   live.meta.scheduler.nextPlannedCalculatedAt = isoNow();
 
   const processedIds = new Set(live.meta.processedMatchIds || []);
@@ -1477,7 +1458,7 @@ async function main() {
     costControl: {
       ok: true,
       source: 'worker',
-      method: 'cached completed matches forever, capped backlog catch-up, throttled live scorecards',
+      method: 'scheduled league-stage windows, cached completed matches forever, capped backlog catch-up, throttled live scorecards',
       liveScorecardsEnabled: LIVE_SCORECARD_ENABLED,
       liveScorecardIntervalMinutes: LIVE_SCORECARD_INTERVAL_MINUTES,
       maxBacklogScorecardsPerRun: MAX_BACKLOG_SCORECARDS_PER_RUN,
@@ -1486,18 +1467,36 @@ async function main() {
     }
   };
 
-  live.fetchedAt = isoNow();
-  live.scrapeStatus = `ok (${live.meta.processedMatchIds.length} processed matches${activeMatch ? ', live match tracked' : ''}, ${live.meta.lastRun.scorecardCalls} scorecard call${live.meta.lastRun.scorecardCalls === 1 ? '' : 's'} this run${backlogRemaining ? `, ${backlogRemaining} backlog remaining` : ''})`;
-  updateScoreHistory(live);
+    setProviderStatusOk(live);
+    live.fetchedAt = isoNow();
+    live.scrapeStatus = `ok (${live.meta.processedMatchIds.length} processed matches${activeMatch ? ', live match tracked' : ''}, ${live.meta.lastRun.scorecardCalls} scorecard call${live.meta.lastRun.scorecardCalls === 1 ? '' : 's'} this run${backlogRemaining ? `, ${backlogRemaining} backlog remaining` : ''})`;
 
-  await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
+    await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
 
-  console.log(
-    `Updated live.json. Series info calls: ${live.meta.lastRun.seriesInfoCalls}. Scorecard calls: ${live.meta.lastRun.scorecardCalls}. Backlog processed: ${live.meta.lastRun.backlogProcessed}. Backlog remaining: ${backlogRemaining}. Live overlay: ${live.meta.liveOverlay.source || 'none'}.`
-  );
+    console.log(
+      `Updated live.json. Series info calls: ${live.meta.lastRun.seriesInfoCalls}. Scorecard calls: ${live.meta.lastRun.scorecardCalls}. Backlog processed: ${live.meta.lastRun.backlogProcessed}. Backlog remaining: ${backlogRemaining}. Live overlay: ${live.meta.liveOverlay.source || 'none'}.`
+    );
+  } catch (error) {
+    if (isCricketDataQuotaError(error)) {
+      const details = parseCricketDataQuotaDetails(error);
+      applyProviderDelayState(live, details);
+      await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
+      console.warn(`CricketData quota reached (${details.hitsToday}/${details.hitsLimit}). Keeping previous live snapshot.`);
+      return;
+    }
+    throw error;
+  }
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+function isDirectRun() {
+  const argv1 = process.argv[1];
+  if (!argv1) return false;
+  return import.meta.url === pathToFileURL(argv1).href;
+}
+
+if (isDirectRun()) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}
