@@ -1235,8 +1235,22 @@
       return canonicalCompareName(a) === canonicalCompareName(b);
     }
 
-    function rankOf(pick, ranking){
-      const idx = ranking.findIndex(name => matchesPick(name, pick));
+    function rankOf(pick, ranking, context = null){
+      const ordered = Array.isArray(ranking) ? ranking : [];
+      if (!ordered.length) return null;
+      const key = canonicalCompareName(pick);
+      if (!key) return null;
+
+      const categoryKey = context?.categoryKey || null;
+      const live = context?.live || null;
+      const liveSource = context?.liveSource || LIVE_2026;
+
+      if (categoryKey && live) {
+        const rankMap = buildRankMap(categoryKey, ordered, live, liveSource);
+        return rankMap.get(key) ?? null;
+      }
+
+      const idx = ordered.findIndex(name => matchesPick(name, pick));
       return idx >= 0 ? idx + 1 : null;
     }
 
@@ -1246,9 +1260,82 @@
       return Array.isArray(live?.ranking) ? live.ranking : [];
     }
 
+const COMPETITION_RANK_CATEGORY_KEYS = new Set([
+      'orangeCap',
+      'mostSixes',
+      'purpleCap',
+      'mostDots',
+      'mvp',
+      'uncappedMvp',
+      'highestScoreTeam',
+      'striker',
+      'bestBowlingFigures',
+      'bestBowlingStrikeRate',
+      'mostCatches',
+      'leastMvp'
+    ]);
+
+function categoryUsesCompetitionRanks(categoryKey){
+      return COMPETITION_RANK_CATEGORY_KEYS.has(categoryKey);
+    }
+
+function categoryRankValue(categoryKey, name, live, liveSource = LIVE_2026){
+      const agg = getAggregates(liveSource);
+      if (!name) return null;
+
+      if (categoryKey === 'orangeCap') return valueForPickFromObject(agg.battingRuns || {}, name);
+      if (categoryKey === 'mostSixes') return valueForPickFromObject(agg.battingSixes || {}, name);
+      if (categoryKey === 'purpleCap') return valueForPickFromObject(agg.bowlingWickets || {}, name);
+      if (categoryKey === 'mostDots') return valueForPickFromObject(live?.values || agg.bowlingDots || {}, name);
+      if (categoryKey === 'mostCatches') return valueForPickFromObject(live?.values || agg.catches || {}, name);
+      if (categoryKey === 'mvp' || categoryKey === 'uncappedMvp' || categoryKey === 'leastMvp') {
+        return valueForPickFromObject(live?.values || {}, name, 'score');
+      }
+      if (categoryKey === 'highestScoreTeam') return valueForPickFromObject(live?.values || {}, name);
+      if (categoryKey === 'striker') {
+        const runs = Number(valueForPickFromObject(agg.battingRuns || {}, name) || 0);
+        const balls = Number(valueForPickFromObject(agg.battingBalls || {}, name) || 0);
+        if (!balls) return null;
+        return Number(((100 * runs) / balls).toFixed(2));
+      }
+      if (categoryKey === 'bestBowlingFigures') return valueForPickFromObject(live?.figures || {}, name);
+      if (categoryKey === 'bestBowlingStrikeRate') return valueForPickFromObject(live?.values || {}, name);
+      return null;
+    }
+
+function categoryRankSignature(categoryKey, name, live, liveSource = LIVE_2026){
+      const value = categoryRankValue(categoryKey, name, live, liveSource);
+      if (value === null || value === undefined || value === '') return null;
+      if (typeof value === 'number') return `n:${value}`;
+      return `s:${String(value)}`;
+    }
+
+function buildRankMap(categoryKey, ranking, live, liveSource = LIVE_2026){
+      const map = new Map();
+      const ordered = Array.isArray(ranking) ? ranking : [];
+      if (!ordered.length) return map;
+
+      if (!categoryUsesCompetitionRanks(categoryKey)) {
+        ordered.forEach((name, idx) => map.set(canonicalCompareName(name), idx + 1));
+        return map;
+      }
+
+      let previousSignature = null;
+      let currentRank = 0;
+      ordered.forEach((name, idx) => {
+        const signature = categoryRankSignature(categoryKey, name, live, liveSource) ?? `idx:${idx}`;
+        if (idx === 0 || signature !== previousSignature) {
+          currentRank = idx + 1;
+          previousSignature = signature;
+        }
+        map.set(canonicalCompareName(name), currentRank);
+      });
+      return map;
+    }
+
     function describePickLiveState(category, pick, live, explicitRank){
       const trackingRanking = trackingRankingForLive(live);
-      const rank = explicitRank || (trackingRanking.length ? rankOf(pick, trackingRanking) : null);
+      const rank = explicitRank || (trackingRanking.length ? rankOf(pick, trackingRanking, { categoryKey: category.key, live, liveSource: LIVE_2026 }) : null);
 
       if (category.type === 'title') {
         if (live?.winner && matchesPick(pick, live.winner)) return 'Live: winner';
@@ -1382,8 +1469,8 @@
       for (const row of rows) {
         const live = LIVE_2026[row.category.key] || {};
         const ranking = trackingRankingForLive(live);
-        const rankA = rankOf(row.pickA, ranking);
-        const rankB = rankOf(row.pickB, ranking);
+        const rankA = rankOf(row.pickA, ranking, { categoryKey: row.category.key, live, liveSource: LIVE_2026 });
+        const rankB = rankOf(row.pickB, ranking, { categoryKey: row.category.key, live, liveSource: LIVE_2026 });
         if (rankA && rankB) {
           candidates.push({
             weight: Math.abs(rankA - rankB),
@@ -1448,7 +1535,7 @@
       const agg = getAggregates();
       for (const pick of [matchup.a.picks.striker, matchup.b.picks.striker]) {
         const runs = Number(valueForPickFromObject(agg.battingRuns || {}, pick) || 0);
-        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.striker || {}));
+        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.striker || {}), { categoryKey: 'striker', live: LIVE_2026.striker || {}, liveSource: LIVE_2026 });
         if (!rank && runs < 100) {
           const need = 100 - runs;
           pushes.push({ priority: need + 20, message: `${pick} still needs ${unitLabel('run', need)} just to qualify for Striker, so that category is still loading its drama.` });
@@ -1458,7 +1545,7 @@
       for (const pick of [matchup.a.picks.bestBowlingStrikeRate, matchup.b.picks.bestBowlingStrikeRate]) {
         const balls = Number(valueForPickFromObject(agg.bowlingBalls || {}, pick) || 0);
         const wickets = Number(valueForPickFromObject(agg.bowlingWickets || {}, pick) || 0);
-        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.bestBowlingStrikeRate || {}));
+        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.bestBowlingStrikeRate || {}), { categoryKey: 'bestBowlingStrikeRate', live: LIVE_2026.bestBowlingStrikeRate || {}, liveSource: LIVE_2026 });
         if (!rank && balls < 72) {
           const need = 72 - balls;
           pushes.push({ priority: need + 25, message: wickets > 0 ? `${pick} needs ${need} more balls (${oversLabelFromBalls(need)}) to qualify for bowling strike rate.` : `${pick} needs ${need} more balls (${oversLabelFromBalls(need)}) and a wicket before bowling strike rate even wakes up.` });
@@ -1467,7 +1554,7 @@
 
       for (const pick of [matchup.a.picks.leastMvp, matchup.b.picks.leastMvp]) {
         const matches = Number(valueForPickFromObject(agg.playerMatches || {}, pick) || 0);
-        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.leastMvp || {}));
+        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.leastMvp || {}), { categoryKey: 'leastMvp', live: LIVE_2026.leastMvp || {}, liveSource: LIVE_2026 });
         if (!rank && matches < 5) {
           const need = 5 - matches;
           pushes.push({ priority: need + 15, message: `${pick} still needs ${unitLabel('game', need)} before Least MVP becomes a real battlefield.` });
@@ -1508,12 +1595,11 @@
       const ranking = Array.isArray(live?.extendedRanking) && live.extendedRanking.length
         ? live.extendedRanking
         : (Array.isArray(live?.ranking) ? live.ranking : []);
-
       const aWin = actualWinner && matchesPick(pickA, actualWinner);
       const bWin = actualWinner && matchesPick(pickB, actualWinner);
-      const rankA = rankOf(pickA, ranking);
-      const rankB = rankOf(pickB, ranking);
 
+      const rankA = rankOf(pickA, ranking, { categoryKey, live, liveSource: LIVE_2026 });
+      const rankB = rankOf(pickB, ranking, { categoryKey, live, liveSource: LIVE_2026 });
       let a = aWin ? betterPredictionPoints(rankA || 1, categoryKey) : 0;
       let b = bWin ? betterPredictionPoints(rankB || 1, categoryKey) : 0;
 
@@ -1548,7 +1634,7 @@
       };
     }
 
-    function titleBandScore(pick, live){
+function titleBandScore(pick, live){
       if (live.winner && matchesPick(pick, live.winner)) return 5;
       if (Array.isArray(live.finalists) && live.finalists.some(name => matchesPick(name, pick))) return 3;
       if (Array.isArray(live.playoffs) && live.playoffs.some(name => matchesPick(name, pick))) return 2;
@@ -1611,9 +1697,9 @@
       return 1;
     }
 
-    function scoreTop5Category(pickA, pickB, ranking){
-      const rA = rankOf(pickA, ranking);
-      const rB = rankOf(pickB, ranking);
+    function scoreTop5Category(pickA, pickB, ranking, categoryKey = null, live = null){
+      const rA = rankOf(pickA, ranking, { categoryKey, live, liveSource: LIVE_2026 });
+      const rB = rankOf(pickB, ranking, { categoryKey, live, liveSource: LIVE_2026 });
 
       let a = top5Points(rA);
       let b = top5Points(rB);
@@ -1630,20 +1716,17 @@
       return { a, b, note, rankA:rA, rankB:rB };
     }
 
-    function scoreTop5WithExtended(pickA, pickB, ranking, extendedRanking){
-      const rA = rankOf(pickA, ranking);
-      const rB = rankOf(pickB, ranking);
-      let a = top5Points(rA);
-      let b = top5Points(rB);
-
-      const extA = rankOf(pickA, extendedRanking);
-      const extB = rankOf(pickB, extendedRanking);
+    function scoreTop5WithExtended(pickA, pickB, ranking, extendedRanking, categoryKey = null, live = null){
+      const rA = rankOf(pickA, ranking, { categoryKey, live, liveSource: LIVE_2026 });
+      const rB = rankOf(pickB, ranking, { categoryKey, live, liveSource: LIVE_2026 });
+      const extA = rankOf(pickA, extendedRanking, { categoryKey, live, liveSource: LIVE_2026 });
+      const extB = rankOf(pickB, extendedRanking, { categoryKey, live, liveSource: LIVE_2026 });
       const fullA = extA || rA || null;
       const fullB = extB || rB || null;
 
-      // If both missed the top 5, award the 1-point better-prediction fallback.
-      // This must work symmetrically: any ranked pick beats an unranked pick,
-      // and if both are ranked outside the scoring zone, the closer rank wins.
+      let a = top5Points(fullA || rA);
+      let b = top5Points(fullB || rB);
+
       if (a === 0 && b === 0) {
         if (fullA && fullB) {
           if (fullA < fullB) a = 1;
@@ -1661,13 +1744,13 @@
       };
     }
 
-    function scoreBetterRankCategory(pickA, pickB, ranking, emptyNote = 'Waiting for ranking'){
-      const rA = rankOf(pickA, ranking);
-      const rB = rankOf(pickB, ranking);
+    function scoreBetterRankCategory(pickA, pickB, ranking, emptyNote = 'Waiting for ranking', categoryKey = null, live = null){
+      const rA = rankOf(pickA, ranking, { categoryKey, live, liveSource: LIVE_2026 });
+      const rB = rankOf(pickB, ranking, { categoryKey, live, liveSource: LIVE_2026 });
       let a = 0, b = 0;
       if (rA && rB) {
-        if (rA < rB) a = 1;
-        else if (rB < rA) b = 1;
+        if (rA < rB) a = betterPredictionPoints(rA, categoryKey);
+        else if (rB < rA) b = betterPredictionPoints(rB, categoryKey);
       } else if (rA && !rB) {
         a = 1;
       } else if (rB && !rA) {
@@ -1679,9 +1762,9 @@
       };
     }
 
-    function scoreBetterRankLowCategory(pickA, pickB, ranking){
-      const rA = rankOf(pickA, ranking);
-      const rB = rankOf(pickB, ranking);
+    function scoreBetterRankLowCategory(pickA, pickB, ranking, categoryKey = null, live = null){
+      const rA = rankOf(pickA, ranking, { categoryKey, live, liveSource: LIVE_2026 });
+      const rB = rankOf(pickB, ranking, { categoryKey, live, liveSource: LIVE_2026 });
       let a = 0, b = 0;
       if (rA && rB) {
         if (rA > rB) a = 1;
@@ -1722,19 +1805,19 @@
         if (category.key === 'striker') emptyNote = 'Waiting for ranking (min 100 runs)';
         if (category.key === 'bestBowlingStrikeRate') emptyNote = 'Waiting for ranking (min 12 overs)';
         return extendedRanking
-          ? scoreBetterRankCategory(pickA, pickB, extendedRanking, emptyNote)
-          : scoreBetterRankCategory(pickA, pickB, ranking, emptyNote);
+          ? scoreBetterRankCategory(pickA, pickB, extendedRanking, emptyNote, category.key, live)
+          : scoreBetterRankCategory(pickA, pickB, ranking, emptyNote, category.key, live);
       }
 
       if (category.type === 'better_rank_low') {
         return extendedRanking
-          ? scoreBetterRankLowCategory(pickA, pickB, extendedRanking)
-          : scoreBetterRankLowCategory(pickA, pickB, ranking);
+          ? scoreBetterRankLowCategory(pickA, pickB, extendedRanking, category.key, live)
+          : scoreBetterRankLowCategory(pickA, pickB, ranking, category.key, live);
       }
 
       return extendedRanking
-        ? scoreTop5WithExtended(pickA, pickB, ranking, extendedRanking)
-        : scoreTop5Category(pickA, pickB, ranking);
+        ? scoreTop5WithExtended(pickA, pickB, ranking, extendedRanking, category.key, live)
+        : scoreTop5Category(pickA, pickB, ranking, category.key, live);
     }
 
     function computeMatchup(matchup, liveSource = LIVE_2026){
@@ -2066,8 +2149,8 @@
       for (const row of rows) {
         const live = LIVE_2026[row.category.key] || {};
         const ranking = trackingRankingForLive(live);
-        const rankA = rankOf(row.pickA, ranking);
-        const rankB = rankOf(row.pickB, ranking);
+        const rankA = rankOf(row.pickA, ranking, { categoryKey: row.category.key, live, liveSource: LIVE_2026 });
+        const rankB = rankOf(row.pickB, ranking, { categoryKey: row.category.key, live, liveSource: LIVE_2026 });
         if (rankA && rankB) {
           ranked.push({
             delta: Math.abs(rankA - rankB),
@@ -2274,6 +2357,8 @@
       const teamsByPlayer = playerTeamMap();
       const ext = Array.isArray(live.extendedRanking) && live.extendedRanking.length ? live.extendedRanking : (Array.isArray(live.ranking) ? live.ranking : []);
       const ranking = Array.isArray(ext) ? ext : [];
+      const rankMap = buildRankMap(categoryKey, ranking, live, LIVE_2026);
+      const displayRank = (name, fallbackIndex) => rankMap.get(canonicalCompareName(name)) ?? fallbackIndex;
       const rows = [];
 
       if (categoryKey === 'titleWinner' || categoryKey === 'tableBottom') {
@@ -2281,32 +2366,32 @@
         const ordered = ranking.length ? ranking : Object.keys(standings);
         ordered.forEach((team, idx) => {
           const s = standings[team] || {};
-          rows.push({ rank: idx + 1, name: team, value: `${s.points ?? 0} pts`, context: `Played ${s.played ?? 0} • W ${s.wins ?? 0} • L ${s.losses ?? 0} • NRR ${standingNrrValue(s).toFixed(3)}` });
+          rows.push({ rank: displayRank(team, idx + 1), name: team, value: `${s.points ?? 0} pts`, context: `Played ${s.played ?? 0} • W ${s.wins ?? 0} • L ${s.losses ?? 0} • NRR ${standingNrrValue(s).toFixed(3)}` });
         });
         return { summary: categoryKey === 'titleWinner' ? 'Current title-race order from the live standings.' : 'Current table order. For Bottom of table, the lowest side is the live target.', rows };
       }
 
       if (categoryKey === 'fairPlay') {
         const values = live.values || {};
-        ranking.forEach((team, idx) => rows.push({ rank: idx + 1, name: team, value: values[team] ?? '—', context: live.updatedAt ? `Official feed updated ${live.updatedAt}` : 'Official fair-play feed' }));
+        ranking.forEach((team, idx) => rows.push({ rank: displayRank(team, idx + 1), name: team, value: values[team] ?? '—', context: live.updatedAt ? `Official feed updated ${live.updatedAt}` : 'Official fair-play feed' }));
         return { summary: 'Official IPL Fair Play table.', rows };
       }
 
       if (categoryKey === 'highestScoreTeam') {
         const values = live.values || {};
-        ranking.forEach((team, idx) => rows.push({ rank: idx + 1, name: team, value: values[team] ?? '—', context: 'Highest innings total so far' }));
+        ranking.forEach((team, idx) => rows.push({ rank: displayRank(team, idx + 1), name: team, value: values[team] ?? '—', context: 'Highest innings total so far' }));
         return { summary: 'Team leaderboard by highest innings total.', rows };
       }
 
       if (categoryKey === 'bestBowlingFigures') {
         const figures = live.figures || {};
-        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: figures[name] ?? '—', context: teamsByPlayer[canonicalCompareName(name)] || 'Player' }));
+        ranking.forEach((name, idx) => rows.push({ rank: displayRank(name, idx + 1), name, value: figures[name] ?? '—', context: teamsByPlayer[canonicalCompareName(name)] || 'Player' }));
         return { summary: 'Best single-spell figures this season.', rows };
       }
 
       if (categoryKey === 'bestBowlingStrikeRate') {
         const values = live.values || {};
-        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: values[name] ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • min 12 overs` }));
+        ranking.forEach((name, idx) => rows.push({ rank: displayRank(name, idx + 1), name, value: values[name] ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • min 12 overs` }));
         return { summary: 'Bowling strike rate board for qualified bowlers only.', rows };
       }
 
@@ -2314,30 +2399,30 @@
         const values = live.values || {};
         ranking.forEach((name, idx) => {
           const obj = values[name] || {};
-          rows.push({ rank: idx + 1, name, value: obj.score ?? '—', context: mvpContextLine(obj) });
+          rows.push({ rank: displayRank(name, idx + 1), name, value: obj.score ?? '—', context: mvpContextLine(obj) });
         });
         const summary = categoryKey === 'uncappedMvp' ? 'Uncapped-only MVP board.' : categoryKey === 'leastMvp' ? 'Eligible MVP board used for Least MVP (lower is better, minimum 5 games).' : 'Custom MVP board from live.json.';
         return { summary, rows };
       }
 
       if (categoryKey === 'orangeCap') {
-        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: valueForPickFromObject(agg.battingRuns || {}, name) ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.battingBalls || {}, name) ?? 0} balls • ${valueForPickFromObject(agg.battingSixes || {}, name) ?? 0} sixes` }));
+        ranking.forEach((name, idx) => rows.push({ rank: displayRank(name, idx + 1), name, value: valueForPickFromObject(agg.battingRuns || {}, name) ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.battingBalls || {}, name) ?? 0} balls • ${valueForPickFromObject(agg.battingSixes || {}, name) ?? 0} sixes` }));
         return { summary: 'Complete Orange Cap board from live data.', rows };
       }
 
       if (categoryKey === 'mostSixes') {
-        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: valueForPickFromObject(agg.battingSixes || {}, name) ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.battingRuns || {}, name) ?? 0} runs` }));
+        ranking.forEach((name, idx) => rows.push({ rank: displayRank(name, idx + 1), name, value: valueForPickFromObject(agg.battingSixes || {}, name) ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.battingRuns || {}, name) ?? 0} runs` }));
         return { summary: 'Full six-hitting board from live data.', rows };
       }
 
       if (categoryKey === 'purpleCap') {
-        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: valueForPickFromObject(agg.bowlingWickets || {}, name) ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.bowlingBalls || {}, name) ?? 0} balls bowled` }));
+        ranking.forEach((name, idx) => rows.push({ rank: displayRank(name, idx + 1), name, value: valueForPickFromObject(agg.bowlingWickets || {}, name) ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.bowlingBalls || {}, name) ?? 0} balls bowled` }));
         return { summary: 'Full wickets board from live data.', rows };
       }
 
       if (categoryKey === 'mostDots') {
         const values = live.values || agg.bowlingDots || {};
-        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: values[name] ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.bowlingWickets || {}, name) ?? 0} wickets` }));
+        ranking.forEach((name, idx) => rows.push({ rank: displayRank(name, idx + 1), name, value: values[name] ?? '—', context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${valueForPickFromObject(agg.bowlingWickets || {}, name) ?? 0} wickets` }));
         return { summary: 'Dot-ball board from Cricmetric/derived live feed.', rows };
       }
 
@@ -2346,18 +2431,18 @@
           const runs = Number(valueForPickFromObject(agg.battingRuns || {}, name) || 0);
           const balls = Number(valueForPickFromObject(agg.battingBalls || {}, name) || 0);
           const sr = balls ? ((100 * runs) / balls).toFixed(2) : '—';
-          rows.push({ rank: idx + 1, name, value: sr, context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${runs} runs from ${balls} balls` });
+          rows.push({ rank: displayRank(name, idx + 1), name, value: sr, context: `${teamsByPlayer[canonicalCompareName(name)] || 'Player'} • ${runs} runs from ${balls} balls` });
         });
         return { summary: 'Qualified striker board (minimum 100 runs).', rows };
       }
 
       if (categoryKey === 'mostCatches') {
         const values = live.values || agg.catches || {};
-        ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: values[name] ?? '—', context: teamsByPlayer[canonicalCompareName(name)] || 'Player' }));
+        ranking.forEach((name, idx) => rows.push({ rank: displayRank(name, idx + 1), name, value: values[name] ?? '—', context: teamsByPlayer[canonicalCompareName(name)] || 'Player' }));
         return { summary: 'Catching leaderboard.', rows };
       }
 
-      ranking.forEach((name, idx) => rows.push({ rank: idx + 1, name, value: '—', context: 'Live board entry' }));
+      ranking.forEach((name, idx) => rows.push({ rank: displayRank(name, idx + 1), name, value: '—', context: 'Live board entry' }));
       return { summary: 'Live board from data/live.json.', rows };
     }
 
