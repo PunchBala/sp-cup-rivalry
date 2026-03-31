@@ -1,59 +1,47 @@
-# War Room league model
+# War Room league model (V1A)
 
-This is the V1-ready local league data contract.
+The war room is now fixture-backed instead of hardcoding rivalry tabs inside `index.html`.
 
-## Why this exists
+## What changed
 
-The current app already has strong protection for:
-- scoring rules
-- live data shape
-- smoke tests
+- `warroom-league-model.js` provides a browser-safe league loader/validator API.
+- `fixtures/league_sp_cup_2026.json` is the default locked league used by the page.
+- `fixtures/league_draft_example.json` is a draft fixture that proves incomplete picks are allowed before lock.
+- `index.html` loads a league fixture, validates it, builds matchup tabs, then renders the normal war room.
 
-V1 introduces a new failure class: malformed saved leagues, missing picks, duplicate players, or bad category keys. This model protects that before Supabase is added.
+## URL parameters
 
-## Core league shape
+- `?league=sp-cup-2026` loads a specific league fixture.
+- `?matchup=sai-vibeesh` opens a specific matchup tab after the league is loaded.
 
-A valid league JSON must include:
-- `version`
-- `id`
-- `slug`
-- `name`
-- `templateId`
-- `visibility`
-- `state`
-- `players[]`
-- `picks{}`
+Example:
 
-## Current template
+```text
+/index.html?league=sp-cup-2026&matchup=sai-vibeesh
+```
 
-- `ipl-classic-v1`
+## Current fixture path strategy
 
-## States
+`index.html` currently maps known league slugs to local fixture files:
 
-- `draft` → incomplete picks allowed
-- `locked` → all picks required
+- `sp-cup-2026` → `fixtures/league_sp_cup_2026.json`
+- `draft-example` → `fixtures/league_draft_example.json`
 
-## Files added in Phase E
+This is the V1A bridge to BaaS.
+Later, the same loading contract can be swapped to Supabase reads without reworking the page-level rivalry rendering.
 
-- `warroom-league-model.mjs` → schema helpers, validator, matchup builder, local adapter
-- `scripts/validate-league-config.mjs` → direct validator for fixture or future exported league JSON
-- `fixtures/league_sp_cup_2026.json` → locked real league fixture using current picks
-- `fixtures/league_draft_example.json` → draft fixture proving incomplete picks can still validate
-- `tests/league-model.test.mjs` → product-model tests
+## Validation rules
 
-## Why the adapter matters
+League fixtures must satisfy the league model:
 
-The local adapter gives V1 a clean seam:
-- today: load from fixture JSON
-- later: load from Supabase
+- version must match the current model version
+- at least 2 players
+- unique player ids and names
+- valid category keys only
+- locked leagues must have complete picks
+- draft leagues may be incomplete
 
-The rest of the app can consume matchup objects without caring where the league came from.
+## V1A goal
 
-## Expected future flow
-
-1. Load league by slug from adapter
-2. Validate league config
-3. Build pairwise matchups from league players + picks
-4. Feed those matchups into the existing scoring engine
-
-That means the existing scoring engine remains the scoring truth, while the league model becomes the product-data truth.
+Get the page to render from a real league document, not from hardcoded matchup constants.
+That makes the app product-shaped before any backend write flow arrives.
