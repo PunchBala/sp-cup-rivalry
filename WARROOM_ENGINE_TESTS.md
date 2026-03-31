@@ -1,43 +1,31 @@
-# WARROOM_ENGINE_TESTS
+# War Room test commands
 
-## Local commands
+Run from repo root.
 
-Run the scoring-engine tests:
-
-```bash
-node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs
-```
-
-Run the live-data contract test:
+## Engine + live-data + league-model tests
 
 ```bash
-node --test tests/live-data.contract.test.mjs
+node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs tests/live-data.contract.test.mjs tests/league-model.test.mjs
 ```
 
-Validate the current worker output directly:
+## Direct validators
+
+Validate the current live data payload:
 
 ```bash
 node scripts/validate-live-data.mjs data/live.json
 ```
 
-Run everything the main CI job runs:
+Validate shipped or exported league JSON:
 
 ```bash
-node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs tests/live-data.contract.test.mjs && node scripts/validate-live-data.mjs data/live.json
+node scripts/validate-league-config.mjs fixtures/league_sp_cup_2026.json fixtures/league_draft_example.json
 ```
 
-## What pass/fail looks like
+## What Phase E adds
 
-- **Pass**: Node prints passing test output and exits normally.
-- **Fail**: Node prints the failing test name or contract errors and exits with a non-zero status.
-
-## What GitHub Actions now checks
-
-The `warroom-tests.yml` workflow now verifies:
-
-- golden scoring rules
-- fixture-based scoring behavior
-- the current `data/live.json` contract
-- the browser smoke test
-
-The scheduled live-data worker also validates `data/live.json` before committing it.
+- league schema helpers in `warroom-league-model.mjs`
+- local adapter for fixture-driven league loading
+- validation for locked vs draft league states
+- pairwise matchup generation from saved league data
+- regression tests for malformed league data

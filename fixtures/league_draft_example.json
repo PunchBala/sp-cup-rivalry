@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "id": "draft-war-room",
+  "slug": "draft-war-room",
+  "name": "Draft War Room",
+  "templateId": "ipl-classic-v1",
+  "visibility": "unlisted",
+  "state": "draft",
+  "createdBy": "senthil",
+  "players": [
+    { "id": "senthil", "name": "Senthil" },
+    { "id": "hari", "name": "Hari" }
+  ],
+  "settings": {
+    "enableRoasts": true,
+    "enableInsights": true,
+    "enableClutch": true,
+    "enableWormGraph": true
+  },
+  "picks": {
+    "senthil": {
+      "titleWinner": "MI",
+      "orangeCap": "KL Rahul",
+      "mvp": "KL Rahul"
+    },
+    "hari": {
+      "titleWinner": "RCB",
+      "orangeCap": "Virat Kohli"
+    }
+  }
+}

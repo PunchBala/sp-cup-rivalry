@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  engine-and-contract-tests:
+  engine-contract-and-league-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,15 +20,18 @@ jobs:
         with:
           node-version: 20
 
-      - name: Run engine and live-data contract tests
-        run: node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs tests/live-data.contract.test.mjs
+      - name: Run engine, live-data contract, and league-model tests
+        run: node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs tests/live-data.contract.test.mjs tests/league-model.test.mjs
 
       - name: Validate current live.json contract directly
         run: node scripts/validate-live-data.mjs data/live.json
 
+      - name: Validate shipped league fixtures directly
+        run: node scripts/validate-league-config.mjs fixtures/league_sp_cup_2026.json fixtures/league_draft_example.json
+
   page-smoke:
     runs-on: ubuntu-latest
-    needs: engine-and-contract-tests
+    needs: engine-contract-and-league-tests
     steps:
       - name: Checkout
         uses: actions/checkout@v4
