@@ -1,29 +1,67 @@
-# War Room engine tests
+# War Room tests
 
-Replace/add these items in your repo:
+These tests protect the scoring engine and catch basic page breakages before you push a broken board.
 
-- `warroom-engine.js`
-- `tests/warroom-engine.golden.test.mjs`
+## What is covered
 
-Run the golden tests with:
+- golden rule tests for scoring and alias logic
+- fixture-driven tests against saved `live.json` snapshots
+- a browser smoke test that loads `index.html`, injects fixture live data, and checks the main board renders
+
+## Local engine tests
+
+Run these from the repo root:
 
 ```bash
-node --test tests/warroom-engine.golden.test.mjs
+node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs
 ```
 
-What these tests lock down:
+If they pass, Node exits normally and prints a passing summary.
+If they fail, Node prints which test failed and exits with an error.
 
-- player alias matching (`Tilak Varma` vs `N. Tilak Varma`, `Phil Salt` vs `Philip Salt`)
-- top-5 fallback scoring when one pick is ranked outside the visible top 5
-- bottom-of-table lower-rank fallback
-- rank-1 bonus only for selected player better-prediction categories
-- no rank-1 bonus for team better-prediction categories
-- `uncappedMvp` and `fairPlay` ranking fallback behavior
-- title winner / finalist / playoff scoring
-- least-MVP lower-rank-wins logic
-- mixed matchup total stability
+## Local page smoke test
 
-Expected result right now:
+This uses Playwright.
 
-- 10 tests
-- 10 passing
+Install the runner once:
+
+```bash
+npm install -D @playwright/test
+npx playwright install chromium
+```
+
+Start a simple local server from the repo root in one terminal:
+
+```bash
+python -m http.server 4173
+```
+
+Then run the smoke test in another terminal:
+
+```bash
+npx playwright test tests/page.smoke.spec.mjs --reporter=line
+```
+
+## GitHub Actions
+
+`.github/workflows/warroom-tests.yml` runs automatically on:
+
+- push
+- pull request
+- manual workflow dispatch
+
+It runs:
+
+1. the Node engine tests
+2. the Playwright smoke test
+
+So in GitHub you will get:
+
+- green check when tests pass
+- red X when tests fail
+
+## Fixture files
+
+- `fixtures/live_early_season.json` — real early-season snapshot
+- `fixtures/live_weird_aliases.json` — alias-heavy synthetic cases
+- `fixtures/live_thresholds.json` — qualification-threshold synthetic cases

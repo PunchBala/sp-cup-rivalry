@@ -1,0 +1,3358 @@
+{
+  "season": 2026,
+  "provider": "data/live.json",
+  "source": "data/live.json",
+  "fetchedAt": "2026-03-30T06:25:09.312Z",
+  "scrapeStatus": "ok (2 processed matches, 2 scorecard calls this run)",
+  "scrapeReport": {
+    "orangeCap": {
+      "ok": true,
+      "source": "CricketData scorecards",
+      "method": "computed season total runs"
+    },
+    "mostSixes": {
+      "ok": true,
+      "source": "CricketData scorecards",
+      "method": "computed season total sixes"
+    },
+    "purpleCap": {
+      "ok": true,
+      "source": "CricketData scorecards",
+      "method": "computed season total wickets"
+    },
+    "highestScoreTeam": {
+      "ok": true,
+      "source": "CricketData scorecards",
+      "method": "computed team max innings score"
+    },
+    "striker": {
+      "ok": true,
+      "source": "CricketData scorecards",
+      "method": "computed strike rate with minimum 100 runs"
+    },
+    "bestBowlingFigures": {
+      "ok": true,
+      "source": "CricketData scorecards",
+      "method": "best single spell sorted by wickets then runs"
+    },
+    "bestBowlingStrikeRate": {
+      "ok": true,
+      "source": "CricketData scorecards",
+      "method": "computed balls per wicket with minimum 72 balls"
+    },
+    "mostCatches": {
+      "ok": true,
+      "source": "CricketData scorecards",
+      "method": "computed season total catches"
+    },
+    "titleWinner": {
+      "ok": true,
+      "source": "CricketData scorecards",
+      "method": "computed standings from completed matches"
+    },
+    "tableBottom": {
+      "ok": true,
+      "source": "CricketData scorecards",
+      "method": "computed standings from completed matches"
+    },
+    "mostDots": {
+      "ok": true,
+      "source": "IPLT20 official most dots feed",
+      "method": "parsed JSONP mostdotballsbowledtournament feed from Sports Mechanic stats feed",
+      "rows": 24
+    },
+    "mvp": {
+      "ok": true,
+      "source": "CricketData + IPLT20 official Most Dots",
+      "method": "custom formula using runs, sixes, wickets, dot balls, catches, strike-rate bonus, economy bonus and milestone bonuses"
+    },
+    "uncappedMvp": {
+      "ok": true,
+      "source": "custom MVP ranking",
+      "method": "filtered to the provided uncapped player pool, then compares picks by their positions in the custom MVP ranking"
+    },
+    "fairPlay": {
+      "ok": true,
+      "source": "IPLT20 official fairplay feed",
+      "method": "parsed JSONP fairplayTotal table from Sports Mechanic stats feed",
+      "rows": 4,
+      "updatedAt": "30-03-2026 : 08:50:02"
+    },
+    "leastMvp": {
+      "ok": true,
+      "source": "custom MVP ranking",
+      "method": "lower in custom MVP ranking wins, filtered to players with minimum 5 matches"
+    },
+    "costControl": {
+      "ok": true,
+      "source": "worker",
+      "method": "cached completed matches forever, capped backlog catch-up, throttled live scorecards",
+      "liveScorecardsEnabled": false,
+      "liveScorecardIntervalMinutes": 30,
+      "maxBacklogScorecardsPerRun": 2,
+      "scorecardCallsThisRun": 2,
+      "backlogRemaining": 0
+    }
+  },
+  "meta": {
+    "scheduler": {
+      "dayKey": "2026-03-30",
+      "quietRefreshesUsed": 1,
+      "lastQuietRefreshAt": "2026-03-30T06:25:01.649Z",
+      "lastLiveRefreshAt": null,
+      "lastSeriesInfoAt": "2026-03-30T06:25:01.649Z",
+      "lastDecision": {
+        "at": "2026-03-30T06:25:00.780Z",
+        "shouldRefresh": true,
+        "mode": "quiet_window",
+        "reason": "quiet refresh slot available"
+      },
+      "nextPlannedRefreshAt": "2026-03-30T11:13:01.649Z",
+      "nextPlannedMode": "quiet_window",
+      "nextPlannedReason": "quiet refresh slot available",
+      "nextPlannedCalculatedAt": "2026-03-30T06:25:07.648Z"
+    },
+    "cache": {
+      "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
+      "matchList": [
+        {
+          "id": "771739a7-564d-412d-a181-05722657e8f6",
+          "name": "Sunrisers Hyderabad vs Delhi Capitals, 31st Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 21, 14:00 GMT",
+          "dateTimeGMT": "2026-04-21T14:00:00",
+          "teams": [
+            "Sunrisers Hyderabad",
+            "Delhi Capitals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Rajiv Gandhi International Stadium, Hyderabad"
+        },
+        {
+          "id": "736f3e02-212a-49bc-8b3b-08a106312702",
+          "name": "Delhi Capitals vs Mumbai Indians, 8th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 04, 10:00 GMT",
+          "dateTimeGMT": "2026-04-04T10:00:00",
+          "teams": [
+            "Delhi Capitals",
+            "Mumbai Indians"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Arun Jaitley Stadium, Delhi"
+        },
+        {
+          "id": "0d462688-8d5b-4aef-936c-094c7b664bb3",
+          "name": "Lucknow Super Giants vs Rajasthan Royals, 32nd Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 22, 14:00 GMT",
+          "dateTimeGMT": "2026-04-22T14:00:00",
+          "teams": [
+            "Lucknow Super Giants",
+            "Rajasthan Royals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow"
+        },
+        {
+          "id": "f2c8b750-3dcd-41c0-acbf-0e9c179eddaf",
+          "name": "Rajasthan Royals vs Delhi Capitals, 43rd Match, Indian Premier League 2026",
+          "status": "Match starts at May 01, 14:00 GMT",
+          "dateTimeGMT": "2026-05-01T14:00:00",
+          "teams": [
+            "Rajasthan Royals",
+            "Delhi Capitals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Sawai Mansingh Stadium, Jaipur"
+        },
+        {
+          "id": "05a88a74-0e68-47d9-996b-257b3b1ebf8d",
+          "name": "Rajasthan Royals vs Royal Challengers Bengaluru, 16th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 10, 14:00 GMT",
+          "dateTimeGMT": "2026-04-10T14:00:00",
+          "teams": [
+            "Rajasthan Royals",
+            "Royal Challengers Bengaluru"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Barsapara Cricket Stadium, Guwahati"
+        },
+        {
+          "id": "178d76ff-214e-46a7-8fe2-27ab7afb75d3",
+          "name": "Sunrisers Hyderabad vs Kolkata Knight Riders, 45th Match, Indian Premier League 2026",
+          "status": "Match starts at May 03, 10:00 GMT",
+          "dateTimeGMT": "2026-05-03T10:00:00",
+          "teams": [
+            "Sunrisers Hyderabad",
+            "Kolkata Knight Riders"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Rajiv Gandhi International Stadium, Hyderabad"
+        },
+        {
+          "id": "26e1c31e-1033-4d72-887e-2c6ccb09b82f",
+          "name": "Punjab Kings vs Royal Challengers Bengaluru, 61st Match, Indian Premier League 2026",
+          "status": "Match starts at May 17, 10:00 GMT",
+          "dateTimeGMT": "2026-05-17T10:00:00",
+          "teams": [
+            "Punjab Kings",
+            "Royal Challengers Bengaluru"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Himachal Pradesh Cricket Association Stadium, Dharamsala"
+        },
+        {
+          "id": "adeebb28-bc39-439b-99ed-2daef5106232",
+          "name": "Kolkata Knight Riders vs Punjab Kings, 12th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 06, 14:00 GMT",
+          "dateTimeGMT": "2026-04-06T14:00:00",
+          "teams": [
+            "Kolkata Knight Riders",
+            "Punjab Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Eden Gardens, Kolkata"
+        },
+        {
+          "id": "1511024c-7c43-453d-b3db-2ee6d6ee6c6e",
+          "name": "Rajasthan Royals vs Gujarat Titans, 52nd Match, Indian Premier League 2026",
+          "status": "Match starts at May 09, 14:00 GMT",
+          "dateTimeGMT": "2026-05-09T14:00:00",
+          "teams": [
+            "Rajasthan Royals",
+            "Gujarat Titans"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Sawai Mansingh Stadium, Jaipur"
+        },
+        {
+          "id": "0a8f942f-d951-4dd4-9543-3077af3c91eb",
+          "name": "Delhi Capitals vs Punjab Kings, 35th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 25, 10:00 GMT",
+          "dateTimeGMT": "2026-04-25T10:00:00",
+          "teams": [
+            "Delhi Capitals",
+            "Punjab Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Arun Jaitley Stadium, Delhi"
+        },
+        {
+          "id": "ea4d01bf-bf47-4f7d-a4f8-32eade678141",
+          "name": "Gujarat Titans vs Rajasthan Royals, 9th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 04, 14:00 GMT",
+          "dateTimeGMT": "2026-04-04T14:00:00",
+          "teams": [
+            "Gujarat Titans",
+            "Rajasthan Royals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Narendra Modi Stadium, Ahmedabad"
+        },
+        {
+          "id": "d9c104ce-83e8-4342-97d5-33d7ece256b4",
+          "name": "Sunrisers Hyderabad vs Punjab Kings, 49th Match, Indian Premier League 2026",
+          "status": "Match starts at May 06, 14:00 GMT",
+          "dateTimeGMT": "2026-05-06T14:00:00",
+          "teams": [
+            "Sunrisers Hyderabad",
+            "Punjab Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Rajiv Gandhi International Stadium, Hyderabad"
+        },
+        {
+          "id": "3bfe7704-4818-4501-9708-35261cb09f96",
+          "name": "Gujarat Titans vs Chennai Super Kings, 37th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 26, 10:00 GMT",
+          "dateTimeGMT": "2026-04-26T10:00:00",
+          "teams": [
+            "Gujarat Titans",
+            "Chennai Super Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Narendra Modi Stadium, Ahmedabad"
+        },
+        {
+          "id": "a30ef3c8-1002-4181-9167-39b9b7ea7760",
+          "name": "Kolkata Knight Riders vs Gujarat Titans, 60th Match, Indian Premier League 2026",
+          "status": "Match starts at May 16, 14:00 GMT",
+          "dateTimeGMT": "2026-05-16T14:00:00",
+          "teams": [
+            "Kolkata Knight Riders",
+            "Gujarat Titans"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Eden Gardens, Kolkata"
+        },
+        {
+          "id": "d9242d24-f86f-4dbd-8291-3b00eadcda4a",
+          "name": "Royal Challengers Bengaluru vs Delhi Capitals, 26th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 18, 10:00 GMT",
+          "dateTimeGMT": "2026-04-18T10:00:00",
+          "teams": [
+            "Royal Challengers Bengaluru",
+            "Delhi Capitals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "M.Chinnaswamy Stadium, Bengaluru"
+        },
+        {
+          "id": "f30e699c-2e4f-48dd-98d2-4321d9e622e7",
+          "name": "Chennai Super Kings vs Kolkata Knight Riders, 22nd Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 14, 14:00 GMT",
+          "dateTimeGMT": "2026-04-14T14:00:00",
+          "teams": [
+            "Chennai Super Kings",
+            "Kolkata Knight Riders"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "MA Chidambaram Stadium, Chennai"
+        },
+        {
+          "id": "ef0699eb-29be-4949-8e4f-474e90a6be6b",
+          "name": "Mumbai Indians vs Chennai Super Kings, 33rd Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 23, 14:00 GMT",
+          "dateTimeGMT": "2026-04-23T14:00:00",
+          "teams": [
+            "Mumbai Indians",
+            "Chennai Super Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Wankhede Stadium, Mumbai"
+        },
+        {
+          "id": "4a2b94e3-1e2d-45dc-b542-4764807e06e2",
+          "name": "Sunrisers Hyderabad vs Rajasthan Royals, 21st Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 13, 14:00 GMT",
+          "dateTimeGMT": "2026-04-13T14:00:00",
+          "teams": [
+            "Sunrisers Hyderabad",
+            "Rajasthan Royals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Rajiv Gandhi International Stadium, Hyderabad"
+        },
+        {
+          "id": "634ea924-b96f-478a-bd6f-48370174f344",
+          "name": "Royal Challengers Bengaluru vs Mumbai Indians, 54th Match, Indian Premier League 2026",
+          "status": "Match starts at May 10, 14:00 GMT",
+          "dateTimeGMT": "2026-05-10T14:00:00",
+          "teams": [
+            "Royal Challengers Bengaluru",
+            "Mumbai Indians"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Shaheed Veer Narayan Singh International Stadium, Raipur"
+        },
+        {
+          "id": "ae3b8240-34ff-48ea-b74b-4840ab72ae33",
+          "name": "Gujarat Titans vs Sunrisers Hyderabad, 56th Match, Indian Premier League 2026",
+          "status": "Match starts at May 12, 14:00 GMT",
+          "dateTimeGMT": "2026-05-12T14:00:00",
+          "teams": [
+            "Gujarat Titans",
+            "Sunrisers Hyderabad"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Narendra Modi Stadium, Ahmedabad"
+        },
+        {
+          "id": "e8225a82-12c7-4bc8-8e40-4892f52d7d21",
+          "name": "Royal Challengers Bengaluru vs Lucknow Super Giants, 23rd Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 15, 14:00 GMT",
+          "dateTimeGMT": "2026-04-15T14:00:00",
+          "teams": [
+            "Royal Challengers Bengaluru",
+            "Lucknow Super Giants"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "M.Chinnaswamy Stadium, Bengaluru"
+        },
+        {
+          "id": "11d553de-3b2a-4e58-9abd-4bb7d575595e",
+          "name": "Mumbai Indians vs Royal Challengers Bengaluru, 20th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 12, 14:00 GMT",
+          "dateTimeGMT": "2026-04-12T14:00:00",
+          "teams": [
+            "Mumbai Indians",
+            "Royal Challengers Bengaluru"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Wankhede Stadium, Mumbai"
+        },
+        {
+          "id": "36d875e2-3333-4fab-ba4d-4f89fb4d7055",
+          "name": "Lucknow Super Giants vs Gujarat Titans, 19th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 12, 10:00 GMT",
+          "dateTimeGMT": "2026-04-12T10:00:00",
+          "teams": [
+            "Lucknow Super Giants",
+            "Gujarat Titans"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow"
+        },
+        {
+          "id": "4f617f5e-c635-4989-b135-5430dc73c5d7",
+          "name": "Rajasthan Royals vs Mumbai Indians, 13th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 07, 14:00 GMT",
+          "dateTimeGMT": "2026-04-07T14:00:00",
+          "teams": [
+            "Rajasthan Royals",
+            "Mumbai Indians"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Barsapara Cricket Stadium, Guwahati"
+        },
+        {
+          "id": "55fe0f15-6eb0-4ad5-835b-5564be4f6a21",
+          "name": "Royal Challengers Bengaluru vs Sunrisers Hyderabad, 1st Match, Indian Premier League 2026",
+          "status": "Royal Challengers Bengaluru won by 6 wkts",
+          "dateTimeGMT": "2026-03-28T14:00:00",
+          "teams": [
+            "Royal Challengers Bengaluru",
+            "Sunrisers Hyderabad"
+          ],
+          "matchStarted": true,
+          "matchEnded": true,
+          "venue": "M.Chinnaswamy Stadium, Bengaluru"
+        },
+        {
+          "id": "ae676d7c-3082-489c-96c5-5620f393c900",
+          "name": "Lucknow Super Giants vs Delhi Capitals, 5th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 01, 14:00 GMT",
+          "dateTimeGMT": "2026-04-01T14:00:00",
+          "teams": [
+            "Lucknow Super Giants",
+            "Delhi Capitals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow"
+        },
+        {
+          "id": "34d1e7e5-a498-4a9b-bb89-5a273ef81b8d",
+          "name": "Mumbai Indians vs Lucknow Super Giants, 47th Match, Indian Premier League 2026",
+          "status": "Match starts at May 04, 14:00 GMT",
+          "dateTimeGMT": "2026-05-04T14:00:00",
+          "teams": [
+            "Mumbai Indians",
+            "Lucknow Super Giants"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Wankhede Stadium, Mumbai"
+        },
+        {
+          "id": "0ea0c97c-6fb6-4728-832e-5abd0820edc2",
+          "name": "Delhi Capitals vs Rajasthan Royals, 62nd Match, Indian Premier League 2026",
+          "status": "Match starts at May 17, 14:00 GMT",
+          "dateTimeGMT": "2026-05-17T14:00:00",
+          "teams": [
+            "Delhi Capitals",
+            "Rajasthan Royals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Arun Jaitley Stadium, Delhi"
+        },
+        {
+          "id": "11ff7db9-9c71-464e-afcb-5b03e4fa4b0a",
+          "name": "Punjab Kings vs Gujarat Titans, 4th Match, Indian Premier League 2026",
+          "status": "Match starts at Mar 31, 14:00 GMT",
+          "dateTimeGMT": "2026-03-31T14:00:00",
+          "teams": [
+            "Punjab Kings",
+            "Gujarat Titans"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur, New Chandigarh"
+        },
+        {
+          "id": "204afd0a-026a-41f4-afda-653030a84e46",
+          "name": "Chennai Super Kings vs Delhi Capitals, 18th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 11, 14:00 GMT",
+          "dateTimeGMT": "2026-04-11T14:00:00",
+          "teams": [
+            "Chennai Super Kings",
+            "Delhi Capitals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "MA Chidambaram Stadium, Chennai"
+        },
+        {
+          "id": "aec16058-7741-4f3d-a1b0-68d7210b29c9",
+          "name": "Kolkata Knight Riders vs Delhi Capitals, 70th Match, Indian Premier League 2026",
+          "status": "Match starts at May 24, 14:00 GMT",
+          "dateTimeGMT": "2026-05-24T14:00:00",
+          "teams": [
+            "Kolkata Knight Riders",
+            "Delhi Capitals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Eden Gardens, Kolkata"
+        },
+        {
+          "id": "e43dd29e-c60e-40c9-a6c4-6c1bd69dd671",
+          "name": "Sunrisers Hyderabad vs Lucknow Super Giants, 10th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 05, 10:00 GMT",
+          "dateTimeGMT": "2026-04-05T10:00:00",
+          "teams": [
+            "Sunrisers Hyderabad",
+            "Lucknow Super Giants"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Rajiv Gandhi International Stadium, Hyderabad"
+        },
+        {
+          "id": "df78909a-2ab7-4760-b679-705c381bd2d3",
+          "name": "Punjab Kings vs Mumbai Indians, 58th Match, Indian Premier League 2026",
+          "status": "Match starts at May 14, 14:00 GMT",
+          "dateTimeGMT": "2026-05-14T14:00:00",
+          "teams": [
+            "Punjab Kings",
+            "Mumbai Indians"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Himachal Pradesh Cricket Association Stadium, Dharamsala"
+        },
+        {
+          "id": "913bdcbf-179f-452e-a2ed-75f807b7c2b0",
+          "name": "Lucknow Super Giants vs Punjab Kings, 68th Match, Indian Premier League 2026",
+          "status": "Match starts at May 23, 14:00 GMT",
+          "dateTimeGMT": "2026-05-23T14:00:00",
+          "teams": [
+            "Lucknow Super Giants",
+            "Punjab Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow"
+        },
+        {
+          "id": "66477e53-9cd5-4be2-bc3d-78114722da72",
+          "name": "Chennai Super Kings vs Sunrisers Hyderabad, 63rd Match, Indian Premier League 2026",
+          "status": "Match starts at May 18, 14:00 GMT",
+          "dateTimeGMT": "2026-05-18T14:00:00",
+          "teams": [
+            "Chennai Super Kings",
+            "Sunrisers Hyderabad"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "MA Chidambaram Stadium, Chennai"
+        },
+        {
+          "id": "c741ba65-dc7d-40cb-8e2c-7a415f3df8ab",
+          "name": "Delhi Capitals vs Chennai Super Kings, 48th Match, Indian Premier League 2026",
+          "status": "Match starts at May 05, 14:00 GMT",
+          "dateTimeGMT": "2026-05-05T14:00:00",
+          "teams": [
+            "Delhi Capitals",
+            "Chennai Super Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Arun Jaitley Stadium, Delhi"
+        },
+        {
+          "id": "91f9f16f-8c16-408b-ac66-7b5c7e9b4af0",
+          "name": "Punjab Kings vs Lucknow Super Giants, 29th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 19, 14:00 GMT",
+          "dateTimeGMT": "2026-04-19T14:00:00",
+          "teams": [
+            "Punjab Kings",
+            "Lucknow Super Giants"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur, New Chandigarh"
+        },
+        {
+          "id": "bff622ad-fe85-46f0-8969-80a3df72face",
+          "name": "Royal Challengers Bengaluru vs Gujarat Titans, 34th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 24, 14:00 GMT",
+          "dateTimeGMT": "2026-04-24T14:00:00",
+          "teams": [
+            "Royal Challengers Bengaluru",
+            "Gujarat Titans"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "M.Chinnaswamy Stadium, Bengaluru"
+        },
+        {
+          "id": "c2c75e2e-df87-47fa-8ccd-8473058efae5",
+          "name": "Rajasthan Royals vs Sunrisers Hyderabad, 36th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 25, 14:00 GMT",
+          "dateTimeGMT": "2026-04-25T14:00:00",
+          "teams": [
+            "Rajasthan Royals",
+            "Sunrisers Hyderabad"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Sawai Mansingh Stadium, Jaipur"
+        },
+        {
+          "id": "595e2ad6-5b3a-4f81-9c8f-84ee3633b8c7",
+          "name": "Mumbai Indians vs Sunrisers Hyderabad, 41st Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 29, 14:00 GMT",
+          "dateTimeGMT": "2026-04-29T14:00:00",
+          "teams": [
+            "Mumbai Indians",
+            "Sunrisers Hyderabad"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Wankhede Stadium, Mumbai"
+        },
+        {
+          "id": "9c3b727a-2767-4e2b-a30c-855b3c6b59aa",
+          "name": "Punjab Kings vs Delhi Capitals, 55th Match, Indian Premier League 2026",
+          "status": "Match starts at May 11, 14:00 GMT",
+          "dateTimeGMT": "2026-05-11T14:00:00",
+          "teams": [
+            "Punjab Kings",
+            "Delhi Capitals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Himachal Pradesh Cricket Association Stadium, Dharamsala"
+        },
+        {
+          "id": "37b02340-7238-41b7-bcf3-8ae4215e4bee",
+          "name": "Gujarat Titans vs Punjab Kings, 46th Match, Indian Premier League 2026",
+          "status": "Match starts at May 03, 14:00 GMT",
+          "dateTimeGMT": "2026-05-03T14:00:00",
+          "teams": [
+            "Gujarat Titans",
+            "Punjab Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Narendra Modi Stadium, Ahmedabad"
+        },
+        {
+          "id": "c78dcc8a-67cf-460a-8f2b-8f16d3891682",
+          "name": "Kolkata Knight Riders vs Lucknow Super Giants, 15th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 09, 14:00 GMT",
+          "dateTimeGMT": "2026-04-09T14:00:00",
+          "teams": [
+            "Kolkata Knight Riders",
+            "Lucknow Super Giants"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Eden Gardens, Kolkata"
+        },
+        {
+          "id": "d788e9f9-99bf-4650-a035-92a7e21b3d08",
+          "name": "Rajasthan Royals vs Chennai Super Kings, 3rd Match, Indian Premier League 2026",
+          "status": "Match starts at Mar 30, 14:00 GMT",
+          "dateTimeGMT": "2026-03-30T14:00:00",
+          "teams": [
+            "Rajasthan Royals",
+            "Chennai Super Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Barsapara Cricket Stadium, Guwahati"
+        },
+        {
+          "id": "2b441eeb-c4be-4d4e-892e-92f2e47b33df",
+          "name": "Chennai Super Kings vs Gujarat Titans, 66th Match, Indian Premier League 2026",
+          "status": "Match starts at May 21, 14:00 GMT",
+          "dateTimeGMT": "2026-05-21T14:00:00",
+          "teams": [
+            "Chennai Super Kings",
+            "Gujarat Titans"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "MA Chidambaram Stadium, Chennai"
+        },
+        {
+          "id": "fd010e39-2255-4460-b0e0-962a26b67b70",
+          "name": "Kolkata Knight Riders vs Sunrisers Hyderabad, 6th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 02, 14:00 GMT",
+          "dateTimeGMT": "2026-04-02T14:00:00",
+          "teams": [
+            "Kolkata Knight Riders",
+            "Sunrisers Hyderabad"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Eden Gardens, Kolkata"
+        },
+        {
+          "id": "80dbe709-8a04-48b2-878d-988042000536",
+          "name": "Punjab Kings vs Rajasthan Royals, 40th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 28, 14:00 GMT",
+          "dateTimeGMT": "2026-04-28T14:00:00",
+          "teams": [
+            "Punjab Kings",
+            "Rajasthan Royals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur, New Chandigarh"
+        },
+        {
+          "id": "999ec29a-1cdf-48e0-b8c5-9d3ae95a45c3",
+          "name": "Lucknow Super Giants vs Chennai Super Kings, 59th Match, Indian Premier League 2026",
+          "status": "Match starts at May 15, 14:00 GMT",
+          "dateTimeGMT": "2026-05-15T14:00:00",
+          "teams": [
+            "Lucknow Super Giants",
+            "Chennai Super Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow"
+        },
+        {
+          "id": "abe1482c-3e40-43c8-be6f-9da9da643111",
+          "name": "Gujarat Titans vs Royal Challengers Bengaluru, 42nd Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 30, 14:00 GMT",
+          "dateTimeGMT": "2026-04-30T14:00:00",
+          "teams": [
+            "Gujarat Titans",
+            "Royal Challengers Bengaluru"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Narendra Modi Stadium, Ahmedabad"
+        },
+        {
+          "id": "de4a5f85-ea02-4426-a074-a0bff9f757ca",
+          "name": "Sunrisers Hyderabad vs Chennai Super Kings, 27th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 18, 14:00 GMT",
+          "dateTimeGMT": "2026-04-18T14:00:00",
+          "teams": [
+            "Sunrisers Hyderabad",
+            "Chennai Super Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Rajiv Gandhi International Stadium, Hyderabad"
+        },
+        {
+          "id": "ef86ee7b-dbea-4e3c-9bbf-af77da1ff223",
+          "name": "Royal Challengers Bengaluru vs Kolkata Knight Riders, 57th Match, Indian Premier League 2026",
+          "status": "Match starts at May 13, 14:00 GMT",
+          "dateTimeGMT": "2026-05-13T14:00:00",
+          "teams": [
+            "Royal Challengers Bengaluru",
+            "Kolkata Knight Riders"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Shaheed Veer Narayan Singh International Stadium, Raipur"
+        },
+        {
+          "id": "a4cd9851-d79a-42b6-8a4b-b35cbb9f9f0a",
+          "name": "Punjab Kings vs Sunrisers Hyderabad, 17th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 11, 10:00 GMT",
+          "dateTimeGMT": "2026-04-11T10:00:00",
+          "teams": [
+            "Punjab Kings",
+            "Sunrisers Hyderabad"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur, New Chandigarh"
+        },
+        {
+          "id": "c8f30ec3-a953-438a-ba4a-c5dedd97063a",
+          "name": "Gujarat Titans vs Kolkata Knight Riders, 25th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 17, 14:00 GMT",
+          "dateTimeGMT": "2026-04-17T14:00:00",
+          "teams": [
+            "Gujarat Titans",
+            "Kolkata Knight Riders"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Narendra Modi Stadium, Ahmedabad"
+        },
+        {
+          "id": "e92727d0-61fc-4c6f-82ed-cde4789745a2",
+          "name": "Royal Challengers Bengaluru vs Chennai Super Kings, 11th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 05, 14:00 GMT",
+          "dateTimeGMT": "2026-04-05T14:00:00",
+          "teams": [
+            "Royal Challengers Bengaluru",
+            "Chennai Super Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "M.Chinnaswamy Stadium, Bengaluru"
+        },
+        {
+          "id": "f72cb89b-3085-4556-a814-d28a44885b0e",
+          "name": "Gujarat Titans vs Mumbai Indians, 30th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 20, 14:00 GMT",
+          "dateTimeGMT": "2026-04-20T14:00:00",
+          "teams": [
+            "Gujarat Titans",
+            "Mumbai Indians"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Narendra Modi Stadium, Ahmedabad"
+        },
+        {
+          "id": "058243dd-5399-42b2-ae68-d3e9796fa3b2",
+          "name": "Delhi Capitals vs Kolkata Knight Riders, 51st Match, Indian Premier League 2026",
+          "status": "Match starts at May 08, 14:00 GMT",
+          "dateTimeGMT": "2026-05-08T14:00:00",
+          "teams": [
+            "Delhi Capitals",
+            "Kolkata Knight Riders"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Arun Jaitley Stadium, Delhi"
+        },
+        {
+          "id": "e02475c1-8f9a-4915-a9e8-d4dbc3441c96",
+          "name": "Mumbai Indians vs Kolkata Knight Riders, 2nd Match, Indian Premier League 2026",
+          "status": "Mumbai Indians won by 6 wkts",
+          "dateTimeGMT": "2026-03-29T14:00:00",
+          "teams": [
+            "Mumbai Indians",
+            "Kolkata Knight Riders"
+          ],
+          "matchStarted": true,
+          "matchEnded": true,
+          "venue": "Wankhede Stadium, Mumbai"
+        },
+        {
+          "id": "e5b677a2-6e87-4c9e-baa5-d997644501f1",
+          "name": "Kolkata Knight Riders vs Mumbai Indians, 65th Match, Indian Premier League 2026",
+          "status": "Match starts at May 20, 14:00 GMT",
+          "dateTimeGMT": "2026-05-20T14:00:00",
+          "teams": [
+            "Kolkata Knight Riders",
+            "Mumbai Indians"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Eden Gardens, Kolkata"
+        },
+        {
+          "id": "12496498-8526-46d9-a053-da2ba8d047e1",
+          "name": "Delhi Capitals vs Gujarat Titans, 14th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 08, 14:00 GMT",
+          "dateTimeGMT": "2026-04-08T14:00:00",
+          "teams": [
+            "Delhi Capitals",
+            "Gujarat Titans"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Arun Jaitley Stadium, Delhi"
+        },
+        {
+          "id": "129a6173-9149-481f-9eeb-e1c8afe1533f",
+          "name": "Chennai Super Kings vs Lucknow Super Giants, 53rd Match, Indian Premier League 2026",
+          "status": "Match starts at May 10, 10:00 GMT",
+          "dateTimeGMT": "2026-05-10T10:00:00",
+          "teams": [
+            "Chennai Super Kings",
+            "Lucknow Super Giants"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "MA Chidambaram Stadium, Chennai"
+        },
+        {
+          "id": "e1ecf776-e9eb-4456-82df-e6c8b6e12cd3",
+          "name": "Mumbai Indians vs Rajasthan Royals, 69th Match, Indian Premier League 2026",
+          "status": "Match starts at May 24, 10:00 GMT",
+          "dateTimeGMT": "2026-05-24T10:00:00",
+          "teams": [
+            "Mumbai Indians",
+            "Rajasthan Royals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Wankhede Stadium, Mumbai"
+        },
+        {
+          "id": "39a0b9c4-bcb7-4dd6-b21c-e9bf537edce7",
+          "name": "Rajasthan Royals vs Lucknow Super Giants, 64th Match, Indian Premier League 2026",
+          "status": "Match starts at May 19, 14:00 GMT",
+          "dateTimeGMT": "2026-05-19T14:00:00",
+          "teams": [
+            "Rajasthan Royals",
+            "Lucknow Super Giants"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Sawai Mansingh Stadium, Jaipur"
+        },
+        {
+          "id": "eab75760-b25e-421f-8321-eb0806cbb784",
+          "name": "Lucknow Super Giants vs Kolkata Knight Riders, 38th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 26, 14:00 GMT",
+          "dateTimeGMT": "2026-04-26T14:00:00",
+          "teams": [
+            "Lucknow Super Giants",
+            "Kolkata Knight Riders"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow"
+        },
+        {
+          "id": "96d2aa6b-ea40-4da4-b4cf-eb996de24ef7",
+          "name": "Chennai Super Kings vs Punjab Kings, 7th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 03, 14:00 GMT",
+          "dateTimeGMT": "2026-04-03T14:00:00",
+          "teams": [
+            "Chennai Super Kings",
+            "Punjab Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "MA Chidambaram Stadium, Chennai"
+        },
+        {
+          "id": "d0279d32-e120-4b96-b600-efa118f6ec12",
+          "name": "Mumbai Indians vs Punjab Kings, 24th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 16, 14:00 GMT",
+          "dateTimeGMT": "2026-04-16T14:00:00",
+          "teams": [
+            "Mumbai Indians",
+            "Punjab Kings"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Wankhede Stadium, Mumbai"
+        },
+        {
+          "id": "79770ea7-9819-4414-97fe-f01444aa8ccf",
+          "name": "Lucknow Super Giants vs Royal Challengers Bengaluru, 50th Match, Indian Premier League 2026",
+          "status": "Match starts at May 07, 14:00 GMT",
+          "dateTimeGMT": "2026-05-07T14:00:00",
+          "teams": [
+            "Lucknow Super Giants",
+            "Royal Challengers Bengaluru"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow"
+        },
+        {
+          "id": "ca40682e-02d0-40a0-9a4c-f2a9c8754de0",
+          "name": "Chennai Super Kings vs Mumbai Indians, 44th Match, Indian Premier League 2026",
+          "status": "Match starts at May 02, 14:00 GMT",
+          "dateTimeGMT": "2026-05-02T14:00:00",
+          "teams": [
+            "Chennai Super Kings",
+            "Mumbai Indians"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "MA Chidambaram Stadium, Chennai"
+        },
+        {
+          "id": "a86beb23-22f5-4afb-914c-f2b9f6711166",
+          "name": "Kolkata Knight Riders vs Rajasthan Royals, 28th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 19, 10:00 GMT",
+          "dateTimeGMT": "2026-04-19T10:00:00",
+          "teams": [
+            "Kolkata Knight Riders",
+            "Rajasthan Royals"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Eden Gardens, Kolkata"
+        },
+        {
+          "id": "0ed37800-881a-401b-a1fe-f41adb244741",
+          "name": "Delhi Capitals vs Royal Challengers Bengaluru, 39th Match, Indian Premier League 2026",
+          "status": "Match starts at Apr 27, 14:00 GMT",
+          "dateTimeGMT": "2026-04-27T14:00:00",
+          "teams": [
+            "Delhi Capitals",
+            "Royal Challengers Bengaluru"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Arun Jaitley Stadium, Delhi"
+        },
+        {
+          "id": "25c031c2-2776-48a7-824c-fe66e0e6cf48",
+          "name": "Sunrisers Hyderabad vs Royal Challengers Bengaluru, 67th Match, Indian Premier League 2026",
+          "status": "Match starts at May 22, 14:00 GMT",
+          "dateTimeGMT": "2026-05-22T14:00:00",
+          "teams": [
+            "Sunrisers Hyderabad",
+            "Royal Challengers Bengaluru"
+          ],
+          "matchStarted": false,
+          "matchEnded": false,
+          "venue": "Rajiv Gandhi International Stadium, Hyderabad"
+        }
+      ]
+    },
+    "processedMatchIds": [
+      "55fe0f15-6eb0-4ad5-835b-5564be4f6a21",
+      "e02475c1-8f9a-4915-a9e8-d4dbc3441c96"
+    ],
+    "aggregates": {
+      "battingRuns": {
+        "Travis Head": 11,
+        "Abhishek Sharma": 7,
+        "Ishan Kishan": 80,
+        "Nitish Kumar Reddy": 1,
+        "Heinrich Klaasen": 31,
+        "Salil Arora": 9,
+        "Aniket Verma": 43,
+        "Harsh Dubey": 3,
+        "Harshal Patel": 0,
+        "David Payne": 6,
+        "Jaydev Unadkat": 4,
+        "Philip Salt": 8,
+        "Virat Kohli": 69,
+        "Devdutt Padikkal": 61,
+        "Rajat Patidar": 31,
+        "Jitesh Sharma": 0,
+        "Tim David": 16,
+        "Ajinkya Rahane": 67,
+        "Finn Allen": 37,
+        "Cameron Green": 18,
+        "Angkrish Raghuvanshi": 51,
+        "Rinku Singh": 33,
+        "Ramandeep Singh": 4,
+        "Ryan Rickelton": 81,
+        "Rohit Sharma": 78,
+        "Suryakumar Yadav": 16,
+        "Tilak Varma": 20,
+        "Hardik Pandya": 18,
+        "Naman Dhir": 5
+      },
+      "battingBalls": {
+        "Travis Head": 9,
+        "Abhishek Sharma": 8,
+        "Ishan Kishan": 38,
+        "Nitish Kumar Reddy": 6,
+        "Heinrich Klaasen": 22,
+        "Salil Arora": 6,
+        "Aniket Verma": 18,
+        "Harsh Dubey": 3,
+        "Harshal Patel": 2,
+        "David Payne": 5,
+        "Jaydev Unadkat": 3,
+        "Philip Salt": 7,
+        "Virat Kohli": 38,
+        "Devdutt Padikkal": 26,
+        "Rajat Patidar": 12,
+        "Jitesh Sharma": 1,
+        "Tim David": 10,
+        "Ajinkya Rahane": 40,
+        "Finn Allen": 17,
+        "Cameron Green": 10,
+        "Angkrish Raghuvanshi": 29,
+        "Rinku Singh": 21,
+        "Ramandeep Singh": 4,
+        "Ryan Rickelton": 43,
+        "Rohit Sharma": 38,
+        "Suryakumar Yadav": 8,
+        "Tilak Varma": 14,
+        "Hardik Pandya": 11,
+        "Naman Dhir": 2
+      },
+      "battingSixes": {
+        "Travis Head": 0,
+        "Abhishek Sharma": 1,
+        "Ishan Kishan": 5,
+        "Nitish Kumar Reddy": 0,
+        "Heinrich Klaasen": 1,
+        "Salil Arora": 1,
+        "Aniket Verma": 4,
+        "Harsh Dubey": 0,
+        "Harshal Patel": 0,
+        "David Payne": 0,
+        "Jaydev Unadkat": 0,
+        "Philip Salt": 0,
+        "Virat Kohli": 5,
+        "Devdutt Padikkal": 4,
+        "Rajat Patidar": 3,
+        "Jitesh Sharma": 0,
+        "Tim David": 1,
+        "Ajinkya Rahane": 5,
+        "Finn Allen": 2,
+        "Cameron Green": 1,
+        "Angkrish Raghuvanshi": 2,
+        "Rinku Singh": 0,
+        "Ramandeep Singh": 0,
+        "Ryan Rickelton": 8,
+        "Rohit Sharma": 6,
+        "Suryakumar Yadav": 0,
+        "Tilak Varma": 0,
+        "Hardik Pandya": 0,
+        "Naman Dhir": 0
+      },
+      "bowlingWickets": {
+        "Jacob Duffy": 3,
+        "Bhuvneshwar Kumar": 1,
+        "Abhinandan Singh": 1,
+        "Romario Shepherd": 3,
+        "Suyash Sharma": 1,
+        "Krunal Pandya": 0,
+        "Nitish Kumar Reddy": 0,
+        "Jaydev Unadkat": 1,
+        "David Payne": 2,
+        "Harsh Dubey": 1,
+        "Eshan Malinga": 0,
+        "Harshal Patel": 0,
+        "Trent Boult": 0,
+        "Hardik Pandya": 1,
+        "AM Ghazanfar": 0,
+        "Jasprit Bumrah": 0,
+        "Shardul Thakur": 3,
+        "Mayank Markande": 0,
+        "Vaibhav Arora": 1,
+        "Blessing Muzarabani": 0,
+        "Varun Chakaravarthy": 0,
+        "Kartik Tyagi": 1,
+        "Sunil Narine": 1,
+        "Anukul Roy": 0
+      },
+      "bowlingBalls": {
+        "Jacob Duffy": 24,
+        "Bhuvneshwar Kumar": 24,
+        "Abhinandan Singh": 18,
+        "Romario Shepherd": 24,
+        "Suyash Sharma": 18,
+        "Krunal Pandya": 12,
+        "Nitish Kumar Reddy": 12,
+        "Jaydev Unadkat": 18,
+        "David Payne": 18,
+        "Harsh Dubey": 18,
+        "Eshan Malinga": 12,
+        "Harshal Patel": 16,
+        "Trent Boult": 24,
+        "Hardik Pandya": 18,
+        "AM Ghazanfar": 24,
+        "Jasprit Bumrah": 24,
+        "Shardul Thakur": 24,
+        "Mayank Markande": 6,
+        "Vaibhav Arora": 24,
+        "Blessing Muzarabani": 18,
+        "Varun Chakaravarthy": 24,
+        "Kartik Tyagi": 24,
+        "Sunil Narine": 18,
+        "Anukul Roy": 7
+      },
+      "bowlingRunsConceded": {
+        "Jacob Duffy": 22,
+        "Bhuvneshwar Kumar": 31,
+        "Abhinandan Singh": 38,
+        "Romario Shepherd": 54,
+        "Suyash Sharma": 28,
+        "Krunal Pandya": 26,
+        "Nitish Kumar Reddy": 19,
+        "Jaydev Unadkat": 29,
+        "David Payne": 35,
+        "Harsh Dubey": 35,
+        "Eshan Malinga": 35,
+        "Harshal Patel": 39,
+        "Trent Boult": 38,
+        "Hardik Pandya": 39,
+        "AM Ghazanfar": 51,
+        "Jasprit Bumrah": 35,
+        "Shardul Thakur": 39,
+        "Mayank Markande": 16,
+        "Vaibhav Arora": 52,
+        "Blessing Muzarabani": 34,
+        "Varun Chakaravarthy": 48,
+        "Kartik Tyagi": 43,
+        "Sunil Narine": 30,
+        "Anukul Roy": 15
+      },
+      "catches": {
+        "Jitesh Sharma": 1,
+        "Abhinandan Singh": 1,
+        "Devdutt Padikkal": 3,
+        "Virat Kohli": 1,
+        "Heinrich Klaasen": 2,
+        "Harsh Dubey": 1,
+        "Jaydev Unadkat": 1,
+        "Hardik Pandya": 1,
+        "Tilak Varma": 2,
+        "Sherfane Rutherford": 1,
+        "Anukul Roy": 1,
+        "Rinku Singh": 1,
+        "Manish Pandey": 1
+      },
+      "teamHighestScore": {
+        "Sunrisers Hyderabad": 201,
+        "Royal Challengers Bengaluru": 203,
+        "Kolkata Knight Riders": 220,
+        "Mumbai Indians": 224
+      },
+      "standings": {
+        "Royal Challengers Bengaluru": {
+          "played": 1,
+          "wins": 1,
+          "losses": 0,
+          "points": 2,
+          "runsFor": 203,
+          "ballsFaced": 94,
+          "runsAgainst": 201,
+          "ballsBowled": 120
+        },
+        "Sunrisers Hyderabad": {
+          "played": 1,
+          "wins": 0,
+          "losses": 1,
+          "points": 0,
+          "runsFor": 201,
+          "ballsFaced": 120,
+          "runsAgainst": 203,
+          "ballsBowled": 94
+        },
+        "Mumbai Indians": {
+          "played": 1,
+          "wins": 1,
+          "losses": 0,
+          "points": 2,
+          "runsFor": 224,
+          "ballsFaced": 115,
+          "runsAgainst": 220,
+          "ballsBowled": 120
+        },
+        "Kolkata Knight Riders": {
+          "played": 1,
+          "wins": 0,
+          "losses": 1,
+          "points": 0,
+          "runsFor": 220,
+          "ballsFaced": 120,
+          "runsAgainst": 224,
+          "ballsBowled": 115
+        }
+      },
+      "bestBowlingFigures": {
+        "Jacob Duffy": {
+          "wickets": 3,
+          "runs": 22,
+          "balls": 24
+        },
+        "Bhuvneshwar Kumar": {
+          "wickets": 1,
+          "runs": 31,
+          "balls": 24
+        },
+        "Abhinandan Singh": {
+          "wickets": 1,
+          "runs": 38,
+          "balls": 18
+        },
+        "Romario Shepherd": {
+          "wickets": 3,
+          "runs": 54,
+          "balls": 24
+        },
+        "Suyash Sharma": {
+          "wickets": 1,
+          "runs": 28,
+          "balls": 18
+        },
+        "Krunal Pandya": {
+          "wickets": 0,
+          "runs": 26,
+          "balls": 12
+        },
+        "Nitish Kumar Reddy": {
+          "wickets": 0,
+          "runs": 19,
+          "balls": 12
+        },
+        "Jaydev Unadkat": {
+          "wickets": 1,
+          "runs": 29,
+          "balls": 18
+        },
+        "David Payne": {
+          "wickets": 2,
+          "runs": 35,
+          "balls": 18
+        },
+        "Harsh Dubey": {
+          "wickets": 1,
+          "runs": 35,
+          "balls": 18
+        },
+        "Eshan Malinga": {
+          "wickets": 0,
+          "runs": 35,
+          "balls": 12
+        },
+        "Harshal Patel": {
+          "wickets": 0,
+          "runs": 39,
+          "balls": 16
+        },
+        "Trent Boult": {
+          "wickets": 0,
+          "runs": 38,
+          "balls": 24
+        },
+        "Hardik Pandya": {
+          "wickets": 1,
+          "runs": 39,
+          "balls": 18
+        },
+        "AM Ghazanfar": {
+          "wickets": 0,
+          "runs": 51,
+          "balls": 24
+        },
+        "Jasprit Bumrah": {
+          "wickets": 0,
+          "runs": 35,
+          "balls": 24
+        },
+        "Shardul Thakur": {
+          "wickets": 3,
+          "runs": 39,
+          "balls": 24
+        },
+        "Mayank Markande": {
+          "wickets": 0,
+          "runs": 16,
+          "balls": 6
+        },
+        "Vaibhav Arora": {
+          "wickets": 1,
+          "runs": 52,
+          "balls": 24
+        },
+        "Blessing Muzarabani": {
+          "wickets": 0,
+          "runs": 34,
+          "balls": 18
+        },
+        "Varun Chakaravarthy": {
+          "wickets": 0,
+          "runs": 48,
+          "balls": 24
+        },
+        "Kartik Tyagi": {
+          "wickets": 1,
+          "runs": 43,
+          "balls": 24
+        },
+        "Sunil Narine": {
+          "wickets": 1,
+          "runs": 30,
+          "balls": 18
+        },
+        "Anukul Roy": {
+          "wickets": 0,
+          "runs": 15,
+          "balls": 7
+        }
+      },
+      "bowlingDots": {},
+      "battingFifties": {
+        "Ishan Kishan": 1,
+        "Virat Kohli": 1,
+        "Devdutt Padikkal": 1,
+        "Ajinkya Rahane": 1,
+        "Angkrish Raghuvanshi": 1,
+        "Ryan Rickelton": 1,
+        "Rohit Sharma": 1
+      },
+      "battingHundreds": {},
+      "battingImpact30s": {
+        "Rajat Patidar": 1
+      },
+      "bowling3w": {
+        "Jacob Duffy": 1,
+        "Romario Shepherd": 1,
+        "Shardul Thakur": 1
+      },
+      "bowling4w": {},
+      "bowling5w": {},
+      "playerMatches": {
+        "Travis Head": 1,
+        "Abhishek Sharma": 1,
+        "Ishan Kishan": 1,
+        "Nitish Kumar Reddy": 1,
+        "Heinrich Klaasen": 1,
+        "Salil Arora": 1,
+        "Aniket Verma": 1,
+        "Harsh Dubey": 1,
+        "Harshal Patel": 1,
+        "David Payne": 1,
+        "Jaydev Unadkat": 1,
+        "Jacob Duffy": 1,
+        "Bhuvneshwar Kumar": 1,
+        "Abhinandan Singh": 1,
+        "Romario Shepherd": 1,
+        "Suyash Sharma": 1,
+        "Krunal Pandya": 1,
+        "Jitesh Sharma": 1,
+        "Devdutt Padikkal": 1,
+        "Virat Kohli": 1,
+        "Philip Salt": 1,
+        "Rajat Patidar": 1,
+        "Tim David": 1,
+        "Eshan Malinga": 1,
+        "Ajinkya Rahane": 1,
+        "Finn Allen": 1,
+        "Cameron Green": 1,
+        "Angkrish Raghuvanshi": 1,
+        "Rinku Singh": 1,
+        "Ramandeep Singh": 1,
+        "Trent Boult": 1,
+        "Hardik Pandya": 1,
+        "AM Ghazanfar": 1,
+        "Jasprit Bumrah": 1,
+        "Shardul Thakur": 1,
+        "Mayank Markande": 1,
+        "Tilak Varma": 1,
+        "Sherfane Rutherford": 1,
+        "Ryan Rickelton": 1,
+        "Rohit Sharma": 1,
+        "Suryakumar Yadav": 1,
+        "Naman Dhir": 1,
+        "Vaibhav Arora": 1,
+        "Blessing Muzarabani": 1,
+        "Varun Chakaravarthy": 1,
+        "Kartik Tyagi": 1,
+        "Sunil Narine": 1,
+        "Anukul Roy": 1,
+        "Manish Pandey": 1
+      }
+    },
+    "liveOverlay": {
+      "matchId": null,
+      "generatedAt": "2026-03-30T06:25:08.013Z",
+      "aggregates": null,
+      "status": null,
+      "source": null
+    },
+    "scorecardBudget": {
+      "liveEnabled": false,
+      "liveIntervalMinutes": 30,
+      "maxBacklogPerRun": 2,
+      "lastLiveScorecardAt": null,
+      "lastLiveScorecardMatchId": null,
+      "lastBacklogProcessAt": "2026-03-29T18:02:03.693Z"
+    },
+    "officialMostDots": {
+      "enabled": true,
+      "minRefreshMinutes": 120,
+      "lastFetchedAt": "2026-03-30T06:25:08.680Z",
+      "lastAttemptAt": "2026-03-30T06:25:08.013Z",
+      "lastSource": "IPLT20 official most dots feed",
+      "lastStatus": "ok",
+      "lastError": null
+    },
+    "lastRun": {
+      "seriesInfoCalls": 1,
+      "scorecardCalls": 2,
+      "backlogProcessed": 0,
+      "backlogRemaining": 0,
+      "liveOverlayFetched": false,
+      "liveOverlayReused": false,
+      "liveOverlaySkippedReason": null
+    },
+    "aggregateSchemaVersion": 2,
+    "cricmetricDots": {
+      "enabled": true,
+      "minRefreshMinutes": 120,
+      "lastFetchedAt": null,
+      "lastAttemptAt": "2026-03-29T18:02:03.694Z",
+      "lastSource": null,
+      "lastStatus": "error",
+      "lastError": "cricmetric-page-direct: HTTP 403 for https://www.cricmetric.com/jscripts/leadersdata.py?show=Player&type=Standard&format=All_T20&category=Men&start=1800-01-01&role=Bowling&sortby=W&series=ipl2026&sig=6fcf9b2618b11d1245fd00060540ec29505a97102c26d97ff48258b08d7bfdb1 | cricmetric-page-via-jina: leadersdata-url-not-found"
+    }
+  },
+  "titleWinner": {
+    "winner": "Royal Challengers Bengaluru",
+    "finalists": [
+      "Royal Challengers Bengaluru",
+      "Mumbai Indians"
+    ],
+    "playoffs": [
+      "Royal Challengers Bengaluru",
+      "Mumbai Indians",
+      "Kolkata Knight Riders",
+      "Sunrisers Hyderabad"
+    ],
+    "ranking": [
+      "Royal Challengers Bengaluru",
+      "Mumbai Indians",
+      "Kolkata Knight Riders",
+      "Sunrisers Hyderabad"
+    ],
+    "extendedRanking": [
+      "Royal Challengers Bengaluru",
+      "Mumbai Indians",
+      "Kolkata Knight Riders",
+      "Sunrisers Hyderabad"
+    ]
+  },
+  "orangeCap": {
+    "ranking": [
+      "Ryan Rickelton",
+      "Ishan Kishan",
+      "Rohit Sharma",
+      "Virat Kohli",
+      "Ajinkya Rahane",
+      "Devdutt Padikkal",
+      "Angkrish Raghuvanshi",
+      "Aniket Verma",
+      "Finn Allen",
+      "Rinku Singh"
+    ],
+    "extendedRanking": [
+      "Ryan Rickelton",
+      "Ishan Kishan",
+      "Rohit Sharma",
+      "Virat Kohli",
+      "Ajinkya Rahane",
+      "Devdutt Padikkal",
+      "Angkrish Raghuvanshi",
+      "Aniket Verma",
+      "Finn Allen",
+      "Rinku Singh",
+      "Heinrich Klaasen",
+      "Rajat Patidar",
+      "Tilak Varma",
+      "Cameron Green",
+      "Hardik Pandya",
+      "Suryakumar Yadav",
+      "Tim David",
+      "Travis Head",
+      "Salil Arora",
+      "Philip Salt",
+      "Abhishek Sharma",
+      "David Payne",
+      "Naman Dhir",
+      "Jaydev Unadkat",
+      "Ramandeep Singh",
+      "Harsh Dubey",
+      "Nitish Kumar Reddy",
+      "Harshal Patel",
+      "Jitesh Sharma"
+    ]
+  },
+  "mostSixes": {
+    "ranking": [
+      "Ryan Rickelton",
+      "Rohit Sharma",
+      "Ajinkya Rahane",
+      "Ishan Kishan",
+      "Virat Kohli",
+      "Aniket Verma",
+      "Devdutt Padikkal",
+      "Rajat Patidar",
+      "Angkrish Raghuvanshi",
+      "Finn Allen"
+    ],
+    "extendedRanking": [
+      "Ryan Rickelton",
+      "Rohit Sharma",
+      "Ajinkya Rahane",
+      "Ishan Kishan",
+      "Virat Kohli",
+      "Aniket Verma",
+      "Devdutt Padikkal",
+      "Rajat Patidar",
+      "Angkrish Raghuvanshi",
+      "Finn Allen",
+      "Abhishek Sharma",
+      "Cameron Green",
+      "Heinrich Klaasen",
+      "Salil Arora",
+      "Tim David",
+      "David Payne",
+      "Hardik Pandya",
+      "Harsh Dubey",
+      "Harshal Patel",
+      "Jaydev Unadkat",
+      "Jitesh Sharma",
+      "Naman Dhir",
+      "Nitish Kumar Reddy",
+      "Philip Salt",
+      "Ramandeep Singh",
+      "Rinku Singh",
+      "Suryakumar Yadav",
+      "Tilak Varma",
+      "Travis Head"
+    ]
+  },
+  "purpleCap": {
+    "ranking": [
+      "Jacob Duffy",
+      "Romario Shepherd",
+      "Shardul Thakur",
+      "David Payne",
+      "Abhinandan Singh",
+      "Bhuvneshwar Kumar",
+      "Hardik Pandya",
+      "Harsh Dubey",
+      "Jaydev Unadkat",
+      "Kartik Tyagi"
+    ],
+    "extendedRanking": [
+      "Jacob Duffy",
+      "Romario Shepherd",
+      "Shardul Thakur",
+      "David Payne",
+      "Abhinandan Singh",
+      "Bhuvneshwar Kumar",
+      "Hardik Pandya",
+      "Harsh Dubey",
+      "Jaydev Unadkat",
+      "Kartik Tyagi",
+      "Sunil Narine",
+      "Suyash Sharma",
+      "Vaibhav Arora",
+      "AM Ghazanfar",
+      "Anukul Roy",
+      "Blessing Muzarabani",
+      "Eshan Malinga",
+      "Harshal Patel",
+      "Jasprit Bumrah",
+      "Krunal Pandya",
+      "Mayank Markande",
+      "Nitish Kumar Reddy",
+      "Trent Boult",
+      "Varun Chakaravarthy"
+    ]
+  },
+  "mostDots": {
+    "ranking": [
+      "Jacob Duffy",
+      "Bhuvneshwar Kumar",
+      "Kartik Tyagi",
+      "Vaibhav Arora",
+      "Abhinandan Singh",
+      "Hardik Pandya",
+      "Shardul Thakur",
+      "Trent Boult",
+      "Allah Ghazanfar",
+      "Blessing Muzarabani"
+    ],
+    "extendedRanking": [
+      "Jacob Duffy",
+      "Bhuvneshwar Kumar",
+      "Kartik Tyagi",
+      "Vaibhav Arora",
+      "Abhinandan Singh",
+      "Hardik Pandya",
+      "Shardul Thakur",
+      "Trent Boult",
+      "Allah Ghazanfar",
+      "Blessing Muzarabani",
+      "Jaydev Unadkat",
+      "Sunil Narine",
+      "Suyash Sharma",
+      "David Payne",
+      "Nitish Kumar Reddy",
+      "Romario Shepherd",
+      "Varun Chakaravarthy",
+      "Harsh Dubey",
+      "Jasprit Bumrah",
+      "Eshan Malinga",
+      "Harshal Patel",
+      "Anukul Roy",
+      "Krunal Pandya",
+      "Mayank Markande"
+    ],
+    "values": {
+      "Jacob Duffy": 13,
+      "Bhuvneshwar Kumar": 9,
+      "Kartik Tyagi": 9,
+      "Vaibhav Arora": 8,
+      "Abhinandan Singh": 7,
+      "Hardik Pandya": 7,
+      "Trent Boult": 7,
+      "Shardul Thakur": 7,
+      "Suyash Sharma": 6,
+      "Jaydev Unadkat": 6,
+      "Sunil Narine": 6,
+      "Blessing Muzarabani": 6,
+      "Allah Ghazanfar": 6,
+      "Nitish Kumar Reddy": 5,
+      "David Payne": 5,
+      "Varun Chakaravarthy": 5,
+      "Romario Shepherd": 5,
+      "Harsh Dubey": 4,
+      "Jasprit Bumrah": 4,
+      "Eshan Malinga": 3,
+      "Harshal Patel": 3,
+      "Mayank Markande": 1,
+      "Anukul Roy": 1,
+      "Krunal Pandya": 1
+    }
+  },
+  "mvp": {
+    "ranking": [
+      "Ryan Rickelton",
+      "Devdutt Padikkal",
+      "Ishan Kishan",
+      "Rohit Sharma",
+      "Virat Kohli",
+      "Jacob Duffy",
+      "Ajinkya Rahane",
+      "Shardul Thakur",
+      "Romario Shepherd",
+      "Angkrish Raghuvanshi"
+    ],
+    "extendedRanking": [
+      "Ryan Rickelton",
+      "Devdutt Padikkal",
+      "Ishan Kishan",
+      "Rohit Sharma",
+      "Virat Kohli",
+      "Jacob Duffy",
+      "Ajinkya Rahane",
+      "Shardul Thakur",
+      "Romario Shepherd",
+      "Angkrish Raghuvanshi",
+      "Aniket Verma",
+      "Rajat Patidar",
+      "Hardik Pandya",
+      "Heinrich Klaasen",
+      "Finn Allen",
+      "David Payne",
+      "Rinku Singh",
+      "Jaydev Unadkat",
+      "Tilak Varma",
+      "Bhuvneshwar Kumar",
+      "Abhinandan Singh",
+      "Harsh Dubey",
+      "Sunil Narine",
+      "Suyash Sharma",
+      "Kartik Tyagi",
+      "Vaibhav Arora",
+      "Cameron Green",
+      "Tim David",
+      "Suryakumar Yadav",
+      "Salil Arora",
+      "Travis Head",
+      "Trent Boult",
+      "Anukul Roy",
+      "Abhishek Sharma",
+      "Allah Ghazanfar",
+      "Nitish Kumar Reddy",
+      "Jitesh Sharma",
+      "Manish Pandey",
+      "Philip Salt",
+      "Sherfane Rutherford",
+      "Jasprit Bumrah",
+      "Naman Dhir",
+      "Blessing Muzarabani",
+      "Ramandeep Singh",
+      "Varun Chakaravarthy",
+      "Mayank Markande",
+      "Eshan Malinga",
+      "Harshal Patel",
+      "Krunal Pandya",
+      "AM Ghazanfar"
+    ],
+    "values": {
+      "Ryan Rickelton": {
+        "score": 115,
+        "runs": 81,
+        "sixes": 8,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 188.37,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 1,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Devdutt Padikkal": {
+        "score": 111,
+        "runs": 61,
+        "sixes": 4,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 3,
+        "battingStrikeRate": 234.62,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 1,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Ishan Kishan": {
+        "score": 108,
+        "runs": 80,
+        "sixes": 5,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 210.53,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 1,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Rohit Sharma": {
+        "score": 108,
+        "runs": 78,
+        "sixes": 6,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 205.26,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 1,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Virat Kohli": {
+        "score": 105,
+        "runs": 69,
+        "sixes": 5,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 1,
+        "battingStrikeRate": 181.58,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 1,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Jacob Duffy": {
+        "score": 99.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 3,
+        "dotBalls": 13,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 5.5,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 8,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 1,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Ajinkya Rahane": {
+        "score": 92,
+        "runs": 67,
+        "sixes": 5,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 167.5,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 5,
+          "economy": 0,
+          "batting50s": 1,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Shardul Thakur": {
+        "score": 82.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 3,
+        "dotBalls": 7,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 9.75,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 1,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Romario Shepherd": {
+        "score": 74.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 3,
+        "dotBalls": 5,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 13.5,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 1,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Angkrish Raghuvanshi": {
+        "score": 73,
+        "runs": 51,
+        "sixes": 2,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 175.86,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 1,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Aniket Verma": {
+        "score": 59,
+        "runs": 43,
+        "sixes": 4,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 238.89,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Rajat Patidar": {
+        "score": 53,
+        "runs": 31,
+        "sixes": 3,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 258.33,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 1,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Hardik Pandya": {
+        "score": 51.5,
+        "runs": 18,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 7,
+        "catches": 1,
+        "battingStrikeRate": 163.64,
+        "economy": 13,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Heinrich Klaasen": {
+        "score": 51,
+        "runs": 31,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 2,
+        "battingStrikeRate": 140.91,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 2,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Finn Allen": {
+        "score": 49,
+        "runs": 37,
+        "sixes": 2,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 217.65,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "David Payne": {
+        "score": 48.5,
+        "runs": 6,
+        "sixes": 0,
+        "wickets": 2,
+        "dotBalls": 5,
+        "catches": 0,
+        "battingStrikeRate": 120,
+        "economy": 11.67,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Rinku Singh": {
+        "score": 46,
+        "runs": 33,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 1,
+        "battingStrikeRate": 157.14,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 5,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Jaydev Unadkat": {
+        "score": 41,
+        "runs": 4,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 6,
+        "catches": 1,
+        "battingStrikeRate": 133.33,
+        "economy": 9.67,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Tilak Varma": {
+        "score": 36,
+        "runs": 20,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 2,
+        "battingStrikeRate": 142.86,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Bhuvneshwar Kumar": {
+        "score": 35.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 9,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 7.75,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 2,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Abhinandan Singh": {
+        "score": 33.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 7,
+        "catches": 1,
+        "battingStrikeRate": null,
+        "economy": 12.67,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Harsh Dubey": {
+        "score": 32,
+        "runs": 3,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 4,
+        "catches": 1,
+        "battingStrikeRate": 100,
+        "economy": 11.67,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Sunil Narine": {
+        "score": 29,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 6,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 10,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Suyash Sharma": {
+        "score": 29,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 6,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 9.33,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Kartik Tyagi": {
+        "score": 28.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 9,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 10.75,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Vaibhav Arora": {
+        "score": 27,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 8,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 13,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Cameron Green": {
+        "score": 20,
+        "runs": 18,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 180,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Tim David": {
+        "score": 18,
+        "runs": 16,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 160,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Suryakumar Yadav": {
+        "score": 16,
+        "runs": 16,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 200,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Salil Arora": {
+        "score": 11,
+        "runs": 9,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 150,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Travis Head": {
+        "score": 11,
+        "runs": 11,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 122.22,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Trent Boult": {
+        "score": 10.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 7,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 9.5,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Anukul Roy": {
+        "score": 9.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 1,
+        "catches": 1,
+        "battingStrikeRate": null,
+        "economy": 12.86,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Abhishek Sharma": {
+        "score": 9,
+        "runs": 7,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 87.5,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Allah Ghazanfar": {
+        "score": 9,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 6,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": null,
+        "matches": 0,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Nitish Kumar Reddy": {
+        "score": 8.5,
+        "runs": 1,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 5,
+        "catches": 0,
+        "battingStrikeRate": 16.67,
+        "economy": 9.5,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Jitesh Sharma": {
+        "score": 8,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 1,
+        "battingStrikeRate": 0,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Manish Pandey": {
+        "score": 8,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 1,
+        "battingStrikeRate": null,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Philip Salt": {
+        "score": 8,
+        "runs": 8,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 114.29,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Sherfane Rutherford": {
+        "score": 8,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 1,
+        "battingStrikeRate": null,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Jasprit Bumrah": {
+        "score": 6,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 4,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 8.75,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Naman Dhir": {
+        "score": 5,
+        "runs": 5,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 250,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Blessing Muzarabani": {
+        "score": 4,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 6,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 11.33,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Ramandeep Singh": {
+        "score": 4,
+        "runs": 4,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 100,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Varun Chakaravarthy": {
+        "score": 2.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 5,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 12,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Mayank Markande": {
+        "score": 1.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 1,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 16,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Eshan Malinga": {
+        "score": -0.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 3,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 17.5,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Harshal Patel": {
+        "score": -0.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 3,
+        "catches": 0,
+        "battingStrikeRate": 0,
+        "economy": 14.63,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Krunal Pandya": {
+        "score": -3.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 1,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 13,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "AM Ghazanfar": {
+        "score": -5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 12.75,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      }
+    },
+    "formula": "Runs + (Sixes×2) + (Wickets×20) + (Dot balls×1.5) + (Catches×8) + batting SR bonus + bowling economy bonus + milestone bonuses",
+    "milestoneRules": {
+      "batting50": 10,
+      "batting100": 25,
+      "impact30Under15Balls": 8,
+      "bowling3w": 12,
+      "bowling4w": 20,
+      "bowling5w": 30
+    },
+    "bonusRules": {
+      "battingStrikeRate": {
+        "gt170": 8,
+        "gt150": 5,
+        "gt130": 2,
+        "lt100": -5,
+        "minRuns": 30
+      },
+      "economy": {
+        "lt6": 8,
+        "lt7": 5,
+        "lt8": 2,
+        "gt10": -5,
+        "minBalls": 12
+      }
+    }
+  },
+  "uncappedMvp": {
+    "ranking": [
+      "Angkrish Raghuvanshi",
+      "Aniket Verma",
+      "Abhinandan Singh",
+      "Harsh Dubey",
+      "Suyash Sharma",
+      "Kartik Tyagi",
+      "Vaibhav Arora",
+      "Salil Arora",
+      "Anukul Roy",
+      "Naman Dhir"
+    ],
+    "extendedRanking": [
+      "Angkrish Raghuvanshi",
+      "Aniket Verma",
+      "Abhinandan Singh",
+      "Harsh Dubey",
+      "Suyash Sharma",
+      "Kartik Tyagi",
+      "Vaibhav Arora",
+      "Salil Arora",
+      "Anukul Roy",
+      "Naman Dhir"
+    ],
+    "values": {
+      "Angkrish Raghuvanshi": {
+        "score": 73,
+        "runs": 51,
+        "sixes": 2,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 175.86,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 1,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Aniket Verma": {
+        "score": 59,
+        "runs": 43,
+        "sixes": 4,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 238.89,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 8,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Abhinandan Singh": {
+        "score": 33.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 7,
+        "catches": 1,
+        "battingStrikeRate": null,
+        "economy": 12.67,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Harsh Dubey": {
+        "score": 32,
+        "runs": 3,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 4,
+        "catches": 1,
+        "battingStrikeRate": 100,
+        "economy": 11.67,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Suyash Sharma": {
+        "score": 29,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 6,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 9.33,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Kartik Tyagi": {
+        "score": 28.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 9,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 10.75,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Vaibhav Arora": {
+        "score": 27,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 1,
+        "dotBalls": 8,
+        "catches": 0,
+        "battingStrikeRate": null,
+        "economy": 13,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": -5,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Salil Arora": {
+        "score": 11,
+        "runs": 9,
+        "sixes": 1,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 150,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Anukul Roy": {
+        "score": 9.5,
+        "runs": 0,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 1,
+        "catches": 1,
+        "battingStrikeRate": null,
+        "economy": 12.86,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      },
+      "Naman Dhir": {
+        "score": 5,
+        "runs": 5,
+        "sixes": 0,
+        "wickets": 0,
+        "dotBalls": 0,
+        "catches": 0,
+        "battingStrikeRate": 250,
+        "economy": null,
+        "matches": 1,
+        "bonuses": {
+          "sr": 0,
+          "economy": 0,
+          "batting50s": 0,
+          "batting100s": 0,
+          "impact30s": 0,
+          "bowling3w": 0,
+          "bowling4w": 0,
+          "bowling5w": 0
+        }
+      }
+    },
+    "source": "custom MVP ranking filtered to user-provided uncapped player pool"
+  },
+  "fairPlay": {
+    "winner": "Kolkata Knight Riders",
+    "ranking": [
+      "Kolkata Knight Riders",
+      "Mumbai Indians",
+      "Sunrisers Hyderabad",
+      "Royal Challengers Bengaluru"
+    ],
+    "extendedRanking": [
+      "Kolkata Knight Riders",
+      "Mumbai Indians",
+      "Sunrisers Hyderabad",
+      "Royal Challengers Bengaluru"
+    ],
+    "values": {
+      "Kolkata Knight Riders": {
+        "matches": 1,
+        "average": null,
+        "points": 10,
+        "raw": {
+          "TeamID": "3",
+          "TeamName": "KKR",
+          "TeamFullName": "Kolkata Knight Riders",
+          "No": "1",
+          "HM": "0",
+          "HP": "0",
+          "AM": "1",
+          "AP": "10",
+          "Points": "10",
+          "AvePoints": "10.00"
+        }
+      },
+      "Mumbai Indians": {
+        "matches": 1,
+        "average": null,
+        "points": 10,
+        "raw": {
+          "TeamID": "1",
+          "TeamName": "MI",
+          "TeamFullName": "Mumbai Indians",
+          "No": "1",
+          "HM": "1",
+          "HP": "10",
+          "AM": "0",
+          "AP": "0",
+          "Points": "10",
+          "AvePoints": "10.00"
+        }
+      },
+      "Sunrisers Hyderabad": {
+        "matches": 1,
+        "average": null,
+        "points": 10,
+        "raw": {
+          "TeamID": "8",
+          "TeamName": "SRH",
+          "TeamFullName": "Sunrisers Hyderabad",
+          "No": "1",
+          "HM": "0",
+          "HP": "0",
+          "AM": "1",
+          "AP": "10",
+          "Points": "10",
+          "AvePoints": "10.00"
+        }
+      },
+      "Royal Challengers Bengaluru": {
+        "matches": 1,
+        "average": null,
+        "points": 9,
+        "raw": {
+          "TeamID": "7",
+          "TeamName": "RCB",
+          "TeamFullName": "Royal Challengers Bengaluru",
+          "No": "1",
+          "HM": "1",
+          "HP": "9",
+          "AM": "0",
+          "AP": "0",
+          "Points": "9",
+          "AvePoints": "9.00"
+        }
+      }
+    },
+    "updatedAt": "30-03-2026 : 08:50:02",
+    "source": "IPLT20 official fairplay feed"
+  },
+  "highestScoreTeam": {
+    "ranking": [
+      "Mumbai Indians",
+      "Kolkata Knight Riders",
+      "Royal Challengers Bengaluru",
+      "Sunrisers Hyderabad"
+    ],
+    "extendedRanking": [
+      "Mumbai Indians",
+      "Kolkata Knight Riders",
+      "Royal Challengers Bengaluru",
+      "Sunrisers Hyderabad"
+    ],
+    "values": {
+      "Sunrisers Hyderabad": 201,
+      "Royal Challengers Bengaluru": 203,
+      "Kolkata Knight Riders": 220,
+      "Mumbai Indians": 224
+    }
+  },
+  "striker": {
+    "ranking": [],
+    "extendedRanking": []
+  },
+  "bestBowlingFigures": {
+    "ranking": [
+      "Jacob Duffy",
+      "Shardul Thakur",
+      "Romario Shepherd",
+      "David Payne",
+      "Suyash Sharma",
+      "Jaydev Unadkat",
+      "Sunil Narine",
+      "Bhuvneshwar Kumar",
+      "Harsh Dubey",
+      "Abhinandan Singh"
+    ],
+    "extendedRanking": [
+      "Jacob Duffy",
+      "Shardul Thakur",
+      "Romario Shepherd",
+      "David Payne",
+      "Suyash Sharma",
+      "Jaydev Unadkat",
+      "Sunil Narine",
+      "Bhuvneshwar Kumar",
+      "Harsh Dubey",
+      "Abhinandan Singh",
+      "Hardik Pandya",
+      "Kartik Tyagi",
+      "Vaibhav Arora",
+      "Anukul Roy",
+      "Mayank Markande",
+      "Nitish Kumar Reddy",
+      "Krunal Pandya",
+      "Blessing Muzarabani",
+      "Eshan Malinga",
+      "Jasprit Bumrah",
+      "Trent Boult",
+      "Harshal Patel",
+      "Varun Chakaravarthy",
+      "AM Ghazanfar"
+    ],
+    "figures": {
+      "Jacob Duffy": "3/22",
+      "Shardul Thakur": "3/39",
+      "Romario Shepherd": "3/54",
+      "David Payne": "2/35",
+      "Suyash Sharma": "1/28",
+      "Jaydev Unadkat": "1/29",
+      "Sunil Narine": "1/30",
+      "Bhuvneshwar Kumar": "1/31",
+      "Harsh Dubey": "1/35",
+      "Abhinandan Singh": "1/38",
+      "Hardik Pandya": "1/39",
+      "Kartik Tyagi": "1/43",
+      "Vaibhav Arora": "1/52",
+      "Anukul Roy": "0/15",
+      "Mayank Markande": "0/16",
+      "Nitish Kumar Reddy": "0/19",
+      "Krunal Pandya": "0/26",
+      "Blessing Muzarabani": "0/34",
+      "Eshan Malinga": "0/35",
+      "Jasprit Bumrah": "0/35",
+      "Trent Boult": "0/38",
+      "Harshal Patel": "0/39",
+      "Varun Chakaravarthy": "0/48",
+      "AM Ghazanfar": "0/51"
+    }
+  },
+  "bestBowlingStrikeRate": {
+    "ranking": [],
+    "extendedRanking": [],
+    "values": {}
+  },
+  "mostCatches": {
+    "ranking": [
+      "Devdutt Padikkal",
+      "Heinrich Klaasen",
+      "Tilak Varma",
+      "Abhinandan Singh",
+      "Anukul Roy",
+      "Hardik Pandya",
+      "Harsh Dubey",
+      "Jaydev Unadkat",
+      "Jitesh Sharma",
+      "Manish Pandey"
+    ],
+    "extendedRanking": [
+      "Devdutt Padikkal",
+      "Heinrich Klaasen",
+      "Tilak Varma",
+      "Abhinandan Singh",
+      "Anukul Roy",
+      "Hardik Pandya",
+      "Harsh Dubey",
+      "Jaydev Unadkat",
+      "Jitesh Sharma",
+      "Manish Pandey",
+      "Rinku Singh",
+      "Sherfane Rutherford",
+      "Virat Kohli"
+    ],
+    "values": {
+      "Jitesh Sharma": 1,
+      "Abhinandan Singh": 1,
+      "Devdutt Padikkal": 3,
+      "Virat Kohli": 1,
+      "Heinrich Klaasen": 2,
+      "Harsh Dubey": 1,
+      "Jaydev Unadkat": 1,
+      "Hardik Pandya": 1,
+      "Tilak Varma": 2,
+      "Sherfane Rutherford": 1,
+      "Anukul Roy": 1,
+      "Rinku Singh": 1,
+      "Manish Pandey": 1
+    }
+  },
+  "tableBottom": {
+    "ranking": [
+      "Royal Challengers Bengaluru",
+      "Mumbai Indians",
+      "Kolkata Knight Riders",
+      "Sunrisers Hyderabad"
+    ],
+    "extendedRanking": [
+      "Royal Challengers Bengaluru",
+      "Mumbai Indians",
+      "Kolkata Knight Riders",
+      "Sunrisers Hyderabad"
+    ]
+  },
+  "leastMvp": {
+    "ranking": [],
+    "extendedRanking": [],
+    "values": {},
+    "minMatches": 5,
+    "formulaSource": "custom MVP ranking filtered to players with minimum match requirement"
+  }
+}
