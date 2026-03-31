@@ -1,67 +1,43 @@
-# War Room tests
+# WARROOM_ENGINE_TESTS
 
-These tests protect the scoring engine and catch basic page breakages before you push a broken board.
+## Local commands
 
-## What is covered
-
-- golden rule tests for scoring and alias logic
-- fixture-driven tests against saved `live.json` snapshots
-- a browser smoke test that loads `index.html`, injects fixture live data, and checks the main board renders
-
-## Local engine tests
-
-Run these from the repo root:
+Run the scoring-engine tests:
 
 ```bash
 node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs
 ```
 
-If they pass, Node exits normally and prints a passing summary.
-If they fail, Node prints which test failed and exits with an error.
-
-## Local page smoke test
-
-This uses Playwright.
-
-Install the runner once:
+Run the live-data contract test:
 
 ```bash
-npm install -D @playwright/test
-npx playwright install chromium
+node --test tests/live-data.contract.test.mjs
 ```
 
-Start a simple local server from the repo root in one terminal:
+Validate the current worker output directly:
 
 ```bash
-python -m http.server 4173
+node scripts/validate-live-data.mjs data/live.json
 ```
 
-Then run the smoke test in another terminal:
+Run everything the main CI job runs:
 
 ```bash
-npx playwright test tests/page.smoke.spec.mjs --reporter=line
+node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs tests/live-data.contract.test.mjs && node scripts/validate-live-data.mjs data/live.json
 ```
 
-## GitHub Actions
+## What pass/fail looks like
 
-`.github/workflows/warroom-tests.yml` runs automatically on:
+- **Pass**: Node prints passing test output and exits normally.
+- **Fail**: Node prints the failing test name or contract errors and exits with a non-zero status.
 
-- push
-- pull request
-- manual workflow dispatch
+## What GitHub Actions now checks
 
-It runs:
+The `warroom-tests.yml` workflow now verifies:
 
-1. the Node engine tests
-2. the Playwright smoke test
+- golden scoring rules
+- fixture-based scoring behavior
+- the current `data/live.json` contract
+- the browser smoke test
 
-So in GitHub you will get:
-
-- green check when tests pass
-- red X when tests fail
-
-## Fixture files
-
-- `fixtures/live_early_season.json` — real early-season snapshot
-- `fixtures/live_weird_aliases.json` — alias-heavy synthetic cases
-- `fixtures/live_thresholds.json` — qualification-threshold synthetic cases
+The scheduled live-data worker also validates `data/live.json` before committing it.

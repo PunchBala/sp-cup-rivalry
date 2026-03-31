@@ -25,6 +25,9 @@ jobs:
           CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY }}
         run: node scripts/update-live-data.mjs
 
+      - name: Validate live data contract
+        run: node scripts/validate-live-data.mjs data/live.json
+
       - name: Commit live data
         shell: powershell
         run: |
