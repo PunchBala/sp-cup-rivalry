@@ -2,7 +2,7 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-03-30T20:07:07.069Z",
+  "fetchedAt": "2026-03-30T23:54:04.483Z",
   "scrapeStatus": "ok (3 processed matches, 3 scorecard calls this run)",
   "scrapeReport": {
     "orangeCap": {
@@ -96,21 +96,21 @@
   },
   "meta": {
     "scheduler": {
-      "dayKey": "2026-03-30",
-      "quietRefreshesUsed": 2,
-      "lastQuietRefreshAt": "2026-03-30T20:07:03.489Z",
+      "dayKey": "2026-03-31",
+      "quietRefreshesUsed": 1,
+      "lastQuietRefreshAt": "2026-03-30T23:53:59.271Z",
       "lastLiveRefreshAt": null,
-      "lastSeriesInfoAt": "2026-03-30T20:07:03.489Z",
+      "lastSeriesInfoAt": "2026-03-30T23:53:59.271Z",
       "lastDecision": {
-        "at": "2026-03-30T20:07:02.859Z",
+        "at": "2026-03-30T23:53:58.751Z",
         "shouldRefresh": true,
         "mode": "quiet_window",
         "reason": "quiet refresh slot available"
       },
-      "nextPlannedRefreshAt": "2026-03-30T23:00:00.489Z",
+      "nextPlannedRefreshAt": "2026-03-31T04:41:59.271Z",
       "nextPlannedMode": "quiet_window",
       "nextPlannedReason": "quiet refresh slot available",
-      "nextPlannedCalculatedAt": "2026-03-30T20:07:05.065Z"
+      "nextPlannedCalculatedAt": "2026-03-30T23:54:02.200Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -1659,7 +1659,7 @@
     },
     "liveOverlay": {
       "matchId": null,
-      "generatedAt": "2026-03-30T20:07:05.636Z",
+      "generatedAt": "2026-03-30T23:54:03.052Z",
       "aggregates": null,
       "status": null,
       "source": null
@@ -1675,8 +1675,8 @@
     "officialMostDots": {
       "enabled": true,
       "minRefreshMinutes": 120,
-      "lastFetchedAt": "2026-03-30T20:07:06.472Z",
-      "lastAttemptAt": "2026-03-30T20:07:05.637Z",
+      "lastFetchedAt": "2026-03-30T23:54:03.886Z",
+      "lastAttemptAt": "2026-03-30T23:54:03.054Z",
       "lastSource": "IPLT20 official most dots feed",
       "lastStatus": "ok",
       "lastError": null
@@ -1684,7 +1684,7 @@
     "lastRun": {
       "seriesInfoCalls": 1,
       "scorecardCalls": 3,
-      "backlogProcessed": 1,
+      "backlogProcessed": 0,
       "backlogRemaining": 0,
       "liveOverlayFetched": false,
       "liveOverlayReused": false,
@@ -3631,7 +3631,7 @@
       },
       {
         "processedMatchCount": 3,
-        "fetchedAt": "2026-03-30T20:07:07.069Z",
+        "fetchedAt": "2026-03-30T23:54:04.483Z",
         "snapshot": {
           "titleWinner": {
             "winner": "Rajasthan Royals",
