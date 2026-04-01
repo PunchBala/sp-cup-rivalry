@@ -14,7 +14,7 @@ These tests protect the scoring engine, the duel-first war room model, and the p
 Run these from the repo root:
 
 ```bash
-node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs tests/live-data.contract.test.mjs tests/warroom-room-model.test.mjs tests/update-live-data.quota.test.mjs tests/update-live-data.schedule.test.mjs
+node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs tests/live-data.contract.test.mjs tests/warroom-room-model.test.mjs tests/update-live-data.quota.test.mjs tests/update-live-data.schedule.test.mjs tests/page.alias-wiring.test.mjs
 node scripts/validate-live-data.mjs data/live.json
 node scripts/validate-war-room-config.mjs fixtures/war_room_sp_cup_2026.json fixtures/war_room_draft_example.json
 ```
@@ -39,3 +39,9 @@ Then run:
 ```bash
 npx playwright test tests/page.smoke.spec.mjs --reporter=line
 ```
+
+
+## Extra runtime alias coverage
+
+- `tests/page.alias-wiring.test.mjs` protects the page runtime from drifting back to team-only alias matching.
+- This catches cases like `Vaibhav Sooryavanshi`, `V Suryavanshi`, and `Tilak Varma` style display variants before they silently become `Live: unranked`.
