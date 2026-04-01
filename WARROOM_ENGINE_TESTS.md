@@ -1,28 +1,41 @@
 # War Room tests
 
-## Engine and data-model tests
+These tests protect the scoring engine, the duel-first war room model, and the page smoke path.
 
-Run from the repo root:
+## What is covered
+
+- golden rule tests for scoring and alias logic
+- fixture-driven tests against saved `live.json` snapshots
+- war-room model tests for explicit duels and duplicate display names across duels
+- a browser smoke test that loads `index.html`, injects fixture live data, and checks the duel tabs render
+
+## Local test commands
+
+Run these from the repo root:
 
 ```bash
-node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs tests/live-data.contract.test.mjs tests/league-model.test.mjs
+node --test tests/warroom-engine.golden.test.mjs tests/warroom-engine.fixtures.test.mjs tests/live-data.contract.test.mjs tests/warroom-room-model.test.mjs tests/update-live-data.quota.test.mjs tests/update-live-data.schedule.test.mjs
+node scripts/validate-live-data.mjs data/live.json
+node scripts/validate-war-room-config.mjs fixtures/war_room_sp_cup_2026.json fixtures/war_room_draft_example.json
 ```
 
-## League fixture validation
+## Local page smoke test
 
-Validate the shipped local league fixtures:
+Install the runner once:
 
 ```bash
-node scripts/validate-league-config.mjs fixtures/league_sp_cup_2026.json fixtures/league_draft_example.json
+npm install -D @playwright/test
+npx playwright install chromium
 ```
 
-## Browser smoke
+Start a local server from the repo root:
 
-The browser smoke test now covers V1A fixture-backed league loading:
+```bash
+python -m http.server 4173
+```
 
-- loads `?league=sp-cup-2026`
-- checks dynamic rivalry tabs are present
-- checks the war room renders from the loaded league
-- checks a URL-selected matchup opens correctly
+Then run:
 
-Use it through Playwright in CI or your local Playwright setup.
+```bash
+npx playwright test tests/page.smoke.spec.mjs --reporter=line
+```

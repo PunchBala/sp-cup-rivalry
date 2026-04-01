@@ -776,22 +776,8 @@ function matchesPick(a,b){
       return canonicalCompareName(a) === canonicalCompareName(b);
     }
 
-function rankOf(pick, ranking, context = null){
-      const ordered = Array.isArray(ranking) ? ranking : [];
-      if (!ordered.length) return null;
-      const key = canonicalCompareName(pick);
-      if (!key) return null;
-
-      const categoryKey = context?.categoryKey || null;
-      const live = context?.live || null;
-      const liveSource = context?.liveSource || currentLiveSource;
-
-      if (categoryKey && live) {
-        const rankMap = buildRankMap(categoryKey, ordered, live, liveSource);
-        return rankMap.get(key) ?? null;
-      }
-
-      const idx = ordered.findIndex(name => matchesPick(name, pick));
+function rankOf(pick, ranking){
+      const idx = ranking.findIndex(name => matchesPick(name, pick));
       return idx >= 0 ? idx + 1 : null;
     }
 
@@ -801,82 +787,9 @@ function trackingRankingForLive(live){
       return Array.isArray(live?.ranking) ? live.ranking : [];
     }
 
-const COMPETITION_RANK_CATEGORY_KEYS = new Set([
-      'orangeCap',
-      'mostSixes',
-      'purpleCap',
-      'mostDots',
-      'mvp',
-      'uncappedMvp',
-      'highestScoreTeam',
-      'striker',
-      'bestBowlingFigures',
-      'bestBowlingStrikeRate',
-      'mostCatches',
-      'leastMvp'
-    ]);
-
-function categoryUsesCompetitionRanks(categoryKey){
-      return COMPETITION_RANK_CATEGORY_KEYS.has(categoryKey);
-    }
-
-function categoryRankValue(categoryKey, name, live, liveSource = currentLiveSource){
-      const agg = getAggregates(liveSource);
-      if (!name) return null;
-
-      if (categoryKey === 'orangeCap') return valueForPickFromObject(agg.battingRuns || {}, name);
-      if (categoryKey === 'mostSixes') return valueForPickFromObject(agg.battingSixes || {}, name);
-      if (categoryKey === 'purpleCap') return valueForPickFromObject(agg.bowlingWickets || {}, name);
-      if (categoryKey === 'mostDots') return valueForPickFromObject(live?.values || agg.bowlingDots || {}, name);
-      if (categoryKey === 'mostCatches') return valueForPickFromObject(live?.values || agg.catches || {}, name);
-      if (categoryKey === 'mvp' || categoryKey === 'uncappedMvp' || categoryKey === 'leastMvp') {
-        return valueForPickFromObject(live?.values || {}, name, 'score');
-      }
-      if (categoryKey === 'highestScoreTeam') return valueForPickFromObject(live?.values || {}, name);
-      if (categoryKey === 'striker') {
-        const runs = Number(valueForPickFromObject(agg.battingRuns || {}, name) || 0);
-        const balls = Number(valueForPickFromObject(agg.battingBalls || {}, name) || 0);
-        if (!balls) return null;
-        return Number(((100 * runs) / balls).toFixed(2));
-      }
-      if (categoryKey === 'bestBowlingFigures') return valueForPickFromObject(live?.figures || {}, name);
-      if (categoryKey === 'bestBowlingStrikeRate') return valueForPickFromObject(live?.values || {}, name);
-      return null;
-    }
-
-function categoryRankSignature(categoryKey, name, live, liveSource = currentLiveSource){
-      const value = categoryRankValue(categoryKey, name, live, liveSource);
-      if (value === null || value === undefined || value === '') return null;
-      if (typeof value === 'number') return `n:${value}`;
-      return `s:${String(value)}`;
-    }
-
-function buildRankMap(categoryKey, ranking, live, liveSource = currentLiveSource){
-      const map = new Map();
-      const ordered = Array.isArray(ranking) ? ranking : [];
-      if (!ordered.length) return map;
-
-      if (!categoryUsesCompetitionRanks(categoryKey)) {
-        ordered.forEach((name, idx) => map.set(canonicalCompareName(name), idx + 1));
-        return map;
-      }
-
-      let previousSignature = null;
-      let currentRank = 0;
-      ordered.forEach((name, idx) => {
-        const signature = categoryRankSignature(categoryKey, name, live, liveSource) ?? `idx:${idx}`;
-        if (idx === 0 || signature !== previousSignature) {
-          currentRank = idx + 1;
-          previousSignature = signature;
-        }
-        map.set(canonicalCompareName(name), currentRank);
-      });
-      return map;
-    }
-
 function describePickLiveState(category, pick, live, explicitRank){
       const trackingRanking = trackingRankingForLive(live);
-      const rank = explicitRank || (trackingRanking.length ? rankOf(pick, trackingRanking, { categoryKey: category.key, live, liveSource: currentLiveSource }) : null);
+      const rank = explicitRank || (trackingRanking.length ? rankOf(pick, trackingRanking) : null);
 
       if (category.type === 'title') {
         if (live?.winner && matchesPick(pick, live.winner)) return 'Live: winner';
@@ -1009,8 +922,8 @@ function buildClosestContestInsight(rows, liveSource = currentLiveSource){
       for (const row of rows) {
         const live = liveSource[row.category.key] || {};
         const ranking = trackingRankingForLive(live);
-        const rankA = rankOf(row.pickA, ranking, { categoryKey: row.category.key, live, liveSource: currentLiveSource });
-        const rankB = rankOf(row.pickB, ranking, { categoryKey: row.category.key, live, liveSource: currentLiveSource });
+        const rankA = rankOf(row.pickA, ranking);
+        const rankB = rankOf(row.pickB, ranking);
         if (rankA && rankB) {
           candidates.push({
             weight: Math.abs(rankA - rankB),
@@ -1081,7 +994,7 @@ function buildThresholdPushes(matchup, liveSource = currentLiveSource){
       const agg = getAggregates(liveSource);
       for (const pick of [matchup.a.picks.striker, matchup.b.picks.striker]) {
         const runs = Number(valueForPickFromObject(agg.battingRuns || {}, pick) || 0);
-        const rank = rankOf(pick, trackingRankingForLive(liveSource.striker || {}), { categoryKey: 'striker', live: liveSource.striker || {}, liveSource: currentLiveSource });
+        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.striker || {}));
         if (!rank && runs < 100) {
           const need = 100 - runs;
           pushes.push({ priority: need + 20, message: `${pick} still needs ${unitLabel('run', need)} just to qualify for Striker, so that category is still loading its drama.` });
@@ -1091,7 +1004,7 @@ function buildThresholdPushes(matchup, liveSource = currentLiveSource){
       for (const pick of [matchup.a.picks.bestBowlingStrikeRate, matchup.b.picks.bestBowlingStrikeRate]) {
         const balls = Number(valueForPickFromObject(agg.bowlingBalls || {}, pick) || 0);
         const wickets = Number(valueForPickFromObject(agg.bowlingWickets || {}, pick) || 0);
-        const rank = rankOf(pick, trackingRankingForLive(liveSource.bestBowlingStrikeRate || {}), { categoryKey: 'bestBowlingStrikeRate', live: liveSource.bestBowlingStrikeRate || {}, liveSource: currentLiveSource });
+        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.bestBowlingStrikeRate || {}));
         if (!rank && balls < 72) {
           const need = 72 - balls;
           pushes.push({ priority: need + 25, message: wickets > 0 ? `${pick} needs ${need} more balls (${oversLabelFromBalls(need)}) to qualify for bowling strike rate.` : `${pick} needs ${need} more balls (${oversLabelFromBalls(need)}) and a wicket before bowling strike rate even wakes up.` });
@@ -1100,7 +1013,7 @@ function buildThresholdPushes(matchup, liveSource = currentLiveSource){
 
       for (const pick of [matchup.a.picks.leastMvp, matchup.b.picks.leastMvp]) {
         const matches = Number(valueForPickFromObject(agg.playerMatches || {}, pick) || 0);
-        const rank = rankOf(pick, trackingRankingForLive(liveSource.leastMvp || {}), { categoryKey: 'leastMvp', live: liveSource.leastMvp || {}, liveSource: currentLiveSource });
+        const rank = rankOf(pick, trackingRankingForLive(LIVE_2026.leastMvp || {}));
         if (!rank && matches < 5) {
           const need = 5 - matches;
           pushes.push({ priority: need + 15, message: `${pick} still needs ${unitLabel('game', need)} before Least MVP becomes a real battlefield.` });
@@ -1144,30 +1057,19 @@ function scoreWinnerBetterCategory(pickA, pickB, live, categoryKey){
       const aWin = actualWinner && matchesPick(pickA, actualWinner);
       const bWin = actualWinner && matchesPick(pickB, actualWinner);
 
-      const rankA = rankOf(pickA, ranking, { categoryKey, live, liveSource: currentLiveSource });
-      const rankB = rankOf(pickB, ranking, { categoryKey, live, liveSource: currentLiveSource });
+      let rankA = rankOf(pickA, ranking);
+      let rankB = rankOf(pickB, ranking);
       let a = aWin ? betterPredictionPoints(rankA || 1, categoryKey) : 0;
       let b = bWin ? betterPredictionPoints(rankB || 1, categoryKey) : 0;
 
-      if (a === 0 && b === 0) {
-        if (categoryKey === 'tableBottom') {
-          if (rankA && rankB) {
-            if (rankA > rankB) a = 1;
-            else if (rankB > rankA) b = 1;
-          } else if (rankA && !rankB) {
-            a = 1;
-          } else if (rankB && !rankA) {
-            b = 1;
-          }
-        } else {
-          if (rankA && rankB) {
-            if (rankA < rankB) a = betterPredictionPoints(rankA, categoryKey);
-            else if (rankB < rankA) b = betterPredictionPoints(rankB, categoryKey);
-          } else if (rankA && !rankB) {
-            a = betterPredictionPoints(rankA, categoryKey);
-          } else if (rankB && !rankA) {
-            b = betterPredictionPoints(rankB, categoryKey);
-          }
+      if (categoryKey === 'tableBottom' && a === 0 && b === 0) {
+        if (rankA && rankB) {
+          if (rankA > rankB) a = 1;
+          else if (rankB > rankA) b = 1;
+        } else if (rankA && !rankB) {
+          a = 1;
+        } else if (rankB && !rankA) {
+          b = 1;
         }
       }
 
@@ -1243,9 +1145,9 @@ function betterPredictionPoints(rank, categoryKey){
       return 1;
     }
 
-function scoreTop5Category(pickA, pickB, ranking, categoryKey = null, live = null){
-      const rA = rankOf(pickA, ranking, { categoryKey, live, liveSource: currentLiveSource });
-      const rB = rankOf(pickB, ranking, { categoryKey, live, liveSource: currentLiveSource });
+function scoreTop5Category(pickA, pickB, ranking){
+      const rA = rankOf(pickA, ranking);
+      const rB = rankOf(pickB, ranking);
 
       let a = top5Points(rA);
       let b = top5Points(rB);
@@ -1262,17 +1164,20 @@ function scoreTop5Category(pickA, pickB, ranking, categoryKey = null, live = nul
       return { a, b, note, rankA:rA, rankB:rB };
     }
 
-function scoreTop5WithExtended(pickA, pickB, ranking, extendedRanking, categoryKey = null, live = null){
-      const rA = rankOf(pickA, ranking, { categoryKey, live, liveSource: currentLiveSource });
-      const rB = rankOf(pickB, ranking, { categoryKey, live, liveSource: currentLiveSource });
-      const extA = rankOf(pickA, extendedRanking, { categoryKey, live, liveSource: currentLiveSource });
-      const extB = rankOf(pickB, extendedRanking, { categoryKey, live, liveSource: currentLiveSource });
+function scoreTop5WithExtended(pickA, pickB, ranking, extendedRanking){
+      const rA = rankOf(pickA, ranking);
+      const rB = rankOf(pickB, ranking);
+      let a = top5Points(rA);
+      let b = top5Points(rB);
+
+      const extA = rankOf(pickA, extendedRanking);
+      const extB = rankOf(pickB, extendedRanking);
       const fullA = extA || rA || null;
       const fullB = extB || rB || null;
 
-      let a = top5Points(fullA || rA);
-      let b = top5Points(fullB || rB);
-
+      // If both missed the top 5, award the 1-point better-prediction fallback.
+      // This must work symmetrically: any ranked pick beats an unranked pick,
+      // and if both are ranked outside the scoring zone, the closer rank wins.
       if (a === 0 && b === 0) {
         if (fullA && fullB) {
           if (fullA < fullB) a = 1;
@@ -1290,9 +1195,9 @@ function scoreTop5WithExtended(pickA, pickB, ranking, extendedRanking, categoryK
       };
     }
 
-function scoreBetterRankCategory(pickA, pickB, ranking, emptyNote = 'Waiting for ranking', categoryKey = null, live = null){
-      const rA = rankOf(pickA, ranking, { categoryKey, live, liveSource: currentLiveSource });
-      const rB = rankOf(pickB, ranking, { categoryKey, live, liveSource: currentLiveSource });
+function scoreBetterRankCategory(pickA, pickB, ranking, emptyNote = 'Waiting for ranking', categoryKey = null){
+      const rA = rankOf(pickA, ranking);
+      const rB = rankOf(pickB, ranking);
       let a = 0, b = 0;
       if (rA && rB) {
         if (rA < rB) a = betterPredictionPoints(rA, categoryKey);
@@ -1308,9 +1213,9 @@ function scoreBetterRankCategory(pickA, pickB, ranking, emptyNote = 'Waiting for
       };
     }
 
-function scoreBetterRankLowCategory(pickA, pickB, ranking, categoryKey = null, live = null){
-      const rA = rankOf(pickA, ranking, { categoryKey, live, liveSource: currentLiveSource });
-      const rB = rankOf(pickB, ranking, { categoryKey, live, liveSource: currentLiveSource });
+function scoreBetterRankLowCategory(pickA, pickB, ranking){
+      const rA = rankOf(pickA, ranking);
+      const rB = rankOf(pickB, ranking);
       let a = 0, b = 0;
       if (rA && rB) {
         if (rA > rB) a = 1;
@@ -1327,7 +1232,6 @@ function scoreBetterRankLowCategory(pickA, pickB, ranking, categoryKey = null, l
     }
 
 function getCategoryResult(category, matchup, liveSource = currentLiveSource){
-      if (liveSource) setLiveSource(liveSource);
       const pickA = matchup.a.picks[category.key];
       const pickB = matchup.b.picks[category.key];
       const live = (liveSource && liveSource[category.key]) || {};
@@ -1352,19 +1256,19 @@ function getCategoryResult(category, matchup, liveSource = currentLiveSource){
         if (category.key === 'striker') emptyNote = 'Waiting for ranking (min 100 runs)';
         if (category.key === 'bestBowlingStrikeRate') emptyNote = 'Waiting for ranking (min 12 overs)';
         return extendedRanking
-          ? scoreBetterRankCategory(pickA, pickB, extendedRanking, emptyNote, category.key, live)
-          : scoreBetterRankCategory(pickA, pickB, ranking, emptyNote, category.key, live);
+          ? scoreBetterRankCategory(pickA, pickB, extendedRanking, emptyNote, category.key)
+          : scoreBetterRankCategory(pickA, pickB, ranking, emptyNote, category.key);
       }
 
       if (category.type === 'better_rank_low') {
         return extendedRanking
-          ? scoreBetterRankLowCategory(pickA, pickB, extendedRanking, category.key, live)
-          : scoreBetterRankLowCategory(pickA, pickB, ranking, category.key, live);
+          ? scoreBetterRankLowCategory(pickA, pickB, extendedRanking)
+          : scoreBetterRankLowCategory(pickA, pickB, ranking);
       }
 
       return extendedRanking
-        ? scoreTop5WithExtended(pickA, pickB, ranking, extendedRanking, category.key, live)
-        : scoreTop5Category(pickA, pickB, ranking, category.key, live);
+        ? scoreTop5WithExtended(pickA, pickB, ranking, extendedRanking)
+        : scoreTop5Category(pickA, pickB, ranking);
     }
 
 function computeMatchup(matchup, liveSource = currentLiveSource){
