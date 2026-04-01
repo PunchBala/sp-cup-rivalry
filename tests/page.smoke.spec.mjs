@@ -36,7 +36,8 @@ test('war room v1 renders duel-backed tabs and stat value chips without runtime 
   await expect(page.locator('#statsSummary')).toContainText('board');
 
   await page.getByRole('button', { name: 'Schedule' }).click();
-  await expect(page.locator('#scheduleSummary')).toContainText('Official league-stage schedule');
+  await expect(page.locator('#scheduleSummary')).toContainText('League-stage schedule');
+  await expect(page.locator('#scheduleSummary')).toContainText('Next planned update window');
   await expect(page.locator('#scheduleTable tbody tr')).toHaveCount(70);
 
   expect(pageErrors).toEqual([]);
