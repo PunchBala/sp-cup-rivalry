@@ -225,12 +225,13 @@
 <body>
   <div class="wrap">
     <div class="hero">
-      <h1>IPL 2026 Prediction War Room</h1>
-      <p class="sub">Live tracker for the season-long nonsense, delusion, and occasional genius. Scoring logic fixed. Season lock fixed. Next match card fixed.</p>
+      <h1 id="leagueTitle">IPL 2026 Prediction War Room</h1>
+      <p class="sub" id="leagueSubtitle">Live tracker for the season-long nonsense, delusion, and occasional genius. Scoring logic fixed. Season lock fixed. Next match card fixed.</p>
       <div class="tabs" id="tabs"></div>
       <div class="view-tabs" id="viewTabs"></div>
       <div class="meta">
         <div class="pill" id="providerPill">Provider: Live / embedded official schedule</div>
+        <div class="pill" id="leaguePill">War Room: loading…</div>
         <div class="pill" id="seasonPill">Season: IPL 2026 only</div>
         <div class="pill" id="updatedPill">Last updated: --</div>
         <div class="pill" id="nextUpdatePill">Next planned update: --</div>
@@ -238,6 +239,21 @@
     </div>
 
     <div class="grid top-summary" id="warRoomSection">
+      <div class="card span-12">
+        <div class="layout-side">
+          <div>
+            <div class="section-title">Live board</div>
+            <div class="scoreboard" id="scoreboard"></div>
+          </div>
+          <div>
+            <div class="section-title">Next match</div>
+            <div class="small" id="nextMatchMeta">Loading fixture swing point…</div>
+            <div class="next-match-teams" id="nextMatchTeams">--</div>
+            <div class="small" id="nextMatchVenue">--</div>
+            <div class="small" id="nextMatchImpact" style="margin-top:10px"></div>
+          </div>
+        </div>
+      </div>
       <div class="card span-3 metric-card"><div class="label">Overall score</div><div class="value" id="metricOverall">0 - 0</div><div class="note" id="metricLead">Waiting for the first swing.</div></div>
       <div class="card span-3 metric-card"><div class="label">Fronts won</div><div class="value" id="metricFronts">0 - 0</div><div class="note">Categories currently led by each side.</div></div>
       <div class="card span-3 metric-card"><div class="label">Likely winner</div><div class="value" id="metricWinner">Too early</div><div class="note" id="metricWinnerNote">Need more movement before calling it.</div></div>
@@ -277,27 +293,14 @@
         </div>
       </div>
       <div class="card span-12">
-        <div class="layout-side">
-          <div>
-            <div class="section-title">Live board</div>
-            <div class="scoreboard" id="scoreboard"></div>
-          </div>
-          <div>
-            <div class="section-title">Next match</div>
-            <div class="small" id="nextMatchMeta">Loading fixture swing point…</div>
-            <div class="next-match-teams" id="nextMatchTeams">--</div>
-            <div class="small" id="nextMatchVenue">--</div>
-            <div class="small" id="nextMatchImpact" style="margin-top:10px"></div>
-          </div>
-        </div>
-      </div>
-      <div class="card span-12">
         <div class="section-title">Scoring rules</div>
         <div class="legend">
           <div class="pill">Title winner: 5 / 3 / 2, else better prediction 1</div>
           <div class="pill">Orange Cap, Most Sixes, Purple Cap, Most Dots, MVP: 4 / 3 / 2, else better prediction 1</div>
-          <div class="pill">Categories 7-15: better prediction wins 1 point</div>
+          <div class="pill">Player better-prediction rows: 1 point, or 2 if the winning pick is live #1</div>
+          <div class="pill">Team/table better-prediction rows still stay at 1 point</div>
           <div class="pill">Least MVP: lower in custom MVP ranking wins (min 5 games)</div>
+          <div class="pill">Tie-aware stat ranking: equal values share rank and the next lower value skips accordingly</div>
           <div class="pill">Custom MVP = Runs + (6s×2) + (Wkts×20) + (Dots×1.5) + (Catches×8)</div>
           <div class="pill">MVP bonuses: batting SR, bowling economy, 50/100, quick 30+, 3w/4w/5w</div>
           <div class="pill">Striker: minimum 100 runs required</div>
@@ -340,101 +343,19 @@
 
   </div>
 
+  <script src="warroom-room-model.js"></script>
   <script>
     const SEASON = 2026;
     const SERIES_TAG = 'IPL 2026';
 
     // ========= USER-EDITABLE PREDICTIONS =========
-    const MATCHUPS = [
-      {
-        id: 'senthil-sai',
-        label: 'Senthil vs Sai',
-        a: {
-          name: 'Senthil',
-          picks: {
-            titleWinner: 'MI',
-            orangeCap: 'KL Rahul',
-            mostSixes: 'Vaibhav Suryavanshi',
-            purpleCap: 'Yuzvendra Chahal',
-            mostDots: 'Prasidh Krishna',
-            mvp: 'KL Rahul',
-            uncappedMvp: 'Auqib Nabi',
-            fairPlay: 'PBKS',
-            highestScoreTeam: 'PBKS',
-            striker: 'Dewald Brevis',
-            bestBowlingFigures: 'Akeal Hosein',
-            bestBowlingStrikeRate: 'Josh Hazlewood',
-            mostCatches: 'Dewald Brevis',
-            tableBottom: 'KKR',
-            leastMvp: 'MS Dhoni'
-          }
-        },
-        b: {
-          name: 'Sai',
-          picks: {
-            titleWinner: 'RCB',
-            orangeCap: 'Shubman Gill',
-            mostSixes: 'Nicholas Pooran',
-            purpleCap: 'Rashid Khan',
-            mostDots: 'Trent Boult',
-            mvp: 'Shreyas Iyer',
-            uncappedMvp: 'Prashant Veer',
-            fairPlay: 'GT',
-            highestScoreTeam: 'LSG',
-            striker: 'Phil Salt',
-            bestBowlingFigures: 'Harshal Patel',
-            bestBowlingStrikeRate: 'Rashid Khan',
-            mostCatches: 'Virat Kohli',
-            tableBottom: 'SRH',
-            leastMvp: 'Cameron Green'
-          }
-        }
-      },
-      {
-        id: 'senthil-vibeesh',
-        label: 'Senthil vs Vibeesh',
-        a: {
-          name: 'Senthil',
-          picks: {
-            titleWinner: 'RCB',
-            orangeCap: 'Shubman Gill',
-            mostSixes: 'Sanju Samson',
-            purpleCap: 'Arshdeep Singh',
-            mostDots: 'Jasprit Bumrah',
-            mvp: 'Abhishek Sharma',
-            uncappedMvp: 'Vaibhav Suryavanshi',
-            fairPlay: 'CSK',
-            highestScoreTeam: 'LSG',
-            striker: 'Ishan Kishan',
-            bestBowlingFigures: 'Yuzvendra Chahal',
-            bestBowlingStrikeRate: 'Harshal Patel',
-            mostCatches: 'Tilak Varma',
-            tableBottom: 'RR',
-            leastMvp: 'Rajat Patidar'
-          }
-        },
-        b: {
-          name: 'Vibeesh',
-          picks: {
-            titleWinner: 'PBKS',
-            orangeCap: 'Shreyas Iyer',
-            mostSixes: 'Abhishek Sharma',
-            purpleCap: 'Yuzvendra Chahal',
-            mostDots: 'Khaleel Ahmed',
-            mvp: 'Virat Kohli',
-            uncappedMvp: 'Prabhsimran Singh',
-            fairPlay: 'DC',
-            highestScoreTeam: 'MI',
-            striker: 'Finn Allen',
-            bestBowlingFigures: 'Varun Chakravarthy',
-            bestBowlingStrikeRate: 'Jasprit Bumrah',
-            mostCatches: 'Rinku Singh',
-            tableBottom: 'CSK',
-            leastMvp: 'Rishabh Pant'
-          }
-        }
-      }
-    ];
+    const DEFAULT_ROOM_SLUG = 'sp-cup-2026';
+    const WARROOM_FIXTURE_PATHS = {
+      'sp-cup-2026': 'fixtures/war_room_sp_cup_2026.json',
+      'draft-example': 'fixtures/war_room_draft_example.json'
+    };
+    let ACTIVE_ROOM = null;
+    let MATCHUPS = [];
 
     // ========= CATEGORY MAP =========
     const CATEGORIES = [
@@ -1973,14 +1894,155 @@ function titleBandScore(pick, live){
       return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
-    let activeId = MATCHUPS[0].id;
+    function getWarRoomModelApi(){
+      if (!window.WarRoomRoomModel) throw new Error('warroom-room-model.js is missing');
+      return window.WarRoomRoomModel;
+    }
+
+    function getRequestedRoomSlug(){
+      const params = new URLSearchParams(window.location.search);
+      const raw = params.get('room') || params.get('league') || params.get('slug') || DEFAULT_ROOM_SLUG;
+      return getWarRoomModelApi().normalizeSlug(raw) || DEFAULT_ROOM_SLUG;
+    }
+
+    function getRequestedDuelId(){
+      const params = new URLSearchParams(window.location.search);
+      const model = getWarRoomModelApi();
+      const raw = params.get('duel') || params.get('matchup') || params.get('battle') || '';
+      return model.normalizeSlug(raw) || null;
+    }
+
+    function buildWarRoomFixturePath(slug){
+      return WARROOM_FIXTURE_PATHS[slug] || `fixtures/${slug}.json`;
+    }
+
+    function updateWarRoomHeader(room){
+      const titleEl = document.getElementById('leagueTitle');
+      const subtitleEl = document.getElementById('leagueSubtitle');
+      const pillEl = document.getElementById('leaguePill');
+      if (!room) {
+        titleEl.textContent = 'IPL 2026 Prediction War Room';
+        subtitleEl.textContent = 'Live tracker for the season-long nonsense, delusion, and occasional genius. War room data failed to load, so the rivalry board is waiting on fixtures.';
+        pillEl.textContent = 'War Room: unavailable';
+        return;
+      }
+      const duelCount = Array.isArray(room.duels) ? room.duels.length : 0;
+      const liveCount = Array.isArray(room.duels) ? room.duels.filter((duel) => duel.state === 'locked').length : 0;
+      const waitingCount = Math.max(0, duelCount - liveCount);
+      const stateLabel = room.state === 'locked' ? 'sealed' : 'draft';
+      titleEl.textContent = `${room.name} War Room`;
+      subtitleEl.textContent = `${duelCount} duel${duelCount === 1 ? '' : 's'} • ${liveCount} live${waitingCount ? ` • ${waitingCount} waiting` : ''} • ${stateLabel} rivalry room. Each tab is its own sealed battle, not a shared league pick sheet.`;
+      pillEl.textContent = `War Room: ${room.name}`;
+    }
+
+    async function loadWarRoomData(){
+      try {
+        const slug = getRequestedRoomSlug();
+        const cacheBust = `t=${Date.now()}`;
+        const res = await fetch(`${buildWarRoomFixturePath(slug)}?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`Failed to fetch war room fixture: HTTP ${res.status}`);
+        const rawRoom = await res.json();
+        const model = getWarRoomModelApi();
+        const validation = model.validateWarRoomConfig(rawRoom, { requireCompletePicks: rawRoom?.state === 'locked' });
+        if (!validation.ok) throw new Error(`War room fixture validation failed: ${validation.errors.join(' | ')}`);
+        const effectiveSlug = model.normalizeSlug(rawRoom.slug || slug);
+        const adapter = model.createLocalWarRoomAdapter({ [effectiveSlug]: rawRoom });
+        ACTIVE_ROOM = adapter.loadWarRoomBySlug(effectiveSlug);
+        MATCHUPS = adapter.buildMatchups(ACTIVE_ROOM);
+        const requestedDuelId = getRequestedDuelId();
+        activeId = MATCHUPS.find((m) => m.id === requestedDuelId)?.id || MATCHUPS[0]?.id || null;
+        updateWarRoomHeader(ACTIVE_ROOM);
+      } catch (err) {
+        console.error('War room data load failed:', err);
+        ACTIVE_ROOM = null;
+        MATCHUPS = [];
+        activeId = null;
+        updateWarRoomHeader(null);
+      }
+    }
+
+    function setRequestedDuelIdInUrl(duelId){
+      if (!ACTIVE_ROOM || !duelId) return;
+      const params = new URLSearchParams(window.location.search);
+      params.set('room', ACTIVE_ROOM.slug || DEFAULT_ROOM_SLUG);
+      params.set('duel', duelId);
+      const next = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, '', next);
+    }
+
+    function renderEmptyWarRoomState(){
+      document.getElementById('scoreboard').innerHTML = `
+        <div class="player-box" style="grid-column:1 / -1;min-height:120px;display:flex;flex-direction:column;justify-content:center">
+          <div class="player-name">War room data unavailable</div>
+          <div class="small">No duel fixture could be loaded yet. Check the requested room slug or fixture file.</div>
+        </div>`;
+      document.getElementById('nextMatchMeta').textContent = 'Next match still uses the shared league-stage schedule.';
+      document.getElementById('nextMatchTeams').textContent = '--';
+      document.getElementById('nextMatchVenue').textContent = '--';
+      document.getElementById('nextMatchImpact').textContent = 'Load a valid war room fixture to calculate rivalry-specific swing points.';
+      document.getElementById('breakdownTable').innerHTML = `<thead><tr><th>Category</th><th>War room status</th></tr></thead><tbody><tr><td colspan="2">No rivalry board can be rendered until a valid war room fixture is loaded.</td></tr></tbody>`;
+      document.getElementById('insights').innerHTML = '<div class="insight">War room fixture did not load, so the smart insights are keeping their powder dry.</div>';
+      document.getElementById('roasts').innerHTML = '<div class="insight roast">No war room loaded, no roast served. Even the banter has standards.</div>';
+      document.getElementById('metricOverall').textContent = '—';
+      document.getElementById('metricFronts').textContent = '—';
+      document.getElementById('metricWinner').textContent = 'Waiting';
+      document.getElementById('metricConfidence').textContent = '—';
+      document.getElementById('metricLead').textContent = 'Need a valid war room fixture before the scoreboard can breathe.';
+      document.getElementById('metricWinnerNote').textContent = 'No loaded duel yet.';
+      document.getElementById('metricConfidenceNote').textContent = 'Confidence comes after data.';
+      document.getElementById('clutchHeadline').textContent = 'Recent momentum is still loading';
+      document.getElementById('clutchNote').textContent = 'Need a valid war room fixture before recent-form tracking means anything.';
+      resetWormGraph();
+    }
+
+    function renderPendingDuelState(matchup){
+      const stateLabel = matchup?.state === 'locked' ? 'Live' : 'Waiting on picks';
+      document.getElementById('scoreboard').innerHTML = `
+        <div class="player-box">
+          <div class="player-name">${escapeHtml(matchup.a.name)}</div>
+          <div class="big-score lead">—</div>
+          <div class="small">This side has not sealed the battle yet.</div>
+        </div>
+        <div class="vs">VS<div class="small" style="margin-top:8px">${escapeHtml(stateLabel)}</div></div>
+        <div class="player-box">
+          <div class="player-name">${escapeHtml(matchup.b.name)}</div>
+          <div class="big-score trail">—</div>
+          <div class="small">No score until both rivals lock their cards.</div>
+        </div>`;
+      document.getElementById('nextMatchMeta').textContent = 'This duel is not live yet.';
+      document.getElementById('nextMatchTeams').textContent = `${matchup.a.name} vs ${matchup.b.name}`;
+      document.getElementById('nextMatchVenue').textContent = 'State: waiting for both submissions';
+      document.getElementById('nextMatchImpact').textContent = 'Once both rivals submit and lock their picks, this tab becomes a live battle board.';
+      document.getElementById('breakdownTable').innerHTML = `<thead><tr><th>Category</th><th>Duel state</th></tr></thead><tbody><tr><td colspan="2">This duel is waiting for both pick sheets to be locked before live scoring begins.</td></tr></tbody>`;
+      document.getElementById('insights').innerHTML = '<div class="insight">No live insights yet. The duel wakes up the second both sides lock in.</div>';
+      document.getElementById('roasts').innerHTML = '<div class="insight roast">No roast yet. Even chaos needs two signed consent forms.</div>';
+      document.getElementById('metricOverall').textContent = '—';
+      document.getElementById('metricFronts').textContent = '—';
+      document.getElementById('metricWinner').textContent = 'Pending';
+      document.getElementById('metricConfidence').textContent = '—';
+      document.getElementById('metricLead').textContent = 'Both rivals need to submit before the duel goes live.';
+      document.getElementById('metricWinnerNote').textContent = 'No winner call until both pick sheets are sealed.';
+      document.getElementById('metricConfidenceNote').textContent = 'Confidence is zero until the tab is live.';
+      document.getElementById('clutchHeadline').textContent = 'Clutch tracker starts once this duel is live';
+      document.getElementById('clutchNote').textContent = 'No completed-match momentum exists for a duel that is still waiting on picks.';
+      resetWormGraph();
+    }
+
+    function renderEmptyLeagueState(){
+      renderEmptyWarRoomState();
+    }
+
+    let activeId = null;
     let activeView = 'warroom';
     let activeStatsKey = 'orangeCap';
 
     function renderTabs(){
       const el = document.getElementById('tabs');
       const tabs = [
-        ...MATCHUPS.map(m => ({ key: m.id, label: m.label, type: 'matchup' })),
+        ...MATCHUPS.map(m => ({ key: m.id, label: m.label + (m.state !== 'locked' ? ' (Waiting)' : ''), type: 'matchup' })),
         { key:'stats', label:'Nerd Room', type:'stats' },
         { key:'schedule', label:'Schedule', type:'schedule' }
       ];
@@ -1998,6 +2060,7 @@ function titleBandScore(pick, live){
           } else {
             activeId = key;
             activeView = 'warroom';
+            setRequestedDuelIdInUrl(key);
           }
           render();
         };
@@ -2766,6 +2829,26 @@ function titleBandScore(pick, live){
       renderStatsTab();
       renderScheduleTab();
       const matchup = MATCHUPS.find(m => m.id === activeId) || MATCHUPS[0];
+      if (!matchup) {
+        renderEmptyWarRoomState();
+        const updatedAt = LIVE_2026.fetchedAt ? new Date(LIVE_2026.fetchedAt) : new Date();
+        document.getElementById('updatedPill').textContent = `Last updated: ${new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(updatedAt)}`;
+        const nextPlannedAtRaw = LIVE_2026?.meta?.scheduler?.nextPlannedRefreshAt;
+        document.getElementById('nextUpdatePill').textContent = nextPlannedAtRaw
+          ? `Next planned update: ${new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(new Date(nextPlannedAtRaw))}`
+          : 'Next planned update: --';
+        return;
+      }
+      if (matchup.state && matchup.state !== 'locked') {
+        renderPendingDuelState(matchup);
+        const updatedAt = LIVE_2026.fetchedAt ? new Date(LIVE_2026.fetchedAt) : new Date();
+        document.getElementById('updatedPill').textContent = `Last updated: ${new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(updatedAt)}`;
+        const nextPlannedAtRaw = LIVE_2026?.meta?.scheduler?.nextPlannedRefreshAt;
+        document.getElementById('nextUpdatePill').textContent = nextPlannedAtRaw
+          ? `Next planned update: ${new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(new Date(nextPlannedAtRaw))}`
+          : 'Next planned update: --';
+        return;
+      }
       const { rows, totalA, totalB } = computeMatchup(matchup);
       renderScoreboard(matchup, totalA, totalB);
       renderNextMatch(matchup);
@@ -2853,6 +2936,7 @@ function titleBandScore(pick, live){
       render();
     }
 
+    loadWarRoomData().finally(() => render());
     loadScheduleData().finally(() => render());
     loadLiveData();
   </script>

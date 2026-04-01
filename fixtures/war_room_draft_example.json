@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "id": "draft-example",
+  "slug": "draft-example",
+  "name": "Draft Example",
+  "templateId": "rivalry-war-room-v1",
+  "visibility": "unlisted",
+  "state": "draft",
+  "createdBy": "arun",
+  "settings": {
+    "enableRoasts": true,
+    "enableInsights": true,
+    "enableClutch": true,
+    "enableWormGraph": true
+  },
+  "duels": [
+    {
+      "id": "arun-bala",
+      "label": "Arun vs Bala",
+      "state": "draft",
+      "a": {
+        "id": "arun-bala-arun",
+        "displayName": "Arun",
+        "ownerId": "arun",
+        "picks": {
+          "titleWinner": "MI",
+          "orangeCap": "Virat Kohli"
+        }
+      },
+      "b": {
+        "id": "arun-bala-bala",
+        "displayName": "Bala",
+        "ownerId": "bala",
+        "picks": {}
+      }
+    }
+  ]
+}

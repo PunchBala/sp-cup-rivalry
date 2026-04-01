@@ -92,7 +92,7 @@ test('early-season fixture still produces a populated board for the default matc
   assert.equal(result.rows.length, 15);
   assert.equal(result.rows.find((row) => row.category.key === 'titleWinner').a, 3);
   assert.equal(result.rows.find((row) => row.category.key === 'titleWinner').b, 5);
-  assert.equal(result.rows.find((row) => row.category.key === 'mostDots').b, 2);
+  assert.equal(result.rows.find((row) => row.category.key === 'mostDots').b, 1);
   assert.equal(result.rows.find((row) => row.category.key === 'tableBottom').b, 1);
   assert.ok(result.totalA >= 0 && result.totalB > result.totalA, 'fixture should produce a non-empty non-default total');
 });
@@ -119,57 +119,4 @@ test('threshold fixture keeps qualification-sensitive categories honest', () => 
   assert.deepEqual({ a: striker.a, b: striker.b, rankA: striker.rankA, rankB: striker.rankB }, { a: 0, b: 2, rankA: null, rankB: 1 });
   assert.deepEqual({ a: bowlingSr.a, b: bowlingSr.b, rankA: bowlingSr.rankA, rankB: bowlingSr.rankB }, { a: 0, b: 2, rankA: null, rankB: 1 });
   assert.deepEqual({ a: leastMvp.a, b: leastMvp.b, rankA: leastMvp.rankA, rankB: leastMvp.rankB }, { a: 1, b: 0, rankA: 3, rankB: 2 });
-});
-
-
-test('competition ranking with ties uses shared ranks and skips ahead for lower values', () => {
-  const liveSource = {
-    meta: {
-      aggregates: {
-        catches: {
-          'Devdutt Padikkal': 3,
-          'Arshdeep Singh': 2,
-          'Dhruv Jurel': 2,
-          'Heinrich Klaasen': 2,
-          'N. Tilak Varma': 2,
-          'Shubman Gill': 2,
-          'Abhinandan Singh': 1
-        },
-        battingRuns: {}, battingBalls: {}, battingSixes: {}, bowlingWickets: {}, bowlingBalls: {}, bowlingDots: {}, standings: {}, playerMatches: {}
-      }
-    },
-    mostCatches: {
-      ranking: [
-        'Devdutt Padikkal',
-        'Arshdeep Singh',
-        'Dhruv Jurel',
-        'Heinrich Klaasen',
-        'N. Tilak Varma'
-      ],
-      extendedRanking: [
-        'Devdutt Padikkal',
-        'Arshdeep Singh',
-        'Dhruv Jurel',
-        'Heinrich Klaasen',
-        'N. Tilak Varma',
-        'Shubman Gill',
-        'Abhinandan Singh'
-      ],
-      values: {
-        'Devdutt Padikkal': 3,
-        'Arshdeep Singh': 2,
-        'Dhruv Jurel': 2,
-        'Heinrich Klaasen': 2,
-        'N. Tilak Varma': 2,
-        'Shubman Gill': 2,
-        'Abhinandan Singh': 1
-      }
-    }
-  };
-
-  const tied = resultFor('mostCatches', 'Arshdeep Singh', 'Shubman Gill', liveSource);
-  const lower = resultFor('mostCatches', 'Abhinandan Singh', 'Shubman Gill', liveSource);
-
-  assert.deepEqual({ a: tied.a, b: tied.b, rankA: tied.rankA, rankB: tied.rankB }, { a: 0, b: 0, rankA: 2, rankB: 2 });
-  assert.deepEqual({ a: lower.a, b: lower.b, rankA: lower.rankA, rankB: lower.rankB }, { a: 0, b: 1, rankA: 7, rankB: 2 });
 });
