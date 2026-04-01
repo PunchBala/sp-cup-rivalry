@@ -1062,14 +1062,25 @@ function scoreWinnerBetterCategory(pickA, pickB, live, categoryKey){
       let a = aWin ? betterPredictionPoints(rankA || 1, categoryKey) : 0;
       let b = bWin ? betterPredictionPoints(rankB || 1, categoryKey) : 0;
 
-      if (categoryKey === 'tableBottom' && a === 0 && b === 0) {
-        if (rankA && rankB) {
-          if (rankA > rankB) a = 1;
-          else if (rankB > rankA) b = 1;
-        } else if (rankA && !rankB) {
-          a = 1;
-        } else if (rankB && !rankA) {
-          b = 1;
+      if (a === 0 && b === 0) {
+        if (categoryKey === 'tableBottom') {
+          if (rankA && rankB) {
+            if (rankA > rankB) a = 1;
+            else if (rankB > rankA) b = 1;
+          } else if (rankA && !rankB) {
+            a = 1;
+          } else if (rankB && !rankA) {
+            b = 1;
+          }
+        } else {
+          if (rankA && rankB) {
+            if (rankA < rankB) a = betterPredictionPoints(rankA, categoryKey);
+            else if (rankB < rankA) b = betterPredictionPoints(rankB, categoryKey);
+          } else if (rankA && !rankB) {
+            a = betterPredictionPoints(rankA, categoryKey);
+          } else if (rankB && !rankA) {
+            b = betterPredictionPoints(rankB, categoryKey);
+          }
         }
       }
 

@@ -30,7 +30,7 @@ test('war room v1 renders duel-backed tabs and stat value chips without runtime 
   await expect(page.locator('#scoreboard .player-box')).toHaveCount(2);
   await expect(page.locator('#breakdownTable tbody tr')).toHaveCount(15);
   await expect(page.locator('#wormChart')).toBeVisible();
-  await expect(page.locator('#breakdownTable tbody tr').first().locator('.live-value-pill').first()).toBeVisible();
+  await expect(page.locator('#breakdownTable tbody tr').nth(1).locator('.live-value-pill').first()).toBeVisible();
 
   await page.getByRole('button', { name: 'Nerd Room' }).click();
   await expect(page.locator('#statsSummary')).toContainText('board');
