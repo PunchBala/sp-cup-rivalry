@@ -121,7 +121,7 @@
     .roast-tag{flex:0 0 auto;display:inline-block;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
     .roast-tag.banter{background:rgba(124,196,255,.14);color:#bfe2ff}
     .roast-tag.extreme{background:rgba(255,127,150,.16);color:#ffd0d8}
-    .view-tabs{display:none}
+    .view-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
     .view-tab{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.18s}
     .view-tab.active{background:linear-gradient(180deg,rgba(84,138,255,.22),rgba(84,138,255,.1));border-color:rgba(123,167,255,.45);box-shadow:0 0 0 1px rgba(123,167,255,.18) inset}
     .section-hidden{display:none !important}
@@ -2614,6 +2614,12 @@ function titleBandScore(pick, live){
       return WARROOM_FIXTURE_PATHS[slug] || `fixtures/${slug}.json`;
     }
 
+    let requestedDuelMissing = false;
+
+    function activeMatchup(){
+      return MATCHUPS.find(m => m.id === activeId) || MATCHUPS[0] || null;
+    }
+
     function updateWarRoomHeader(room){
       const titleEl = document.getElementById('leagueTitle');
       const subtitleEl = document.getElementById('leagueSubtitle');
@@ -2629,7 +2635,7 @@ function titleBandScore(pick, live){
       const waitingCount = Math.max(0, duelCount - liveCount);
       const stateLabel = room.state === 'locked' ? 'sealed' : 'draft';
       titleEl.textContent = `${room.name} War Room`;
-      subtitleEl.textContent = `${duelCount} duel${duelCount === 1 ? '' : 's'} • ${liveCount} live${waitingCount ? ` • ${waitingCount} waiting` : ''} • ${stateLabel} rivalry room. Each tab is its own sealed battle, not a shared league pick sheet.`;
+      subtitleEl.textContent = `${duelCount} public duel${duelCount === 1 ? '' : 's'} • ${liveCount} live${waitingCount ? ` • ${waitingCount} waiting` : ''} • ${stateLabel} duel-first room. Each page view focuses on one sealed head-to-head battle, while the model still supports the same player appearing in different duels with different picks.`;
       pillEl.textContent = `War Room: ${room.name}`;
     }
 
@@ -2651,6 +2657,7 @@ function titleBandScore(pick, live){
         ACTIVE_ROOM = adapter.loadWarRoomBySlug(effectiveSlug);
         MATCHUPS = adapter.buildMatchups(ACTIVE_ROOM);
         const requestedDuelId = getRequestedDuelId();
+        requestedDuelMissing = Boolean(requestedDuelId) && !MATCHUPS.some((m) => m.id === requestedDuelId);
         activeId = MATCHUPS.find((m) => m.id === requestedDuelId)?.id || MATCHUPS[0]?.id || null;
         updateWarRoomHeader(ACTIVE_ROOM);
       } catch (err) {
@@ -2658,6 +2665,7 @@ function titleBandScore(pick, live){
         ACTIVE_ROOM = null;
         MATCHUPS = [];
         activeId = null;
+        requestedDuelMissing = false;
         updateWarRoomHeader(null);
       }
     }
@@ -2740,25 +2748,22 @@ function titleBandScore(pick, live){
     function renderTabs(){
       const el = document.getElementById('tabs');
       const tabs = [
-        ...MATCHUPS.map(m => ({ key: m.id, label: m.label + (m.state !== 'locked' ? ' (Waiting)' : ''), type: 'matchup' })),
+        { key:'warroom', label:'War Room', type:'warroom' },
         { key:'stats', label:'Nerd Room', type:'stats' },
         { key:'schedule', label:'Schedule', type:'schedule' }
       ];
       el.innerHTML = tabs.map(t => `
-        <button class="tab ${((t.type==='stats' && activeView==='stats') || (t.type==='schedule' && activeView==='schedule') || (t.type==='matchup' && activeView==='warroom' && t.key===activeId)) ? 'active' : ''}" data-key="${t.key}" data-type="${t.type}">${escapeHtml(t.label)}</button>
+        <button class="tab ${((t.type==='warroom' && activeView==='warroom') || (t.type==='stats' && activeView==='stats') || (t.type==='schedule' && activeView==='schedule')) ? 'active' : ''}" data-key="${t.key}" data-type="${t.type}">${escapeHtml(t.label)}</button>
       `).join('');
       el.querySelectorAll('.tab').forEach(btn => {
         btn.onclick = () => {
           const type = btn.dataset.type;
-          const key = btn.dataset.key;
-          if (type === 'stats') {
+          if (type === 'warroom') {
+            activeView = 'warroom';
+          } else if (type === 'stats') {
             activeView = 'stats';
           } else if (type === 'schedule') {
             activeView = 'schedule';
-          } else {
-            activeId = key;
-            activeView = 'warroom';
-            setRequestedDuelIdInUrl(key);
           }
           render();
         };
@@ -2767,7 +2772,20 @@ function titleBandScore(pick, live){
 
     function renderViewTabs(){
       const el = document.getElementById('viewTabs');
-      if (el) el.innerHTML = '';
+      if (!el) return;
+      const matchup = activeMatchup();
+      if (!ACTIVE_ROOM || !matchup) {
+        el.innerHTML = '';
+        return;
+      }
+      const waitingTag = matchup.state !== 'locked' ? ' • waiting on picks' : '';
+      const fallbackTag = requestedDuelMissing ? 'Requested duel was not found, so this page fell back to the first available duel.' : '';
+      el.innerHTML = `
+        <div class="pill">Active duel: ${escapeHtml(matchup.label || `${matchup.a.name} vs ${matchup.b.name}`)}${escapeHtml(waitingTag)}</div>
+        <div class="pill">Visibility: public duel page</div>
+        <div class="pill">Room: ${escapeHtml(ACTIVE_ROOM.name || ACTIVE_ROOM.slug || 'War Room')}</div>
+        ${fallbackTag ? `<div class="pill">${escapeHtml(fallbackTag)}</div>` : ''}
+      `;
     }
 
     function renderScoreboard(matchup, totalA, totalB){
@@ -3526,7 +3544,7 @@ function titleBandScore(pick, live){
       document.getElementById('scheduleSection').classList.toggle('section-hidden', activeView !== 'schedule');
       renderStatsTab();
       renderScheduleTab();
-      const matchup = MATCHUPS.find(m => m.id === activeId) || MATCHUPS[0];
+      const matchup = activeMatchup();
       if (!matchup) {
         renderEmptyWarRoomState();
         const updatedAt = LIVE_2026.fetchedAt ? new Date(LIVE_2026.fetchedAt) : new Date();
