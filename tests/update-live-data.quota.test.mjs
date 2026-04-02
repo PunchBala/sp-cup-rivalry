@@ -95,6 +95,9 @@ test('fallback retry is allowed for quota and invalid-key failures only', () => 
   const prefixedQuotaError = new Error('API error');
   prefixedQuotaError.api = { status: 'failure', reason: 'Blocking since hits today exceeded hits limit' };
 
+  const temporaryBlockError = new Error('API error');
+  temporaryBlockError.api = { status: 'failure', reason: 'Blocked for 15 minutes' };
+
   const invalidKeyError = new Error('API error');
   invalidKeyError.api = { status: 'failure', reason: 'invalid_api_key' };
 
@@ -104,6 +107,7 @@ test('fallback retry is allowed for quota and invalid-key failures only', () => 
   assert.equal(isCricketDataFallbackEligibleError(quotaError), true);
   assert.equal(isCricketDataFallbackEligibleError(spacedQuotaError), true);
   assert.equal(isCricketDataFallbackEligibleError(prefixedQuotaError), true);
+  assert.equal(isCricketDataFallbackEligibleError(temporaryBlockError), true);
   assert.equal(isCricketDataFallbackEligibleError(invalidKeyError), true);
   assert.equal(isCricketDataFallbackEligibleError(genericError), false);
 });
