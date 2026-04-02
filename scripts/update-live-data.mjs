@@ -9,6 +9,7 @@ const DATA_FILE = path.join(DATA_DIR, 'live.json');
 const SCHEDULE_FILE = path.join(ROOT, 'ipl_2026_schedule.json');
 
 const API_KEY = process.env.CRICKETDATA_API_KEY;
+const FORCE_REFRESH = parseEnvBool(process.env.CRICKETDATA_FORCE_REFRESH, false);
 const SERIES_ID = '87c62aac-bc3c-4738-ab93-19da0690488f';
 const SERIES_INFO_URL = `https://api.cricapi.com/v1/series_info?apikey=${API_KEY}&offset=0&id=${SERIES_ID}`;
 const SCORECARD_URL = (matchId) => `https://api.cricapi.com/v1/match_scorecard?apikey=${API_KEY}&offset=0&id=${matchId}`;
@@ -165,6 +166,19 @@ export function createScheduleDecision(scheduleEntries, currentValue) {
     reason: 'inside planned refresh window',
     nextPlannedAt: next ? next.toISOString() : null
   };
+}
+
+export function buildRefreshDecision(scheduleEntries, currentValue, options = {}) {
+  if (options.forceRefresh) {
+    const next = nextScheduledRefreshAt(scheduleEntries, currentValue);
+    return {
+      shouldRefresh: true,
+      mode: 'forced_refresh',
+      reason: 'forced refresh requested',
+      nextPlannedAt: next ? next.toISOString() : null
+    };
+  }
+  return createScheduleDecision(scheduleEntries, currentValue);
 }
 
 
@@ -1263,7 +1277,7 @@ async function main() {
   const scheduleEntries = await readLeagueStageSchedule();
   const now = new Date();
   const currentMs = now.getTime();
-  const decision = createScheduleDecision(scheduleEntries, now);
+  const decision = buildRefreshDecision(scheduleEntries, now, { forceRefresh: FORCE_REFRESH });
   live.meta.scheduler.lastDecision = { at: isoNow(), ...decision };
   live.meta.scheduler.nextPlannedRefreshAt = decision.nextPlannedAt || null;
   live.meta.scheduler.nextPlannedMode = decision.nextPlannedAt ? 'scheduled_window' : null;
@@ -1271,6 +1285,24 @@ async function main() {
   live.meta.scheduler.nextPlannedCalculatedAt = isoNow();
 
   if (!decision.shouldRefresh) {
+    live.fetchedAt = isoNow();
+    live.scrapeStatus = `skipped (${decision.mode}: ${decision.reason})`;
+    live.scrapeReport = {
+      costControl: {
+        ok: true,
+        source: 'worker',
+        method: 'scheduled league-stage windows, cached completed matches forever, capped backlog catch-up, throttled live scorecards',
+        skipped: true,
+        mode: decision.mode,
+        reason: decision.reason,
+        liveScorecardsEnabled: LIVE_SCORECARD_ENABLED,
+        liveScorecardIntervalMinutes: LIVE_SCORECARD_INTERVAL_MINUTES,
+        maxBacklogScorecardsPerRun: MAX_BACKLOG_SCORECARDS_PER_RUN,
+        scorecardCallsThisRun: live.meta.lastRun.scorecardCalls,
+        backlogRemaining: live.meta.lastRun.backlogRemaining
+      }
+    };
+    await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
     console.log(`Skip: ${decision.reason}`);
     return;
   }

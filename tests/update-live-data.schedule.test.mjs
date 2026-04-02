@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  buildRefreshDecision,
   buildScheduledRefreshInstants,
   createScheduleDecision,
   nextScheduledRefreshAt,
@@ -50,4 +51,13 @@ test('reports no future refresh once the league-stage plan is complete', () => {
   const decision = createScheduleDecision(schedule, afterFinal);
   assert.equal(decision.shouldRefresh, false);
   assert.equal(decision.mode, 'schedule_complete');
+});
+
+test('force refresh bypasses the scheduled bucket gate for manual workflow runs', () => {
+  const forced = buildRefreshDecision(schedule, new Date('2026-04-02T15:05:00Z'), { forceRefresh: true });
+
+  assert.equal(forced.shouldRefresh, true);
+  assert.equal(forced.mode, 'forced_refresh');
+  assert.equal(forced.reason, 'forced refresh requested');
+  assert.equal(forced.nextPlannedAt, '2026-04-02T18:00:00.000Z');
 });
