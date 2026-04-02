@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import {
   buildRefreshDecision,
   buildScheduledRefreshInstants,
+  canonicalPlayerPoolKey,
   createScheduleDecision,
+  needsScoreHistoryBackfill,
   nextScheduledRefreshAt,
   readLeagueStageSchedule
 } from '../scripts/update-live-data.mjs';
@@ -60,4 +62,25 @@ test('force refresh bypasses the scheduled bucket gate for manual workflow runs'
   assert.equal(forced.mode, 'forced_refresh');
   assert.equal(forced.reason, 'forced refresh requested');
   assert.equal(forced.nextPlannedAt, '2026-04-02T18:00:00.000Z');
+});
+
+test('uncapped MVP player-pool key normalizer handles provider spelling variants', () => {
+  assert.equal(canonicalPlayerPoolKey('Vaibhav Sooryavanshi'), 'vaibhav suryavanshi');
+  assert.equal(canonicalPlayerPoolKey('Vaibhav Suryavanshi'), 'vaibhav suryavanshi');
+});
+
+test('score-history backfill is required when a completed-game checkpoint is missing', () => {
+  const live = {
+    meta: {
+      processedMatchIds: ['m1', 'm2', 'm3', 'm4', 'm5', 'm6'],
+      scoreHistory: [
+        { processedMatchCount: 0, snapshot: {} },
+        { processedMatchCount: 2, snapshot: {} },
+        { processedMatchCount: 3, snapshot: {} },
+        { processedMatchCount: 4, snapshot: {} }
+      ]
+    }
+  };
+
+  assert.equal(needsScoreHistoryBackfill(live), true);
 });

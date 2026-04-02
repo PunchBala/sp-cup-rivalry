@@ -61,7 +61,11 @@ const UNCAPPED_MVP_PLAYERS = [
   'Aniket Verma', 'Smaran Ravichandran', 'Salil Arora', 'Harsh Dubey', 'Shivang Kumar', 'Krains Fuletra',
   'Zeeshan Ansari', 'Sakib Hussain', 'Onkar Tarmale', 'Amit Kumar', 'Praful Hinge'
 ];
-const UNCAPPED_MVP_PLAYER_KEYS = new Set(UNCAPPED_MVP_PLAYERS.map((name) => normalizePlayerKey(name)));
+const PLAYER_KEY_ALIASES = {
+  // Keep this tiny. Only canonicalize genuinely recurring data-provider variants.
+  'vaibhav sooryavanshi': 'vaibhav suryavanshi'
+};
+const UNCAPPED_MVP_PLAYER_KEYS = new Set(UNCAPPED_MVP_PLAYERS.map((name) => canonicalPlayerPoolKey(name)));
 
 const CRICMETRIC_MANUAL_NAME_ALIASES = {
   // Keep this tiny. Only use manual overrides for genuinely weird edge cases
@@ -187,6 +191,10 @@ function nowMs() { return Date.now(); }
 function safeArray(v) { return Array.isArray(v) ? v : []; }
 function normalizeName(name) { return String(name || '').replace(/\s+/g, ' ').trim(); }
 function normalizePlayerKey(name) { return normalizeName(name).toLowerCase().replace(/\./g, '').trim(); }
+export function canonicalPlayerPoolKey(name) {
+  const normalized = normalizePlayerKey(name);
+  return PLAYER_KEY_ALIASES[normalized] || normalized;
+}
 function minutesSince(iso, currentMs = Date.now()) { return iso ? (currentMs - Date.parse(iso)) / 60000 : Infinity; }
 
 function londonDayKey(ms = Date.now()) {
@@ -252,6 +260,7 @@ function createEmptyLive() {
       },
       cache: { seriesId: SERIES_ID, matchList: [] },
       processedMatchIds: [],
+      scoreHistory: [],
       aggregates: createEmptyAggregates(),
       liveOverlay: {
         matchId: null,
@@ -331,6 +340,7 @@ async function readExistingLive() {
         scheduler: { ...fresh.meta.scheduler, ...(parsed.meta?.scheduler || {}) },
         cache: { ...fresh.meta.cache, ...(parsed.meta?.cache || {}) },
         processedMatchIds: Array.isArray(parsed.meta?.processedMatchIds) ? parsed.meta.processedMatchIds : [],
+        scoreHistory: Array.isArray(parsed.meta?.scoreHistory) ? parsed.meta.scoreHistory : [],
         aggregates: { ...fresh.meta.aggregates, ...(parsed.meta?.aggregates || {}) },
         liveOverlay: { ...fresh.meta.liveOverlay, ...(parsed.meta?.liveOverlay || {}) },
         scorecardBudget: { ...fresh.meta.scorecardBudget, ...(parsed.meta?.scorecardBudget || {}) },
@@ -1073,6 +1083,90 @@ function buildMvpRanking(agg, dotsValues) {
   };
 }
 
+function cloneJson(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function createScoreHistorySnapshotFromAggregates(agg, baseLive = null) {
+  const snapshot = createEmptyLive();
+  snapshot.meta.aggregates = cloneJson(agg || createEmptyAggregates());
+  fillDerivedOutputs(
+    snapshot,
+    snapshot.meta.aggregates,
+    baseLive?.mostDots ? {
+      ranking: safeArray(baseLive.mostDots.ranking),
+      extendedRanking: safeArray(baseLive.mostDots.extendedRanking),
+      values: cloneJson(baseLive.mostDots.values || {})
+    } : null,
+    baseLive?.fairPlay ? {
+      winner: baseLive.fairPlay.winner || null,
+      ranking: safeArray(baseLive.fairPlay.ranking),
+      extendedRanking: safeArray(baseLive.fairPlay.extendedRanking),
+      values: cloneJson(baseLive.fairPlay.values || {}),
+      updatedAt: baseLive.fairPlay.updatedAt || null,
+      source: baseLive.fairPlay.source || null
+    } : null
+  );
+  return snapshot;
+}
+
+function historyEntryCount(entry) {
+  const count = Number(entry?.processedMatchCount ?? entry?.matchCount ?? entry?.completedMatches ?? entry?.processedMatches ?? 0);
+  return Number.isFinite(count) && count >= 0 ? count : 0;
+}
+
+export function needsScoreHistoryBackfill(live) {
+  const processedCount = safeArray(live?.meta?.processedMatchIds).length;
+  if (processedCount <= 0) return false;
+  const counts = new Set(safeArray(live?.meta?.scoreHistory).map((entry) => historyEntryCount(entry)));
+  if (!counts.has(0)) return true;
+  for (let count = 1; count < processedCount; count += 1) {
+    if (!counts.has(count)) return true;
+  }
+  return false;
+}
+
+function upsertScoreHistorySnapshot(live, processedMatchCount, fetchedAt = isoNow()) {
+  const existing = safeArray(live.meta.scoreHistory);
+  const byCount = new Map(existing.map((entry) => [historyEntryCount(entry), entry]));
+  if (!byCount.has(0)) {
+    byCount.set(0, {
+      processedMatchCount: 0,
+      fetchedAt,
+      snapshot: createEmptyLive()
+    });
+  }
+  byCount.set(processedMatchCount, {
+    processedMatchCount,
+    fetchedAt,
+    snapshot: createScoreHistorySnapshotFromAggregates(live.meta.aggregates, live)
+  });
+  live.meta.scoreHistory = Array.from(byCount.values()).sort((a, b) => historyEntryCount(a) - historyEntryCount(b));
+}
+
+async function rebuildHistoricalState(processedIds, baseLive = null, { includeHistory = false } = {}) {
+  const rebuilt = createEmptyAggregates();
+  const history = includeHistory ? [{
+    processedMatchCount: 0,
+    fetchedAt: baseLive?.meta?.scoreHistory?.find((entry) => historyEntryCount(entry) === 0)?.fetchedAt || null,
+    snapshot: createEmptyLive()
+  }] : null;
+
+  for (const matchId of processedIds) {
+    const scorecard = await processScorecard(matchId);
+    applyScorecardToAggregates(rebuilt, scorecard, { isFinal: true });
+    if (includeHistory) {
+      history.push({
+        processedMatchCount: history.length,
+        fetchedAt: isoNow(),
+        snapshot: createScoreHistorySnapshotFromAggregates(rebuilt, baseLive)
+      });
+    }
+  }
+
+  return includeHistory ? { aggregates: rebuilt, scoreHistory: history } : { aggregates: rebuilt };
+}
+
 function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = null) {
   const orange = sortByValueDesc(agg.battingRuns);
   const sixes = sortByValueDesc(agg.battingSixes);
@@ -1144,7 +1238,7 @@ function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = nul
     }
   };
 
-  const uncappedMvpExtendedRanking = mvpExtendedRanking.filter((player) => UNCAPPED_MVP_PLAYER_KEYS.has(normalizePlayerKey(player)));
+  const uncappedMvpExtendedRanking = mvpExtendedRanking.filter((player) => UNCAPPED_MVP_PLAYER_KEYS.has(canonicalPlayerPoolKey(player)));
   const uncappedMvpValues = Object.fromEntries(
     uncappedMvpExtendedRanking
       .filter((player) => mvp.values && mvp.values[player])
@@ -1238,15 +1332,6 @@ function needsHistoricalAggregateBackfill(live) {
   return criticalMaps.some((mapObj) => countKeys(mapObj) === 0);
 }
 
-async function rebuildHistoricalAggregates(processedIds) {
-  const rebuilt = createEmptyAggregates();
-  for (const matchId of processedIds) {
-    const scorecard = await processScorecard(matchId);
-    applyScorecardToAggregates(rebuilt, scorecard, { isFinal: true });
-  }
-  return rebuilt;
-}
-
 async function main() {
   if (!API_KEY) throw new Error('Missing CRICKETDATA_API_KEY environment variable');
 
@@ -1327,9 +1412,20 @@ async function main() {
   let finalizedAgg = live.meta.aggregates || createEmptyAggregates();
 
   const requiresHistoricalBackfill = needsHistoricalAggregateBackfill(live);
-  if (requiresHistoricalBackfill) {
-    finalizedAgg = await rebuildHistoricalAggregates(live.meta.processedMatchIds || []);
+  const requiresScoreHistoryBackfill = needsScoreHistoryBackfill(live);
+  if (requiresHistoricalBackfill || requiresScoreHistoryBackfill) {
+    const rebuiltState = await rebuildHistoricalState(
+      live.meta.processedMatchIds || [],
+      live,
+      { includeHistory: requiresScoreHistoryBackfill }
+    );
+    finalizedAgg = rebuiltState.aggregates;
+    if (requiresScoreHistoryBackfill) {
+      live.meta.scoreHistory = rebuiltState.scoreHistory;
+    }
     live.meta.lastRun.scorecardCalls += safeArray(live.meta.processedMatchIds).length;
+  }
+  if (requiresHistoricalBackfill) {
     live.meta.aggregateSchemaVersion = AGGREGATE_SCHEMA_VERSION;
   }
 
@@ -1502,6 +1598,7 @@ async function main() {
     setProviderStatusOk(live);
     live.fetchedAt = isoNow();
     live.scrapeStatus = `ok (${live.meta.processedMatchIds.length} processed matches${activeMatch ? ', live match tracked' : ''}, ${live.meta.lastRun.scorecardCalls} scorecard call${live.meta.lastRun.scorecardCalls === 1 ? '' : 's'} this run${backlogRemaining ? `, ${backlogRemaining} backlog remaining` : ''})`;
+    upsertScoreHistorySnapshot(live, live.meta.processedMatchIds.length, live.fetchedAt);
 
     await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
 
