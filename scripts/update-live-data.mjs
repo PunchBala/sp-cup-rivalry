@@ -9,10 +9,9 @@ const DATA_FILE = path.join(DATA_DIR, 'live.json');
 const SCHEDULE_FILE = path.join(ROOT, 'ipl_2026_schedule.json');
 
 const API_KEY = process.env.CRICKETDATA_API_KEY;
+const FALLBACK_API_KEY = process.env.CRICKETDATA_API_KEY_FALLBACK;
 const FORCE_REFRESH = parseEnvBool(process.env.CRICKETDATA_FORCE_REFRESH, false);
 const SERIES_ID = '87c62aac-bc3c-4738-ab93-19da0690488f';
-const SERIES_INFO_URL = `https://api.cricapi.com/v1/series_info?apikey=${API_KEY}&offset=0&id=${SERIES_ID}`;
-const SCORECARD_URL = (matchId) => `https://api.cricapi.com/v1/match_scorecard?apikey=${API_KEY}&offset=0&id=${matchId}`;
 
 const QUIET_REFRESHES_PER_DAY = 5;
 const QUIET_REFRESH_MINUTES = Math.floor((24 * 60) / QUIET_REFRESHES_PER_DAY);
@@ -80,6 +79,14 @@ function parseEnvBool(value, fallback = false) {
 function parseEnvInt(value, fallback) {
   const n = Number.parseInt(String(value ?? ''), 10);
   return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+function buildSeriesInfoUrl(apiKey) {
+  return `https://api.cricapi.com/v1/series_info?apikey=${apiKey}&offset=0&id=${SERIES_ID}`;
+}
+
+function buildScorecardUrl(apiKey, matchId) {
+  return `https://api.cricapi.com/v1/match_scorecard?apikey=${apiKey}&offset=0&id=${matchId}`;
 }
 
 
@@ -393,6 +400,25 @@ export function isCricketDataQuotaError(error) {
   return Boolean(parseCricketDataQuotaDetails(error));
 }
 
+function parseCricketDataFailureDetails(error) {
+  const payload = tryParseApiPayloadFromError(error);
+  if (!payload) return null;
+  return {
+    reason: String(payload.reason || 'provider_error'),
+    hitsToday: Number(payload.hitsToday ?? 0) || null,
+    hitsLimit: Number(payload.hitsLimit ?? 0) || null,
+    status: String(payload.status || 'failure'),
+    apikey: payload.apikey || null
+  };
+}
+
+export function isCricketDataFallbackEligibleError(error) {
+  const payload = tryParseApiPayloadFromError(error);
+  if (!payload) return false;
+  const reason = String(payload.reason || '').toLowerCase();
+  return reason === 'hits_today_exceeded_hits_limit' || reason === 'invalid_api_key';
+}
+
 function setProviderStatusOk(live) {
   live.meta.providerStatus = {
     ...(live.meta.providerStatus || {}),
@@ -433,6 +459,37 @@ function applyProviderDelayState(live, details) {
   };
 }
 
+function applyProviderSafeExitState(live, details) {
+  const failureAt = isoNow();
+  live.meta.providerStatus = {
+    ...(live.meta.providerStatus || {}),
+    state: details.reason === 'invalid_api_key' ? 'auth_error' : 'provider_error',
+    lastErrorAt: failureAt,
+    reason: details.reason,
+    hitsToday: details.hitsToday,
+    hitsLimit: details.hitsLimit
+  };
+
+  const lastGoodAt = live.fetchedAt ? new Date(live.fetchedAt).toISOString() : null;
+  const fallbackText = lastGoodAt ? `showing last good data from ${lastGoodAt}` : 'no previous successful live snapshot yet';
+  live.scrapeStatus = `delayed (CricketData ${details.reason}; ${fallbackText})`;
+  live.scrapeReport = {
+    ...(live.scrapeReport || {}),
+    costControl: {
+      ok: false,
+      source: 'worker',
+      method: 'provider fallback exhausted; kept previous live snapshot',
+      providerFailure: true,
+      reason: details.reason,
+      hitsToday: details.hitsToday,
+      hitsLimit: details.hitsLimit,
+      scorecardCallsThisRun: live.meta?.lastRun?.scorecardCalls || 0,
+      failoversThisRun: live.meta?.lastRun?.cricketDataFailovers || 0,
+      backlogRemaining: live.meta?.lastRun?.backlogRemaining || 0
+    }
+  };
+}
+
 async function fetchJson(url) {
   const res = await fetch(url, {
     headers: {
@@ -444,6 +501,45 @@ async function fetchJson(url) {
   const json = await res.json();
   if (json.status && json.status !== 'success') throw makeApiError(json);
   return json;
+}
+
+function cricketDataProviders() {
+  const providers = [];
+  if (API_KEY) providers.push({ key: API_KEY, tier: 'primary' });
+  if (FALLBACK_API_KEY && FALLBACK_API_KEY !== API_KEY) providers.push({ key: FALLBACK_API_KEY, tier: 'fallback' });
+  return providers;
+}
+
+async function fetchCricketDataJson(buildUrl, live) {
+  const providers = cricketDataProviders();
+  if (!providers.length) throw new Error('Missing CRICKETDATA_API_KEY environment variable');
+
+  let lastError = null;
+  for (let index = 0; index < providers.length; index += 1) {
+    const provider = providers[index];
+    try {
+      const json = await fetchJson(buildUrl(provider.key));
+      live.meta.providerStatus = {
+        ...(live.meta.providerStatus || {}),
+        activeKeyTier: provider.tier,
+        fallbackAvailable: providers.length > 1
+      };
+      return json;
+    } catch (error) {
+      lastError = error;
+      live.meta.providerStatus = {
+        ...(live.meta.providerStatus || {}),
+        activeKeyTier: provider.tier,
+        fallbackAvailable: providers.length > 1
+      };
+      const canFailOver = index < providers.length - 1 && isCricketDataFallbackEligibleError(error);
+      if (!canFailOver) throw error;
+      live.meta.lastRun.cricketDataFailovers = Number(live.meta.lastRun.cricketDataFailovers || 0) + 1;
+      live.meta.providerStatus.lastFallbackAt = isoNow();
+      live.meta.providerStatus.lastFallbackReason = tryParseApiPayloadFromError(error)?.reason || error.message || 'fallback-triggered';
+    }
+  }
+  throw lastError || new Error('CricketData request failed');
 }
 
 async function fetchText(url, extraHeaders = {}) {
@@ -1153,7 +1249,7 @@ async function rebuildHistoricalState(processedIds, baseLive = null, { includeHi
   }] : null;
 
   for (const matchId of processedIds) {
-    const scorecard = await processScorecard(matchId);
+    const scorecard = await processScorecard(matchId, baseLive);
     applyScorecardToAggregates(rebuilt, scorecard, { isFinal: true });
     if (includeHistory) {
       history.push({
@@ -1285,8 +1381,8 @@ function liveMatchCandidate(matchList) {
   return safeArray(matchList).find((m) => m.matchStarted && !m.matchEnded) || null;
 }
 
-async function processScorecard(matchId) {
-  const json = await fetchJson(SCORECARD_URL(matchId));
+async function processScorecard(matchId, live) {
+  const json = await fetchCricketDataJson((apiKey) => buildScorecardUrl(apiKey, matchId), live);
   return json.data;
 }
 
@@ -1333,7 +1429,7 @@ function needsHistoricalAggregateBackfill(live) {
 }
 
 async function main() {
-  if (!API_KEY) throw new Error('Missing CRICKETDATA_API_KEY environment variable');
+  if (!API_KEY && !FALLBACK_API_KEY) throw new Error('Missing CRICKETDATA_API_KEY environment variable');
 
   await ensureDataDir();
 
@@ -1352,11 +1448,16 @@ async function main() {
     backlogRemaining: 0,
     liveOverlayFetched: false,
     liveOverlayReused: false,
-    liveOverlaySkippedReason: null
+    liveOverlaySkippedReason: null,
+    cricketDataFailovers: 0
   };
   live.meta.providerStatus = {
     ...(live.meta.providerStatus || {}),
-    lastAttemptAt: isoNow()
+    lastAttemptAt: isoNow(),
+    activeKeyTier: live.meta?.providerStatus?.activeKeyTier || null,
+    fallbackAvailable: Boolean(FALLBACK_API_KEY && FALLBACK_API_KEY !== API_KEY),
+    lastFallbackAt: live.meta?.providerStatus?.lastFallbackAt || null,
+    lastFallbackReason: live.meta?.providerStatus?.lastFallbackReason || null
   };
 
   const scheduleEntries = await readLeagueStageSchedule();
@@ -1393,8 +1494,8 @@ async function main() {
   }
 
   try {
-    const seriesJson = await fetchJson(SERIES_INFO_URL);
-  live.meta.lastRun.seriesInfoCalls = 1;
+    const seriesJson = await fetchCricketDataJson((apiKey) => buildSeriesInfoUrl(apiKey), live);
+    live.meta.lastRun.seriesInfoCalls = 1;
 
   const matchList = safeArray(seriesJson.data?.matchList).map(toMinimalMatch);
   live.meta.cache.matchList = matchList;
@@ -1435,7 +1536,7 @@ async function main() {
   const activeMatch = liveMatchCandidate(matchList);
 
   for (const match of backlogToProcess) {
-    const scorecard = await processScorecard(match.id);
+    const scorecard = await processScorecard(match.id, live);
     live.meta.lastRun.scorecardCalls += 1;
     applyScorecardToAggregates(finalizedAgg, scorecard, { isFinal: true });
     processedIds.add(match.id);
@@ -1451,7 +1552,7 @@ async function main() {
   const liveScorecardDecision = shouldFetchLiveScorecard(live, activeMatch, currentMs);
 
   if (activeMatch && !processedIds.has(activeMatch.id) && liveScorecardDecision.fetch) {
-    const scorecard = await processScorecard(activeMatch.id);
+    const scorecard = await processScorecard(activeMatch.id, live);
     live.meta.lastRun.scorecardCalls += 1;
     live.meta.lastRun.liveOverlayFetched = true;
     overlayAgg = createEmptyAggregates();
@@ -1611,6 +1712,13 @@ async function main() {
       applyProviderDelayState(live, details);
       await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
       console.warn(`CricketData quota reached (${details.hitsToday}/${details.hitsLimit}). Keeping previous live snapshot.`);
+      return;
+    }
+    if (isCricketDataFallbackEligibleError(error)) {
+      const details = parseCricketDataFailureDetails(error) || { reason: 'provider_error', hitsToday: null, hitsLimit: null };
+      applyProviderSafeExitState(live, details);
+      await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
+      console.warn(`CricketData fallback exhausted (${details.reason}). Keeping previous live snapshot.`);
       return;
     }
     throw error;

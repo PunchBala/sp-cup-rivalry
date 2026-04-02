@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { isCricketDataQuotaError, parseCricketDataQuotaDetails } from '../scripts/update-live-data.mjs';
+import { isCricketDataFallbackEligibleError, isCricketDataQuotaError, parseCricketDataQuotaDetails } from '../scripts/update-live-data.mjs';
 
 test('detects quota exceeded errors from attached API payload', () => {
   const error = new Error('API error');
@@ -43,4 +43,19 @@ test('ignores non-quota API failures', () => {
 
   assert.equal(isCricketDataQuotaError(error), false);
   assert.equal(parseCricketDataQuotaDetails(error), null);
+});
+
+test('fallback retry is allowed for quota and invalid-key failures only', () => {
+  const quotaError = new Error('API error');
+  quotaError.api = { status: 'failure', reason: 'hits_today_exceeded_hits_limit' };
+
+  const invalidKeyError = new Error('API error');
+  invalidKeyError.api = { status: 'failure', reason: 'invalid_api_key' };
+
+  const genericError = new Error('API error');
+  genericError.api = { status: 'failure', reason: 'rate_limited' };
+
+  assert.equal(isCricketDataFallbackEligibleError(quotaError), true);
+  assert.equal(isCricketDataFallbackEligibleError(invalidKeyError), true);
+  assert.equal(isCricketDataFallbackEligibleError(genericError), false);
 });
