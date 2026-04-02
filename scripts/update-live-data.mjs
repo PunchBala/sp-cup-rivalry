@@ -385,9 +385,10 @@ function tryParseApiPayloadFromError(error) {
 export function parseCricketDataQuotaDetails(error) {
   const payload = tryParseApiPayloadFromError(error);
   if (!payload) return null;
-  if (String(payload?.reason || '') !== 'hits_today_exceeded_hits_limit') return null;
+  const normalizedReason = String(payload?.reason || '').toLowerCase().replace(/\s+/g, '_');
+  if (normalizedReason !== 'hits_today_exceeded_hits_limit') return null;
   return {
-    reason: payload.reason,
+    reason: normalizedReason,
     hitsToday: Number(payload.hitsToday ?? 0) || null,
     hitsUsed: Number(payload.hitsUsed ?? 0) || null,
     hitsLimit: Number(payload.hitsLimit ?? 0) || null,
@@ -415,7 +416,7 @@ function parseCricketDataFailureDetails(error) {
 export function isCricketDataFallbackEligibleError(error) {
   const payload = tryParseApiPayloadFromError(error);
   if (!payload) return false;
-  const reason = String(payload.reason || '').toLowerCase();
+  const reason = String(payload.reason || '').toLowerCase().replace(/\s+/g, '_');
   return reason === 'hits_today_exceeded_hits_limit' || reason === 'invalid_api_key';
 }
 

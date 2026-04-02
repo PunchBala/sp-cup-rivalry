@@ -34,6 +34,21 @@ test('detects quota exceeded errors from legacy error messages', () => {
   assert.equal(parseCricketDataQuotaDetails(error)?.hitsLimit, 100);
 });
 
+test('detects quota exceeded errors when the provider returns spaced reason text', () => {
+  const error = new Error('API error');
+  error.api = {
+    apikey: '***',
+    hitsToday: 103,
+    hitsUsed: 1,
+    hitsLimit: 100,
+    status: 'failure',
+    reason: 'hits today exceeded hits limit'
+  };
+
+  assert.equal(isCricketDataQuotaError(error), true);
+  assert.equal(parseCricketDataQuotaDetails(error)?.reason, 'hits_today_exceeded_hits_limit');
+});
+
 test('ignores non-quota API failures', () => {
   const error = new Error('API error');
   error.api = {
@@ -49,6 +64,9 @@ test('fallback retry is allowed for quota and invalid-key failures only', () => 
   const quotaError = new Error('API error');
   quotaError.api = { status: 'failure', reason: 'hits_today_exceeded_hits_limit' };
 
+  const spacedQuotaError = new Error('API error');
+  spacedQuotaError.api = { status: 'failure', reason: 'hits today exceeded hits limit' };
+
   const invalidKeyError = new Error('API error');
   invalidKeyError.api = { status: 'failure', reason: 'invalid_api_key' };
 
@@ -56,6 +74,7 @@ test('fallback retry is allowed for quota and invalid-key failures only', () => 
   genericError.api = { status: 'failure', reason: 'rate_limited' };
 
   assert.equal(isCricketDataFallbackEligibleError(quotaError), true);
+  assert.equal(isCricketDataFallbackEligibleError(spacedQuotaError), true);
   assert.equal(isCricketDataFallbackEligibleError(invalidKeyError), true);
   assert.equal(isCricketDataFallbackEligibleError(genericError), false);
 });
