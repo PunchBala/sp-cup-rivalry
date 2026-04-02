@@ -382,16 +382,24 @@ function tryParseApiPayloadFromError(error) {
   }
 }
 
+function normalizeCricketDataReason(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
 export function parseCricketDataQuotaDetails(error) {
   const payload = tryParseApiPayloadFromError(error);
   if (!payload) return null;
-  const normalizedReason = String(payload?.reason || '').toLowerCase().replace(/\s+/g, '_');
-  if (normalizedReason !== 'hits_today_exceeded_hits_limit') return null;
+  const normalizedReason = normalizeCricketDataReason(payload?.reason);
+  if (!normalizedReason.includes('hits_today_exceeded_hits_limit')) return null;
+  const info = payload?.info && typeof payload.info === 'object' ? payload.info : {};
   return {
-    reason: normalizedReason,
-    hitsToday: Number(payload.hitsToday ?? 0) || null,
-    hitsUsed: Number(payload.hitsUsed ?? 0) || null,
-    hitsLimit: Number(payload.hitsLimit ?? 0) || null,
+    reason: 'hits_today_exceeded_hits_limit',
+    hitsToday: Number(payload.hitsToday ?? info.hitsToday ?? 0) || null,
+    hitsUsed: Number(payload.hitsUsed ?? info.hitsUsed ?? 0) || null,
+    hitsLimit: Number(payload.hitsLimit ?? info.hitsLimit ?? 0) || null,
     status: String(payload.status || 'failure'),
     apikey: payload.apikey || null
   };
@@ -404,10 +412,11 @@ export function isCricketDataQuotaError(error) {
 function parseCricketDataFailureDetails(error) {
   const payload = tryParseApiPayloadFromError(error);
   if (!payload) return null;
+  const info = payload?.info && typeof payload.info === 'object' ? payload.info : {};
   return {
-    reason: String(payload.reason || 'provider_error'),
-    hitsToday: Number(payload.hitsToday ?? 0) || null,
-    hitsLimit: Number(payload.hitsLimit ?? 0) || null,
+    reason: normalizeCricketDataReason(payload.reason || 'provider_error'),
+    hitsToday: Number(payload.hitsToday ?? info.hitsToday ?? 0) || null,
+    hitsLimit: Number(payload.hitsLimit ?? info.hitsLimit ?? 0) || null,
     status: String(payload.status || 'failure'),
     apikey: payload.apikey || null
   };
@@ -416,8 +425,8 @@ function parseCricketDataFailureDetails(error) {
 export function isCricketDataFallbackEligibleError(error) {
   const payload = tryParseApiPayloadFromError(error);
   if (!payload) return false;
-  const reason = String(payload.reason || '').toLowerCase().replace(/\s+/g, '_');
-  return reason === 'hits_today_exceeded_hits_limit' || reason === 'invalid_api_key';
+  const reason = normalizeCricketDataReason(payload.reason || '');
+  return reason.includes('hits_today_exceeded_hits_limit') || reason === 'invalid_api_key';
 }
 
 function setProviderStatusOk(live) {
