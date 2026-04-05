@@ -605,6 +605,8 @@
   </div>
 
   <script src="warroom-room-model.js"></script>
+  <script src="duels-backend.config.js"></script>
+  <script src="duels-backend.js"></script>
   <script>
     const SEASON = 2026;
     const SERIES_TAG = 'IPL 2026';
@@ -629,6 +631,8 @@
     let MATCHUPS = [];
     let CURRENT_USER = null;
     let CUSTOM_DUEL_STORE = { version: 1, rooms: {} };
+    let REMOTE_DUEL_STORE = { version: 1, rooms: {} };
+    const DUELS_BACKEND = window.DUELS_BACKEND_API || window.createDuelsBackend?.(window.DUELS_BACKEND_CONFIG || {}) || { enabled: false, label: 'Local beta storage' };
     let DUEL_STUDIO_NOTICE = null;
     let IPL_SQUADS = {};
     let ACTIVE_PICKER_STATE = {
@@ -3154,8 +3158,16 @@ function titleBandScore(pick, live){
       const model = getWarRoomModelApi();
       const displayName = model.normalizeWhitespace(profile.displayName || profile.name || '');
       const ownerId = model.normalizeSlug(profile.ownerId || profile.handle || displayName || '');
+      const userId = model.normalizeWhitespace(profile.userId || profile.id || '');
+      const email = model.normalizeWhitespace(profile.email || '');
       if (!displayName || !ownerId) return null;
-      return { displayName, ownerId };
+      return {
+        displayName,
+        ownerId,
+        userId: userId || null,
+        email: email || null,
+        authSource: model.normalizeWhitespace(profile.authSource || profile.source || 'local') || 'local'
+      };
     }
 
     function loadStoredUserProfile(){
@@ -3175,6 +3187,14 @@ function titleBandScore(pick, live){
       CURRENT_USER = null;
     }
 
+    function usesHostedDuelsBackend(){
+      return Boolean(DUELS_BACKEND?.enabled);
+    }
+
+    function currentAuthLabel(){
+      return usesHostedDuelsBackend() ? (DUELS_BACKEND.label || 'Hosted backend') : 'Local beta storage';
+    }
+
     function loadStoredCustomDuels(){
       const raw = readStoredJson(LOCAL_CUSTOM_DUELS_STORAGE_KEY, EMPTY_CUSTOM_DUEL_STORE);
       if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return emptyCustomDuelStore();
@@ -3192,6 +3212,44 @@ function titleBandScore(pick, live){
 
     function persistStoredCustomDuels(){
       writeStoredJson(LOCAL_CUSTOM_DUELS_STORAGE_KEY, CUSTOM_DUEL_STORE);
+    }
+
+    function remoteBundlesForRoom(roomSlug){
+      const slug = getWarRoomModelApi().normalizeSlug(roomSlug || '');
+      return cloneJson(REMOTE_DUEL_STORE.rooms?.[slug]?.bundles || []);
+    }
+
+    function setRemoteBundlesForRoom(roomSlug, bundles = [], roomReference = BASE_ROOM){
+      const slug = getWarRoomModelApi().normalizeSlug(roomSlug || '');
+      if (!slug) return [];
+      const nextStore = cloneJson(REMOTE_DUEL_STORE || emptyCustomDuelStore());
+      if (!nextStore.rooms) nextStore.rooms = {};
+      nextStore.rooms[slug] = {
+        bundles: (Array.isArray(bundles) ? bundles : [])
+          .map((bundle) => normalizeCustomDuelBundle({ ...cloneJson(bundle), source: 'backend' }, roomReference))
+          .filter(Boolean)
+      };
+      REMOTE_DUEL_STORE = nextStore;
+      return cloneJson(REMOTE_DUEL_STORE.rooms[slug].bundles);
+    }
+
+    function upsertRemoteBundle(bundle, roomReference = BASE_ROOM){
+      const normalized = normalizeCustomDuelBundle({ ...cloneJson(bundle), source: 'backend' }, roomReference);
+      if (!normalized) return null;
+      const roomSlug = normalized.roomSlug;
+      const duelId = normalized.duelRecord.id;
+      const nextStore = cloneJson(REMOTE_DUEL_STORE || emptyCustomDuelStore());
+      if (!nextStore.rooms) nextStore.rooms = {};
+      if (!nextStore.rooms[roomSlug]) nextStore.rooms[roomSlug] = { bundles: [] };
+      nextStore.rooms[roomSlug].bundles = (nextStore.rooms[roomSlug].bundles || []).filter((entry) => normalizeOwnerId(entry?.duelRecord?.id) !== duelId);
+      nextStore.rooms[roomSlug].bundles.push(normalized);
+      REMOTE_DUEL_STORE = nextStore;
+      return normalized;
+    }
+
+    function localCustomBundlesForRoom(roomSlug){
+      const slug = getWarRoomModelApi().normalizeSlug(roomSlug || '');
+      return cloneJson(CUSTOM_DUEL_STORE.rooms?.[slug]?.bundles || []);
     }
 
     function setStudioNotice(type, text){
@@ -3294,6 +3352,8 @@ function titleBandScore(pick, live){
       if (!duelRecord) return null;
       const entryRecords = (normalizedRoom.entryRecords || []).filter((entry) => model.normalizeSlug(entry.duelId) === model.normalizeSlug(duelRecord.id));
       return {
+        source: bundle.source || 'local',
+        backendProvider: bundle.backendProvider || null,
         roomSlug: normalizedRoom.slug,
         duelRecord: cloneJson(duelRecord),
         entryRecords: entryRecords.map((entry) => cloneJson(entry))
@@ -3301,14 +3361,22 @@ function titleBandScore(pick, live){
     }
 
     function customBundlesForRoom(roomSlug){
-      const slug = getWarRoomModelApi().normalizeSlug(roomSlug || '');
-      return cloneJson(CUSTOM_DUEL_STORE.rooms?.[slug]?.bundles || []);
+      return [
+        ...localCustomBundlesForRoom(roomSlug),
+        ...remoteBundlesForRoom(roomSlug)
+      ];
     }
 
     function findCustomBundleByDuelId(roomSlug, duelId){
       const model = getWarRoomModelApi();
       const targetDuelId = model.normalizeSlug(duelId || '');
       return customBundlesForRoom(roomSlug).find((bundle) => model.normalizeSlug(bundle?.duelRecord?.id) === targetDuelId) || null;
+    }
+
+    function findLocalCustomBundleByDuelId(roomSlug, duelId){
+      const model = getWarRoomModelApi();
+      const targetDuelId = model.normalizeSlug(duelId || '');
+      return localCustomBundlesForRoom(roomSlug).find((bundle) => model.normalizeSlug(bundle?.duelRecord?.id) === targetDuelId) || null;
     }
 
     function upsertCustomBundle(bundle, roomReference = BASE_ROOM){
@@ -3410,6 +3478,21 @@ function titleBandScore(pick, live){
         : (activeId && MATCHUPS.some((matchup) => matchup.id === activeId) ? activeId : MATCHUPS[0]?.id || null);
       activeId = nextActiveId;
       updateWarRoomHeader(ACTIVE_ROOM);
+    }
+
+    async function syncRemoteBundlesForRoom(roomSlug, roomReference = BASE_ROOM){
+      if (!usesHostedDuelsBackend()) return [];
+      const slug = getWarRoomModelApi().normalizeSlug(roomSlug || roomReference?.slug || '');
+      if (!slug) return [];
+      try {
+        const bundles = await DUELS_BACKEND.listPublicBundles(slug);
+        return setRemoteBundlesForRoom(slug, bundles, roomReference);
+      } catch (error) {
+        console.error('Hosted duel load failed:', error);
+        setStudioNotice('bad', `Could not load hosted public duels from ${currentAuthLabel()}. The shipped fixture and local fallbacks are still available.`);
+        setRemoteBundlesForRoom(slug, [], roomReference);
+        return [];
+      }
     }
 
     function importSharedBundleIntoCurrentRoom(roomReference = BASE_ROOM){
@@ -3643,6 +3726,7 @@ function titleBandScore(pick, live){
         const effectiveSlug = model.normalizeSlug(rawRoom.slug || slug);
         BASE_ROOM = model.normalizeWarRoomConfig({ ...rawRoom, slug: effectiveSlug });
         const sharedBundle = importSharedBundleIntoCurrentRoom(BASE_ROOM);
+        await syncRemoteBundlesForRoom(BASE_ROOM.slug, BASE_ROOM);
         const requestedDuelId = getRequestedDuelId();
         refreshMergedRoom(sharedBundle?.duelRecord?.id || requestedDuelId);
         requestedDuelMissing = Boolean(requestedDuelId) && !MATCHUPS.some((m) => m.id === requestedDuelId);
@@ -3652,7 +3736,7 @@ function titleBandScore(pick, live){
           const liveCount = Array.isArray(ACTIVE_ROOM.duels) ? ACTIVE_ROOM.duels.filter((duel) => duel.state === 'locked').length : 0;
           const waitingCount = Math.max(0, duelCount - liveCount);
           const stateLabel = ACTIVE_ROOM.state === 'locked' ? 'sealed' : 'draft';
-          document.getElementById('leagueSubtitle').textContent = `${duelCount} public duel${duelCount === 1 ? '' : 's'} • ${liveCount} live${waitingCount ? ` • ${waitingCount} waiting` : ''} • ${stateLabel} duel-first room. Browse every public duel from the directory, then drop into one deep-linked head-to-head battle at a time while the same player can still carry different picks in different duels.`;
+          document.getElementById('leagueSubtitle').textContent = `${duelCount} public duel${duelCount === 1 ? '' : 's'} - ${liveCount} live${waitingCount ? ` - ${waitingCount} waiting` : ''} - ${stateLabel} duel-first room. Browse every public duel from the directory, then drop into one deep-linked head-to-head battle at a time while the same player can still carry different picks in different duels.`;
         }
         if (ACTIVE_ROOM) updateWarRoomHeader(ACTIVE_ROOM);
       } catch (err) {
@@ -3671,12 +3755,9 @@ function titleBandScore(pick, live){
       const params = new URLSearchParams(window.location.search);
       params.set('room', ACTIVE_ROOM.slug || DEFAULT_ROOM_SLUG);
       params.set('duel', duelId);
-      const customBundle = findCustomBundleByDuelId(ACTIVE_ROOM.slug, duelId);
-      if (customBundle) {
-        params.set('share', encodeBase64Url(JSON.stringify(customBundle)));
-      } else {
-        params.delete('share');
-      }
+      const localBundle = findLocalCustomBundleByDuelId(ACTIVE_ROOM.slug, duelId);
+      if (localBundle) params.set('share', encodeBase64Url(JSON.stringify(localBundle)));
+      else params.delete('share');
       const next = `${window.location.pathname}?${params.toString()}`;
       window.history.replaceState({}, '', next);
     }
@@ -3690,7 +3771,7 @@ function titleBandScore(pick, live){
       render();
     }
 
-    function createCustomDuel(opponentName, opponentOwnerId){
+    async function createCustomDuel(opponentName, opponentOwnerId){
       if (!CURRENT_USER || !ACTIVE_ROOM) return null;
       const model = getWarRoomModelApi();
       const roomSlug = ACTIVE_ROOM.slug || BASE_ROOM?.slug || DEFAULT_ROOM_SLUG;
@@ -3701,6 +3782,24 @@ function titleBandScore(pick, live){
       }
       const duelId = nextCustomDuelId(`${CURRENT_USER.displayName} vs ${safeOpponentName}`, roomSlug);
       const now = new Date().toISOString();
+      if (usesHostedDuelsBackend()) {
+        const remoteBundle = await DUELS_BACKEND.createPublicDuel({
+          roomSlug,
+          duelSlug: duelId,
+          opponentName: safeOpponentName,
+          opponentOwnerId: invitedOwnerId,
+          currentUser: CURRENT_USER
+        });
+        const storedRemote = upsertRemoteBundle(syncBundleDerivedState(remoteBundle), BASE_ROOM || ACTIVE_ROOM);
+        refreshMergedRoom(storedRemote?.duelRecord?.id || duelId);
+        requestedDuelMissing = false;
+        activeView = 'warroom';
+        setRequestedDuelIdInUrl(storedRemote?.duelRecord?.id || duelId);
+        setStudioNotice('good', invitedOwnerId
+          ? `Public duel created in ${currentAuthLabel()}. Share the duel link with @${invitedOwnerId} so they can open their slot and submit picks.`
+          : `Public duel created in ${currentAuthLabel()}. Share the duel link with your friend so they can claim the open slot and submit picks.`);
+        return storedRemote;
+      }
       const creatorEntry = {
         id: `${duelId}-${CURRENT_USER.ownerId}`,
         duelId,
@@ -3744,10 +3843,21 @@ function titleBandScore(pick, live){
       return stored;
     }
 
-    function claimActiveOpenSlot(){
+    async function claimActiveOpenSlot(){
       const bundle = activeCustomBundle();
       const openEntry = activeOpenEntry(bundle);
       if (!bundle || !openEntry || !CURRENT_USER) return null;
+      if (bundle.source === 'backend' && usesHostedDuelsBackend()) {
+        const storedRemote = upsertRemoteBundle(syncBundleDerivedState(await DUELS_BACKEND.claimOpenEntry({
+          duelSlug: bundle.duelRecord.id,
+          currentUser: CURRENT_USER
+        })), BASE_ROOM || ACTIVE_ROOM);
+        refreshMergedRoom(storedRemote?.duelRecord?.id || activeId);
+        requestedDuelMissing = false;
+        setRequestedDuelIdInUrl(storedRemote?.duelRecord?.id || activeId);
+        setStudioNotice('good', `Joined ${storedRemote?.duelRecord?.label || 'the duel'} as ${CURRENT_USER.displayName}. Fill your picks and submit when ready.`);
+        return storedRemote;
+      }
       const now = new Date().toISOString();
       openEntry.ownerId = CURRENT_USER.ownerId;
       openEntry.displayName = CURRENT_USER.displayName;
@@ -3761,7 +3871,7 @@ function titleBandScore(pick, live){
       return stored;
     }
 
-    function saveActiveEntry(lockPicks){
+    async function saveActiveEntry(lockPicks){
       const bundle = activeCustomBundle();
       const form = document.getElementById('activeEntryForm');
       if (!bundle || !form || !CURRENT_USER) return null;
@@ -3771,7 +3881,7 @@ function titleBandScore(pick, live){
       }
       let targetEntry = activeOwnedEntry(bundle);
       if (!targetEntry && activeOpenEntry(bundle)) {
-        claimActiveOpenSlot();
+        await claimActiveOpenSlot();
         return saveActiveEntry(lockPicks);
       }
       if (!targetEntry) {
@@ -3793,7 +3903,14 @@ function titleBandScore(pick, live){
         targetEntry.submittedAt = null;
       }
       bundle.duelRecord.updatedAt = now;
-      const stored = upsertCustomBundle(syncBundleDerivedState(bundle), BASE_ROOM || ACTIVE_ROOM);
+      const stored = bundle.source === 'backend' && usesHostedDuelsBackend()
+        ? upsertRemoteBundle(syncBundleDerivedState(await DUELS_BACKEND.saveOwnedEntry({
+            duelSlug: bundle.duelRecord.id,
+            currentUser: CURRENT_USER,
+            picks: nextPicks,
+            submittedAt: lockPicks ? now : null
+          })), BASE_ROOM || ACTIVE_ROOM)
+        : upsertCustomBundle(syncBundleDerivedState(bundle), BASE_ROOM || ACTIVE_ROOM);
       const nextLifecycle = deriveCustomBundleLifecycle(stored);
       refreshMergedRoom(stored?.duelRecord?.id || activeId);
       requestedDuelMissing = false;
@@ -3985,17 +4102,31 @@ function titleBandScore(pick, live){
           <div class="studio-meta">
             <span class="studio-chip">Signed in as ${escapeHtml(CURRENT_USER.displayName)}</span>
             <span class="studio-chip">@${escapeHtml(CURRENT_USER.ownerId)}</span>
+            <span class="studio-chip">${escapeHtml(currentAuthLabel())}</span>
           </div>
-          <div class="studio-note">This lightweight beta keeps your duel identity in this browser. Use the same handle whenever you open or share invite links.</div>
+          <div class="studio-note">${usesHostedDuelsBackend()
+            ? `Real Duels account live. Your session and public duel records are coming from ${escapeHtml(currentAuthLabel())}.`
+            : 'This lightweight beta keeps your duel identity in this browser. Use the same handle whenever you open or share invite links.'}</div>
           <div class="studio-actions">
             <button class="studio-button ghost" type="button" id="signOutButton">Sign out</button>
           </div>
         `;
         const button = document.getElementById('signOutButton');
         if (button) {
-          button.onclick = () => {
+          button.onclick = async () => {
+            if (usesHostedDuelsBackend()) {
+              try {
+                await DUELS_BACKEND.signOut();
+              } catch (error) {
+                setStudioNotice('bad', error.message || 'Could not sign out of the hosted Duels account.');
+                render();
+                return;
+              }
+            }
             clearStoredUserProfile();
-            setStudioNotice('info', 'Signed out of the local Duels beta account.');
+            setStudioNotice('info', usesHostedDuelsBackend()
+              ? 'Signed out of the hosted Duels account.'
+              : 'Signed out of the local Duels beta account.');
             render();
           };
         }
@@ -4013,21 +4144,68 @@ function titleBandScore(pick, live){
               <label for="authOwnerId">Handle</label>
               <input class="studio-input" id="authOwnerId" name="ownerId" placeholder="senthil" autocomplete="username" />
             </div>
+            ${usesHostedDuelsBackend() ? `
+              <div class="studio-field">
+                <label for="authEmail">Email</label>
+                <input class="studio-input" id="authEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" />
+              </div>
+              <div class="studio-field">
+                <label for="authPassword">Password</label>
+                <input class="studio-input" id="authPassword" name="password" type="password" placeholder="Minimum 6 characters" autocomplete="current-password" />
+              </div>
+            ` : ''}
           </div>
-          <div class="studio-note">No password yet. Your handle is the minimal beta identity for creating, joining, and updating public duels.</div>
+          <div class="studio-note">${usesHostedDuelsBackend()
+            ? `Hosted auth is enabled through ${escapeHtml(currentAuthLabel())}. Create account uses all four fields; sign in uses email and password, and will reuse display name plus handle if the profile still needs to be created.`
+            : 'No password yet. Your handle is the minimal beta identity for creating, joining, and updating public duels.'}</div>
           <div class="studio-actions">
-            <button class="studio-button" type="submit">Sign in</button>
+            ${usesHostedDuelsBackend()
+              ? `<button class="studio-button" type="submit" data-auth-action="signup">Create account</button>
+                 <button class="studio-button secondary" type="submit" data-auth-action="signin">Sign in</button>`
+              : `<button class="studio-button" type="submit">Sign in</button>`}
           </div>
         </form>
       `;
       const form = document.getElementById('authForm');
       if (form) {
-        form.onsubmit = (event) => {
+        form.onsubmit = async (event) => {
           event.preventDefault();
           const formData = new FormData(form);
+          if (usesHostedDuelsBackend()) {
+            const action = event.submitter?.dataset?.authAction || 'signin';
+            try {
+              const remoteUser = action === 'signup'
+                ? await DUELS_BACKEND.signUp({
+                    displayName: formData.get('displayName'),
+                    ownerId: formData.get('ownerId'),
+                    email: formData.get('email'),
+                    password: formData.get('password')
+                  })
+                : await DUELS_BACKEND.signIn({
+                    displayName: formData.get('displayName'),
+                    ownerId: formData.get('ownerId'),
+                    email: formData.get('email'),
+                    password: formData.get('password')
+                  });
+              CURRENT_USER = normalizeUserProfile(remoteUser || {}) || null;
+              if (!CURRENT_USER) {
+                setStudioNotice('bad', 'The hosted account signed in, but the Duels profile is incomplete.');
+                render();
+                return;
+              }
+              setStudioNotice('good', action === 'signup'
+                ? `Account created for ${CURRENT_USER.displayName}. You can now create, join, and submit public duels from the hosted backend.`
+                : `Signed in as ${CURRENT_USER.displayName}. Hosted public duels are now live in this browser.`);
+            } catch (error) {
+              setStudioNotice('bad', error.message || 'Could not complete hosted sign-in.');
+            }
+            render();
+            return;
+          }
           const saved = persistStoredUserProfile({
             displayName: formData.get('displayName'),
-            ownerId: formData.get('ownerId')
+            ownerId: formData.get('ownerId'),
+            authSource: 'local'
           });
           if (!saved) {
             setStudioNotice('bad', 'Enter a display name and a handle to sign in.');
@@ -4056,7 +4234,9 @@ function titleBandScore(pick, live){
               <input class="studio-input" id="createOpponentOwnerId" name="opponentOwnerId" placeholder="bala" />
             </div>
           </div>
-          <div class="studio-note">Public by default. Reserve a handle if you already know who should take the second slot, or leave it blank so any friend can claim it from the shared duel link.</div>
+          <div class="studio-note">${usesHostedDuelsBackend()
+            ? `Public by default and persisted in ${escapeHtml(currentAuthLabel())}. Reserve a handle if you already know who should take the second slot, or leave it blank so any friend can claim it from the duel link.`
+            : 'Public by default. Reserve a handle if you already know who should take the second slot, or leave it blank so any friend can claim it from the shared duel link.'}</div>
           <div class="studio-actions">
             <button class="studio-button" type="submit" ${disabledAttr}>Create public duel</button>
           </div>
@@ -4064,7 +4244,7 @@ function titleBandScore(pick, live){
       `;
       const form = document.getElementById('createDuelForm');
       if (form) {
-        form.onsubmit = (event) => {
+        form.onsubmit = async (event) => {
           event.preventDefault();
           if (!CURRENT_USER) {
             setStudioNotice('bad', 'Sign in before you create a public duel.');
@@ -4073,7 +4253,7 @@ function titleBandScore(pick, live){
           }
           const formData = new FormData(form);
           try {
-            createCustomDuel(formData.get('opponentName'), formData.get('opponentOwnerId'));
+            await createCustomDuel(formData.get('opponentName'), formData.get('opponentOwnerId'));
           } catch (error) {
             setStudioNotice('bad', error.message || 'Could not create duel.');
           }
@@ -4139,8 +4319,8 @@ function titleBandScore(pick, live){
         `;
         const joinButton = document.getElementById('joinActiveDuelButton');
         if (joinButton) {
-          joinButton.onclick = () => {
-            claimActiveOpenSlot();
+          joinButton.onclick = async () => {
+            await claimActiveOpenSlot();
             render();
           };
         }
@@ -4237,9 +4417,9 @@ function titleBandScore(pick, live){
 
       const saveDraftButton = document.getElementById('saveDraftButton');
       if (saveDraftButton) {
-        saveDraftButton.onclick = () => {
+        saveDraftButton.onclick = async () => {
           try {
-            saveActiveEntry(false);
+            await saveActiveEntry(false);
           } catch (error) {
             setStudioNotice('bad', error.message || 'Could not save draft picks.');
           }
@@ -4249,9 +4429,9 @@ function titleBandScore(pick, live){
 
       const submitPicksButton = document.getElementById('submitPicksButton');
       if (submitPicksButton) {
-        submitPicksButton.onclick = () => {
+        submitPicksButton.onclick = async () => {
           try {
-            saveActiveEntry(true);
+            await saveActiveEntry(true);
           } catch (error) {
             setStudioNotice('bad', error.message || 'Could not submit picks.');
           }
@@ -4268,8 +4448,10 @@ function titleBandScore(pick, live){
       const flash = document.getElementById('duelStudioFlash');
       if (summary) {
         summary.textContent = CURRENT_USER
-          ? `Signed in as ${CURRENT_USER.displayName}. Build a public duel, fill the 15-category pick sheet with search and team filters, and resolve clashes before the duel arms for its start match.`
-          : 'Sign in to create a public duel, claim an invite, and submit picks. Search-first category pickers, clash checks, and frozen reveal rules now run in the browser until the backend lands.';
+          ? `Signed in as ${CURRENT_USER.displayName}. Build a public duel, fill the 15-category pick sheet with search and team filters, and resolve clashes before the duel arms for its start match.${usesHostedDuelsBackend() ? ` This browser is connected to ${currentAuthLabel()} for real auth and persisted duel records.` : ''}`
+          : usesHostedDuelsBackend()
+            ? `Create or sign in to a real Duels account on ${currentAuthLabel()} so public duels, joins, and pick submissions persist across browsers.`
+            : 'Sign in to create a public duel, claim an invite, and submit picks. Search-first category pickers, clash checks, and frozen reveal rules now run in the browser until the backend lands.';
       }
       if (flash) {
         flash.innerHTML = DUEL_STUDIO_NOTICE
@@ -4564,8 +4746,8 @@ function titleBandScore(pick, live){
       const params = new URLSearchParams();
       params.set('room', ACTIVE_ROOM?.slug || DEFAULT_ROOM_SLUG);
       params.set('duel', duelId);
-      const customBundle = findCustomBundleByDuelId(ACTIVE_ROOM?.slug || DEFAULT_ROOM_SLUG, duelId);
-      if (customBundle) params.set('share', encodeBase64Url(JSON.stringify(customBundle)));
+      const localBundle = findLocalCustomBundleByDuelId(ACTIVE_ROOM?.slug || DEFAULT_ROOM_SLUG, duelId);
+      if (localBundle) params.set('share', encodeBase64Url(JSON.stringify(localBundle)));
       const origin = window.location.origin || '';
       return `${origin}${window.location.pathname}?${params.toString()}`;
     }
@@ -5691,13 +5873,28 @@ function titleBandScore(pick, live){
       render();
     }
 
-    CURRENT_USER = loadStoredUserProfile();
-    CUSTOM_DUEL_STORE = loadStoredCustomDuels();
-    renderDuelStudio();
-    loadWarRoomData().finally(() => render());
-    loadScheduleData().finally(() => render());
-    loadSquadsData().finally(() => render());
-    loadLiveData();
+    async function initializeDuelsApp(){
+      CUSTOM_DUEL_STORE = loadStoredCustomDuels();
+      REMOTE_DUEL_STORE = emptyCustomDuelStore();
+      if (usesHostedDuelsBackend()) {
+        try {
+          CURRENT_USER = normalizeUserProfile(await DUELS_BACKEND.bootstrap()) || null;
+        } catch (error) {
+          console.error('Hosted auth bootstrap failed:', error);
+          CURRENT_USER = null;
+          setStudioNotice('bad', `Hosted auth could not be restored from ${currentAuthLabel()}, so the page stayed signed out.`);
+        }
+      } else {
+        CURRENT_USER = loadStoredUserProfile();
+      }
+      renderDuelStudio();
+      loadWarRoomData().finally(() => render());
+      loadScheduleData().finally(() => render());
+      loadSquadsData().finally(() => render());
+      loadLiveData();
+    }
+
+    initializeDuelsApp();
   </script>
 </body>
 </html>

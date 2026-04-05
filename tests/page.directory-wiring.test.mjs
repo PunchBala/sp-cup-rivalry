@@ -13,6 +13,8 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /id="duelDirectory"/);
   assert.match(html, /id="duelDirectorySummary"/);
   assert.match(html, /id="pickPickerModal"/);
+  assert.match(html, /duels-backend\.config\.js/);
+  assert.match(html, /duels-backend\.js/);
   assert.match(html, /function sortedDirectoryDuels\(/);
   assert.match(html, /function buildDuelShareUrl\(/);
   assert.match(html, /function renderDuelStudio\(/);
@@ -21,6 +23,9 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function renderPickPicker\(/);
   assert.match(html, /function deriveCustomBundleLifecycle\(/);
   assert.match(html, /function withFreshLifecycle\(/);
+  assert.match(html, /function syncRemoteBundlesForRoom\(/);
+  assert.match(html, /function usesHostedDuelsBackend\(/);
+  assert.match(html, /function initializeDuelsApp\(/);
   assert.match(html, /LOCAL_AUTH_STORAGE_KEY/);
   assert.match(html, /data-copy-duel-link=/);
   assert.match(html, /data-pick-key=/);
