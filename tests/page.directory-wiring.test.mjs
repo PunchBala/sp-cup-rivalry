@@ -8,7 +8,10 @@ test('public duel directory wiring exists in the page shell', async () => {
 
   assert.match(html, /id="duelStudioCard"/);
   assert.match(html, /id="authPanel"/);
+  assert.match(html, /id="profilePanel"/);
   assert.match(html, /id="createDuelPanel"/);
+  assert.match(html, /id="myDuelsPanel"/);
+  assert.match(html, /id="opsPanel"/);
   assert.match(html, /id="duelControlsPanel"/);
   assert.match(html, /id="duelDirectory"/);
   assert.match(html, /id="duelDirectorySummary"/);
@@ -19,6 +22,11 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function buildDuelShareUrl\(/);
   assert.match(html, /function joinDuelByCode\(/);
   assert.match(html, /function copyDuelCode\(/);
+  assert.match(html, /function copyInviteMessage\(/);
+  assert.match(html, /function renderProfilePanel\(/);
+  assert.match(html, /function renderMyDuelsPanel\(/);
+  assert.match(html, /function renderOpsPanel\(/);
+  assert.match(html, /function readinessPanelHtml\(/);
   assert.match(html, /function renderDuelStudio\(/);
   assert.match(html, /function createCustomDuel\(/);
   assert.match(html, /function claimActiveOpenSlot\(/);
@@ -35,5 +43,6 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /data-open-duel=/);
   assert.match(html, /id="joinByCodeForm"/);
   assert.match(html, /id="joinByCodeInput"/);
+  assert.match(html, /data-directory-filter=/);
   assert.match(html, /window\.history\.replaceState/);
 });

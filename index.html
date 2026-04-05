@@ -262,6 +262,38 @@
     .studio-status-chip.live{background:rgba(95,240,200,.14);border-color:rgba(95,240,200,.24);color:#c9fff0}
     .studio-clash-list{display:flex;gap:8px;flex-wrap:wrap}
     .studio-clash-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,127,150,.12);border:1px solid rgba(255,127,150,.22);font-size:11px;font-weight:800;color:#ffd4dc}
+    .studio-stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .studio-stat-card{display:grid;gap:4px;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .studio-stat-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:800}
+    .studio-stat-value{font-size:22px;font-weight:900;color:#fff;line-height:1}
+    .studio-stat-note{font-size:12px;color:var(--muted);line-height:1.45}
+    .studio-list{display:grid;gap:10px}
+    .studio-list-card{display:grid;gap:8px;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .studio-list-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+    .studio-list-title{font-size:15px;font-weight:900;color:#fff;line-height:1.25}
+    .studio-list-note{font-size:12px;color:var(--muted);line-height:1.45}
+    .studio-list-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .studio-filter-row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+    .studio-filter-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#cfe0ff;font-size:11px;font-weight:800;cursor:pointer}
+    .studio-filter-chip.active{background:rgba(124,196,255,.14);border-color:rgba(124,196,255,.28);color:#fff}
+    .studio-progress{height:10px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+    .studio-progress-fill{height:100%;background:linear-gradient(90deg, rgba(124,196,255,.85), rgba(95,240,200,.85))}
+    .studio-checklist{display:grid;gap:8px}
+    .studio-check-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .studio-check-copy{display:grid;gap:4px}
+    .studio-check-title{font-size:13px;font-weight:800;color:#fff}
+    .studio-check-note{font-size:12px;color:var(--muted);line-height:1.45}
+    .studio-check-state{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+    .studio-check-item.done .studio-check-state{color:#bff2d5}
+    .studio-check-item.wait .studio-check-state{color:#dbeaff}
+    .studio-check-item.warn .studio-check-state{color:#ffd0d9}
+    .studio-code{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-weight:900;letter-spacing:.03em}
+    .studio-tag-row{display:flex;gap:8px;flex-wrap:wrap}
+    .studio-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.05);font-size:11px;font-weight:800;color:#dbe7ff}
+    .studio-tag.good{border-color:rgba(68,215,146,.28);background:rgba(68,215,146,.10);color:#c8f8dc}
+    .studio-tag.warn{border-color:rgba(255,200,87,.28);background:rgba(255,200,87,.10);color:#ffe3a5}
+    .studio-tag.bad{border-color:rgba(255,127,150,.26);background:rgba(255,127,150,.10);color:#ffd0d9}
+    .studio-inline-note{font-size:12px;color:var(--muted);line-height:1.45}
     .picker-modal{
       position:fixed;
       inset:0;
@@ -464,8 +496,20 @@
               <div id="authPanel"></div>
             </div>
             <div class="studio-panel">
+              <div class="studio-kicker">Profile</div>
+              <div id="profilePanel"></div>
+            </div>
+            <div class="studio-panel">
               <div class="studio-kicker">Create duel</div>
               <div id="createDuelPanel"></div>
+            </div>
+            <div class="studio-panel">
+              <div class="studio-kicker">My duels</div>
+              <div id="myDuelsPanel"></div>
+            </div>
+            <div class="studio-panel">
+              <div class="studio-kicker">Ops tools</div>
+              <div id="opsPanel"></div>
             </div>
           </div>
           <div class="studio-panel">
@@ -4117,6 +4161,252 @@ function titleBandScore(pick, live){
       return type === 'good' ? 'good' : type === 'bad' ? 'bad' : 'info';
     }
 
+    function currentUserOwnerKey(){
+      return normalizeOwnerId(CURRENT_USER?.ownerId) || null;
+    }
+
+    function currentUserInMatchup(matchup){
+      const ownerKey = currentUserOwnerKey();
+      if (!ownerKey || !matchup) return false;
+      return [matchup.a?.ownerId, matchup.b?.ownerId].some((value) => normalizeOwnerId(value) === ownerKey);
+    }
+
+    function currentUserRoleInMatchup(matchup){
+      const ownerKey = currentUserOwnerKey();
+      if (!ownerKey || !matchup) return null;
+      if (normalizeOwnerId(matchup.a?.ownerId) === ownerKey) return 'creator';
+      if (normalizeOwnerId(matchup.b?.ownerId) === ownerKey) return 'challenger';
+      return null;
+    }
+
+    function myDirectorySummaries(){
+      if (!CURRENT_USER) return [];
+      return sortedDirectoryDuels().filter((item) => currentUserInMatchup(item.matchup));
+    }
+
+    function leadingStateForCurrentUser(summary){
+      if (!summary?.isLive || !CURRENT_USER) return 'pending';
+      const role = currentUserRoleInMatchup(summary.matchup);
+      if (!role) return 'pending';
+      const ownSideIsA = role === 'creator';
+      if (summary.totalA === summary.totalB) return 'level';
+      const ownLeading = ownSideIsA ? summary.totalA > summary.totalB : summary.totalB > summary.totalA;
+      return ownLeading ? 'leading' : 'trailing';
+    }
+
+    function profileSnapshot(){
+      const myDuels = myDirectorySummaries();
+      const live = myDuels.filter((item) => item.status === 'live');
+      const armed = myDuels.filter((item) => item.status === 'armed').length;
+      const clash = myDuels.filter((item) => item.status === 'clash').length;
+      const draft = myDuels.filter((item) => item.status === 'draft').length;
+      const created = myDuels.filter((item) => currentUserRoleInMatchup(item.matchup) === 'creator').length;
+      const joined = myDuels.filter((item) => currentUserRoleInMatchup(item.matchup) === 'challenger').length;
+      const leading = live.filter((item) => leadingStateForCurrentUser(item) === 'leading').length;
+      const trailing = live.filter((item) => leadingStateForCurrentUser(item) === 'trailing').length;
+      const level = live.filter((item) => leadingStateForCurrentUser(item) === 'level').length;
+      return {
+        myDuels,
+        total: myDuels.length,
+        live: live.length,
+        armed,
+        clash,
+        draft,
+        created,
+        joined,
+        leading,
+        trailing,
+        level
+      };
+    }
+
+    function readinessSteps(bundle, ownEntry, otherEntry, lifecycle){
+      const steps = [
+        {
+          title: 'Your slot is claimed',
+          note: ownEntry?.ownerId ? `Playing as @${ownEntry.ownerId}.` : 'Claim the duel slot first.',
+          tone: ownEntry?.ownerId ? 'done' : 'wait',
+          state: ownEntry?.ownerId ? 'done' : 'waiting'
+        },
+        {
+          title: 'Opponent has joined',
+          note: otherEntry?.ownerId ? `${otherEntry.displayName} has claimed the challenger slot.` : 'Still waiting for someone to claim the open challenger slot.',
+          tone: otherEntry?.ownerId ? 'done' : 'wait',
+          state: otherEntry?.ownerId ? 'done' : 'waiting'
+        },
+        {
+          title: 'Your sheet is submitted',
+          note: ownEntry?.submittedAt ? `Submitted ${formatTimestamp(ownEntry.submittedAt)}.` : 'Finish all 15 picks and submit your sheet.',
+          tone: ownEntry?.submittedAt ? 'done' : 'wait',
+          state: ownEntry?.submittedAt ? 'done' : 'waiting'
+        },
+        {
+          title: 'Opponent sheet is submitted',
+          note: otherEntry?.submittedAt ? `${otherEntry.displayName} has submitted.` : `${otherEntry?.displayName || 'Opponent'} still needs to submit a full pick sheet.`,
+          tone: otherEntry?.submittedAt ? 'done' : 'wait',
+          state: otherEntry?.submittedAt ? 'done' : 'waiting'
+        },
+        {
+          title: 'Clashes are resolved',
+          note: lifecycle?.clashCount
+            ? `${lifecycle.clashCount} clash${lifecycle.clashCount === 1 ? '' : 'es'} still need to be broken.`
+            : lifecycle?.bothSubmitted
+              ? 'No duplicate picks remain, so the duel can arm.'
+              : 'Clash check starts once both sides have submitted.',
+          tone: lifecycle?.clashCount ? 'warn' : lifecycle?.bothSubmitted ? 'done' : 'wait',
+          state: lifecycle?.clashCount ? 'blocked' : lifecycle?.bothSubmitted ? 'done' : 'waiting'
+        },
+        {
+          title: 'Duel start gate is locked in',
+          note: lifecycle?.status === 'live'
+            ? `Live from Match ${lifecycle.startsScoringFromMatchNo || '?'}.`
+            : lifecycle?.status === 'armed'
+              ? `Armed for Match ${lifecycle.startsScoringFromMatchNo || '?'}.`
+              : 'The duel arms once both sides are clash-free and the next untouched match is identified.',
+          tone: lifecycle?.status === 'live' || lifecycle?.status === 'armed' ? 'done' : 'wait',
+          state: lifecycle?.status === 'live' || lifecycle?.status === 'armed' ? 'done' : 'waiting'
+        }
+      ];
+      return steps;
+    }
+
+    function readinessSummary(bundle, ownEntry, otherEntry, lifecycle){
+      const steps = readinessSteps(bundle, ownEntry, otherEntry, lifecycle);
+      const completed = steps.filter((step) => step.state === 'done').length;
+      return {
+        steps,
+        completed,
+        total: steps.length,
+        percent: Math.round((completed / steps.length) * 100)
+      };
+    }
+
+    function buildInviteMessage(duelId){
+      const bundle = findCustomBundleByDuelId(ACTIVE_ROOM?.slug || DEFAULT_ROOM_SLUG, duelId);
+      const label = bundle?.duelRecord?.label || activeMatchup()?.label || 'SP Cup Duel';
+      const duelCode = duelCodeLabel(duelId);
+      const link = buildDuelShareUrl(duelId);
+      return [
+        `Join my SP Cup duel: ${label}.`,
+        'Create or sign in to Duels, then open the invite link or paste the duel code.',
+        `Duel code: ${duelCode}`,
+        `Invite link: ${link}`,
+        'Both pick sheets stay hidden until the duel is clash-free and armed.'
+      ].join('\n');
+    }
+
+    function buildWhatsAppInviteUrl(duelId){
+      return `https://wa.me/?text=${encodeURIComponent(buildInviteMessage(duelId))}`;
+    }
+
+    async function copyInviteMessage(duelId, trigger){
+      const ok = await copyTextToClipboard(buildInviteMessage(duelId));
+      if (!trigger) return ok;
+      const original = trigger.dataset.originalLabel || trigger.textContent;
+      trigger.dataset.originalLabel = original;
+      trigger.textContent = ok ? 'Copied invite' : 'Copy failed';
+      trigger.classList.toggle('copy-ok', ok);
+      setTimeout(() => {
+        trigger.textContent = original;
+        trigger.classList.remove('copy-ok');
+      }, 1400);
+      return ok;
+    }
+
+    function openWhatsAppInvite(duelId){
+      window.open(buildWhatsAppInviteUrl(duelId), '_blank', 'noopener');
+    }
+
+    function buildDuelDebugPayload(matchup = activeMatchup()){
+      if (!matchup) return {};
+      const lifecycle = matchup.lifecycle || deriveMatchupLifecycle(matchup, ACTIVE_ROOM);
+      return {
+        duelId: matchup.id,
+        label: matchup.label,
+        source: activeCustomBundle()?.source || 'fixture',
+        currentUser: CURRENT_USER ? {
+          displayName: CURRENT_USER.displayName,
+          ownerId: CURRENT_USER.ownerId,
+          userId: CURRENT_USER.userId || null
+        } : null,
+        lifecycle: {
+          status: lifecycle.status,
+          clashCount: lifecycle.clashCount,
+          clashKeys: lifecycle.clashKeys,
+          startsScoringFromMatchNo: lifecycle.startsScoringFromMatchNo,
+          readyAt: lifecycle.readyAt,
+          liveAt: lifecycle.liveAt
+        },
+        entries: [
+          { displayName: matchup.a.name, ownerId: matchup.a.ownerId || null, submittedAt: matchup.a.submittedAt || null },
+          { displayName: matchup.b.name, ownerId: matchup.b.ownerId || null, submittedAt: matchup.b.submittedAt || null }
+        ],
+        updatedAt: matchup.updatedAt || null
+      };
+    }
+
+    async function copyDuelDiagnostics(trigger){
+      const ok = await copyTextToClipboard(JSON.stringify(buildDuelDebugPayload(), null, 2));
+      if (!trigger) return ok;
+      const original = trigger.dataset.originalLabel || trigger.textContent;
+      trigger.dataset.originalLabel = original;
+      trigger.textContent = ok ? 'Copied debug' : 'Copy failed';
+      trigger.classList.toggle('copy-ok', ok);
+      setTimeout(() => {
+        trigger.textContent = original;
+        trigger.classList.remove('copy-ok');
+      }, 1400);
+      return ok;
+    }
+
+    async function resyncHostedDuels(){
+      if (!usesHostedDuelsBackend()) {
+        setStudioNotice('info', 'This browser is using local beta duel storage, so there is nothing to resync from the backend.');
+        render();
+        return;
+      }
+      if (!BASE_ROOM && !ACTIVE_ROOM) {
+        setStudioNotice('bad', 'Load a duel room before trying to resync hosted duels.');
+        render();
+        return;
+      }
+      const roomReference = BASE_ROOM || ACTIVE_ROOM;
+      await syncRemoteBundlesForRoom(roomReference.slug, roomReference);
+      refreshMergedRoom(activeId);
+      setStudioNotice('info', `Hosted public duels were refreshed from ${currentAuthLabel()}.`);
+      render();
+    }
+
+    async function clearActiveEntryDraft(){
+      const bundle = activeCustomBundle();
+      const ownEntry = activeOwnedEntry(bundle);
+      if (!bundle || !ownEntry || !CURRENT_USER) throw new Error('Open one of your duels before clearing a draft sheet.');
+      const lifecycle = deriveCustomBundleLifecycle(bundle);
+      if (lifecycle.status === 'armed' || lifecycle.status === 'live') {
+        throw new Error('This duel is already frozen, so the draft sheet cannot be cleared.');
+      }
+      const emptyPicks = createEmptyPicks();
+      const stored = bundle.source === 'backend' && usesHostedDuelsBackend()
+        ? upsertRemoteBundle(syncBundleDerivedState(await DUELS_BACKEND.saveOwnedEntry({
+            duelSlug: bundle.duelRecord.id,
+            currentUser: CURRENT_USER,
+            picks: emptyPicks,
+            submittedAt: null
+          })), BASE_ROOM || ACTIVE_ROOM)
+        : (() => {
+            ownEntry.picks = emptyPicks;
+            ownEntry.submittedAt = null;
+            ownEntry.updatedAt = new Date().toISOString();
+            bundle.duelRecord.updatedAt = ownEntry.updatedAt;
+            return upsertCustomBundle(syncBundleDerivedState(bundle), BASE_ROOM || ACTIVE_ROOM);
+          })();
+      refreshMergedRoom(stored?.duelRecord?.id || activeId);
+      setRequestedDuelIdInUrl(stored?.duelRecord?.id || activeId);
+      setStudioNotice('info', 'Your draft picks were cleared for this duel.');
+      render();
+      return stored;
+    }
+
     function renderAuthPanel(){
       const panel = document.getElementById('authPanel');
       if (!panel) return;
@@ -4306,6 +4596,168 @@ function titleBandScore(pick, live){
       }
     }
 
+    function renderProfilePanel(){
+      const panel = document.getElementById('profilePanel');
+      if (!panel) return;
+      if (!CURRENT_USER) {
+        panel.innerHTML = '<div class="studio-empty">Create or sign in to a Duels account to track your public boards, invite friends, and build a lightweight profile.</div>';
+        return;
+      }
+      const profile = profileSnapshot();
+      panel.innerHTML = `
+        <div class="studio-meta">
+          <span class="studio-chip">${escapeHtml(CURRENT_USER.displayName)}</span>
+          <span class="studio-chip">@${escapeHtml(CURRENT_USER.ownerId)}</span>
+          ${CURRENT_USER.email ? `<span class="studio-chip">${escapeHtml(CURRENT_USER.email)}</span>` : ''}
+        </div>
+        <div class="studio-stat-grid">
+          <div class="studio-stat-card">
+            <div class="studio-stat-label">My duels</div>
+            <div class="studio-stat-value">${escapeHtml(String(profile.total))}</div>
+            <div class="studio-stat-note">${profile.created} created, ${profile.joined} joined.</div>
+          </div>
+          <div class="studio-stat-card">
+            <div class="studio-stat-label">Live now</div>
+            <div class="studio-stat-value">${escapeHtml(String(profile.live))}</div>
+            <div class="studio-stat-note">${profile.leading} leading, ${profile.trailing} trailing, ${profile.level} level.</div>
+          </div>
+          <div class="studio-stat-card">
+            <div class="studio-stat-label">Pre-live</div>
+            <div class="studio-stat-value">${escapeHtml(String(profile.armed + profile.clash + profile.draft))}</div>
+            <div class="studio-stat-note">${profile.armed} armed, ${profile.clash} clash, ${profile.draft} draft.</div>
+          </div>
+          <div class="studio-stat-card">
+            <div class="studio-stat-label">Account mode</div>
+            <div class="studio-stat-value">${usesHostedDuelsBackend() ? 'Hosted' : 'Local'}</div>
+            <div class="studio-stat-note">${escapeHtml(currentAuthLabel())}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMyDuelsPanel(){
+      const panel = document.getElementById('myDuelsPanel');
+      if (!panel) return;
+      if (!CURRENT_USER) {
+        panel.innerHTML = '<div class="studio-empty">Sign in to see the duels you created, joined, are drafting, or already have live.</div>';
+        return;
+      }
+      const items = myDirectorySummaries();
+      if (!items.length) {
+        panel.innerHTML = '<div class="studio-empty">No duels yet. Create a duel above or paste a duel code to join one.</div>';
+        return;
+      }
+      panel.innerHTML = `
+        <div class="studio-inline-note">${items.length} duel${items.length === 1 ? '' : 's'} with your handle in this room.</div>
+        <div class="studio-list">
+          ${items.slice(0, 6).map((item) => {
+            const role = currentUserRoleInMatchup(item.matchup) === 'creator' ? 'Created by you' : 'Joined duel';
+            const leadState = leadingStateForCurrentUser(item);
+            const note = item.isLive
+              ? (leadState === 'leading' ? 'You currently lead this live duel.' : leadState === 'trailing' ? 'You are trailing in this live duel.' : 'This live duel is level right now.')
+              : item.status === 'armed'
+                ? `Armed for Match ${item.lifecycle.startsScoringFromMatchNo || '?'}.`
+                : item.status === 'clash'
+                  ? `${item.lifecycle.clashCount || 0} clash${item.lifecycle.clashCount === 1 ? '' : 'es'} still block the duel start.`
+                  : 'Still drafting and waiting for both sealed pick sheets.';
+            return `
+              <div class="studio-list-card">
+                <div class="studio-list-top">
+                  <div>
+                    <div class="studio-list-title">${escapeHtml(item.duelLabel)}</div>
+                    <div class="studio-tag-row">
+                      <span class="studio-tag">${escapeHtml(role)}</span>
+                      <span class="studio-tag ${item.status === 'live' ? 'good' : item.status === 'clash' ? 'bad' : 'warn'}">${escapeHtml(lifecycleHeadline(item.lifecycle))}</span>
+                    </div>
+                  </div>
+                  <div class="studio-list-actions">
+                    <button class="mini-action" type="button" data-open-my-duel="${escapeHtml(item.matchup.id)}">Open</button>
+                    <button class="mini-action" type="button" data-copy-my-link="${escapeHtml(item.matchup.id)}">Copy invite</button>
+                  </div>
+                </div>
+                <div class="studio-list-note">${escapeHtml(note)}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+      panel.querySelectorAll('[data-open-my-duel]').forEach((button) => {
+        button.onclick = () => selectDuel(button.dataset.openMyDuel);
+      });
+      panel.querySelectorAll('[data-copy-my-link]').forEach((button) => {
+        button.onclick = () => copyInviteMessage(button.dataset.copyMyLink, button);
+      });
+    }
+
+    function renderOpsPanel(){
+      const panel = document.getElementById('opsPanel');
+      if (!panel) return;
+      const bundle = activeCustomBundle();
+      const ownEntry = activeOwnedEntry(bundle);
+      const lifecycle = bundle ? deriveCustomBundleLifecycle(bundle) : null;
+      panel.innerHTML = `
+        <div class="studio-list">
+          <div class="studio-list-card">
+            <div class="studio-list-title">Recovery</div>
+            <div class="studio-list-note">Use these lightweight tools if a duel looks stale, a draft needs clearing, or you want a quick debug payload while user count is still low.</div>
+            <div class="studio-actions">
+              <button class="studio-button ghost" type="button" id="resyncHostedDuelsButton">Refresh duel feed</button>
+              <button class="studio-button ghost" type="button" id="copyDuelDebugButton" ${activeMatchup() ? '' : 'disabled'}>Copy duel debug</button>
+              <button class="studio-button ghost" type="button" id="clearDraftButton" ${(bundle && ownEntry && lifecycle?.status !== 'armed' && lifecycle?.status !== 'live') ? '' : 'disabled'}>Clear my draft picks</button>
+            </div>
+          </div>
+        </div>
+      `;
+      const refreshButton = document.getElementById('resyncHostedDuelsButton');
+      if (refreshButton) {
+        refreshButton.onclick = async () => {
+          try {
+            await resyncHostedDuels();
+          } catch (error) {
+            setStudioNotice('bad', error.message || 'Could not refresh the duel feed.');
+            render();
+          }
+        };
+      }
+      const copyButton = document.getElementById('copyDuelDebugButton');
+      if (copyButton) copyButton.onclick = () => copyDuelDiagnostics(copyButton);
+      const clearButton = document.getElementById('clearDraftButton');
+      if (clearButton) {
+        clearButton.onclick = async () => {
+          try {
+            await clearActiveEntryDraft();
+          } catch (error) {
+            setStudioNotice('bad', error.message || 'Could not clear the draft picks.');
+            render();
+          }
+        };
+      }
+    }
+
+    function readinessPanelHtml(bundle, ownEntry, otherEntry, lifecycle){
+      const readiness = readinessSummary(bundle, ownEntry, otherEntry, lifecycle);
+      return `
+        <div class="studio-lifecycle-card">
+          <div class="studio-lifecycle-title">Duel readiness</div>
+          <div class="studio-lifecycle-note">${readiness.completed}/${readiness.total} checks are locked in. This duel only goes live after both players submit full clash-free sheets and the next untouched match becomes the start gate.</div>
+          <div class="studio-progress" aria-label="Duel readiness progress">
+            <div class="studio-progress-fill" style="width:${readiness.percent}%"></div>
+          </div>
+          <div class="studio-checklist">
+            ${readiness.steps.map((step) => `
+              <div class="studio-check-item ${escapeHtml(step.tone)}">
+                <div class="studio-check-copy">
+                  <div class="studio-check-title">${escapeHtml(step.title)}</div>
+                  <div class="studio-check-note">${escapeHtml(step.note)}</div>
+                </div>
+                <div class="studio-check-state">${escapeHtml(step.state)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
     function renderDuelControlsPanel(){
       const panel = document.getElementById('duelControlsPanel');
       if (!panel) return;
@@ -4341,6 +4793,7 @@ function titleBandScore(pick, live){
           <div class="studio-actions">
             <button class="studio-button ghost" type="button" id="copyStudioLinkButton">Copy duel link</button>
             <button class="studio-button ghost" type="button" id="copyStudioCodeButton">Copy duel code</button>
+            <button class="studio-button ghost" type="button" id="copyStudioInviteButton">Copy invite message</button>
           </div>
           <div class="studio-note">Share URL: <span class="studio-link">${escapeHtml(shareUrl)}</span></div>
           <div class="studio-note">Duel code: <span class="studio-link">${escapeHtml(duelCode)}</span></div>
@@ -4349,6 +4802,8 @@ function titleBandScore(pick, live){
         if (copyButton) copyButton.onclick = () => copyDuelLink(bundle.duelRecord.id, copyButton);
         const codeButton = document.getElementById('copyStudioCodeButton');
         if (codeButton) codeButton.onclick = () => copyDuelCode(bundle.duelRecord.id, codeButton);
+        const inviteButton = document.getElementById('copyStudioInviteButton');
+        if (inviteButton) inviteButton.onclick = () => copyInviteMessage(bundle.duelRecord.id, inviteButton);
         return;
       }
 
@@ -4364,9 +4819,11 @@ function titleBandScore(pick, live){
             <button class="studio-button secondary" type="button" id="joinActiveDuelButton">Join duel</button>
             <button class="studio-button ghost" type="button" id="copyStudioLinkButton">Copy duel link</button>
             <button class="studio-button ghost" type="button" id="copyStudioCodeButton">Copy duel code</button>
+            <button class="studio-button ghost" type="button" id="copyStudioInviteButton">Copy invite message</button>
           </div>
           <div class="studio-note">Creator: ${escapeHtml(entryA?.displayName || 'Unknown')} - public by default via this share link.</div>
           <div class="studio-note">Duel code: <span class="studio-link">${escapeHtml(duelCode)}</span></div>
+          ${readinessPanelHtml(bundle, null, entryA, deriveCustomBundleLifecycle(bundle))}
         `;
         const joinButton = document.getElementById('joinActiveDuelButton');
         if (joinButton) {
@@ -4379,6 +4836,8 @@ function titleBandScore(pick, live){
         if (copyButton) copyButton.onclick = () => copyDuelLink(bundle.duelRecord.id, copyButton);
         const codeButton = document.getElementById('copyStudioCodeButton');
         if (codeButton) codeButton.onclick = () => copyDuelCode(bundle.duelRecord.id, codeButton);
+        const inviteButton = document.getElementById('copyStudioInviteButton');
+        if (inviteButton) inviteButton.onclick = () => copyInviteMessage(bundle.duelRecord.id, inviteButton);
         return;
       }
 
@@ -4394,12 +4853,16 @@ function titleBandScore(pick, live){
           <div class="studio-actions">
             <button class="studio-button ghost" type="button" id="copyStudioLinkButton">Copy duel link</button>
             <button class="studio-button ghost" type="button" id="copyStudioCodeButton">Copy duel code</button>
+            <button class="studio-button ghost" type="button" id="copyStudioInviteButton">Copy invite message</button>
           </div>
+          ${readinessPanelHtml(bundle, null, null, lifecycle)}
         `;
         const copyButton = document.getElementById('copyStudioLinkButton');
         if (copyButton) copyButton.onclick = () => copyDuelLink(bundle.duelRecord.id, copyButton);
         const codeButton = document.getElementById('copyStudioCodeButton');
         if (codeButton) codeButton.onclick = () => copyDuelCode(bundle.duelRecord.id, codeButton);
+        const inviteButton = document.getElementById('copyStudioInviteButton');
+        if (inviteButton) inviteButton.onclick = () => copyInviteMessage(bundle.duelRecord.id, inviteButton);
         return;
       }
 
@@ -4430,6 +4893,7 @@ function titleBandScore(pick, live){
             }).join('')}</div>` : ''}
             ${frozen ? `<div class="studio-locked-note">This sheet is frozen now. Opponent picks ${lifecycle.status === 'live' ? 'are revealed on the live board.' : 'will reveal when the duel goes live.'}</div>` : ''}
           </div>
+          ${readinessPanelHtml(bundle, ownEntry, otherEntry, lifecycle)}
         </div>
         <form id="activeEntryForm">
           <div class="studio-pick-sheet">
@@ -4462,6 +4926,8 @@ function titleBandScore(pick, live){
             <button class="studio-button secondary" type="button" id="submitPicksButton" ${frozen ? 'disabled' : ''}>${escapeHtml(actionLabel)}</button>
             <button class="studio-button ghost" type="button" id="copyStudioLinkButton">Copy duel link</button>
             <button class="studio-button ghost" type="button" id="copyStudioCodeButton">Copy duel code</button>
+            <button class="studio-button ghost" type="button" id="copyStudioInviteButton">Copy invite message</button>
+            <button class="studio-button ghost" type="button" id="openStudioWhatsAppButton">WhatsApp invite</button>
           </div>
         </form>
         <div class="studio-note">${frozen
@@ -4501,6 +4967,10 @@ function titleBandScore(pick, live){
       if (copyButton) copyButton.onclick = () => copyDuelLink(bundle.duelRecord.id, copyButton);
       const codeButton = document.getElementById('copyStudioCodeButton');
       if (codeButton) codeButton.onclick = () => copyDuelCode(bundle.duelRecord.id, codeButton);
+      const inviteButton = document.getElementById('copyStudioInviteButton');
+      if (inviteButton) inviteButton.onclick = () => copyInviteMessage(bundle.duelRecord.id, inviteButton);
+      const whatsappButton = document.getElementById('openStudioWhatsAppButton');
+      if (whatsappButton) whatsappButton.onclick = () => openWhatsAppInvite(bundle.duelRecord.id);
     }
 
     function renderDuelStudio(){
@@ -4519,7 +4989,10 @@ function titleBandScore(pick, live){
           : '';
       }
       renderAuthPanel();
+      renderProfilePanel();
       renderCreateDuelPanel();
+      renderMyDuelsPanel();
+      renderOpsPanel();
       renderDuelControlsPanel();
     }
 
@@ -4646,6 +5119,7 @@ function titleBandScore(pick, live){
     let activeId = null;
     let activeView = 'warroom';
     let activeStatsKey = 'orangeCap';
+    let directoryFilter = 'all';
 
     function renderTabs(){
       const el = document.getElementById('tabs');
@@ -4867,6 +5341,7 @@ function titleBandScore(pick, live){
     function summarizeDirectoryDuel(matchup){
       matchup = withFreshLifecycle(matchup);
       const updatedAt = latestBoardUpdatedAt() || matchup.updatedAt || ACTIVE_ROOM?.updatedAt || null;
+      const createdAt = matchup.createdAt || ACTIVE_ROOM?.createdAt || null;
       const duelLabel = matchup.label || `${matchup.a.name} vs ${matchup.b.name}`;
       const lifecycle = matchup.lifecycle || deriveMatchupLifecycle(matchup, ACTIVE_ROOM);
       const status = lifecycle.status || 'draft';
@@ -4889,7 +5364,10 @@ function titleBandScore(pick, live){
       }
 
       const updatedMs = updatedAt ? Date.parse(updatedAt) : 0;
+      const createdMs = createdAt ? Date.parse(createdAt) : updatedMs;
       const hotDuel = isLive && (margin <= 2 || Math.abs(frontsA - frontsB) <= 1);
+      const myDuel = currentUserInMatchup(matchup);
+      const recentWindowMs = 6 * 60 * 60 * 1000;
       return {
         matchup,
         lifecycle,
@@ -4897,6 +5375,8 @@ function titleBandScore(pick, live){
         duelLabel,
         updatedAt,
         updatedMs: Number.isFinite(updatedMs) ? updatedMs : 0,
+        createdAt,
+        createdMs: Number.isFinite(createdMs) ? createdMs : 0,
         isLive,
         totalA,
         totalB,
@@ -4904,7 +5384,9 @@ function titleBandScore(pick, live){
         frontsB,
         leaderName,
         margin,
-        hotDuel
+        hotDuel,
+        myDuel,
+        freshDuel: Boolean((Number.isFinite(updatedMs) ? updatedMs : 0) && (currentNowMs() - updatedMs) <= recentWindowMs)
       };
     }
 
@@ -4917,6 +5399,13 @@ function titleBandScore(pick, live){
           b.updatedMs - a.updatedMs ||
           a.duelLabel.localeCompare(b.duelLabel)
         );
+    }
+
+    function filteredDirectoryDuels(items = sortedDirectoryDuels()){
+      if (directoryFilter === 'live') return items.filter((item) => item.status === 'live');
+      if (directoryFilter === 'pending') return items.filter((item) => item.status !== 'live');
+      if (directoryFilter === 'mine') return items.filter((item) => item.myDuel);
+      return items;
     }
 
     function renderPublicDuelLayer(){
@@ -4934,6 +5423,8 @@ function titleBandScore(pick, live){
       }
 
       const orderedDuels = sortedDirectoryDuels();
+      if (directoryFilter === 'mine' && !CURRENT_USER) directoryFilter = 'all';
+      const visibleDuels = filteredDirectoryDuels(orderedDuels);
       const activeLabel = matchup.label || `${matchup.a.name} vs ${matchup.b.name}`;
       const waitingTag = matchup.lifecycle?.status === 'live' ? '' : ` - ${lifecycleHeadline(matchup.lifecycle).toLowerCase()}`;
       const fallbackTag = requestedDuelMissing ? 'Requested duel was not found, so this page fell back to the first available duel.' : '';
@@ -4946,6 +5437,8 @@ function titleBandScore(pick, live){
         </div>
         <div class="pill">Active duel: ${escapeHtml(activeLabel)}${escapeHtml(waitingTag)}</div>
         <button class="pill pill-button" id="copyActiveDuelLink" type="button">Copy duel link</button>
+        <button class="pill pill-button" id="copyActiveDuelCode" type="button">Copy duel code</button>
+        <button class="pill pill-button" id="copyActiveInvite" type="button">Copy invite</button>
         <div class="pill">Visibility: public duel page - ${MATCHUPS.length} listed</div>
         <div class="pill">Series: ${escapeHtml(ACTIVE_ROOM.name || ACTIVE_ROOM.slug || 'Duels')}</div>
         ${fallbackTag ? `<div class="pill">${escapeHtml(fallbackTag)}</div>` : ''}
@@ -4955,15 +5448,38 @@ function titleBandScore(pick, live){
       if (duelPicker) duelPicker.onchange = () => selectDuel(duelPicker.value);
       const copyActiveButton = document.getElementById('copyActiveDuelLink');
       if (copyActiveButton) copyActiveButton.onclick = () => copyDuelLink(matchup.id, copyActiveButton);
+      const copyCodeButton = document.getElementById('copyActiveDuelCode');
+      if (copyCodeButton) copyCodeButton.onclick = () => copyDuelCode(matchup.id, copyCodeButton);
+      const copyInviteButton = document.getElementById('copyActiveInvite');
+      if (copyInviteButton) copyInviteButton.onclick = () => copyInviteMessage(matchup.id, copyInviteButton);
 
       const liveCount = orderedDuels.filter((item) => item.isLive).length;
       const armedCount = orderedDuels.filter((item) => item.status === 'armed').length;
       const clashCount = orderedDuels.filter((item) => item.status === 'clash').length;
       const waitingCount = Math.max(0, orderedDuels.length - liveCount - armedCount - clashCount);
       const boardUpdatedAt = latestBoardUpdatedAt();
-      summary.textContent = `${orderedDuels.length} public duel${orderedDuels.length === 1 ? '' : 's'} in the room, ${liveCount} live${armedCount ? `, ${armedCount} armed` : ''}${clashCount ? `, ${clashCount} resolving clashes` : ''}${waitingCount ? `, ${waitingCount} drafting` : ''}. Live duels sort first, then the biggest live margins, then the freshest updates.${boardUpdatedAt ? ` Board last updated ${formatTimestamp(boardUpdatedAt)}.` : ''}`;
+      summary.innerHTML = `
+        <div class="studio-inline-note">${orderedDuels.length} public duel${orderedDuels.length === 1 ? '' : 's'} in the room, ${liveCount} live${armedCount ? `, ${armedCount} armed` : ''}${clashCount ? `, ${clashCount} resolving clashes` : ''}${waitingCount ? `, ${waitingCount} drafting` : ''}. Live duels sort first, then the biggest live margins, then the freshest updates.${boardUpdatedAt ? ` Board last updated ${formatTimestamp(boardUpdatedAt)}.` : ''}</div>
+        <div class="studio-filter-row">
+          <button class="studio-filter-chip ${directoryFilter === 'all' ? 'active' : ''}" type="button" data-directory-filter="all">All</button>
+          <button class="studio-filter-chip ${directoryFilter === 'live' ? 'active' : ''}" type="button" data-directory-filter="live">Live</button>
+          <button class="studio-filter-chip ${directoryFilter === 'pending' ? 'active' : ''}" type="button" data-directory-filter="pending">Pre-live</button>
+          <button class="studio-filter-chip ${directoryFilter === 'mine' ? 'active' : ''}" type="button" data-directory-filter="mine" ${CURRENT_USER ? '' : 'disabled'}>My duels</button>
+        </div>
+      `;
+      summary.querySelectorAll('[data-directory-filter]').forEach((button) => {
+        button.onclick = () => {
+          directoryFilter = button.dataset.directoryFilter || 'all';
+          render();
+        };
+      });
 
-      directory.innerHTML = orderedDuels.map((item) => {
+      if (!visibleDuels.length) {
+        directory.innerHTML = '<div class="small">No public duels match the current filter yet.</div>';
+        return;
+      }
+
+      directory.innerHTML = visibleDuels.map((item) => {
         const statusLabel = item.status === 'live'
           ? (item.margin === 0 ? 'Level duel' : 'Live duel')
           : item.status === 'armed'
@@ -4991,6 +5507,8 @@ function titleBandScore(pick, live){
         const updatedLabel = formatTimestamp(item.updatedAt);
         const activityLabel = item.hotDuel ? 'Hot duel' : item.status === 'armed' ? 'Frozen board' : item.isLive ? 'Live board' : item.status === 'clash' ? 'Clash alert' : 'Draft duel';
         const activityClass = item.hotDuel ? 'duel-activity-tag hot' : 'duel-activity-tag';
+        const roleTag = item.myDuel ? (currentUserRoleInMatchup(item.matchup) === 'creator' ? 'Your duel' : 'Joined duel') : null;
+        const freshTag = item.freshDuel ? 'Just updated' : null;
         const note = item.isLive
           ? (item.leaderName ? `${item.leaderName} has the current edge with a ${frontsLabel} fronts split.` : `This duel is dead level on score with a ${frontsLabel} fronts split.`)
           : item.status === 'armed'
@@ -5018,9 +5536,14 @@ function titleBandScore(pick, live){
             </div>
             <div class="small duel-directory-note">${escapeHtml(note)}</div>
             <div class="duel-directory-footer">
-              <span class="${activityClass}">${escapeHtml(activityLabel)}</span>
+              <div class="studio-tag-row">
+                <span class="${activityClass}">${escapeHtml(activityLabel)}</span>
+                ${roleTag ? `<span class="studio-tag">${escapeHtml(roleTag)}</span>` : ''}
+                ${freshTag ? `<span class="studio-tag warn">${escapeHtml(freshTag)}</span>` : ''}
+              </div>
               <div class="duel-directory-actions">
                 <button class="mini-action" type="button" data-copy-duel-link="${escapeHtml(item.matchup.id)}">Copy link</button>
+                <button class="mini-action" type="button" data-copy-duel-code="${escapeHtml(item.matchup.id)}">Copy code</button>
                 <button class="mini-action" type="button" data-open-duel="${escapeHtml(item.matchup.id)}">${item.matchup.id === activeId ? 'Viewing duel' : 'Open duel'}</button>
               </div>
             </div>
@@ -5033,6 +5556,9 @@ function titleBandScore(pick, live){
       });
       directory.querySelectorAll('[data-copy-duel-link]').forEach((button) => {
         button.onclick = () => copyDuelLink(button.dataset.copyDuelLink, button);
+      });
+      directory.querySelectorAll('[data-copy-duel-code]').forEach((button) => {
+        button.onclick = () => copyDuelCode(button.dataset.copyDuelCode, button);
       });
     }
 
