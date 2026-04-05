@@ -3688,10 +3688,12 @@ function titleBandScore(pick, live){
     function deriveMatchupLifecycle(matchup, room = ACTIVE_ROOM){
       const bundle = room ? findCustomBundleByDuelId(room.slug, matchup?.id) : null;
       if (bundle) return deriveCustomBundleLifecycle(bundle);
+      const fixtureLive = matchup?.state === 'locked';
+      const fixtureStartMatchNo = fixtureLive ? 1 : null;
       return {
-        status: matchup?.state === 'locked' ? 'live' : 'draft',
-        isLive: matchup?.state === 'locked',
-        revealOpponentPicks: matchup?.state === 'locked',
+        status: fixtureLive ? 'live' : 'draft',
+        isLive: fixtureLive,
+        revealOpponentPicks: fixtureLive,
         clashKeys: [],
         clashCount: 0,
         submittedCount: [matchup?.a?.submittedAt, matchup?.b?.submittedAt].filter(Boolean).length,
@@ -3704,7 +3706,7 @@ function titleBandScore(pick, live){
         readyAt: matchup?.createdAt || null,
         startMatch: null,
         startsScoringAt: null,
-        startsScoringFromMatchNo: null,
+        startsScoringFromMatchNo: fixtureStartMatchNo,
         scoreStartCount: 0,
         liveAt: matchup?.updatedAt || null
       };

@@ -50,6 +50,13 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await expect(page.locator('#duelDirectory')).toContainText('Senthil vs Sai');
   await expect(page.locator('#duelDirectory')).toContainText('Senthil vs Vibeesh');
 
+  await page.locator('#authDisplayName').fill('Senthil');
+  await page.locator('#authOwnerId').fill('senthil');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page.locator('#myDuelsPanel')).toContainText('Senthil vs Sai');
+  await expect(page.locator('#myDuelsPanel')).toContainText('Live from Match 1');
+  await page.getByRole('button', { name: 'Sign out' }).click();
+
   await page.locator('#authDisplayName').fill('Anand');
   await page.locator('#authOwnerId').fill('anand');
   await page.getByRole('button', { name: 'Sign in' }).click();
