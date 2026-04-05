@@ -101,6 +101,9 @@ test('fallback retry is allowed for quota and invalid-key failures only', () => 
   const invalidKeyError = new Error('API error');
   invalidKeyError.api = { status: 'failure', reason: 'invalid_api_key' };
 
+  const reversedInvalidKeyError = new Error('API error');
+  reversedInvalidKeyError.api = { status: 'failure', reason: 'api_key_invalid' };
+
   const genericError = new Error('API error');
   genericError.api = { status: 'failure', reason: 'rate_limited' };
 
@@ -109,5 +112,22 @@ test('fallback retry is allowed for quota and invalid-key failures only', () => 
   assert.equal(isCricketDataFallbackEligibleError(prefixedQuotaError), true);
   assert.equal(isCricketDataFallbackEligibleError(temporaryBlockError), true);
   assert.equal(isCricketDataFallbackEligibleError(invalidKeyError), true);
+  assert.equal(isCricketDataFallbackEligibleError(reversedInvalidKeyError), true);
   assert.equal(isCricketDataFallbackEligibleError(genericError), false);
+});
+
+test('fallback retry still works when the provider payload is only embedded in the error message', () => {
+  const temporaryBlockMessageError = new Error('API error: {"status":"failure","reason":"Blocked for 15 minutes"}');
+  const quotaMessageError = new Error('API error: {"status":"failure","reason":"Blocking since hits today exceeded hits limit","info":{"hitsToday":114,"hitsUsed":10,"hitsLimit":100,"credits":0}}');
+
+  assert.equal(isCricketDataFallbackEligibleError(temporaryBlockMessageError), true);
+  assert.equal(isCricketDataFallbackEligibleError(quotaMessageError), true);
+  assert.deepEqual(parseCricketDataQuotaDetails(quotaMessageError), {
+    reason: 'hits_today_exceeded_hits_limit',
+    hitsToday: 114,
+    hitsUsed: 10,
+    hitsLimit: 100,
+    status: 'failure',
+    apikey: null
+  });
 });

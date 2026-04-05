@@ -29,8 +29,8 @@ jobs:
 
       - name: Run CricketData worker
         env:
-          CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY_FALLBACK }}
-          CRICKETDATA_API_KEY_FALLBACK: ${{ secrets.CRICKETDATA_API_KEY }}
+          CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY }}
+          CRICKETDATA_API_KEY_FALLBACK: ${{ secrets.CRICKETDATA_API_KEY_FALLBACK }}
           CRICKETDATA_FORCE_REFRESH: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         run: node scripts/update-live-data.mjs
 

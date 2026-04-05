@@ -426,7 +426,12 @@ export function isCricketDataFallbackEligibleError(error) {
   const payload = tryParseApiPayloadFromError(error);
   if (!payload) return false;
   const reason = normalizeCricketDataReason(payload.reason || '');
-  return reason.includes('hits_today_exceeded_hits_limit') || reason === 'invalid_api_key' || reason.startsWith('blocked_for_');
+  return (
+    reason.includes('hits_today_exceeded_hits_limit') ||
+    reason === 'invalid_api_key' ||
+    reason === 'api_key_invalid' ||
+    reason.startsWith('blocked_for_')
+  );
 }
 
 function setProviderStatusOk(live) {
