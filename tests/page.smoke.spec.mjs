@@ -27,6 +27,7 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
 
   await page.addInitScript(() => {
     window.__DUELS_TEST_NOW__ = '2026-04-05T08:00:00Z';
+    window.DUELS_BACKEND_CONFIG = { enabled: false };
   });
 
   await page.route(/data\/live\.json(\?.*)?$/, async (route) => {
@@ -52,11 +53,13 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await page.getByRole('button', { name: 'Sign in' }).click();
   await expect(page.locator('#authPanel')).toContainText('Signed in as Anand');
 
-  await page.locator('#createOpponentName').fill('Bala');
   await page.getByRole('button', { name: 'Create public duel' }).click();
-  await expect(page.locator('#viewTabs')).toContainText('Active duel: Anand vs Bala');
-  await expect(page.locator('#duelDirectory')).toContainText('Anand vs Bala');
+  await expect(page.locator('#viewTabs')).toContainText('Active duel: Anand vs Open challenger');
+  await expect(page.locator('#duelDirectory')).toContainText('Anand vs Open challenger');
   await expect(page).toHaveURL(/share=/);
+  await expect(page.locator('#duelControlsPanel')).toContainText('Code:');
+  const duelCode = new URL(page.url()).searchParams.get('duel');
+  expect(duelCode).toBeTruthy();
 
   await page.locator('[data-open-picker="titleWinner"]').click();
   await expect(page.locator('#pickPickerModal')).toBeVisible();
@@ -95,7 +98,9 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await page.locator('#authDisplayName').fill('Bala');
   await page.locator('#authOwnerId').fill('bala');
   await page.getByRole('button', { name: 'Sign in' }).click();
-  await page.getByRole('button', { name: 'Join duel' }).click();
+  await page.locator('#joinByCodeInput').fill(duelCode);
+  await page.getByRole('button', { name: 'Join by code' }).click();
+  await expect(page.locator('#viewTabs')).toContainText('Active duel: Anand vs Bala');
 
   await page.locator('[data-open-picker="titleWinner"]').click();
   await page.getByRole('button', { name: 'Mumbai Indians' }).click();

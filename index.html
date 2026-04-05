@@ -3602,6 +3602,10 @@ function titleBandScore(pick, live){
       return orderedBundleEntries(bundle).find((entry) => !normalizeOwnerId(entry?.ownerId)) || null;
     }
 
+    function duelCodeLabel(duelId){
+      return getWarRoomModelApi().normalizeSlug(duelId || '') || '';
+    }
+
     function deriveMatchupLifecycle(matchup, room = ACTIVE_ROOM){
       const bundle = room ? findCustomBundleByDuelId(room.slug, matchup?.id) : null;
       if (bundle) return deriveCustomBundleLifecycle(bundle);
@@ -3775,19 +3779,13 @@ function titleBandScore(pick, live){
       if (!CURRENT_USER || !ACTIVE_ROOM) return null;
       const model = getWarRoomModelApi();
       const roomSlug = ACTIVE_ROOM.slug || BASE_ROOM?.slug || DEFAULT_ROOM_SLUG;
-      const safeOpponentName = model.normalizeWhitespace(opponentName || 'Friend') || 'Friend';
-      const invitedOwnerId = model.normalizeSlug(opponentOwnerId || '') || null;
-      if (invitedOwnerId && invitedOwnerId === CURRENT_USER.ownerId) {
-        throw new Error('Opponent handle must be different from your own handle');
-      }
-      const duelId = nextCustomDuelId(`${CURRENT_USER.displayName} vs ${safeOpponentName}`, roomSlug);
+      const openSlotName = 'Open challenger';
+      const duelId = nextCustomDuelId(`${CURRENT_USER.displayName} duel`, roomSlug);
       const now = new Date().toISOString();
       if (usesHostedDuelsBackend()) {
         const remoteBundle = await DUELS_BACKEND.createPublicDuel({
           roomSlug,
           duelSlug: duelId,
-          opponentName: safeOpponentName,
-          opponentOwnerId: invitedOwnerId,
           currentUser: CURRENT_USER
         });
         const storedRemote = upsertRemoteBundle(syncBundleDerivedState(remoteBundle), BASE_ROOM || ACTIVE_ROOM);
@@ -3795,9 +3793,7 @@ function titleBandScore(pick, live){
         requestedDuelMissing = false;
         activeView = 'warroom';
         setRequestedDuelIdInUrl(storedRemote?.duelRecord?.id || duelId);
-        setStudioNotice('good', invitedOwnerId
-          ? `Public duel created in ${currentAuthLabel()}. Share the duel link with @${invitedOwnerId} so they can open their slot and submit picks.`
-          : `Public duel created in ${currentAuthLabel()}. Share the duel link with your friend so they can claim the open slot and submit picks.`);
+        setStudioNotice('good', `Public duel created in ${currentAuthLabel()}. Share the duel link or duel code ${duelCodeLabel(storedRemote?.duelRecord?.id || duelId)} so your opponent can create an account, join, and submit picks.`);
         return storedRemote;
       }
       const creatorEntry = {
@@ -3809,12 +3805,11 @@ function titleBandScore(pick, live){
         updatedAt: now,
         picks: createEmptyPicks()
       };
-      const opponentSeed = invitedOwnerId || model.normalizeSlug(safeOpponentName) || 'friend';
       const opponentEntry = {
-        id: `${duelId}-${opponentSeed}`,
+        id: `${duelId}-open-slot`,
         duelId,
-        displayName: safeOpponentName,
-        ownerId: invitedOwnerId,
+        displayName: openSlotName,
+        ownerId: null,
         submittedAt: null,
         updatedAt: null,
         picks: createEmptyPicks()
@@ -3837,10 +3832,39 @@ function titleBandScore(pick, live){
       requestedDuelMissing = false;
       activeView = 'warroom';
       setRequestedDuelIdInUrl(stored?.duelRecord?.id || duelId);
-      setStudioNotice('good', invitedOwnerId
-        ? `Public duel created. Share the duel link with @${invitedOwnerId} so they can open their slot and submit picks.`
-        : 'Public duel created. Share the duel link with your friend so they can claim the open slot and submit picks.');
+      setStudioNotice('good', `Public duel created. Share the duel link or duel code ${duelCodeLabel(stored?.duelRecord?.id || duelId)} so your opponent can create an account, join, and submit picks.`);
       return stored;
+    }
+
+    async function joinDuelByCode(code){
+      if (!CURRENT_USER) throw new Error('Sign in before you join a duel by code.');
+      const duelId = getWarRoomModelApi().normalizeSlug(code || '');
+      if (!duelId) throw new Error('Enter a duel code first.');
+      if (!BASE_ROOM && !ACTIVE_ROOM) throw new Error('Load a valid duel room before trying to join a duel.');
+      const roomSlug = ACTIVE_ROOM?.slug || BASE_ROOM?.slug || DEFAULT_ROOM_SLUG;
+
+      let bundle = findCustomBundleByDuelId(roomSlug, duelId);
+      if (!bundle && usesHostedDuelsBackend()) {
+        await syncRemoteBundlesForRoom(roomSlug, BASE_ROOM || ACTIVE_ROOM);
+        refreshMergedRoom(duelId);
+        bundle = findCustomBundleByDuelId(roomSlug, duelId);
+      }
+      if (!bundle) throw new Error(`No public duel was found for code ${duelId}.`);
+
+      activeId = duelId;
+      activeView = 'warroom';
+      requestedDuelMissing = false;
+      setRequestedDuelIdInUrl(duelId);
+
+      if (activeOwnedEntry(bundle)) {
+        setStudioNotice('info', `Opened ${bundle.duelRecord.label || 'your duel'} from code ${duelId}.`);
+        return bundle;
+      }
+      if (activeOpenEntry(bundle)) {
+        return claimActiveOpenSlot();
+      }
+      setStudioNotice('bad', `Code ${duelId} belongs to a duel that has already been fully claimed.`);
+      return bundle;
     }
 
     async function claimActiveOpenSlot(){
@@ -4224,21 +4248,24 @@ function titleBandScore(pick, live){
       const disabledAttr = CURRENT_USER ? '' : 'disabled';
       panel.innerHTML = `
         <form id="createDuelForm">
-          <div class="studio-form-grid">
-            <div class="studio-field">
-              <label for="createOpponentName">Opponent display name</label>
-              <input class="studio-input" id="createOpponentName" name="opponentName" placeholder="Bala" />
-            </div>
-            <div class="studio-field">
-              <label for="createOpponentOwnerId">Reserve handle (optional)</label>
-              <input class="studio-input" id="createOpponentOwnerId" name="opponentOwnerId" placeholder="bala" />
-            </div>
-          </div>
           <div class="studio-note">${usesHostedDuelsBackend()
-            ? `Public by default and persisted in ${escapeHtml(currentAuthLabel())}. Reserve a handle if you already know who should take the second slot, or leave it blank so any friend can claim it from the duel link.`
-            : 'Public by default. Reserve a handle if you already know who should take the second slot, or leave it blank so any friend can claim it from the shared duel link.'}</div>
+            ? `Create duel now, get a live duel code instantly, and keep working on your 15 picks while your opponent creates an account and joins from the invite link or code.`
+            : 'Create duel now, get a duel code instantly, and keep working on your 15 picks while your opponent opens the invite link or joins from the code.'}</div>
+          <div class="studio-note">${usesHostedDuelsBackend()
+            ? `Public by default and persisted in ${escapeHtml(currentAuthLabel())}. The second slot stays open until someone joins.`
+            : 'Public by default. The second slot stays open until someone joins.'}</div>
           <div class="studio-actions">
             <button class="studio-button" type="submit" ${disabledAttr}>Create public duel</button>
+          </div>
+        </form>
+        <form id="joinByCodeForm" style="margin-top:16px">
+          <div class="studio-field">
+            <label for="joinByCodeInput">Join duel by code</label>
+            <input class="studio-input" id="joinByCodeInput" name="duelCode" placeholder="senthil-duel-k4m2x" ${disabledAttr} />
+          </div>
+          <div class="studio-note">If your opponent sent you a duel code instead of the full invite link, paste it here after you sign in.</div>
+          <div class="studio-actions">
+            <button class="studio-button secondary" type="submit" id="joinByCodeButton" ${disabledAttr}>Join by code</button>
           </div>
         </form>
       `;
@@ -4251,11 +4278,28 @@ function titleBandScore(pick, live){
             render();
             return;
           }
-          const formData = new FormData(form);
           try {
-            await createCustomDuel(formData.get('opponentName'), formData.get('opponentOwnerId'));
+            await createCustomDuel();
           } catch (error) {
             setStudioNotice('bad', error.message || 'Could not create duel.');
+          }
+          render();
+        };
+      }
+      const joinForm = document.getElementById('joinByCodeForm');
+      if (joinForm) {
+        joinForm.onsubmit = async (event) => {
+          event.preventDefault();
+          if (!CURRENT_USER) {
+            setStudioNotice('bad', 'Sign in before you join a duel by code.');
+            render();
+            return;
+          }
+          const formData = new FormData(joinForm);
+          try {
+            await joinDuelByCode(formData.get('duelCode'));
+          } catch (error) {
+            setStudioNotice('bad', error.message || 'Could not join duel by code.');
           }
           render();
         };
@@ -4282,6 +4326,7 @@ function titleBandScore(pick, live){
       const ownEntry = activeOwnedEntry(bundle);
       const openEntry = activeOpenEntry(bundle);
       const shareUrl = buildDuelShareUrl(bundle.duelRecord.id);
+      const duelCode = duelCodeLabel(bundle.duelRecord.id);
       const otherEntry = ownEntry ? (entryA?.id === ownEntry.id ? entryB : entryA) : null;
       const completedCount = ownEntry ? countCompletedPicks(ownEntry.picks || {}) : 0;
 
@@ -4292,14 +4337,18 @@ function titleBandScore(pick, live){
             <span class="studio-chip">${escapeHtml(bundle.duelRecord.label || `${entryA?.displayName || 'Entry A'} vs ${entryB?.displayName || 'Entry B'}`)}</span>
             <span class="studio-chip">${escapeHtml(lifecycleHeadline(lifecycle))}</span>
           </div>
-          <div class="studio-empty">Sign in with a display name and handle to claim an open slot or edit your picks on this custom duel link.</div>
+          <div class="studio-empty">Sign in, or create an account, to claim the open slot on this duel link and submit your picks.</div>
           <div class="studio-actions">
             <button class="studio-button ghost" type="button" id="copyStudioLinkButton">Copy duel link</button>
+            <button class="studio-button ghost" type="button" id="copyStudioCodeButton">Copy duel code</button>
           </div>
           <div class="studio-note">Share URL: <span class="studio-link">${escapeHtml(shareUrl)}</span></div>
+          <div class="studio-note">Duel code: <span class="studio-link">${escapeHtml(duelCode)}</span></div>
         `;
         const copyButton = document.getElementById('copyStudioLinkButton');
         if (copyButton) copyButton.onclick = () => copyDuelLink(bundle.duelRecord.id, copyButton);
+        const codeButton = document.getElementById('copyStudioCodeButton');
+        if (codeButton) codeButton.onclick = () => copyDuelCode(bundle.duelRecord.id, codeButton);
         return;
       }
 
@@ -4314,8 +4363,10 @@ function titleBandScore(pick, live){
           <div class="studio-actions">
             <button class="studio-button secondary" type="button" id="joinActiveDuelButton">Join duel</button>
             <button class="studio-button ghost" type="button" id="copyStudioLinkButton">Copy duel link</button>
+            <button class="studio-button ghost" type="button" id="copyStudioCodeButton">Copy duel code</button>
           </div>
           <div class="studio-note">Creator: ${escapeHtml(entryA?.displayName || 'Unknown')} - public by default via this share link.</div>
+          <div class="studio-note">Duel code: <span class="studio-link">${escapeHtml(duelCode)}</span></div>
         `;
         const joinButton = document.getElementById('joinActiveDuelButton');
         if (joinButton) {
@@ -4326,6 +4377,8 @@ function titleBandScore(pick, live){
         }
         const copyButton = document.getElementById('copyStudioLinkButton');
         if (copyButton) copyButton.onclick = () => copyDuelLink(bundle.duelRecord.id, copyButton);
+        const codeButton = document.getElementById('copyStudioCodeButton');
+        if (codeButton) codeButton.onclick = () => copyDuelCode(bundle.duelRecord.id, codeButton);
         return;
       }
 
@@ -4340,10 +4393,13 @@ function titleBandScore(pick, live){
           <div class="studio-empty">Signed in as ${escapeHtml(CURRENT_USER.displayName)}, but this custom duel already belongs to ${escapeHtml(entryA?.displayName || 'Entry A')} and ${escapeHtml(entryB?.displayName || 'Entry B')}.</div>
           <div class="studio-actions">
             <button class="studio-button ghost" type="button" id="copyStudioLinkButton">Copy duel link</button>
+            <button class="studio-button ghost" type="button" id="copyStudioCodeButton">Copy duel code</button>
           </div>
         `;
         const copyButton = document.getElementById('copyStudioLinkButton');
         if (copyButton) copyButton.onclick = () => copyDuelLink(bundle.duelRecord.id, copyButton);
+        const codeButton = document.getElementById('copyStudioCodeButton');
+        if (codeButton) codeButton.onclick = () => copyDuelCode(bundle.duelRecord.id, codeButton);
         return;
       }
 
@@ -4365,6 +4421,7 @@ function titleBandScore(pick, live){
             <div class="studio-inline">
               <span class="studio-chip">You: @${escapeHtml(CURRENT_USER.ownerId)}</span>
               <span class="studio-chip">${otherEntry?.submittedAt ? `${escapeHtml(otherEntry.displayName)} submitted` : `${escapeHtml(otherEntry?.displayName || 'Opponent')} still drafting`}</span>
+              <span class="studio-chip">Code: ${escapeHtml(duelCode)}</span>
               ${lifecycle.startsScoringFromMatchNo ? `<span class="studio-chip">Start match: ${escapeHtml(String(lifecycle.startsScoringFromMatchNo))}</span>` : ''}
             </div>
             ${lifecycle.clashCount ? `<div class="studio-clash-list">${lifecycle.clashKeys.map((key) => {
@@ -4404,11 +4461,12 @@ function titleBandScore(pick, live){
             <button class="studio-button ghost" type="button" id="saveDraftButton" ${frozen ? 'disabled' : ''}>Save draft picks</button>
             <button class="studio-button secondary" type="button" id="submitPicksButton" ${frozen ? 'disabled' : ''}>${escapeHtml(actionLabel)}</button>
             <button class="studio-button ghost" type="button" id="copyStudioLinkButton">Copy duel link</button>
+            <button class="studio-button ghost" type="button" id="copyStudioCodeButton">Copy duel code</button>
           </div>
         </form>
         <div class="studio-note">${frozen
           ? `This duel is frozen. The active score only starts from Match ${lifecycle.startsScoringFromMatchNo || '?'}, and anything before that stays off the board.`
-          : `Each category opens a filtered picker. Search directly for a player like Dhoni, or narrow the pool by team. Shared picks create clashes and stop the duel from arming.`}</div>
+          : `Each category opens a filtered picker. Search directly for a player like Dhoni, or narrow the pool by team. Shared picks create clashes and stop the duel from arming. Share the invite link or duel code ${escapeHtml(duelCode)} while you work on your sheet.`}</div>
       `;
 
       panel.querySelectorAll('[data-open-picker]').forEach((button) => {
@@ -4441,6 +4499,8 @@ function titleBandScore(pick, live){
 
       const copyButton = document.getElementById('copyStudioLinkButton');
       if (copyButton) copyButton.onclick = () => copyDuelLink(bundle.duelRecord.id, copyButton);
+      const codeButton = document.getElementById('copyStudioCodeButton');
+      if (codeButton) codeButton.onclick = () => copyDuelCode(bundle.duelRecord.id, codeButton);
     }
 
     function renderDuelStudio(){
@@ -4448,10 +4508,10 @@ function titleBandScore(pick, live){
       const flash = document.getElementById('duelStudioFlash');
       if (summary) {
         summary.textContent = CURRENT_USER
-          ? `Signed in as ${CURRENT_USER.displayName}. Build a public duel, fill the 15-category pick sheet with search and team filters, and resolve clashes before the duel arms for its start match.${usesHostedDuelsBackend() ? ` This browser is connected to ${currentAuthLabel()} for real auth and persisted duel records.` : ''}`
+          ? `Signed in as ${CURRENT_USER.displayName}. Create a public duel, share the invite link or duel code, fill the 15-category pick sheet with search and team filters, and resolve clashes before the duel arms for its start match.${usesHostedDuelsBackend() ? ` This browser is connected to ${currentAuthLabel()} for real auth and persisted duel records.` : ''}`
           : usesHostedDuelsBackend()
-            ? `Create or sign in to a real Duels account on ${currentAuthLabel()} so public duels, joins, and pick submissions persist across browsers.`
-            : 'Sign in to create a public duel, claim an invite, and submit picks. Search-first category pickers, clash checks, and frozen reveal rules now run in the browser until the backend lands.';
+            ? `Create or sign in to a real Duels account on ${currentAuthLabel()} so public duels, invite links, duel-code joins, and pick submissions persist across browsers.`
+            : 'Sign in to create a public duel, claim an invite, and submit picks. Search-first category pickers, clash checks, duel codes, and frozen reveal rules now run in the browser until the backend lands.';
       }
       if (flash) {
         flash.innerHTML = DUEL_STUDIO_NOTICE
@@ -4782,6 +4842,20 @@ function titleBandScore(pick, live){
       const original = trigger.dataset.originalLabel || trigger.textContent;
       trigger.dataset.originalLabel = original;
       trigger.textContent = ok ? 'Copied link' : 'Copy failed';
+      trigger.classList.toggle('copy-ok', ok);
+      setTimeout(() => {
+        trigger.textContent = original;
+        trigger.classList.remove('copy-ok');
+      }, 1400);
+      return ok;
+    }
+
+    async function copyDuelCode(duelId, trigger){
+      const ok = await copyTextToClipboard(duelCodeLabel(duelId));
+      if (!trigger) return ok;
+      const original = trigger.dataset.originalLabel || trigger.textContent;
+      trigger.dataset.originalLabel = original;
+      trigger.textContent = ok ? 'Copied code' : 'Copy failed';
       trigger.classList.toggle('copy-ok', ok);
       setTimeout(() => {
         trigger.textContent = original;

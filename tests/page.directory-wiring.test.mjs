@@ -17,6 +17,8 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /duels-backend\.js/);
   assert.match(html, /function sortedDirectoryDuels\(/);
   assert.match(html, /function buildDuelShareUrl\(/);
+  assert.match(html, /function joinDuelByCode\(/);
+  assert.match(html, /function copyDuelCode\(/);
   assert.match(html, /function renderDuelStudio\(/);
   assert.match(html, /function createCustomDuel\(/);
   assert.match(html, /function claimActiveOpenSlot\(/);
@@ -31,5 +33,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /data-pick-key=/);
   assert.match(html, /data-open-picker=/);
   assert.match(html, /data-open-duel=/);
+  assert.match(html, /id="joinByCodeForm"/);
+  assert.match(html, /id="joinByCodeInput"/);
   assert.match(html, /window\.history\.replaceState/);
 });

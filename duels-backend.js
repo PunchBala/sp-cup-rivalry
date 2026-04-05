@@ -452,15 +452,14 @@
           .filter(Boolean);
       },
 
-      async createPublicDuel({ roomSlug, duelSlug, opponentName, opponentOwnerId, currentUser }) {
+      async createPublicDuel({ roomSlug, duelSlug, currentUser }) {
         const activeSession = await ensureFreshSession();
         if (!activeSession?.access_token || !currentUser?.userId) {
           throw new Error('Sign in with a backend account before creating a persisted duel.');
         }
         const safeRoomSlug = normalizeSlug(roomSlug || '');
         const safeDuelSlug = normalizeSlug(duelSlug || '');
-        const safeOpponentName = normalizeWhitespace(opponentName || 'Friend') || 'Friend';
-        const safeOpponentOwnerId = normalizeSlug(opponentOwnerId || '') || null;
+        const openSlotName = 'Open challenger';
         if (!safeRoomSlug || !safeDuelSlug) {
           throw new Error('Could not create a persisted duel because the room or duel slug was missing.');
         }
@@ -472,7 +471,7 @@
           body: {
             slug: safeDuelSlug,
             room_slug: safeRoomSlug,
-            label: `${currentUser.displayName} vs ${safeOpponentName}`,
+            label: `${currentUser.displayName} vs ${openSlotName}`,
             visibility: 'public',
             state: 'draft',
             created_by_user_id: currentUser.userId,
@@ -503,8 +502,8 @@
               slot_index: 2,
               owner_user_id: null,
               owner_handle: null,
-              reserved_handle: safeOpponentOwnerId,
-              display_name: safeOpponentName,
+              reserved_handle: null,
+              display_name: openSlotName,
               picks: {}
             }
           ],
