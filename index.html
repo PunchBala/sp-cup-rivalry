@@ -172,6 +172,23 @@
     .duel-directory-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--accent)}
     .duel-directory-note{margin-top:12px;line-height:1.5}
     .duel-directory-cta{margin-top:14px;display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid rgba(124,196,255,.18);background:rgba(124,196,255,.10);color:#dbeaff;font-size:11px;font-weight:900;letter-spacing:.03em;text-transform:uppercase}
+    .duel-directory-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .duel-directory-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .duel-activity-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.05);font-size:11px;font-weight:800;color:#dbe7ff}
+    .duel-activity-tag.hot{border-color:rgba(255,200,87,.28);background:rgba(255,200,87,.12);color:#ffe2a8}
+    .pill-button,.mini-action{
+      border:1px solid rgba(124,196,255,.18);
+      background:rgba(124,196,255,.10);
+      color:#e9f3ff;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    .pill-button:hover,.mini-action:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.32)}
+    .pill-button.copy-ok,.mini-action.copy-ok{background:rgba(68,215,146,.14);border-color:rgba(68,215,146,.28);color:#b7f2d1}
     .status-wait{background:rgba(255,200,87,.16);color:#ffd67e}
     .view-tab{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.18s}
     .view-tab.active{background:linear-gradient(180deg,rgba(84,138,255,.22),rgba(84,138,255,.1));border-color:rgba(123,167,255,.45);box-shadow:0 0 0 1px rgba(123,167,255,.18) inset}
@@ -277,7 +294,7 @@
   <div class="wrap">
     <div class="hero">
       <h1 id="leagueTitle">IPL 2026 Prediction War Room</h1>
-      <p class="sub" id="leagueSubtitle">Live tracker for the season-long nonsense, delusion, and occasional genius. Scoring logic fixed. Season lock fixed. Next match card fixed.</p>
+      <p class="sub" id="leagueSubtitle">Public sealed-duel tracker for the SP Cup board. Browse live head-to-head battles, jump into any duel, and follow how different pick sheets move as the season shifts.</p>
       <div class="tabs" id="tabs"></div>
       <div class="view-tabs" id="viewTabs"></div>
       <div class="meta">
@@ -2498,8 +2515,8 @@ function titleBandScore(pick, live){
     function computeMatchup(matchup, liveSource = LIVE_2026){
       const rows = CATEGORIES.map(category => {
         const result = getCategoryResult(category, matchup, liveSource);
-        const pickA = matchup.a.picks[category.key] || '—';
-        const pickB = matchup.b.picks[category.key] || '—';
+        const pickA = matchup.a.picks[category.key] || '--';
+        const pickB = matchup.b.picks[category.key] || '--';
         const live = (liveSource && liveSource[category.key]) || {};
         return {
           category,
@@ -2517,11 +2534,6 @@ function titleBandScore(pick, live){
       const totalB = rows.reduce((s,r)=>s+r.b,0);
 
       return { rows, totalA, totalB };
-    }
-
-    function currentNextMatch(){
-      const now = new Date();
-      return SCHEDULE_2026.find(m => new Date(m.start).getTime() > now.getTime()) || null;
     }
 
     function topListNote(label, ranking, limit = 5){
@@ -2702,7 +2714,7 @@ function titleBandScore(pick, live){
       const waitingCount = Math.max(0, duelCount - liveCount);
       const stateLabel = room.state === 'locked' ? 'sealed' : 'draft';
       titleEl.textContent = `${room.name} War Room`;
-      subtitleEl.textContent = `${duelCount} public duel${duelCount === 1 ? '' : 's'} • ${liveCount} live${waitingCount ? ` • ${waitingCount} waiting` : ''} • ${stateLabel} duel-first room. Each page view focuses on one sealed head-to-head battle, while the model still supports the same player appearing in different duels with different picks.`;
+      subtitleEl.textContent = `${duelCount} public duel${duelCount === 1 ? '' : 's'} - ${liveCount} live${waitingCount ? ` - ${waitingCount} waiting` : ''} - ${stateLabel} duel-first room. Each page view focuses on one sealed head-to-head battle, while the model still supports the same player appearing in different duels with different picks.`;
       pillEl.textContent = `War Room: ${room.name}`;
     }
 
@@ -2775,10 +2787,10 @@ function titleBandScore(pick, live){
       document.getElementById('breakdownTable').innerHTML = `<thead><tr><th>Category</th><th>War room status</th></tr></thead><tbody><tr><td colspan="2">No rivalry board can be rendered until a valid war room fixture is loaded.</td></tr></tbody>`;
       document.getElementById('insights').innerHTML = '<div class="insight">War room fixture did not load, so the smart insights are keeping their powder dry.</div>';
       document.getElementById('roasts').innerHTML = '<div class="insight roast">No war room loaded, no roast served. Even the banter has standards.</div>';
-      document.getElementById('metricOverall').textContent = '—';
-      document.getElementById('metricFronts').textContent = '—';
+      document.getElementById('metricOverall').textContent = '--';
+      document.getElementById('metricFronts').textContent = '--';
+      document.getElementById('metricConfidence').textContent = '--';
       document.getElementById('metricWinner').textContent = 'Waiting';
-      document.getElementById('metricConfidence').textContent = '—';
       document.getElementById('metricLead').textContent = 'Need a valid war room fixture before the scoreboard can breathe.';
       document.getElementById('metricWinnerNote').textContent = 'No loaded duel yet.';
       document.getElementById('metricConfidenceNote').textContent = 'Confidence comes after data.';
@@ -2794,13 +2806,13 @@ function titleBandScore(pick, live){
       document.getElementById('scoreboard').innerHTML = `
         <div class="player-box">
           <div class="player-name">${escapeHtml(matchup.a.name)}</div>
-          <div class="big-score lead">—</div>
+          <div class="big-score lead">--</div>
           <div class="small">This side has not sealed the battle yet.</div>
         </div>
         <div class="vs">VS<div class="small" style="margin-top:8px">${escapeHtml(stateLabel)}</div></div>
         <div class="player-box">
           <div class="player-name">${escapeHtml(matchup.b.name)}</div>
-          <div class="big-score trail">—</div>
+          <div class="big-score trail">--</div>
           <div class="small">No score until both rivals lock their cards.</div>
         </div>`;
       document.getElementById('nextMatchMeta').textContent = 'This duel is not live yet.';
@@ -2810,10 +2822,10 @@ function titleBandScore(pick, live){
       document.getElementById('breakdownTable').innerHTML = `<thead><tr><th>Category</th><th>Duel state</th></tr></thead><tbody><tr><td colspan="2">This duel is waiting for both pick sheets to be locked before live scoring begins.</td></tr></tbody>`;
       document.getElementById('insights').innerHTML = '<div class="insight">No live insights yet. The duel wakes up the second both sides lock in.</div>';
       document.getElementById('roasts').innerHTML = '<div class="insight roast">No roast yet. Even chaos needs two signed consent forms.</div>';
-      document.getElementById('metricOverall').textContent = '—';
-      document.getElementById('metricFronts').textContent = '—';
+      document.getElementById('metricOverall').textContent = '--';
+      document.getElementById('metricFronts').textContent = '--';
       document.getElementById('metricWinner').textContent = 'Pending';
-      document.getElementById('metricConfidence').textContent = '—';
+      document.getElementById('metricConfidence').textContent = '--';
       document.getElementById('metricLead').textContent = 'Both rivals need to submit before the duel goes live.';
       document.getElementById('metricWinnerNote').textContent = 'No winner call until both pick sheets are sealed.';
       document.getElementById('metricConfidenceNote').textContent = 'Confidence is zero until the duel is live.';
@@ -2855,7 +2867,7 @@ function titleBandScore(pick, live){
       });
     }
 
-    function renderViewTabs(){
+    function legacyRenderViewTabs(){
       const el = document.getElementById('viewTabs');
       if (!el) return;
       const matchup = activeMatchup();
@@ -2893,7 +2905,7 @@ function titleBandScore(pick, live){
       }
     }
 
-    function renderPublicDuelLayer(){
+    function legacyRenderPublicDuelLayer(){
       const nav = document.getElementById('viewTabs');
       const directory = document.getElementById('duelDirectory');
       const summary = document.getElementById('duelDirectorySummary');
@@ -2982,6 +2994,195 @@ function titleBandScore(pick, live){
 
       directory.querySelectorAll('[data-duel-card]').forEach((button) => {
         button.onclick = () => selectDuel(button.dataset.duelId);
+      });
+    }
+
+    function buildDuelShareUrl(duelId){
+      const params = new URLSearchParams();
+      params.set('room', ACTIVE_ROOM?.slug || DEFAULT_ROOM_SLUG);
+      params.set('duel', duelId);
+      const origin = window.location.origin || '';
+      return `${origin}${window.location.pathname}?${params.toString()}`;
+    }
+
+    async function copyTextToClipboard(value){
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(value);
+          return true;
+        }
+      } catch {}
+
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = value;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'absolute';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        const copied = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        return copied;
+      } catch {
+        return false;
+      }
+    }
+
+    async function copyDuelLink(duelId, trigger){
+      const ok = await copyTextToClipboard(buildDuelShareUrl(duelId));
+      if (!trigger) return ok;
+      const original = trigger.dataset.originalLabel || trigger.textContent;
+      trigger.dataset.originalLabel = original;
+      trigger.textContent = ok ? 'Copied link' : 'Copy failed';
+      trigger.classList.toggle('copy-ok', ok);
+      setTimeout(() => {
+        trigger.textContent = original;
+        trigger.classList.remove('copy-ok');
+      }, 1400);
+      return ok;
+    }
+
+    function summarizeDirectoryDuel(matchup){
+      const updatedAt = latestBoardUpdatedAt() || matchup.updatedAt || ACTIVE_ROOM?.updatedAt || null;
+      const duelLabel = matchup.label || `${matchup.a.name} vs ${matchup.b.name}`;
+      const isLive = matchup.state === 'locked';
+      let totalA = null;
+      let totalB = null;
+      let frontsA = 0;
+      let frontsB = 0;
+      let leaderName = null;
+      let margin = 0;
+
+      if (isLive) {
+        const scored = computeMatchup(matchup);
+        totalA = scored.totalA;
+        totalB = scored.totalB;
+        frontsA = scored.rows.filter((row) => row.a > row.b).length;
+        frontsB = scored.rows.filter((row) => row.b > row.a).length;
+        leaderName = totalA === totalB ? null : (totalA > totalB ? matchup.a.name : matchup.b.name);
+        margin = Math.abs(totalA - totalB);
+      }
+
+      const updatedMs = updatedAt ? Date.parse(updatedAt) : 0;
+      const hotDuel = isLive && (margin <= 2 || Math.abs(frontsA - frontsB) <= 1);
+      return {
+        matchup,
+        duelLabel,
+        updatedAt,
+        updatedMs: Number.isFinite(updatedMs) ? updatedMs : 0,
+        isLive,
+        totalA,
+        totalB,
+        frontsA,
+        frontsB,
+        leaderName,
+        margin,
+        hotDuel
+      };
+    }
+
+    function sortedDirectoryDuels(){
+      return MATCHUPS
+        .map((matchup) => summarizeDirectoryDuel(matchup))
+        .sort((a, b) =>
+          Number(b.isLive) - Number(a.isLive) ||
+          b.margin - a.margin ||
+          b.updatedMs - a.updatedMs ||
+          a.duelLabel.localeCompare(b.duelLabel)
+        );
+    }
+
+    function renderPublicDuelLayer(){
+      const nav = document.getElementById('viewTabs');
+      const directory = document.getElementById('duelDirectory');
+      const summary = document.getElementById('duelDirectorySummary');
+      const matchup = activeMatchup();
+
+      if (!nav || !directory || !summary) return;
+      if (!ACTIVE_ROOM || !matchup || !MATCHUPS.length) {
+        nav.innerHTML = '';
+        summary.textContent = 'No public duels are available yet.';
+        directory.innerHTML = '<div class="small">Add a duel fixture to populate the directory.</div>';
+        return;
+      }
+
+      const orderedDuels = sortedDirectoryDuels();
+      const activeLabel = matchup.label || `${matchup.a.name} vs ${matchup.b.name}`;
+      const waitingTag = matchup.state !== 'locked' ? ' - waiting on picks' : '';
+      const fallbackTag = requestedDuelMissing ? 'Requested duel was not found, so this page fell back to the first available duel.' : '';
+      nav.innerHTML = `
+        <div class="duel-picker">
+          <label for="duelPicker">Jump to duel</label>
+          <select id="duelPicker" aria-label="Browse public duel">
+            ${orderedDuels.map(({ matchup: item }) => `<option value="${escapeHtml(item.id)}" ${item.id === matchup.id ? 'selected' : ''}>${escapeHtml(item.label || `${item.a.name} vs ${item.b.name}`)}${item.state !== 'locked' ? ' (Waiting)' : ''}</option>`).join('')}
+          </select>
+        </div>
+        <div class="pill">Active duel: ${escapeHtml(activeLabel)}${escapeHtml(waitingTag)}</div>
+        <button class="pill pill-button" id="copyActiveDuelLink" type="button">Copy duel link</button>
+        <div class="pill">Visibility: public duel page - ${MATCHUPS.length} listed</div>
+        <div class="pill">Room: ${escapeHtml(ACTIVE_ROOM.name || ACTIVE_ROOM.slug || 'War Room')}</div>
+        ${fallbackTag ? `<div class="pill">${escapeHtml(fallbackTag)}</div>` : ''}
+      `;
+
+      const duelPicker = document.getElementById('duelPicker');
+      if (duelPicker) duelPicker.onchange = () => selectDuel(duelPicker.value);
+      const copyActiveButton = document.getElementById('copyActiveDuelLink');
+      if (copyActiveButton) copyActiveButton.onclick = () => copyDuelLink(matchup.id, copyActiveButton);
+
+      const liveCount = orderedDuels.filter((item) => item.isLive).length;
+      const waitingCount = Math.max(0, orderedDuels.length - liveCount);
+      const boardUpdatedAt = latestBoardUpdatedAt();
+      summary.textContent = `${orderedDuels.length} public duel${orderedDuels.length === 1 ? '' : 's'} in the room, ${liveCount} live${waitingCount ? `, ${waitingCount} waiting on picks` : ''}. Live duels sort by biggest margin first, then most recently updated.${boardUpdatedAt ? ` Board last updated ${formatTimestamp(boardUpdatedAt)}.` : ''}`;
+
+      directory.innerHTML = orderedDuels.map((item) => {
+        const statusLabel = item.isLive ? (item.margin === 0 ? 'Level duel' : 'Live duel') : 'Waiting on picks';
+        const statusClass = item.isLive ? (item.margin === 0 ? 'status-tie' : 'status-good') : 'status-wait';
+        const leaderLabel = item.isLive ? (item.leaderName ? `${item.leaderName} by ${item.margin}` : 'Scores level') : 'Awaiting both pick sheets';
+        const marginLabel = item.isLive ? `${item.margin} point${item.margin === 1 ? '' : 's'}` : 'No live margin yet';
+        const frontsLabel = item.isLive ? `${item.frontsA} - ${item.frontsB}` : 'Waiting';
+        const scoreLabel = item.isLive ? `${item.totalA} - ${item.totalB}` : '--';
+        const updatedLabel = formatTimestamp(item.updatedAt);
+        const activityLabel = item.hotDuel ? 'Hot duel' : item.isLive ? 'Live board' : 'Draft duel';
+        const activityClass = item.hotDuel ? 'duel-activity-tag hot' : 'duel-activity-tag';
+        const note = item.isLive
+          ? (item.leaderName ? `${item.leaderName} has the current edge with a ${frontsLabel} fronts split.` : `This duel is dead level on score with a ${frontsLabel} fronts split.`)
+          : 'This duel will go live once both duel entries are sealed.';
+        const activeClass = item.matchup.id === activeId ? 'active' : '';
+
+        return `
+          <article class="duel-directory-card ${activeClass}" data-duel-card>
+            <div class="duel-directory-top">
+              <div>
+                <div class="duel-directory-label">${escapeHtml(item.duelLabel)}</div>
+                <div class="small">${escapeHtml(item.matchup.visibility || ACTIVE_ROOM.visibility || 'public')} duel</div>
+              </div>
+              <span class="status-chip ${statusClass}">${escapeHtml(statusLabel)}</span>
+            </div>
+            <div class="duel-directory-score">${escapeHtml(scoreLabel)}</div>
+            <div class="duel-directory-meta">
+              <div class="duel-directory-row"><span class="duel-directory-kicker">Leader</span><strong>${escapeHtml(leaderLabel)}</strong></div>
+              <div class="duel-directory-row"><span class="duel-directory-kicker">Margin</span><strong>${escapeHtml(marginLabel)}</strong></div>
+              <div class="duel-directory-row"><span class="duel-directory-kicker">Fronts won</span><strong>${escapeHtml(frontsLabel)}</strong></div>
+              <div class="duel-directory-row"><span class="duel-directory-kicker">Last updated</span><strong>${escapeHtml(updatedLabel)}</strong></div>
+            </div>
+            <div class="small duel-directory-note">${escapeHtml(note)}</div>
+            <div class="duel-directory-footer">
+              <span class="${activityClass}">${escapeHtml(activityLabel)}</span>
+              <div class="duel-directory-actions">
+                <button class="mini-action" type="button" data-copy-duel-link="${escapeHtml(item.matchup.id)}">Copy link</button>
+                <button class="mini-action" type="button" data-open-duel="${escapeHtml(item.matchup.id)}">${item.matchup.id === activeId ? 'Viewing duel' : 'Open duel'}</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      directory.querySelectorAll('[data-open-duel]').forEach((button) => {
+        button.onclick = () => selectDuel(button.dataset.openDuel);
+      });
+      directory.querySelectorAll('[data-copy-duel-link]').forEach((button) => {
+        button.onclick = () => copyDuelLink(button.dataset.copyDuelLink, button);
       });
     }
 
@@ -3559,6 +3760,25 @@ function titleBandScore(pick, live){
       }).sort((a,b) => a.count - b.count);
     }
 
+    function resetWormGraph(){
+      const svg = document.getElementById('wormChart');
+      const empty = document.getElementById('wormEmpty');
+      const shell = document.getElementById('wormChartShell');
+      const meta = document.getElementById('wormMeta');
+      const legendA = document.getElementById('wormLegendA');
+      const legendB = document.getElementById('wormLegendB');
+
+      if (svg) {
+        svg.innerHTML = '';
+        svg.classList.add('section-hidden');
+      }
+      if (empty) empty.classList.remove('section-hidden');
+      if (shell) shell.classList.add('worm-empty-mode');
+      if (meta) meta.textContent = 'Waiting for completed-game checkpoints';
+      if (legendA) legendA.innerHTML = '<span class="worm-swatch worm-swatch-a"></span>Entry A 0 pts';
+      if (legendB) legendB.innerHTML = '<span class="worm-swatch worm-swatch-b"></span>Entry B 0 pts';
+    }
+
     function renderWormChart(matchup){
       const svg = document.getElementById('wormChart');
       const empty = document.getElementById('wormEmpty');
@@ -3735,7 +3955,6 @@ function titleBandScore(pick, live){
 
     function render(){
       renderTabs();
-      renderViewTabs();
       renderPublicDuelLayer();
       document.getElementById('warRoomSection').classList.toggle('section-hidden', activeView !== 'warroom');
       document.getElementById('statsSection').classList.toggle('section-hidden', activeView !== 'stats');
