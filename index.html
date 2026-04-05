@@ -240,6 +240,97 @@
     .studio-pick-card .small{line-height:1.45}
     .studio-inline{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .studio-link{color:#dbeaff}
+    .studio-status-stack{display:grid;gap:12px}
+    .studio-lifecycle-card{display:grid;gap:10px;padding:14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+    .studio-lifecycle-title{font-size:18px;font-weight:900;color:#fff}
+    .studio-lifecycle-note{font-size:13px;color:var(--muted);line-height:1.55}
+    .studio-locked-note{font-size:12px;color:#cfe2ff}
+    .studio-pick-sheet{display:grid;gap:12px;margin-top:16px}
+    .studio-pick-row{display:grid;gap:10px;padding:14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .studio-pick-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .studio-pick-label{font-size:15px;font-weight:900;color:#fff}
+    .studio-pick-picker{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .studio-picked-value{min-height:44px;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:14px;font-weight:700;color:#fff}
+    .studio-picked-value.empty{color:#8ea4ca;font-weight:600}
+    .studio-row-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .studio-status-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid var(--line);font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+    .studio-status-chip.empty{background:rgba(255,255,255,.04);color:#a9bce2}
+    .studio-status-chip.draft{background:rgba(124,196,255,.12);border-color:rgba(124,196,255,.24);color:#dbeaff}
+    .studio-status-chip.submitted{background:rgba(68,215,146,.12);border-color:rgba(68,215,146,.24);color:#c3f6d9}
+    .studio-status-chip.clash{background:rgba(255,127,150,.14);border-color:rgba(255,127,150,.24);color:#ffd0d9}
+    .studio-status-chip.armed{background:rgba(255,200,87,.14);border-color:rgba(255,200,87,.24);color:#ffe3a5}
+    .studio-status-chip.live{background:rgba(95,240,200,.14);border-color:rgba(95,240,200,.24);color:#c9fff0}
+    .studio-clash-list{display:flex;gap:8px;flex-wrap:wrap}
+    .studio-clash-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,127,150,.12);border:1px solid rgba(255,127,150,.22);font-size:11px;font-weight:800;color:#ffd4dc}
+    .picker-modal{
+      position:fixed;
+      inset:0;
+      z-index:60;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      padding:18px;
+      background:rgba(4,9,18,.70);
+      backdrop-filter:blur(6px);
+    }
+    .picker-shell{
+      width:min(900px,100%);
+      max-height:min(88vh,860px);
+      overflow:auto;
+      background:linear-gradient(180deg, rgba(19,30,58,.98), rgba(9,17,34,.98));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--glow);
+    }
+    .picker-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .picker-title{font-size:24px;font-weight:900;color:#fff}
+    .picker-sub{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.5;max-width:620px}
+    .picker-close{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#eef6ff;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:900;cursor:pointer}
+    .picker-toolbar{display:grid;gap:12px;margin-top:16px}
+    .picker-search{
+      width:100%;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:14px;
+      font:inherit;
+    }
+    .picker-chip-row{display:flex;gap:8px;flex-wrap:wrap}
+    .picker-chip{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+      transition:.16s ease;
+    }
+    .picker-chip.active{background:rgba(124,196,255,.14);border-color:rgba(124,196,255,.28);color:#eff6ff}
+    .picker-team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}
+    .picker-team-option,.picker-result{
+      width:100%;
+      text-align:left;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      border-radius:16px;
+      padding:13px 14px;
+      cursor:pointer;
+      transition:.16s ease;
+    }
+    .picker-team-option:hover,.picker-result:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.32)}
+    .picker-team-option.active,.picker-result.active{border-color:rgba(95,240,200,.32);background:rgba(95,240,200,.10)}
+    .picker-team-code{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:900}
+    .picker-team-name,.picker-result-name{margin-top:6px;font-size:15px;font-weight:900;color:#fff}
+    .picker-results{display:grid;gap:10px;margin-top:12px}
+    .picker-result-meta{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.45}
+    .picker-result-empty{padding:20px 16px;border-radius:16px;border:1px dashed rgba(255,255,255,.12);color:var(--muted);line-height:1.6;margin-top:12px}
+    .picker-footer{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px}
+    .picker-count{font-size:12px;color:var(--muted);font-weight:700}
     @media (max-width:1100px){
       .studio-layout{grid-template-columns:1fr}
       .studio-form-grid,.studio-picks-grid{grid-template-columns:1fr}
@@ -490,6 +581,27 @@
       </div>
     </div>
 
+    <div id="pickPickerModal" class="picker-modal section-hidden" aria-hidden="true">
+      <div class="picker-shell" role="dialog" aria-modal="true" aria-labelledby="pickPickerTitle">
+        <div class="picker-top">
+          <div>
+            <div class="picker-title" id="pickPickerTitle">Choose a pick</div>
+            <div class="picker-sub" id="pickPickerSubtitle">Search, filter, and lock in your duel pick.</div>
+          </div>
+          <button class="picker-close" id="pickPickerClose" type="button">Close picker</button>
+        </div>
+        <div class="picker-toolbar" id="pickPickerToolbar"></div>
+        <div id="pickPickerBody"></div>
+        <div class="picker-footer">
+          <div class="picker-count" id="pickPickerCount">0 options</div>
+          <div class="studio-inline">
+            <button class="studio-button ghost" id="pickPickerClear" type="button">Clear pick</button>
+            <button class="studio-button ghost" id="pickPickerDone" type="button">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="warroom-room-model.js"></script>
@@ -518,6 +630,15 @@
     let CURRENT_USER = null;
     let CUSTOM_DUEL_STORE = { version: 1, rooms: {} };
     let DUEL_STUDIO_NOTICE = null;
+    let IPL_SQUADS = {};
+    let ACTIVE_PICKER_STATE = {
+      open: false,
+      categoryKey: null,
+      teamFilter: 'ALL',
+      search: '',
+      formId: null,
+      duelId: null
+    };
 
     // ========= CATEGORY MAP =========
     const CATEGORIES = [
@@ -539,6 +660,70 @@
     ];
 
     const BONUS_TOP_RANK_BETTER_PREDICTION_KEYS = new Set(['uncappedMvp','striker','bestBowlingFigures','bestBowlingStrikeRate','mostCatches']);
+    const TEAM_CODE_TO_NAME = {
+      MI: 'Mumbai Indians',
+      RCB: 'Royal Challengers Bengaluru',
+      CSK: 'Chennai Super Kings',
+      SRH: 'Sunrisers Hyderabad',
+      GT: 'Gujarat Titans',
+      LSG: 'Lucknow Super Giants',
+      DC: 'Delhi Capitals',
+      PBKS: 'Punjab Kings',
+      RR: 'Rajasthan Royals',
+      KKR: 'Kolkata Knight Riders'
+    };
+    const TEAM_NAME_TO_CODE = Object.fromEntries(Object.entries(TEAM_CODE_TO_NAME).map(([code, name]) => [name, code]));
+    const TEAM_PICK_CATEGORY_KEYS = new Set(['titleWinner', 'fairPlay', 'highestScoreTeam', 'tableBottom']);
+    const UNBOUNDED_PLAYER_PICK_CATEGORY_KEYS = new Set([
+      'orangeCap',
+      'mostSixes',
+      'purpleCap',
+      'mostDots',
+      'mvp',
+      'striker',
+      'bestBowlingFigures',
+      'bestBowlingStrikeRate',
+      'mostCatches',
+      'leastMvp'
+    ]);
+    const DUEL_STATUS_PRIORITY = {
+      live: 4,
+      armed: 3,
+      clash: 2,
+      draft: 1
+    };
+    const DUEL_STATUS_LABELS = {
+      live: 'Live duel',
+      armed: 'Armed duel',
+      clash: 'Clash resolution',
+      draft: 'Draft duel'
+    };
+    const PICKER_EMPTY_SEARCH = 'Type a player name or filter by team.';
+    const PICKER_TEST_NOW_KEY = '__DUELS_TEST_NOW__';
+    const UNCAPPED_MVP_PLAYERS = [
+      'Ayush Mhatre', 'Kartik Sharma', 'Urvil Patel', 'Ramakrishna Ghosh', 'Prashant Veer', 'Aman Khan',
+      'Anshul Kamboj', 'Mukesh Choudhary', 'Shreyas Gopal', 'Gurjapneet Singh', 'Mahendra Singh Dhoni',
+      'Sahil Parakh', 'Abishek Porel', 'Sameer Rizvi', 'Ashutosh Sharma', 'Vipraj Nigam', 'Ajay Mandal',
+      'Tripurana Vijay', 'Madhav Tiwari', 'Auqib Nabi',
+      'Kumar Kushagra', 'Anuj Rawat', 'Nishant Sindhu', 'Mohd. Arshad Khan', 'Rahul Tewatia', 'Shahrukh Khan',
+      'Manav Suthar', 'Gurnoor Singh Brar', 'Ashok Sharma', 'Kulwant Khejroliya',
+      'Angkrish Raghuvanshi', 'Tejasvi Singh', 'Anukul Roy', 'Sarthak Ranjan', 'Daksh Kamra', 'Vaibhav Arora',
+      'Kartik Tyagi', 'Prashant Solanki', 'Saurabh Dubey',
+      'Himmat Singh', 'Mukul Choudhary', 'Akshat Raghuwanshi', 'Abdul Samad', 'Arshin Kulkarni', 'Ayush Badoni',
+      'M. Siddharth', 'Digvesh Singh', 'Akash Singh', 'Prince Yadav', 'Arjun Tendulkar', 'Naman Tiwari',
+      'Mohsin Khan',
+      'Robin Minz', 'Danish Malewar', 'Naman Dhir', 'Raj Angad Bawa', 'Atharva Ankolekar', 'Mayank Rawat',
+      'Ashwani Kumar', 'Raghu Sharma', 'Mohammad Izhar',
+      'Nehal Wadhera', 'Vishnu Vinod', 'Harnoor Pannu', 'Pyla Avinash', 'Prabhsimran Singh', 'Shashank Singh',
+      'Harpreet Brar', 'Priyansh Arya', 'Musheer Khan', 'Suryansh Shedge', 'Vyshak Vijaykumar', 'Yash Thakur',
+      'Pravin Dubey', 'Vishal Nishad',
+      'Shubham Dubey', 'Vaibhav Suryavanshi', 'Ravi Singh', 'Aman Rao Perala', 'Yudhvir Singh Charak',
+      'Sushant Mishra', 'Yash Raj Punja', 'Vignesh Puthur', 'Brijesh Sharma',
+      'Swapnil Singh', 'Satvik Deswal', 'Mangesh Yadav', 'Vicky Ostwal', 'Vihaan Malhotra', 'Kanishk Chouhan',
+      'Rasikh Dar', 'Suyash Sharma', 'Abhinandan Singh', 'Yash Dayal',
+      'Aniket Verma', 'Smaran Ravichandran', 'Salil Arora', 'Harsh Dubey', 'Shivang Kumar', 'Krains Fuletra',
+      'Zeeshan Ansari', 'Sakib Hussain', 'Onkar Tarmale', 'Amit Kumar', 'Praful Hinge'
+    ];
 
     // ========= LEAGUE-STAGE SCHEDULE (UTC) =========
     const LEAGUE_STAGE_SCHEDULE_FALLBACK = [
@@ -2012,6 +2197,123 @@
       return PLAYER_NAME_ALIASES[normalized] || TEAM_NAME_ALIASES[normalized] || normalized;
     }
 
+    const UNCAPPED_MVP_PLAYER_KEYS = new Set(UNCAPPED_MVP_PLAYERS.map((name) => canonicalCompareName(name)));
+
+    function currentNowDate(){
+      const injected = window[PICKER_TEST_NOW_KEY];
+      if (!injected) return new Date();
+      const value = injected instanceof Date ? injected : new Date(injected);
+      return Number.isNaN(value.getTime()) ? new Date() : value;
+    }
+
+    function currentNowMs(){
+      return currentNowDate().getTime();
+    }
+
+    function officialTeamName(value){
+      const canonical = TEAM_NAME_ALIASES[normalizeName(value)] || '';
+      return Object.values(TEAM_CODE_TO_NAME).find((name) => canonicalCompareName(name) === canonical) || value || '';
+    }
+
+    function officialTeamCode(value){
+      const name = officialTeamName(value);
+      return TEAM_NAME_TO_CODE[name] || '';
+    }
+
+    function pickerCategoryMode(categoryKey){
+      return TEAM_PICK_CATEGORY_KEYS.has(categoryKey) ? 'team' : 'player';
+    }
+
+    function playerOptionPool(){
+      const seen = new Set();
+      const options = [];
+      for (const [teamCode, names] of Object.entries(IPL_SQUADS || {})) {
+        for (const name of names || []) {
+          const canonical = canonicalCompareName(name);
+          if (!canonical || seen.has(canonical)) continue;
+          seen.add(canonical);
+          options.push({
+            label: name,
+            canonical,
+            teamCode,
+            teamName: TEAM_CODE_TO_NAME[teamCode] || teamCode,
+            isUncapped: UNCAPPED_MVP_PLAYER_KEYS.has(canonical)
+          });
+        }
+      }
+      if (!options.length) {
+        const teamsByPlayer = playerTeamMap();
+        for (const [canonical, teamName] of Object.entries(teamsByPlayer || {})) {
+          if (!canonical || seen.has(canonical)) continue;
+          seen.add(canonical);
+          const label = String(canonical || '').split(' ').map((part) => part ? `${part[0].toUpperCase()}${part.slice(1)}` : '').join(' ');
+          options.push({
+            label,
+            canonical,
+            teamCode: officialTeamCode(teamName),
+            teamName: officialTeamName(teamName),
+            isUncapped: UNCAPPED_MVP_PLAYER_KEYS.has(canonical)
+          });
+        }
+      }
+      return options.sort((a, b) => a.label.localeCompare(b.label));
+    }
+
+    function pickerOptionsForCategory(categoryKey){
+      if (pickerCategoryMode(categoryKey) === 'team') {
+        return Object.entries(TEAM_CODE_TO_NAME).map(([teamCode, label]) => ({
+          value: label,
+          label,
+          teamCode
+        }));
+      }
+      const options = playerOptionPool();
+      if (categoryKey === 'uncappedMvp') {
+        return options.filter((option) => option.isUncapped);
+      }
+      return options;
+    }
+
+    function searchScoreForOption(option, query){
+      const q = normalizeName(query);
+      if (!q) return 0;
+      const label = normalizeName(option?.label || option?.value || '');
+      const canonical = normalizeName(option?.canonical || option?.label || option?.value || '');
+      if (label === q || canonical === q) return 100;
+      if (label.startsWith(q) || canonical.startsWith(q)) return 70;
+      if (label.includes(q) || canonical.includes(q)) return 40;
+      return -1;
+    }
+
+    function filteredPickerOptions(categoryKey, searchText = '', teamFilter = 'ALL'){
+      const options = pickerOptionsForCategory(categoryKey);
+      const mode = pickerCategoryMode(categoryKey);
+      const search = normalizeName(searchText);
+      return options
+        .filter((option) => {
+          if (mode === 'player' && teamFilter !== 'ALL' && option.teamCode !== teamFilter) return false;
+          if (!search) return true;
+          return searchScoreForOption(option, search) >= 0;
+        })
+        .sort((a, b) => {
+          const aScore = search ? searchScoreForOption(a, search) : 0;
+          const bScore = search ? searchScoreForOption(b, search) : 0;
+          return bScore - aScore ||
+            String(a.teamCode || '').localeCompare(String(b.teamCode || '')) ||
+            String(a.label || a.value || '').localeCompare(String(b.label || b.value || ''));
+        });
+    }
+
+    function futureScheduleMatchAfter(instantIso){
+      const readyMs = Date.parse(instantIso || '');
+      if (!Number.isFinite(readyMs)) return null;
+      return LEAGUE_STAGE_SCHEDULE.find((match) => Date.parse(match?.datetime_utc || '') > readyMs) || null;
+    }
+
+    function matchByNumber(matchNo){
+      return LEAGUE_STAGE_SCHEDULE.find((match) => Number(match?.match_no || match?.matchNo || 0) === Number(matchNo || 0)) || null;
+    }
+
     function matchesPick(a,b){
       return canonicalCompareName(a) === canonicalCompareName(b);
     }
@@ -2601,7 +2903,7 @@ function titleBandScore(pick, live){
         : scoreTop5Category(pickA, pickB, ranking, category.key, live);
     }
 
-    function computeMatchup(matchup, liveSource = LIVE_2026){
+    function computeRawMatchup(matchup, liveSource = LIVE_2026){
       const rows = CATEGORIES.map(category => {
         const result = getCategoryResult(category, matchup, liveSource);
         const pickA = matchup.a.picks[category.key] || '--';
@@ -2623,6 +2925,43 @@ function titleBandScore(pick, live){
       const totalB = rows.reduce((s,r)=>s+r.b,0);
 
       return { rows, totalA, totalB };
+    }
+
+    function historyEntryAtOrBeforeCount(targetCount){
+      const history = getScoreHistorySnapshots();
+      if (!history.length) return { count: 0, fetchedAt: null, snapshot: emptyLiveSnapshot() };
+      return history.find((entry) => entry.count === targetCount)
+        || history.filter((entry) => entry.count <= targetCount).slice(-1)[0]
+        || history[0];
+    }
+
+    function baselineSnapshotForMatchup(matchup){
+      const startCount = Number(matchup?.lifecycle?.scoreStartCount ?? 0);
+      if (!startCount) return null;
+      return historyEntryAtOrBeforeCount(startCount);
+    }
+
+    function applyBaselineToScore(matchup, rawScore){
+      const baselineEntry = baselineSnapshotForMatchup(matchup);
+      if (!baselineEntry) return rawScore;
+      const baselineScore = computeRawMatchup(matchup, baselineEntry.snapshot);
+      const rows = rawScore.rows.map((row) => {
+        const baseRow = baselineScore.rows.find((entry) => entry.category.key === row.category.key) || { a: 0, b: 0 };
+        return {
+          ...row,
+          a: Math.max(0, row.a - baseRow.a),
+          b: Math.max(0, row.b - baseRow.b)
+        };
+      });
+      return {
+        rows,
+        totalA: rows.reduce((sum, row) => sum + row.a, 0),
+        totalB: rows.reduce((sum, row) => sum + row.b, 0)
+      };
+    }
+
+    function computeMatchup(matchup, liveSource = LIVE_2026){
+      return applyBaselineToScore(matchup, computeRawMatchup(matchup, liveSource));
     }
 
     function topListNote(label, ranking, limit = 5){
@@ -2706,13 +3045,13 @@ function titleBandScore(pick, live){
     }
 
     function currentNextMatch(){
-      const nowMs = Date.now();
+      const nowMs = currentNowMs();
       return LEAGUE_STAGE_SCHEDULE.find(m => Date.parse(m.datetime_utc || '') > nowMs) || null;
     }
 
     function scheduleRowStatus(match, nextMatchNo){
       const startMs = Date.parse(match.datetime_utc || '');
-      const nowMs = Date.now();
+      const nowMs = currentNowMs();
       const endMs = startMs + (5 * 60 * 60 * 1000);
       if (match.match_no === nextMatchNo) return { label: 'Next', cls: 'status-good' };
       if (nowMs >= endMs) return { label: 'Done', cls: 'status-tie' };
@@ -2737,6 +3076,22 @@ function titleBandScore(pick, live){
         LEAGUE_STAGE_SCHEDULE = LEAGUE_STAGE_SCHEDULE_FALLBACK.map(match => ({ ...match, fixture: formatFixtureLabel(match.fixture) }));
       }
       updateNextPlannedRefreshPill();
+    }
+
+    async function loadSquadsData(){
+      try {
+        const cacheBust = `t=${Date.now()}`;
+        const res = await fetch(`ipl_2026_squads.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        IPL_SQUADS = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+      } catch (err) {
+        console.warn('Falling back to empty squads directory', err);
+        IPL_SQUADS = {};
+      }
     }
 
 
@@ -2858,6 +3213,52 @@ function titleBandScore(pick, live){
 
     function isCompletePickSet(picks = {}){
       return countCompletedPicks(picks) === CATEGORIES.length;
+    }
+
+    function clashKeysForEntries(entryA, entryB){
+      if (!entryA || !entryB) return [];
+      return CATEGORIES
+        .filter((category) => {
+          const pickA = entryA?.picks?.[category.key] || '';
+          const pickB = entryB?.picks?.[category.key] || '';
+          return pickA && pickB && matchesPick(pickA, pickB);
+        })
+        .map((category) => category.key);
+    }
+
+    function deriveCustomBundleLifecycle(bundle){
+      const [entryA, entryB] = orderedBundleEntries(bundle);
+      const duelRecord = bundle?.duelRecord || {};
+      const submittedEntries = [entryA, entryB].filter((entry) => entry?.submittedAt);
+      const completeEntries = [entryA, entryB].filter((entry) => isCompletePickSet(entry?.picks || {}));
+      const clashKeys = clashKeysForEntries(entryA, entryB);
+      const bothComplete = completeEntries.length === 2;
+      const bothSubmitted = submittedEntries.length === 2;
+      const ready = bothSubmitted && bothComplete && clashKeys.length === 0;
+      const readyAt = ready ? (duelRecord.readyAt || currentNowDate().toISOString()) : null;
+      const startMatch = ready ? futureScheduleMatchAfter(readyAt) : null;
+      const startMatchNo = Number(startMatch?.match_no || startMatch?.matchNo || 0) || null;
+      const startsScoringAt = startMatch?.datetime_utc || null;
+      const scoreStartCount = startMatchNo ? Math.max(0, startMatchNo - 1) : 0;
+      const live = Boolean(startsScoringAt && currentNowMs() >= Date.parse(startsScoringAt));
+      const status = ready ? (live ? 'live' : 'armed') : (clashKeys.length ? 'clash' : 'draft');
+      return {
+        status,
+        isLive: status === 'live',
+        revealOpponentPicks: status === 'live',
+        clashKeys,
+        clashCount: clashKeys.length,
+        submittedCount: submittedEntries.length,
+        completeCount: completeEntries.length,
+        bothComplete,
+        bothSubmitted,
+        readyAt,
+        startMatch,
+        startsScoringAt,
+        startsScoringFromMatchNo: startMatchNo,
+        scoreStartCount,
+        liveAt: live ? (duelRecord.liveAt || startsScoringAt || currentNowDate().toISOString()) : null
+      };
     }
 
     function orderedBundleEntries(bundle){
@@ -2995,7 +3396,15 @@ function titleBandScore(pick, live){
       }
       const model = getWarRoomModelApi();
       ACTIVE_ROOM = mergeRoomWithCustomBundles(BASE_ROOM, customBundlesForRoom(BASE_ROOM.slug));
-      MATCHUPS = model.buildMatchupsFromWarRoom(ACTIVE_ROOM);
+      MATCHUPS = model.buildMatchupsFromWarRoom(ACTIVE_ROOM).map((matchup) => {
+        const lifecycle = deriveMatchupLifecycle(matchup, ACTIVE_ROOM);
+        return {
+          ...matchup,
+          lifecycle,
+          state: lifecycle.isLive ? 'locked' : 'draft',
+          updatedAt: lifecycle.liveAt || lifecycle.readyAt || matchup.updatedAt || null
+        };
+      });
       const nextActiveId = preferredDuelId && MATCHUPS.some((matchup) => matchup.id === preferredDuelId)
         ? preferredDuelId
         : (activeId && MATCHUPS.some((matchup) => matchup.id === activeId) ? activeId : MATCHUPS[0]?.id || null);
@@ -3029,6 +3438,56 @@ function titleBandScore(pick, live){
       return 'Player or team prediction';
     }
 
+    function lifecycleHeadline(lifecycle){
+      if (!lifecycle) return 'Draft duel';
+      if (lifecycle.status === 'live') return `Live from Match ${lifecycle.startsScoringFromMatchNo || '?'}`;
+      if (lifecycle.status === 'armed') return `Armed for Match ${lifecycle.startsScoringFromMatchNo || '?'}`;
+      if (lifecycle.status === 'clash') return `${lifecycle.clashCount} clash${lifecycle.clashCount === 1 ? '' : 'es'} to resolve`;
+      return 'Waiting for both pick sheets';
+    }
+
+    function lifecycleNote(lifecycle, ownEntry, otherEntry){
+      if (!lifecycle) return 'Waiting for duel setup.';
+      if (lifecycle.status === 'live') {
+        return `Both pick sheets are revealed now. Only points earned from Match ${lifecycle.startsScoringFromMatchNo || '?'} onward count on this duel.`;
+      }
+      if (lifecycle.status === 'armed') {
+        return `Both sides are clash-free, locked, and frozen. Opponent picks stay hidden until Match ${lifecycle.startsScoringFromMatchNo || '?'} goes live.`;
+      }
+      if (lifecycle.status === 'clash') {
+        return `${otherEntry?.displayName || 'Your opponent'} matched at least one of your picks. Change the marked fields so this duel can arm for the next untouched match.`;
+      }
+      if (otherEntry?.submittedAt) {
+        return `${otherEntry.displayName} has submitted. Finish or resubmit your full 15 before the duel can arm.`;
+      }
+      return `${otherEntry?.displayName || 'Your opponent'} still needs to finish their sheet. Picks stay hidden until both sides are confirmed and clash-free.`;
+    }
+
+    function categoryStatusForOwner(bundle, ownEntry, otherEntry, categoryKey, ownPickOverride = null){
+      const lifecycle = deriveCustomBundleLifecycle(bundle);
+      const ownPick = ownPickOverride != null ? getWarRoomModelApi().normalizeWhitespace(ownPickOverride || '') : (ownEntry?.picks?.[categoryKey] || '');
+      const otherPick = otherEntry?.picks?.[categoryKey] || '';
+      if (!ownPick) return { tone: 'empty', label: 'No pick', note: 'Choose a pick for this category.' };
+      if (otherPick && matchesPick(ownPick, otherPick)) {
+        return { tone: 'clash', label: 'Clash', note: 'Both sides picked the same outcome here. Change it before the duel can arm.' };
+      }
+      if (lifecycle.status === 'live') {
+        return { tone: 'live', label: 'Live', note: 'This category is frozen and scoring from the duel start point.' };
+      }
+      if (lifecycle.status === 'armed') {
+        return { tone: 'armed', label: 'Frozen', note: `Locked clean. Opponent picks reveal when Match ${lifecycle.startsScoringFromMatchNo || '?'} starts.` };
+      }
+      if (ownEntry?.submittedAt) {
+        return { tone: 'submitted', label: 'Submitted', note: otherEntry?.submittedAt ? 'Locked on your side, waiting for clash resolution or start time.' : 'Submitted on your side. Opponent still needs to finish.' };
+      }
+      return { tone: 'draft', label: 'Draft', note: categoryInputHint(CATEGORIES.find((category) => category.key === categoryKey) || { type: 'top5' }) };
+    }
+
+    function activeFormPickValue(categoryKey){
+      const input = document.querySelector(`#activeEntryForm input[data-pick-key="${categoryKey}"]`);
+      return input ? getWarRoomModelApi().normalizeWhitespace(input.value || '') : '';
+    }
+
     function nextCustomDuelId(label, roomSlug){
       const model = getWarRoomModelApi();
       const seed = Date.now().toString(36).slice(-5);
@@ -3060,12 +3519,45 @@ function titleBandScore(pick, live){
       return orderedBundleEntries(bundle).find((entry) => !normalizeOwnerId(entry?.ownerId)) || null;
     }
 
+    function deriveMatchupLifecycle(matchup, room = ACTIVE_ROOM){
+      const bundle = room ? findCustomBundleByDuelId(room.slug, matchup?.id) : null;
+      if (bundle) return deriveCustomBundleLifecycle(bundle);
+      return {
+        status: matchup?.state === 'locked' ? 'live' : 'draft',
+        isLive: matchup?.state === 'locked',
+        revealOpponentPicks: matchup?.state === 'locked',
+        clashKeys: [],
+        clashCount: 0,
+        submittedCount: [matchup?.a?.submittedAt, matchup?.b?.submittedAt].filter(Boolean).length,
+        completeCount: [
+          isCompletePickSet(matchup?.a?.picks || {}),
+          isCompletePickSet(matchup?.b?.picks || {})
+        ].filter(Boolean).length,
+        bothComplete: true,
+        bothSubmitted: true,
+        readyAt: matchup?.createdAt || null,
+        startMatch: null,
+        startsScoringAt: null,
+        startsScoringFromMatchNo: null,
+        scoreStartCount: 0,
+        liveAt: matchup?.updatedAt || null
+      };
+    }
+
     function syncBundleDerivedState(bundle){
       const [entryA, entryB] = orderedBundleEntries(bundle);
       if (!entryA || !entryB) return bundle;
       bundle.duelRecord.label = `${entryA.displayName || 'Entry A'} vs ${entryB.displayName || 'Entry B'}`;
-      const bothLocked = [entryA, entryB].every((entry) => entry?.submittedAt && isCompletePickSet(entry?.picks || {}));
-      bundle.duelRecord.state = bothLocked ? 'locked' : 'draft';
+      const lifecycle = deriveCustomBundleLifecycle(bundle);
+      bundle.duelRecord.state = lifecycle.isLive ? 'locked' : 'draft';
+      bundle.duelRecord.lifecycleStatus = lifecycle.status;
+      bundle.duelRecord.clashKeys = lifecycle.clashKeys.slice();
+      bundle.duelRecord.readyAt = lifecycle.readyAt;
+      bundle.duelRecord.startsScoringAt = lifecycle.startsScoringAt;
+      bundle.duelRecord.startsScoringFromMatchNo = lifecycle.startsScoringFromMatchNo;
+      bundle.duelRecord.scoreStartCount = lifecycle.scoreStartCount;
+      bundle.duelRecord.liveAt = lifecycle.liveAt;
+      bundle.duelRecord.updatedAt = bundle.duelRecord.updatedAt || currentNowDate().toISOString();
       return bundle;
     }
 
@@ -3088,8 +3580,19 @@ function titleBandScore(pick, live){
 
     let requestedDuelMissing = false;
 
+    function withFreshLifecycle(matchup){
+      if (!matchup) return null;
+      const lifecycle = deriveMatchupLifecycle(matchup, ACTIVE_ROOM);
+      return {
+        ...matchup,
+        lifecycle,
+        state: lifecycle.isLive ? 'locked' : 'draft',
+        updatedAt: lifecycle.liveAt || lifecycle.readyAt || matchup.updatedAt || null
+      };
+    }
+
     function activeMatchup(){
-      return MATCHUPS.find(m => m.id === activeId) || MATCHUPS[0] || null;
+      return withFreshLifecycle(MATCHUPS.find(m => m.id === activeId) || MATCHUPS[0] || null);
     }
 
     function latestBoardUpdatedAt(){
@@ -3113,12 +3616,14 @@ function titleBandScore(pick, live){
         pillEl.textContent = 'Duels: unavailable';
         return;
       }
-      const duelCount = Array.isArray(room.duels) ? room.duels.length : 0;
-      const liveCount = Array.isArray(room.duels) ? room.duels.filter((duel) => duel.state === 'locked').length : 0;
-      const waitingCount = Math.max(0, duelCount - liveCount);
+      const duelCount = MATCHUPS.length || (Array.isArray(room.duels) ? room.duels.length : 0);
+      const liveCount = MATCHUPS.length ? MATCHUPS.filter((duel) => duel.lifecycle?.status === 'live').length : (Array.isArray(room.duels) ? room.duels.filter((duel) => duel.state === 'locked').length : 0);
+      const armedCount = MATCHUPS.length ? MATCHUPS.filter((duel) => duel.lifecycle?.status === 'armed').length : 0;
+      const clashCount = MATCHUPS.length ? MATCHUPS.filter((duel) => duel.lifecycle?.status === 'clash').length : 0;
+      const waitingCount = Math.max(0, duelCount - liveCount - armedCount - clashCount);
       const stateLabel = room.state === 'locked' ? 'sealed' : 'draft';
       titleEl.textContent = `${room.name} Duels`;
-      subtitleEl.textContent = `${duelCount} public duel${duelCount === 1 ? '' : 's'} - ${liveCount} live${waitingCount ? ` - ${waitingCount} waiting` : ''} - ${stateLabel} duel-first room. Each page view focuses on one sealed head-to-head battle, while the model still supports the same player appearing in different duels with different picks.`;
+      subtitleEl.textContent = `${duelCount} public duel${duelCount === 1 ? '' : 's'} - ${liveCount} live${armedCount ? ` - ${armedCount} armed` : ''}${clashCount ? ` - ${clashCount} in clash resolution` : ''}${waitingCount ? ` - ${waitingCount} drafting` : ''} - ${stateLabel} duel-first room. Each page view focuses on one head-to-head battle while the model still supports the same player appearing in different duels with different picks.`;
       pillEl.textContent = `Duels: ${room.name}`;
     }
 
@@ -3260,6 +3765,10 @@ function titleBandScore(pick, live){
       const bundle = activeCustomBundle();
       const form = document.getElementById('activeEntryForm');
       if (!bundle || !form || !CURRENT_USER) return null;
+      const lifecycle = deriveCustomBundleLifecycle(bundle);
+      if (lifecycle.status === 'armed' || lifecycle.status === 'live') {
+        throw new Error('This duel is already frozen, so the pick sheet can no longer be edited.');
+      }
       let targetEntry = activeOwnedEntry(bundle);
       if (!targetEntry && activeOpenEntry(bundle)) {
         claimActiveOpenSlot();
@@ -3280,20 +3789,187 @@ function titleBandScore(pick, live){
       targetEntry.picks = nextPicks;
       if (lockPicks) {
         targetEntry.submittedAt = now;
-      } else if (!isCompletePickSet(nextPicks)) {
+      } else {
         targetEntry.submittedAt = null;
       }
       bundle.duelRecord.updatedAt = now;
       const stored = upsertCustomBundle(syncBundleDerivedState(bundle), BASE_ROOM || ACTIVE_ROOM);
+      const nextLifecycle = deriveCustomBundleLifecycle(stored);
       refreshMergedRoom(stored?.duelRecord?.id || activeId);
       requestedDuelMissing = false;
       setRequestedDuelIdInUrl(stored?.duelRecord?.id || activeId);
-      setStudioNotice(lockPicks
-        ? 'good'
-        : 'info', lockPicks
-          ? `Picks submitted for ${CURRENT_USER.displayName}. This duel goes live once both sides submit complete cards.`
-          : `Draft picks saved for ${CURRENT_USER.displayName}.`);
+      if (!lockPicks) {
+        setStudioNotice('info', `Draft picks saved for ${CURRENT_USER.displayName}.`);
+      } else if (nextLifecycle.status === 'clash') {
+        setStudioNotice('bad', `Picks submitted for ${CURRENT_USER.displayName}, but ${nextLifecycle.clashCount} clash${nextLifecycle.clashCount === 1 ? '' : 'es'} still need fixing before this duel can arm.`);
+      } else if (nextLifecycle.status === 'armed') {
+        setStudioNotice('good', `Both sides are clean and frozen. This duel is armed for Match ${nextLifecycle.startsScoringFromMatchNo || '?'}.`);
+      } else if (nextLifecycle.status === 'live') {
+        setStudioNotice('good', `Both sides are live. Only movement from Match ${nextLifecycle.startsScoringFromMatchNo || '?'} onward now counts.`);
+      } else {
+        setStudioNotice('good', `Picks submitted for ${CURRENT_USER.displayName}. The duel will arm once both sides submit full, clash-free sheets.`);
+      }
       return stored;
+    }
+
+    function closePickPicker(){
+      ACTIVE_PICKER_STATE = {
+        open: false,
+        categoryKey: null,
+        teamFilter: 'ALL',
+        search: '',
+        formId: null,
+        duelId: null
+      };
+      renderPickPicker();
+    }
+
+    function updateStudioPickRow(categoryKey){
+      const row = document.querySelector(`[data-pick-row="${categoryKey}"]`);
+      const bundle = activeCustomBundle();
+      const ownEntry = activeOwnedEntry(bundle);
+      const otherEntry = ownEntry ? orderedBundleEntries(bundle).find((entry) => entry?.id !== ownEntry?.id) : null;
+      if (!row || !bundle || !ownEntry) return;
+      const value = activeFormPickValue(categoryKey);
+      const status = categoryStatusForOwner(bundle, ownEntry, otherEntry, categoryKey, value);
+      const valueEl = row.querySelector('[data-picked-value]');
+      const statusEl = row.querySelector('[data-pick-status]');
+      const noteEl = row.querySelector('[data-pick-note]');
+      const buttonEl = row.querySelector('[data-open-picker]');
+      if (valueEl) {
+        valueEl.textContent = value || 'No pick chosen yet';
+        valueEl.classList.toggle('empty', !value);
+      }
+      if (statusEl) {
+        statusEl.textContent = status.label;
+        statusEl.className = `studio-status-chip ${status.tone}`;
+      }
+      if (noteEl) noteEl.textContent = status.note;
+      if (buttonEl) buttonEl.textContent = value ? 'Change pick' : 'Choose pick';
+    }
+
+    function applyPickerSelection(nextValue){
+      const categoryKey = ACTIVE_PICKER_STATE.categoryKey;
+      if (!categoryKey) return;
+      const input = document.querySelector(`#activeEntryForm input[data-pick-key="${categoryKey}"]`);
+      if (!input) return;
+      input.value = nextValue || '';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      updateStudioPickRow(categoryKey);
+      closePickPicker();
+    }
+
+    function openPickPicker(categoryKey){
+      ACTIVE_PICKER_STATE = {
+        open: true,
+        categoryKey,
+        teamFilter: 'ALL',
+        search: '',
+        formId: 'activeEntryForm',
+        duelId: activeId
+      };
+      renderPickPicker();
+    }
+
+    function renderPickPicker(){
+      const modal = document.getElementById('pickPickerModal');
+      const toolbar = document.getElementById('pickPickerToolbar');
+      const body = document.getElementById('pickPickerBody');
+      const count = document.getElementById('pickPickerCount');
+      const title = document.getElementById('pickPickerTitle');
+      const subtitle = document.getElementById('pickPickerSubtitle');
+      const closeButton = document.getElementById('pickPickerClose');
+      const doneButton = document.getElementById('pickPickerDone');
+      const clearButton = document.getElementById('pickPickerClear');
+      if (!modal || !toolbar || !body || !count || !title || !subtitle || !closeButton || !doneButton || !clearButton) return;
+
+      if (!ACTIVE_PICKER_STATE.open || !ACTIVE_PICKER_STATE.categoryKey) {
+        modal.classList.add('section-hidden');
+        modal.setAttribute('aria-hidden', 'true');
+        toolbar.innerHTML = '';
+        body.innerHTML = '';
+        count.textContent = '0 options';
+        return;
+      }
+
+      const category = CATEGORIES.find((item) => item.key === ACTIVE_PICKER_STATE.categoryKey) || CATEGORIES[0];
+      const mode = pickerCategoryMode(category.key);
+      const filtered = filteredPickerOptions(category.key, ACTIVE_PICKER_STATE.search, ACTIVE_PICKER_STATE.teamFilter);
+      const currentValue = activeFormPickValue(category.key);
+
+      modal.classList.remove('section-hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      title.textContent = category.label;
+      subtitle.textContent = mode === 'team'
+        ? 'This category uses team picks only.'
+        : category.key === 'uncappedMvp'
+          ? 'Only uncapped-player options are listed here. Search directly or narrow by team.'
+          : 'Search directly if you know the player, or filter by team to narrow the field.';
+
+      const searchPlaceholder = mode === 'team' ? 'Search team name' : 'Search player name';
+      const teamChipRow = mode === 'player'
+        ? `<div class="picker-chip-row">
+            <button type="button" class="picker-chip ${ACTIVE_PICKER_STATE.teamFilter === 'ALL' ? 'active' : ''}" data-picker-team="ALL">All teams</button>
+            ${Object.keys(TEAM_CODE_TO_NAME).map((teamCode) => `<button type="button" class="picker-chip ${ACTIVE_PICKER_STATE.teamFilter === teamCode ? 'active' : ''}" data-picker-team="${teamCode}">${teamCode}</button>`).join('')}
+          </div>`
+        : '';
+
+      toolbar.innerHTML = `
+        <input class="picker-search" id="pickPickerSearch" placeholder="${escapeHtml(searchPlaceholder)}" value="${escapeHtml(ACTIVE_PICKER_STATE.search)}" autocomplete="off" />
+        ${teamChipRow}
+      `;
+
+      if (mode === 'team') {
+        body.innerHTML = `<div class="picker-team-grid">
+          ${filtered.map((option) => `
+            <button type="button" class="picker-team-option ${matchesPick(option.value, currentValue) ? 'active' : ''}" data-picker-value="${escapeHtml(option.value)}">
+              <div class="picker-team-code">${escapeHtml(option.teamCode)}</div>
+              <div class="picker-team-name">${escapeHtml(option.label)}</div>
+            </button>
+          `).join('')}
+        </div>`;
+      } else if (!filtered.length) {
+        body.innerHTML = `<div class="picker-result-empty">${escapeHtml(PICKER_EMPTY_SEARCH)}</div>`;
+      } else {
+        body.innerHTML = `<div class="picker-results">
+          ${filtered.map((option) => `
+            <button type="button" class="picker-result ${matchesPick(option.label, currentValue) ? 'active' : ''}" data-picker-value="${escapeHtml(option.label)}">
+              <div class="picker-result-name">${escapeHtml(option.label)}</div>
+              <div class="picker-result-meta">${escapeHtml(option.teamCode)} - ${escapeHtml(option.teamName)}${option.isUncapped ? ' - uncapped' : ''}</div>
+            </button>
+          `).join('')}
+        </div>`;
+      }
+
+      count.textContent = `${filtered.length} option${filtered.length === 1 ? '' : 's'} shown`;
+      closeButton.onclick = () => closePickPicker();
+      doneButton.onclick = () => closePickPicker();
+      clearButton.onclick = () => applyPickerSelection('');
+      modal.onclick = (event) => {
+        if (event.target === modal) closePickPicker();
+      };
+
+      const searchInput = document.getElementById('pickPickerSearch');
+      if (searchInput) {
+        searchInput.oninput = (event) => {
+          ACTIVE_PICKER_STATE.search = event.target.value || '';
+          renderPickPicker();
+        };
+        searchInput.focus();
+        searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+      }
+
+      toolbar.querySelectorAll('[data-picker-team]').forEach((button) => {
+        button.onclick = () => {
+          ACTIVE_PICKER_STATE.teamFilter = button.dataset.pickerTeam || 'ALL';
+          renderPickPicker();
+        };
+      });
+
+      body.querySelectorAll('[data-picker-value]').forEach((button) => {
+        button.onclick = () => applyPickerSelection(button.dataset.pickerValue || '');
+      });
     }
 
     function studioAlertClass(type){
@@ -3430,10 +4106,11 @@ function titleBandScore(pick, live){
       const completedCount = ownEntry ? countCompletedPicks(ownEntry.picks || {}) : 0;
 
       if (!CURRENT_USER) {
+        const lifecycle = deriveCustomBundleLifecycle(bundle);
         panel.innerHTML = `
           <div class="studio-meta">
             <span class="studio-chip">${escapeHtml(bundle.duelRecord.label || `${entryA?.displayName || 'Entry A'} vs ${entryB?.displayName || 'Entry B'}`)}</span>
-            <span class="studio-chip">${escapeHtml(bundle.duelRecord.state === 'locked' ? 'Live public duel' : 'Draft public duel')}</span>
+            <span class="studio-chip">${escapeHtml(lifecycleHeadline(lifecycle))}</span>
           </div>
           <div class="studio-empty">Sign in with a display name and handle to claim an open slot or edit your picks on this custom duel link.</div>
           <div class="studio-actions">
@@ -3458,7 +4135,7 @@ function titleBandScore(pick, live){
             <button class="studio-button secondary" type="button" id="joinActiveDuelButton">Join duel</button>
             <button class="studio-button ghost" type="button" id="copyStudioLinkButton">Copy duel link</button>
           </div>
-          <div class="studio-note">Creator: ${escapeHtml(entryA?.displayName || 'Unknown')} • Public by default via this share link.</div>
+          <div class="studio-note">Creator: ${escapeHtml(entryA?.displayName || 'Unknown')} - public by default via this share link.</div>
         `;
         const joinButton = document.getElementById('joinActiveDuelButton');
         if (joinButton) {
@@ -3473,10 +4150,12 @@ function titleBandScore(pick, live){
       }
 
       if (!ownEntry) {
+        const lifecycle = deriveCustomBundleLifecycle(bundle);
         panel.innerHTML = `
           <div class="studio-meta">
             <span class="studio-chip">${escapeHtml(bundle.duelRecord.label || `${entryA?.displayName || 'Entry A'} vs ${entryB?.displayName || 'Entry B'}`)}</span>
             <span class="studio-chip">Already claimed</span>
+            <span class="studio-chip">${escapeHtml(lifecycleHeadline(lifecycle))}</span>
           </div>
           <div class="studio-empty">Signed in as ${escapeHtml(CURRENT_USER.displayName)}, but this custom duel already belongs to ${escapeHtml(entryA?.displayName || 'Entry A')} and ${escapeHtml(entryB?.displayName || 'Entry B')}.</div>
           <div class="studio-actions">
@@ -3488,43 +4167,73 @@ function titleBandScore(pick, live){
         return;
       }
 
+      const lifecycle = deriveCustomBundleLifecycle(bundle);
+      const frozen = lifecycle.status === 'armed' || lifecycle.status === 'live';
+      const statusChipTone = lifecycle.status === 'live' ? 'live' : lifecycle.status === 'armed' ? 'armed' : lifecycle.status === 'clash' ? 'clash' : 'draft';
+      const actionLabel = ownEntry.submittedAt ? 'Resubmit picks' : 'Submit picks';
       panel.innerHTML = `
-        <div class="studio-meta">
-          <span class="studio-chip">${escapeHtml(bundle.duelRecord.label || `${entryA?.displayName || 'Entry A'} vs ${entryB?.displayName || 'Entry B'}`)}</span>
-          <span class="studio-chip">${escapeHtml(bundle.duelRecord.state === 'locked' ? 'Live public duel' : 'Draft public duel')}</span>
-          <span class="studio-chip">${completedCount}/${CATEGORIES.length} picks filled</span>
-        </div>
-        <div class="studio-owner">${escapeHtml(ownEntry.displayName)}</div>
-        <div class="studio-status">
-          You are editing your side of this duel as @${escapeHtml(CURRENT_USER.ownerId)}.
-          ${otherEntry?.submittedAt ? `${escapeHtml(otherEntry.displayName)} has already submitted.` : `${escapeHtml(otherEntry?.displayName || 'Your opponent')} still needs to submit.`}
+        <div class="studio-status-stack">
+          <div class="studio-meta">
+            <span class="studio-chip">${escapeHtml(bundle.duelRecord.label || `${entryA?.displayName || 'Entry A'} vs ${entryB?.displayName || 'Entry B'}`)}</span>
+            <span class="studio-status-chip ${statusChipTone}">${escapeHtml(lifecycleHeadline(lifecycle))}</span>
+            <span class="studio-chip">${completedCount}/${CATEGORIES.length} picks filled</span>
+            <span class="studio-chip">${ownEntry.submittedAt ? 'Your sheet submitted' : 'Your sheet open'}</span>
+          </div>
+          <div class="studio-lifecycle-card">
+            <div class="studio-lifecycle-title">${escapeHtml(lifecycleHeadline(lifecycle))}</div>
+            <div class="studio-lifecycle-note">${escapeHtml(lifecycleNote(lifecycle, ownEntry, otherEntry))}</div>
+            <div class="studio-inline">
+              <span class="studio-chip">You: @${escapeHtml(CURRENT_USER.ownerId)}</span>
+              <span class="studio-chip">${otherEntry?.submittedAt ? `${escapeHtml(otherEntry.displayName)} submitted` : `${escapeHtml(otherEntry?.displayName || 'Opponent')} still drafting`}</span>
+              ${lifecycle.startsScoringFromMatchNo ? `<span class="studio-chip">Start match: ${escapeHtml(String(lifecycle.startsScoringFromMatchNo))}</span>` : ''}
+            </div>
+            ${lifecycle.clashCount ? `<div class="studio-clash-list">${lifecycle.clashKeys.map((key) => {
+              const category = CATEGORIES.find((item) => item.key === key);
+              return `<span class="studio-clash-badge">${escapeHtml(category?.label || key)}</span>`;
+            }).join('')}</div>` : ''}
+            ${frozen ? `<div class="studio-locked-note">This sheet is frozen now. Opponent picks ${lifecycle.status === 'live' ? 'are revealed on the live board.' : 'will reveal when the duel goes live.'}</div>` : ''}
+          </div>
         </div>
         <form id="activeEntryForm">
-          <div class="studio-picks-grid">
-            ${CATEGORIES.map((category) => `
-              <div class="studio-pick-card">
-                <label for="pick-${escapeHtml(category.key)}">${escapeHtml(category.label)}</label>
-                <input
-                  class="studio-input"
-                  id="pick-${escapeHtml(category.key)}"
-                  name="${escapeHtml(category.key)}"
-                  data-pick-key="${escapeHtml(category.key)}"
-                  value="${escapeHtml(ownEntry.picks?.[category.key] || '')}"
-                  placeholder="${escapeHtml(categoryInputPlaceholder(category))}"
-                  autocomplete="off"
-                />
-                <div class="small">${escapeHtml(categoryInputHint(category))}</div>
-              </div>
-            `).join('')}
+          <div class="studio-pick-sheet">
+            ${CATEGORIES.map((category) => {
+              const pickValue = ownEntry.picks?.[category.key] || '';
+              const status = categoryStatusForOwner(bundle, ownEntry, otherEntry, category.key);
+              return `
+                <div class="studio-pick-row" data-pick-row="${escapeHtml(category.key)}">
+                  <div class="studio-pick-top">
+                    <div>
+                      <div class="studio-pick-label">${escapeHtml(category.label)}</div>
+                      <div class="small">${escapeHtml(categoryInputHint(category))}</div>
+                    </div>
+                    <div class="studio-row-meta">
+                      <span class="studio-status-chip ${escapeHtml(status.tone)}" data-pick-status>${escapeHtml(status.label)}</span>
+                    </div>
+                  </div>
+                  <input type="hidden" name="${escapeHtml(category.key)}" data-pick-key="${escapeHtml(category.key)}" value="${escapeHtml(pickValue)}" />
+                  <div class="studio-picked-value ${pickValue ? '' : 'empty'}" data-picked-value>${escapeHtml(pickValue || 'No pick chosen yet')}</div>
+                  <div class="studio-inline">
+                    <button class="studio-button ghost" type="button" data-open-picker="${escapeHtml(category.key)}" ${frozen ? 'disabled' : ''}>${pickValue ? 'Change pick' : 'Choose pick'}</button>
+                  </div>
+                  <div class="small" data-pick-note>${escapeHtml(status.note)}</div>
+                </div>
+              `;
+            }).join('')}
           </div>
           <div class="studio-actions">
-            <button class="studio-button ghost" type="button" id="saveDraftButton">Save draft picks</button>
-            <button class="studio-button secondary" type="button" id="submitPicksButton">Submit picks</button>
+            <button class="studio-button ghost" type="button" id="saveDraftButton" ${frozen ? 'disabled' : ''}>Save draft picks</button>
+            <button class="studio-button secondary" type="button" id="submitPicksButton" ${frozen ? 'disabled' : ''}>${escapeHtml(actionLabel)}</button>
             <button class="studio-button ghost" type="button" id="copyStudioLinkButton">Copy duel link</button>
           </div>
         </form>
-        <div class="studio-note">Submitting locks your side when all ${CATEGORIES.length} picks are filled. The duel goes live the moment both sides submit complete cards.</div>
+        <div class="studio-note">${frozen
+          ? `This duel is frozen. The active score only starts from Match ${lifecycle.startsScoringFromMatchNo || '?'}, and anything before that stays off the board.`
+          : `Each category opens a filtered picker. Search directly for a player like Dhoni, or narrow the pool by team. Shared picks create clashes and stop the duel from arming.`}</div>
       `;
+
+      panel.querySelectorAll('[data-open-picker]').forEach((button) => {
+        button.onclick = () => openPickPicker(button.dataset.openPicker);
+      });
 
       const saveDraftButton = document.getElementById('saveDraftButton');
       if (saveDraftButton) {
@@ -3559,8 +4268,8 @@ function titleBandScore(pick, live){
       const flash = document.getElementById('duelStudioFlash');
       if (summary) {
         summary.textContent = CURRENT_USER
-          ? `Signed in as ${CURRENT_USER.displayName}. Create public duels, share them, and submit your side of any custom duel link from this browser.`
-          : 'Sign in to create a public duel, claim an invite, and submit picks. This beta saves to your browser and travels by share link until the real backend lands.';
+          ? `Signed in as ${CURRENT_USER.displayName}. Build a public duel, fill the 15-category pick sheet with search and team filters, and resolve clashes before the duel arms for its start match.`
+          : 'Sign in to create a public duel, claim an invite, and submit picks. Search-first category pickers, clash checks, and frozen reveal rules now run in the browser until the backend lands.';
       }
       if (flash) {
         flash.innerHTML = DUEL_STUDIO_NOTICE
@@ -3600,35 +4309,91 @@ function titleBandScore(pick, live){
     }
 
     function renderPendingDuelState(matchup){
-      const stateLabel = matchup?.state === 'locked' ? 'Live' : 'Waiting on picks';
+      const lifecycle = matchup?.lifecycle || {};
+      const stateLabel = lifecycleHeadline(lifecycle);
+      const startMatch = lifecycle.startMatch || currentNextMatch();
+      const categoryRows = CATEGORIES.map((category) => {
+        let label = 'Waiting';
+        let note = 'Not both sides are locked here yet.';
+        const pickCount = [matchup?.a?.picks?.[category.key], matchup?.b?.picks?.[category.key]].filter(Boolean).length;
+        if (lifecycle.clashKeys?.includes(category.key)) {
+          label = 'Clash';
+          note = 'Both sides picked the same outcome, so this category has to be changed before the duel can arm.';
+        } else if (lifecycle.status === 'armed') {
+          label = 'Frozen';
+          note = 'Locked clean and waiting for the duel start match.';
+        } else if (pickCount === 2) {
+          label = 'Filled';
+          note = 'Both sides have a pick here, but opponent reveals stay hidden until the duel goes live.';
+        } else if (pickCount === 1) {
+          label = 'One side ready';
+          note = 'One side has chosen a pick; the other still needs to finish this lane.';
+        }
+        return `<tr><td><strong>${escapeHtml(category.label)}</strong></td><td><span class="status-chip ${label === 'Clash' ? 'status-bad' : label === 'Frozen' ? 'status-good' : label === 'Filled' ? 'status-tie' : 'status-wait'}">${escapeHtml(label)}</span><div class="small" style="margin-top:6px">${escapeHtml(note)}</div></td></tr>`;
+      }).join('');
+
       document.getElementById('scoreboard').innerHTML = `
         <div class="player-box">
           <div class="player-name">${escapeHtml(matchup.a.name)}</div>
           <div class="big-score lead">--</div>
-          <div class="small">This side has not sealed the battle yet.</div>
+          <div class="small">${escapeHtml(lifecycle.status === 'armed' ? 'Sheet frozen and hidden until the duel start.' : 'This side has not revealed a live board yet.')}</div>
         </div>
         <div class="vs">VS<div class="small" style="margin-top:8px">${escapeHtml(stateLabel)}</div></div>
         <div class="player-box">
           <div class="player-name">${escapeHtml(matchup.b.name)}</div>
           <div class="big-score trail">--</div>
-          <div class="small">No score until both rivals lock their cards.</div>
+          <div class="small">Opponent picks stay hidden until the duel is actually live.</div>
         </div>`;
-      document.getElementById('nextMatchMeta').textContent = 'This duel is not live yet.';
-      document.getElementById('nextMatchTeams').textContent = `${matchup.a.name} vs ${matchup.b.name}`;
-      document.getElementById('nextMatchVenue').textContent = 'State: waiting for both submissions';
-      document.getElementById('nextMatchImpact').textContent = 'Once both rivals submit and lock their picks, this duel becomes a live battle board.';
-      document.getElementById('breakdownTable').innerHTML = `<thead><tr><th>Category</th><th>Duel state</th></tr></thead><tbody><tr><td colspan="2">This duel is waiting for both pick sheets to be locked before live scoring begins.</td></tr></tbody>`;
-      document.getElementById('insights').innerHTML = '<div class="insight">No live insights yet. The duel wakes up the second both sides lock in.</div>';
-      document.getElementById('roasts').innerHTML = '<div class="insight roast">No roast yet. Even chaos needs two signed consent forms.</div>';
+      if (lifecycle.status === 'armed' && startMatch) {
+        document.getElementById('nextMatchMeta').textContent = `Armed for Match ${startMatch.match_no || startMatch.matchNo} - ${formatDate(startMatch.datetime_utc)}`;
+        document.getElementById('nextMatchTeams').textContent = `${teamShort(startMatch.away_team || '')} vs ${teamShort(startMatch.home_team || '')}`;
+        document.getElementById('nextMatchVenue').textContent = startMatch.venue ? `Venue: ${startMatch.venue}` : formatUtcStamp(startMatch.datetime_utc);
+        document.getElementById('nextMatchImpact').textContent = 'Both sheets are frozen. The duel reveals fully and starts scoring from this match onward.';
+      } else if (lifecycle.status === 'clash') {
+        document.getElementById('nextMatchMeta').textContent = 'Clash resolution in progress';
+        document.getElementById('nextMatchTeams').textContent = `${matchup.a.name} vs ${matchup.b.name}`;
+        document.getElementById('nextMatchVenue').textContent = `${lifecycle.clashCount || 0} clash${lifecycle.clashCount === 1 ? '' : 'es'} blocking the start`;
+        document.getElementById('nextMatchImpact').textContent = 'Both sides can still edit, but duplicate picks have to be broken before the duel can arm.';
+      } else {
+        document.getElementById('nextMatchMeta').textContent = 'This duel is still drafting';
+        document.getElementById('nextMatchTeams').textContent = `${matchup.a.name} vs ${matchup.b.name}`;
+        document.getElementById('nextMatchVenue').textContent = 'State: waiting for both full submissions';
+        document.getElementById('nextMatchImpact').textContent = 'Opponent picks stay hidden, and pre-duel matches do not count once this battle eventually goes live.';
+      }
+      document.getElementById('breakdownTable').innerHTML = `<thead><tr><th>Category</th><th>Duel state</th></tr></thead><tbody>${categoryRows}</tbody>`;
+      document.getElementById('insights').innerHTML = `<div class="insight">${escapeHtml(
+        lifecycle.status === 'armed'
+          ? `The duel is armed and frozen. Nothing before Match ${lifecycle.startsScoringFromMatchNo || '?'} will count, so the live board starts from zero on purpose.`
+          : lifecycle.status === 'clash'
+            ? `Both sides have enough information to collide, but not enough separation to go live. Resolve the clashes and the duel will arm for the next untouched match.`
+            : 'No live insights yet. This duel stays sealed until both sides finish full, clash-free sheets.'
+      )}</div>`;
+      document.getElementById('roasts').innerHTML = `<div class="insight roast">${escapeHtml(
+        lifecycle.status === 'armed'
+          ? 'The picks are frozen, the opponent sheet is still under wraps, and the scoreboard is pretending not to care. Classic pre-fight theatre.'
+          : lifecycle.status === 'clash'
+            ? 'A clash means both sides independently arrived at the same answer, which is either elite consensus or shared cowardice.'
+            : 'No roast yet. Even chaos needs two signed pick sheets before the banter can go live.'
+      )}</div>`;
       document.getElementById('metricOverall').textContent = '--';
       document.getElementById('metricFronts').textContent = '--';
       document.getElementById('metricWinner').textContent = 'Pending';
       document.getElementById('metricConfidence').textContent = '--';
-      document.getElementById('metricLead').textContent = 'Both rivals need to submit before the duel goes live.';
-      document.getElementById('metricWinnerNote').textContent = 'No winner call until both pick sheets are sealed.';
+      document.getElementById('metricLead').textContent = lifecycle.status === 'armed'
+        ? `Frozen and waiting for Match ${lifecycle.startsScoringFromMatchNo || '?'}.`
+        : lifecycle.status === 'clash'
+          ? `${lifecycle.clashCount || 0} clash${lifecycle.clashCount === 1 ? '' : 'es'} still block the duel start.`
+          : 'Both rivals need full, clash-free sheets before the duel goes live.';
+      document.getElementById('metricWinnerNote').textContent = lifecycle.status === 'armed'
+        ? 'The scoreboard starts at 0-0 when the start match begins.'
+        : 'No winner call until both pick sheets are sealed and the duel start match arrives.';
       document.getElementById('metricConfidenceNote').textContent = 'Confidence is zero until the duel is live.';
-      document.getElementById('clutchHeadline').textContent = 'Clutch tracker starts once this duel is live';
-      document.getElementById('clutchNote').textContent = 'No completed-match momentum exists for a duel that is still waiting on picks.';
+      document.getElementById('clutchHeadline').textContent = lifecycle.status === 'armed'
+        ? `Clutch tracker opens after Match ${lifecycle.startsScoringFromMatchNo || '?'}`
+        : 'Clutch tracker starts once this duel is live';
+      document.getElementById('clutchNote').textContent = lifecycle.status === 'armed'
+        ? 'The duel is armed, but there are still no completed post-start checkpoints to chart.'
+        : 'No completed-match momentum exists for a duel that is still waiting on picks.';
       resetWormGraph();
     }
 
@@ -3844,9 +4609,12 @@ function titleBandScore(pick, live){
     }
 
     function summarizeDirectoryDuel(matchup){
+      matchup = withFreshLifecycle(matchup);
       const updatedAt = latestBoardUpdatedAt() || matchup.updatedAt || ACTIVE_ROOM?.updatedAt || null;
       const duelLabel = matchup.label || `${matchup.a.name} vs ${matchup.b.name}`;
-      const isLive = matchup.state === 'locked';
+      const lifecycle = matchup.lifecycle || deriveMatchupLifecycle(matchup, ACTIVE_ROOM);
+      const status = lifecycle.status || 'draft';
+      const isLive = status === 'live';
       let totalA = null;
       let totalB = null;
       let frontsA = 0;
@@ -3868,6 +4636,8 @@ function titleBandScore(pick, live){
       const hotDuel = isLive && (margin <= 2 || Math.abs(frontsA - frontsB) <= 1);
       return {
         matchup,
+        lifecycle,
+        status,
         duelLabel,
         updatedAt,
         updatedMs: Number.isFinite(updatedMs) ? updatedMs : 0,
@@ -3886,7 +4656,7 @@ function titleBandScore(pick, live){
       return MATCHUPS
         .map((matchup) => summarizeDirectoryDuel(matchup))
         .sort((a, b) =>
-          Number(b.isLive) - Number(a.isLive) ||
+          (DUEL_STATUS_PRIORITY[b.status] || 0) - (DUEL_STATUS_PRIORITY[a.status] || 0) ||
           b.margin - a.margin ||
           b.updatedMs - a.updatedMs ||
           a.duelLabel.localeCompare(b.duelLabel)
@@ -3909,13 +4679,13 @@ function titleBandScore(pick, live){
 
       const orderedDuels = sortedDirectoryDuels();
       const activeLabel = matchup.label || `${matchup.a.name} vs ${matchup.b.name}`;
-      const waitingTag = matchup.state !== 'locked' ? ' - waiting on picks' : '';
+      const waitingTag = matchup.lifecycle?.status === 'live' ? '' : ` - ${lifecycleHeadline(matchup.lifecycle).toLowerCase()}`;
       const fallbackTag = requestedDuelMissing ? 'Requested duel was not found, so this page fell back to the first available duel.' : '';
       nav.innerHTML = `
         <div class="duel-picker">
           <label for="duelPicker">Jump to duel</label>
           <select id="duelPicker" aria-label="Browse public duel">
-            ${orderedDuels.map(({ matchup: item }) => `<option value="${escapeHtml(item.id)}" ${item.id === matchup.id ? 'selected' : ''}>${escapeHtml(item.label || `${item.a.name} vs ${item.b.name}`)}${item.state !== 'locked' ? ' (Waiting)' : ''}</option>`).join('')}
+            ${orderedDuels.map(({ matchup: item, lifecycle }) => `<option value="${escapeHtml(item.id)}" ${item.id === matchup.id ? 'selected' : ''}>${escapeHtml(item.label || `${item.a.name} vs ${item.b.name}`)}${lifecycle?.status === 'live' ? '' : ` (${escapeHtml(lifecycleHeadline(lifecycle))})`}</option>`).join('')}
           </select>
         </div>
         <div class="pill">Active duel: ${escapeHtml(activeLabel)}${escapeHtml(waitingTag)}</div>
@@ -3931,23 +4701,47 @@ function titleBandScore(pick, live){
       if (copyActiveButton) copyActiveButton.onclick = () => copyDuelLink(matchup.id, copyActiveButton);
 
       const liveCount = orderedDuels.filter((item) => item.isLive).length;
-      const waitingCount = Math.max(0, orderedDuels.length - liveCount);
+      const armedCount = orderedDuels.filter((item) => item.status === 'armed').length;
+      const clashCount = orderedDuels.filter((item) => item.status === 'clash').length;
+      const waitingCount = Math.max(0, orderedDuels.length - liveCount - armedCount - clashCount);
       const boardUpdatedAt = latestBoardUpdatedAt();
-      summary.textContent = `${orderedDuels.length} public duel${orderedDuels.length === 1 ? '' : 's'} in the room, ${liveCount} live${waitingCount ? `, ${waitingCount} waiting on picks` : ''}. Live duels sort by biggest margin first, then most recently updated.${boardUpdatedAt ? ` Board last updated ${formatTimestamp(boardUpdatedAt)}.` : ''}`;
+      summary.textContent = `${orderedDuels.length} public duel${orderedDuels.length === 1 ? '' : 's'} in the room, ${liveCount} live${armedCount ? `, ${armedCount} armed` : ''}${clashCount ? `, ${clashCount} resolving clashes` : ''}${waitingCount ? `, ${waitingCount} drafting` : ''}. Live duels sort first, then the biggest live margins, then the freshest updates.${boardUpdatedAt ? ` Board last updated ${formatTimestamp(boardUpdatedAt)}.` : ''}`;
 
       directory.innerHTML = orderedDuels.map((item) => {
-        const statusLabel = item.isLive ? (item.margin === 0 ? 'Level duel' : 'Live duel') : 'Waiting on picks';
-        const statusClass = item.isLive ? (item.margin === 0 ? 'status-tie' : 'status-good') : 'status-wait';
-        const leaderLabel = item.isLive ? (item.leaderName ? `${item.leaderName} by ${item.margin}` : 'Scores level') : 'Awaiting both pick sheets';
+        const statusLabel = item.status === 'live'
+          ? (item.margin === 0 ? 'Level duel' : 'Live duel')
+          : item.status === 'armed'
+            ? 'Armed duel'
+            : item.status === 'clash'
+              ? 'Clash resolution'
+              : 'Draft duel';
+        const statusClass = item.status === 'live'
+          ? (item.margin === 0 ? 'status-tie' : 'status-good')
+          : item.status === 'armed'
+            ? 'status-wait'
+            : item.status === 'clash'
+              ? 'status-bad'
+              : 'status-wait';
+        const leaderLabel = item.isLive
+          ? (item.leaderName ? `${item.leaderName} by ${item.margin}` : 'Scores level')
+          : item.status === 'armed'
+            ? `Starts from Match ${item.lifecycle.startsScoringFromMatchNo || '?'}`
+            : item.status === 'clash'
+              ? `${item.lifecycle.clashCount || 0} clash${item.lifecycle.clashCount === 1 ? '' : 'es'}`
+              : 'Awaiting both pick sheets';
         const marginLabel = item.isLive ? `${item.margin} point${item.margin === 1 ? '' : 's'}` : 'No live margin yet';
-        const frontsLabel = item.isLive ? `${item.frontsA} - ${item.frontsB}` : 'Waiting';
+        const frontsLabel = item.isLive ? `${item.frontsA} - ${item.frontsB}` : item.status === 'armed' ? 'Frozen' : item.status === 'clash' ? 'Blocked' : 'Waiting';
         const scoreLabel = item.isLive ? `${item.totalA} - ${item.totalB}` : '--';
         const updatedLabel = formatTimestamp(item.updatedAt);
-        const activityLabel = item.hotDuel ? 'Hot duel' : item.isLive ? 'Live board' : 'Draft duel';
+        const activityLabel = item.hotDuel ? 'Hot duel' : item.status === 'armed' ? 'Frozen board' : item.isLive ? 'Live board' : item.status === 'clash' ? 'Clash alert' : 'Draft duel';
         const activityClass = item.hotDuel ? 'duel-activity-tag hot' : 'duel-activity-tag';
         const note = item.isLive
           ? (item.leaderName ? `${item.leaderName} has the current edge with a ${frontsLabel} fronts split.` : `This duel is dead level on score with a ${frontsLabel} fronts split.`)
-          : 'This duel will go live once both duel entries are sealed.';
+          : item.status === 'armed'
+            ? `Both pick sheets are frozen, and only movement from Match ${item.lifecycle.startsScoringFromMatchNo || '?'} onward will count.`
+            : item.status === 'clash'
+              ? `Opponent picks stay hidden until the duplicate picks are broken and the duel arms for the next untouched match.`
+              : 'This duel stays private at the pick level until both sides finish full, clash-free sheets.';
         const activeClass = item.matchup.id === activeId ? 'active' : '';
 
         return `
@@ -4475,6 +5269,23 @@ function titleBandScore(pick, live){
       return Array.from(map.values()).sort((a, b) => a.count - b.count);
     }
 
+    function duelHistorySnapshots(matchup){
+      const history = getScoreHistorySnapshots();
+      const startCount = Number(matchup?.lifecycle?.scoreStartCount ?? 0);
+      if (!startCount) return history;
+      const baseline = historyEntryAtOrBeforeCount(startCount);
+      const future = history.filter((entry) => entry.count > startCount);
+      return [
+        {
+          count: startCount,
+          fetchedAt: baseline?.fetchedAt || matchup?.lifecycle?.startsScoringAt || null,
+          snapshot: baseline?.snapshot || emptyLiveSnapshot(),
+          isBaseline: true
+        },
+        ...future
+      ];
+    }
+
     function scoreDiffRows(startRows, endRows){
       return endRows.map(endRow => {
         const startRow = startRows.find(r => r.category.key === endRow.category.key) || { a: 0, b: 0 };
@@ -4488,14 +5299,18 @@ function titleBandScore(pick, live){
     }
 
     function computeClutchTracker(matchup, windowSize = 3){
-      const history = getScoreHistorySnapshots();
+      const history = duelHistorySnapshots(matchup);
+      const baselineCount = Number(matchup?.lifecycle?.scoreStartCount ?? 0);
       const latest = history[history.length - 1] || { count: 0, snapshot: emptyLiveSnapshot() };
-      const latestCount = latest.count;
+      const latestCount = Math.max(0, latest.count - baselineCount);
       if (latestCount <= 0) {
+        const lockedStart = matchup?.lifecycle?.startsScoringFromMatchNo;
         return {
           available: false,
-          headline: 'No completed-match momentum yet',
-          note: 'The Clutch Tracker wakes up after the first completed match snapshot lands.',
+          headline: lockedStart ? `Momentum starts after Match ${lockedStart}` : 'No completed-match momentum yet',
+          note: lockedStart
+            ? `This duel only scores from Match ${lockedStart} onward, so the Clutch Tracker stays asleep until that match finishes.`
+            : 'The Clutch Tracker wakes up after the first completed match snapshot lands.',
           labelA: `${matchup.a.name} +0 recent points`,
           labelB: `${matchup.b.name} +0 recent points`,
           widthA: 50,
@@ -4504,9 +5319,9 @@ function titleBandScore(pick, live){
         };
       }
 
-      const startCount = Math.max(0, latestCount - windowSize);
-      const startEntry = history.find(entry => entry.count === startCount) || history.filter(entry => entry.count < latestCount).slice(-1)[0] || { count: 0, snapshot: emptyLiveSnapshot() };
-      const effectiveWindow = Math.max(1, latestCount - startEntry.count);
+      const startCount = Math.max(baselineCount, latest.count - windowSize);
+      const startEntry = history.find(entry => entry.count === startCount) || history.filter(entry => entry.count < latest.count).slice(-1)[0] || { count: baselineCount, snapshot: emptyLiveSnapshot() };
+      const effectiveWindow = Math.max(1, latest.count - startEntry.count);
       const startScore = computeMatchup(matchup, startEntry.snapshot);
       const latestScore = computeMatchup(matchup, latest.snapshot);
       const gainA = latestScore.totalA - startScore.totalA;
@@ -4548,7 +5363,7 @@ function titleBandScore(pick, live){
     }
 
     function computeWormTimeline(matchup){
-      const history = getScoreHistorySnapshots();
+      const history = duelHistorySnapshots(matchup);
       return history.map(entry => {
         const score = computeMatchup(matchup, entry.snapshot);
         return {
@@ -4587,6 +5402,7 @@ function titleBandScore(pick, live){
       const legendA = document.getElementById('wormLegendA');
       const legendB = document.getElementById('wormLegendB');
       const points = computeWormTimeline(matchup);
+      const baselineCount = Number(matchup?.lifecycle?.scoreStartCount ?? 0);
       const usablePoints = points.filter(point => point.count > 0 || point.totalA > 0 || point.totalB > 0);
 
       legendA.innerHTML = `<span class="worm-swatch worm-swatch-a"></span>${escapeHtml(matchup.a.name)} ${usablePoints.length ? `${usablePoints[usablePoints.length - 1].totalA} pts` : '0 pts'}`;
@@ -4597,14 +5413,18 @@ function titleBandScore(pick, live){
         svg.classList.add('section-hidden');
         empty.classList.remove('section-hidden');
         shell.classList.add('worm-empty-mode');
-        meta.textContent = 'Waiting for completed-game checkpoints';
+        meta.textContent = baselineCount
+          ? `Waiting for the first completed checkpoint after Match ${baselineCount + 1}`
+          : 'Waiting for completed-game checkpoints';
         return;
       }
 
       svg.classList.remove('section-hidden');
       empty.classList.add('section-hidden');
       shell.classList.remove('worm-empty-mode');
-      meta.textContent = 'Points after each completed-game checkpoint';
+      meta.textContent = baselineCount
+        ? `Points after each completed checkpoint from Match ${baselineCount + 1} onward`
+        : 'Points after each completed-game checkpoint';
 
       const width = 560;
       const height = 138;
@@ -4633,7 +5453,7 @@ function titleBandScore(pick, live){
 
       const xLabels = xLabelCounts.map(count => {
         const { x } = project(count, 0);
-        const text = count === 0 ? 'Start' : `G${count}`;
+        const text = count === baselineCount ? 'Start' : `G${count}`;
         return `<text class="worm-label" x="${x.toFixed(2)}" y="${(height - 6).toFixed(2)}" text-anchor="middle">${escapeHtml(text)}</text>`;
       }).join('');
 
@@ -4757,6 +5577,7 @@ function titleBandScore(pick, live){
       renderTabs();
       renderPublicDuelLayer();
       renderDuelStudio();
+      renderPickPicker();
       document.getElementById('warRoomSection').classList.toggle('section-hidden', activeView !== 'warroom');
       document.getElementById('statsSection').classList.toggle('section-hidden', activeView !== 'stats');
       document.getElementById('scheduleSection').classList.toggle('section-hidden', activeView !== 'schedule');
@@ -4773,7 +5594,7 @@ function titleBandScore(pick, live){
           : 'Next planned update: --';
         return;
       }
-      if (matchup.state && matchup.state !== 'locked') {
+      if (!matchup.lifecycle?.isLive) {
         renderPendingDuelState(matchup);
         const updatedAt = LIVE_2026.fetchedAt ? new Date(LIVE_2026.fetchedAt) : new Date();
         document.getElementById('updatedPill').textContent = `Last updated: ${new Intl.DateTimeFormat(undefined, {dateStyle:'medium', timeStyle:'short'}).format(updatedAt)}`;
@@ -4875,6 +5696,7 @@ function titleBandScore(pick, live){
     renderDuelStudio();
     loadWarRoomData().finally(() => render());
     loadScheduleData().finally(() => render());
+    loadSquadsData().finally(() => render());
     loadLiveData();
   </script>
 </body>

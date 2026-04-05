@@ -87,6 +87,14 @@ test('record-backed duel rejects entry ids that belong to another duel', async (
   assert.match(result.errors.join('\n'), /belongs to duel/i);
 });
 
+test('record-backed room rejects malformed entry record references', async () => {
+  const room = await readFixture('war_room_sp_cup_2026.json');
+  room.entryRecords[0].duelId = '';
+  const result = validateWarRoomConfig(room);
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join('\n'), /duelId: must be a non-empty slug/i);
+});
+
 test('slug normalizer stays predictable', () => {
   assert.equal(normalizeSlug('SP Cup 2026'), 'sp-cup-2026');
 });

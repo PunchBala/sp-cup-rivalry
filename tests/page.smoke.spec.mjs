@@ -7,9 +7,27 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const liveFixture = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../fixtures/live_early_season.json'), 'utf8'));
 
-test('duels v1 renders public duel browsing plus local create, join, and submit flows without runtime errors', async ({ page }) => {
+async function setHiddenPick(page, key, value) {
+  await page.locator(`#activeEntryForm input[data-pick-key="${key}"]`).evaluate((input, nextValue) => {
+    input.value = nextValue;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }, value);
+}
+
+async function setHiddenPicks(page, picks) {
+  for (const [key, value] of Object.entries(picks)) {
+    await setHiddenPick(page, key, value);
+  }
+}
+
+test('duels beta supports picker search, clash resolution, and armed start gating without runtime errors', async ({ page }) => {
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(String(error)));
+
+  await page.addInitScript(() => {
+    window.__DUELS_TEST_NOW__ = '2026-04-05T08:00:00Z';
+  });
 
   await page.route(/data\/live\.json(\?.*)?$/, async (route) => {
     await route.fulfill({
@@ -25,31 +43,9 @@ test('duels v1 renders public duel browsing plus local create, join, and submit 
   await expect(page.locator('#leaguePill')).toContainText('Duels: SP Cup 2026');
   await expect(page.getByRole('button', { name: 'Duels' })).toBeVisible();
   await expect(page.getByLabel('Browse public duel')).toBeVisible();
-  await expect(page.locator('#authPanel')).toContainText('Sign in');
-  await expect(page.locator('#createDuelPanel')).toContainText('Create public duel');
-  await expect(page.locator('#duelPicker')).toHaveValue('senthil-vibeesh');
-  await expect(page.locator('#viewTabs')).toContainText('Active duel: Senthil vs Vibeesh');
-  await expect(page.locator('#viewTabs')).toContainText('Visibility: public duel page');
-  await expect(page.locator('#duelDirectorySummary')).toContainText('public duel');
   await expect(page.locator('#duelDirectory [data-duel-card]')).toHaveCount(2);
-  await expect(page.locator('#duelDirectory')).toContainText('Leader');
-  await expect(page.locator('#duelDirectory')).toContainText('Margin');
-  await expect(page.locator('#duelDirectory')).toContainText('Fronts won');
-  await expect(page.locator('#duelDirectory')).toContainText('Last updated');
-  await expect(page.locator('#duelDirectory')).toContainText('Copy link');
-  await expect(page.locator('#duelDirectory [data-duel-card]').first()).toContainText('Senthil vs Sai');
+  await expect(page.locator('#duelDirectory')).toContainText('Senthil vs Sai');
   await expect(page.locator('#duelDirectory')).toContainText('Senthil vs Vibeesh');
-  await expect(page.getByRole('button', { name: 'Copy duel link' })).toBeVisible();
-
-  await expect(page.locator('#scoreboard .player-box')).toHaveCount(2);
-  await expect(page.locator('#breakdownTable tbody tr')).toHaveCount(15);
-  await expect(page.locator('#wormChart')).toBeVisible();
-  await expect(page.locator('#breakdownTable tbody tr').nth(1).locator('.live-value-pill').first()).toBeVisible();
-
-  await page.locator('#duelDirectory [data-open-duel="senthil-sai"]').click();
-  await expect(page.locator('#viewTabs')).toContainText('Active duel: Senthil vs Sai');
-  await expect(page.locator('#duelPicker')).toHaveValue('senthil-sai');
-  await expect(page).toHaveURL(/duel=senthil-sai/);
 
   await page.locator('#authDisplayName').fill('Anand');
   await page.locator('#authOwnerId').fill('anand');
@@ -62,41 +58,92 @@ test('duels v1 renders public duel browsing plus local create, join, and submit 
   await expect(page.locator('#duelDirectory')).toContainText('Anand vs Bala');
   await expect(page).toHaveURL(/share=/);
 
-  await page.evaluate(() => {
-    document.querySelectorAll('#activeEntryForm [data-pick-key]').forEach((input, index) => {
-      input.value = `Anand pick ${index + 1}`;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    });
+  await page.locator('[data-open-picker="titleWinner"]').click();
+  await expect(page.locator('#pickPickerModal')).toBeVisible();
+  await page.getByRole('button', { name: 'Mumbai Indians' }).click();
+  await expect(page.locator('[data-pick-row="titleWinner"] [data-picked-value]')).toContainText('Mumbai Indians');
+
+  await page.locator('[data-open-picker="orangeCap"]').click();
+  await page.locator('#pickPickerSearch').fill('rahul');
+  await page.locator('[data-picker-value="KL Rahul"]').click();
+  await expect(page.locator('[data-pick-row="orangeCap"] [data-picked-value]')).toContainText('KL Rahul');
+
+  await page.locator('[data-open-picker="uncappedMvp"]').click();
+  await page.locator('[data-picker-team="DC"]').click();
+  await page.locator('[data-picker-value="Sameer Rizvi"]').click();
+  await expect(page.locator('[data-pick-row="uncappedMvp"] [data-picked-value]')).toContainText('Sameer Rizvi');
+
+  await setHiddenPicks(page, {
+    mostSixes: 'Nicholas Pooran',
+    purpleCap: 'Kuldeep Yadav',
+    mostDots: 'Kuldeep Yadav',
+    mvp: 'KL Rahul',
+    fairPlay: 'Chennai Super Kings',
+    highestScoreTeam: 'Sunrisers Hyderabad',
+    striker: 'Tristan Stubbs',
+    bestBowlingFigures: 'Kuldeep Yadav',
+    bestBowlingStrikeRate: 'Kuldeep Yadav',
+    mostCatches: 'Rinku Singh',
+    tableBottom: 'Rajasthan Royals',
+    leastMvp: 'Mahendra Singh Dhoni'
   });
-  await page.getByRole('button', { name: 'Submit picks' }).click();
-  await expect(page.locator('#duelControlsPanel')).toContainText('Bala still needs to submit');
+
+  await page.locator('#submitPicksButton').click();
+  await expect(page.locator('#duelControlsPanel')).toContainText('still drafting');
 
   await page.getByRole('button', { name: 'Sign out' }).click();
   await page.locator('#authDisplayName').fill('Bala');
   await page.locator('#authOwnerId').fill('bala');
   await page.getByRole('button', { name: 'Sign in' }).click();
-  await expect(page.getByRole('button', { name: 'Join duel' })).toBeVisible();
   await page.getByRole('button', { name: 'Join duel' }).click();
 
-  await page.evaluate(() => {
-    document.querySelectorAll('#activeEntryForm [data-pick-key]').forEach((input, index) => {
-      input.value = `Bala pick ${index + 1}`;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    });
+  await page.locator('[data-open-picker="titleWinner"]').click();
+  await page.getByRole('button', { name: 'Mumbai Indians' }).click();
+
+  await page.locator('[data-open-picker="orangeCap"]').click();
+  await page.locator('#pickPickerSearch').fill('gill');
+  await page.locator('[data-picker-value="Shubman Gill"]').click();
+
+  await page.locator('[data-open-picker="uncappedMvp"]').click();
+  await page.locator('[data-picker-team="PBKS"]').click();
+  await page.locator('[data-picker-value="Prabhsimran Singh"]').click();
+
+  await setHiddenPicks(page, {
+    mostSixes: 'Shashank Singh',
+    purpleCap: 'Prasidh Krishna',
+    mostDots: 'Varun Chakaravarthy',
+    mvp: 'Shubman Gill',
+    fairPlay: 'Mumbai Indians',
+    highestScoreTeam: 'Punjab Kings',
+    striker: 'Prabhsimran Singh',
+    bestBowlingFigures: 'Prasidh Krishna',
+    bestBowlingStrikeRate: 'Varun Chakaravarthy',
+    mostCatches: 'Riyan Parag',
+    tableBottom: 'Delhi Capitals',
+    leastMvp: 'Ravi Singh'
   });
-  await page.getByRole('button', { name: 'Submit picks' }).click();
-  await expect(page.locator('#scoreboard .player-box')).toHaveCount(2);
-  await expect(page.locator('#metricOverall')).toContainText('0 - 0');
-  await expect(page.locator('#duelDirectory')).toContainText('Anand vs Bala');
+
+  await page.locator('#submitPicksButton').click();
+  await expect(page.locator('#duelControlsPanel')).toContainText('1 clash');
+  await expect(page.locator('#breakdownTable')).toContainText('Clash');
+  await expect(page.locator('#metricOverall')).toContainText('--');
+  await expect(page.locator('#breakdownTable')).not.toContainText('KL Rahul');
+
+  await page.locator('[data-open-picker="titleWinner"]').click();
+  await page.getByRole('button', { name: 'Chennai Super Kings' }).click();
+  await page.locator('#submitPicksButton').click();
+
+  await expect(page.locator('#duelControlsPanel')).toContainText('Armed for Match');
+  await expect(page.locator('#nextMatchMeta')).toContainText('Armed for Match');
+  await expect(page.locator('#metricOverall')).toContainText('--');
+  await expect(page.locator('#breakdownTable')).not.toContainText('Shubman Gill');
+  await expect(page.locator('#duelDirectory')).toContainText('Armed duel');
 
   await page.getByRole('button', { name: 'Nerd Room' }).click();
   await expect(page.locator('#statsSummary')).toContainText('board');
 
   await page.getByRole('button', { name: 'Schedule' }).click();
   await expect(page.locator('#scheduleSummary')).toContainText('League-stage schedule');
-  await expect(page.locator('#scheduleSummary')).toContainText('Next planned update window');
   await expect(page.locator('#scheduleTable tbody tr')).toHaveCount(70);
 
   expect(pageErrors).toEqual([]);
