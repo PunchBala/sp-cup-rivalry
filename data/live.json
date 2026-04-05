@@ -88,7 +88,7 @@
       "source": "worker",
       "method": "provider quota exceeded; kept previous live snapshot",
       "quotaExceeded": true,
-      "hitsToday": 101,
+      "hitsToday": 113,
       "hitsLimit": 100,
       "scorecardCallsThisRun": 0,
       "backlogRemaining": 0
@@ -102,16 +102,16 @@
       "lastLiveRefreshAt": "2026-04-05T18:51:35.311Z",
       "lastSeriesInfoAt": "2026-04-05T18:51:35.311Z",
       "lastDecision": {
-        "at": "2026-04-05T18:51:34.323Z",
+        "at": "2026-04-05T19:50:35.210Z",
         "shouldRefresh": true,
-        "mode": "forced_refresh",
-        "reason": "forced refresh requested",
-        "nextPlannedAt": "2026-04-05T19:00:00.000Z"
+        "mode": "scheduled_window",
+        "reason": "inside planned refresh window",
+        "nextPlannedAt": "2026-04-06T13:00:00.000Z"
       },
-      "nextPlannedRefreshAt": "2026-04-05T19:00:00.000Z",
+      "nextPlannedRefreshAt": "2026-04-06T13:00:00.000Z",
       "nextPlannedMode": "scheduled_window",
       "nextPlannedReason": "league-stage refresh plan",
-      "nextPlannedCalculatedAt": "2026-04-05T18:51:35.313Z"
+      "nextPlannedCalculatedAt": "2026-04-05T19:50:35.210Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -48119,27 +48119,27 @@
       "lastError": null
     },
     "lastRun": {
-      "seriesInfoCalls": 1,
+      "seriesInfoCalls": 0,
       "scorecardCalls": 0,
       "backlogProcessed": 0,
       "backlogRemaining": 0,
       "liveOverlayFetched": false,
       "liveOverlayReused": false,
       "liveOverlaySkippedReason": null,
-      "cricketDataFailovers": 10
+      "cricketDataFailovers": 1
     },
     "aggregateSchemaVersion": 2,
     "providerStatus": {
       "state": "quota_exceeded",
-      "lastAttemptAt": "2026-04-05T18:51:34.305Z",
-      "lastErrorAt": "2026-04-05T18:51:36.755Z",
+      "lastAttemptAt": "2026-04-05T19:50:35.202Z",
+      "lastErrorAt": "2026-04-05T19:50:38.468Z",
       "reason": "hits_today_exceeded_hits_limit",
-      "hitsToday": 101,
+      "hitsToday": 113,
       "hitsLimit": 100,
       "activeKeyTier": "fallback",
       "fallbackAvailable": true,
-      "lastFallbackAt": "2026-04-05T18:51:36.688Z",
-      "lastFallbackReason": "Blocked for 15 minutes"
+      "lastFallbackAt": "2026-04-05T19:50:38.280Z",
+      "lastFallbackReason": "hits today exceeded hits limit"
     },
     "cricmetricDots": {
       "enabled": true,
