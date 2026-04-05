@@ -32,14 +32,19 @@ test('war room v1 renders a public duel directory with deep-linked duel pages an
   await expect(page.locator('#duelDirectory [data-duel-card]')).toHaveCount(2);
   await expect(page.locator('#duelDirectory')).toContainText('Leader');
   await expect(page.locator('#duelDirectory')).toContainText('Margin');
+  await expect(page.locator('#duelDirectory')).toContainText('Fronts won');
   await expect(page.locator('#duelDirectory')).toContainText('Last updated');
+  await expect(page.locator('#duelDirectory')).toContainText('Copy link');
+  await expect(page.locator('#duelDirectory [data-duel-card]').first()).toContainText('Senthil vs Sai');
+  await expect(page.locator('#duelDirectory')).toContainText('Senthil vs Vibeesh');
+  await expect(page.getByRole('button', { name: 'Copy duel link' })).toBeVisible();
 
   await expect(page.locator('#scoreboard .player-box')).toHaveCount(2);
   await expect(page.locator('#breakdownTable tbody tr')).toHaveCount(15);
   await expect(page.locator('#wormChart')).toBeVisible();
   await expect(page.locator('#breakdownTable tbody tr').nth(1).locator('.live-value-pill').first()).toBeVisible();
 
-  await page.locator('#duelDirectory [data-duel-id="senthil-sai"]').click();
+  await page.locator('#duelDirectory [data-open-duel="senthil-sai"]').click();
   await expect(page.locator('#viewTabs')).toContainText('Active duel: Senthil vs Sai');
   await expect(page.locator('#duelPicker')).toHaveValue('senthil-sai');
   await expect(page).toHaveURL(/duel=senthil-sai/);

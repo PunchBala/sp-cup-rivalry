@@ -79,6 +79,14 @@ test('record-backed room fixture resolves duel records into live duel objects', 
   assert.equal(loaded.duels[1].b.displayName, 'Vibeesh');
 });
 
+test('record-backed duel rejects entry ids that belong to another duel', async () => {
+  const room = await readFixture('war_room_sp_cup_2026.json');
+  room.duelRecords[0].entryIds = ['senthil-sai-senthil', 'senthil-vibeesh-vibeesh'];
+  const result = validateWarRoomConfig(room);
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join('\n'), /belongs to duel/i);
+});
+
 test('slug normalizer stays predictable', () => {
   assert.equal(normalizeSlug('SP Cup 2026'), 'sp-cup-2026');
 });
