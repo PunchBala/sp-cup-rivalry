@@ -42,7 +42,7 @@ test('buildMatchupsFromWarRoom preserves explicit duel list and separate Senthil
 
 test('duplicate entry ids are rejected even when display names repeat across duels', async () => {
   const room = await readFixture('war_room_sp_cup_2026.json');
-  room.duels[1].a.id = room.duels[0].a.id;
+  room.entryRecords[2].id = room.entryRecords[0].id;
   const result = validateWarRoomConfig(room);
   assert.equal(result.ok, false);
   assert.match(result.errors.join('\n'), /duplicate entry id/i);
@@ -50,7 +50,7 @@ test('duplicate entry ids are rejected even when display names repeat across due
 
 test('locked duel rejects missing required picks', async () => {
   const room = await readFixture('war_room_sp_cup_2026.json');
-  delete room.duels[0].b.picks.fairPlay;
+  delete room.entryRecords[1].picks.fairPlay;
   const result = validateWarRoomConfig(room);
   assert.equal(result.ok, false);
   assert.match(result.errors.join('\n'), /fairPlay: is required once the duel is locked/i);
@@ -61,8 +61,22 @@ test('local adapter loads by slug and returns deep clones', async () => {
   const adapter = createLocalWarRoomAdapter({ [room.slug]: room });
   const loadedA = adapter.loadWarRoomBySlug('sp-cup-2026');
   const loadedB = adapter.loadWarRoomBySlug('sp-cup-2026');
-  loadedA.duels[0].a.picks.orangeCap = 'Mutated';
+  loadedA.entryRecords[0].picks.orangeCap = 'Mutated';
+  assert.equal(loadedB.entryRecords[0].picks.orangeCap, 'KL Rahul');
   assert.equal(loadedB.duels[0].a.picks.orangeCap, 'KL Rahul');
+});
+
+test('record-backed room fixture resolves duel records into live duel objects', async () => {
+  const room = await readFixture('war_room_sp_cup_2026.json');
+  const adapter = createLocalWarRoomAdapter({ [room.slug]: room });
+  const loaded = adapter.loadWarRoomBySlug(room.slug);
+
+  assert.equal(Array.isArray(loaded.duelRecords), true);
+  assert.equal(Array.isArray(loaded.entryRecords), true);
+  assert.equal(loaded.duelRecords.length, 2);
+  assert.equal(loaded.entryRecords.length, 4);
+  assert.deepEqual(loaded.duelRecords[0].entryIds, ['senthil-sai-senthil', 'senthil-sai-sai']);
+  assert.equal(loaded.duels[1].b.displayName, 'Vibeesh');
 });
 
 test('slug normalizer stays predictable', () => {

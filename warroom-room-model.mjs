@@ -78,6 +78,152 @@ function validateEntry(entry, path, errors, warnings, { requireCompletePicks, se
   }
 }
 
+function validateOptionalStringField(value, path, errors) {
+  if (value != null && !isNonEmptyString(value)) pushError(errors, path, 'must be a non-empty string when provided');
+}
+
+function normalizeEntryRecord(entry = {}) {
+  return {
+    ...entry,
+    id: normalizeSlug(entry.id),
+    duelId: normalizeSlug(entry.duelId),
+    displayName: normalizeWhitespace(entry.displayName || entry.name),
+    ownerId: entry.ownerId != null ? normalizeWhitespace(entry.ownerId) : null,
+    createdAt: isNonEmptyString(entry.createdAt) ? normalizeWhitespace(entry.createdAt) : null,
+    updatedAt: isNonEmptyString(entry.updatedAt) ? normalizeWhitespace(entry.updatedAt) : null,
+    submittedAt: isNonEmptyString(entry.submittedAt) ? normalizeWhitespace(entry.submittedAt) : null,
+    picks: deepClone(entry.picks || {})
+  };
+}
+
+function normalizeDuelRecord(duel = {}, roomVisibility = 'public') {
+  return {
+    ...duel,
+    id: normalizeSlug(duel.id),
+    label: normalizeWhitespace(duel.label || ''),
+    visibility: duel.visibility || roomVisibility,
+    state: duel.state || 'locked',
+    createdAt: isNonEmptyString(duel.createdAt) ? normalizeWhitespace(duel.createdAt) : null,
+    updatedAt: isNonEmptyString(duel.updatedAt) ? normalizeWhitespace(duel.updatedAt) : null,
+    entryIds: Array.isArray(duel.entryIds) ? duel.entryIds.map((value) => normalizeSlug(value)) : []
+  };
+}
+
+function buildDuelFromRecord(duelRecord, entryMap) {
+  const [entryAId, entryBId] = duelRecord.entryIds;
+  const entryA = entryMap.get(entryAId);
+  const entryB = entryMap.get(entryBId);
+  if (!entryA || !entryB) return null;
+
+  const generatedLabel = `${entryA.displayName} vs ${entryB.displayName}`;
+  return {
+    id: duelRecord.id,
+    label: normalizeWhitespace(duelRecord.label || generatedLabel),
+    visibility: duelRecord.visibility || 'public',
+    state: duelRecord.state || 'locked',
+    createdAt: duelRecord.createdAt || null,
+    updatedAt: duelRecord.updatedAt || null,
+    a: {
+      id: entryA.id,
+      displayName: entryA.displayName,
+      ownerId: entryA.ownerId || null,
+      createdAt: entryA.createdAt || null,
+      updatedAt: entryA.updatedAt || null,
+      submittedAt: entryA.submittedAt || null,
+      picks: deepClone(entryA.picks || {})
+    },
+    b: {
+      id: entryB.id,
+      displayName: entryB.displayName,
+      ownerId: entryB.ownerId || null,
+      createdAt: entryB.createdAt || null,
+      updatedAt: entryB.updatedAt || null,
+      submittedAt: entryB.submittedAt || null,
+      picks: deepClone(entryB.picks || {})
+    }
+  };
+}
+
+function validateRecordBackedRoom(room, errors, warnings) {
+  const duelRecords = Array.isArray(room.duelRecords) ? room.duelRecords : null;
+  const entryRecords = Array.isArray(room.entryRecords) ? room.entryRecords : null;
+  const duelStateById = new Map();
+  const duelIds = new Set();
+
+  if (!duelRecords || duelRecords.length < 1) {
+    pushError(errors, 'duelRecords', 'must contain at least 1 duel record');
+  } else {
+    duelRecords.forEach((duel, index) => {
+      const path = `duelRecords[${index}]`;
+      if (!duel || typeof duel !== 'object' || Array.isArray(duel)) {
+        pushError(errors, path, 'must be an object');
+        return;
+      }
+      const duelId = normalizeSlug(duel.id || '');
+      if (!duelId) pushError(errors, `${path}.id`, 'must be a non-empty slug');
+      if (duelId) {
+        if (duelIds.has(duelId)) pushError(errors, `${path}.id`, `duplicate duel id '${duelId}'`);
+        duelIds.add(duelId);
+      }
+      const duelState = duel.state || 'locked';
+      if (!VALID_DUEL_STATE_SET.has(duelState)) pushError(errors, `${path}.state`, `must be one of: ${VALID_DUEL_STATES.join(', ')}`);
+      if (duel.visibility != null && !VALID_VISIBILITY_SET.has(duel.visibility)) pushError(errors, `${path}.visibility`, `must be one of: ${VALID_VISIBILITY.join(', ')}`);
+      const entryIds = Array.isArray(duel.entryIds) ? duel.entryIds.map((value) => normalizeSlug(value)) : [];
+      if (entryIds.length !== 2) pushError(errors, `${path}.entryIds`, 'must contain exactly 2 entry ids');
+      if (entryIds.some((value) => !value)) pushError(errors, `${path}.entryIds`, 'must contain only non-empty entry ids');
+      if (new Set(entryIds).size !== entryIds.length) pushError(errors, `${path}.entryIds`, 'must reference 2 distinct entries');
+      validateOptionalStringField(duel.label, `${path}.label`, errors);
+      validateOptionalStringField(duel.createdAt, `${path}.createdAt`, errors);
+      validateOptionalStringField(duel.updatedAt, `${path}.updatedAt`, errors);
+      if (duelId) duelStateById.set(duelId, duelState);
+    });
+  }
+
+  const entryMap = new Map();
+  const seenEntryIds = new Set();
+
+  if (!entryRecords || entryRecords.length < 1) {
+    pushError(errors, 'entryRecords', 'must contain at least 2 entry records');
+  } else {
+    entryRecords.forEach((entry, index) => {
+      const path = `entryRecords[${index}]`;
+      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+        pushError(errors, path, 'must be an object');
+        return;
+      }
+      const duelId = normalizeSlug(entry.duelId || '');
+      const requireCompletePicks = duelStateById.get(duelId) === 'locked';
+      validateEntry(entry, path, errors, warnings, { requireCompletePicks, seenEntryIds });
+      if (!duelId) pushError(errors, `${path}.duelId`, 'must be a non-empty slug');
+      if (duelId && !duelStateById.has(duelId)) pushError(errors, `${path}.duelId`, `references missing duel '${duelId}'`);
+      validateOptionalStringField(entry.createdAt, `${path}.createdAt`, errors);
+      validateOptionalStringField(entry.updatedAt, `${path}.updatedAt`, errors);
+      validateOptionalStringField(entry.submittedAt, `${path}.submittedAt`, errors);
+      const normalizedEntry = normalizeEntryRecord(entry);
+      if (normalizedEntry.id) entryMap.set(normalizedEntry.id, normalizedEntry);
+    });
+  }
+
+  const derivedDuels = (duelRecords || []).map((duel, index) => {
+    const path = `duelRecords[${index}]`;
+    const normalizedDuel = normalizeDuelRecord(duel, room.visibility);
+    const [entryAId, entryBId] = normalizedDuel.entryIds;
+    const entryA = entryMap.get(entryAId);
+    const entryB = entryMap.get(entryBId);
+    if (!entryA) pushError(errors, `${path}.entryIds`, `references missing entry '${entryAId || ''}'`);
+    if (!entryB) pushError(errors, `${path}.entryIds`, `references missing entry '${entryBId || ''}'`);
+    if (entryA && entryA.duelId !== normalizedDuel.id) pushError(errors, `${path}.entryIds`, `entry '${entryA.id}' belongs to duel '${entryA.duelId}' not '${normalizedDuel.id}'`);
+    if (entryB && entryB.duelId !== normalizedDuel.id) pushError(errors, `${path}.entryIds`, `entry '${entryB.id}' belongs to duel '${entryB.duelId}' not '${normalizedDuel.id}'`);
+    const duelObject = buildDuelFromRecord(normalizedDuel, entryMap);
+    if (duelObject && normalizedDuel.label && duelObject.label !== `${duelObject.a.displayName} vs ${duelObject.b.displayName}`) {
+      warnings.push(`${path}.label: '${duelObject.label}' differs from generated label '${duelObject.a.displayName} vs ${duelObject.b.displayName}'`);
+    }
+    return duelObject;
+  }).filter(Boolean);
+
+  validateDuelArray(derivedDuels, errors, warnings);
+}
+
 function validateDuelArray(duels, errors, warnings) {
   if (!Array.isArray(duels) || duels.length < 1) {
     pushError(errors, 'duels', 'must contain at least 1 duel');
@@ -133,8 +279,12 @@ function validateWarRoomConfig(room) {
   if (!VALID_STATE_SET.has(room.state)) pushError(errors, 'state', `must be one of: ${VALID_STATES.join(', ')}`);
   if (room.createdBy != null && !isNonEmptyString(room.createdBy)) pushError(errors, 'createdBy', 'must be a non-empty string when provided');
   if (room.settings != null && (typeof room.settings !== 'object' || Array.isArray(room.settings))) pushError(errors, 'settings', 'must be an object when provided');
-
-  validateDuelArray(room.duels, errors, warnings);
+  const usesRecordBackedShape = Array.isArray(room.duelRecords) || Array.isArray(room.entryRecords);
+  if (usesRecordBackedShape) {
+    validateRecordBackedRoom(room, errors, warnings);
+  } else {
+    validateDuelArray(room.duels, errors, warnings);
+  }
 
   return { ok: errors.length === 0, errors, warnings };
 }
@@ -153,23 +303,73 @@ function normalizeWarRoomConfig(room) {
   cloned.slug = normalizeSlug(cloned.slug);
   cloned.id = normalizeWhitespace(cloned.id);
   cloned.name = normalizeWhitespace(cloned.name);
-  cloned.duels = cloned.duels.map((duel) => ({
-    ...duel,
-    id: normalizeSlug(duel.id),
-    label: normalizeWhitespace(duel.label || `${duel.a.displayName} vs ${duel.b.displayName}`),
-    a: {
-      ...duel.a,
-      id: normalizeSlug(duel.a.id),
-      displayName: normalizeWhitespace(duel.a.displayName || duel.a.name),
-      picks: deepClone(duel.a.picks || {})
-    },
-    b: {
-      ...duel.b,
-      id: normalizeSlug(duel.b.id),
-      displayName: normalizeWhitespace(duel.b.displayName || duel.b.name),
-      picks: deepClone(duel.b.picks || {})
-    }
-  }));
+  const usesRecordBackedShape = Array.isArray(cloned.duelRecords) || Array.isArray(cloned.entryRecords);
+  if (usesRecordBackedShape) {
+    cloned.entryRecords = (cloned.entryRecords || []).map((entry) => normalizeEntryRecord(entry));
+    cloned.duelRecords = (cloned.duelRecords || []).map((duel) => normalizeDuelRecord(duel, cloned.visibility));
+    const entryMap = new Map(cloned.entryRecords.map((entry) => [entry.id, entry]));
+    cloned.duels = cloned.duelRecords.map((duel) => buildDuelFromRecord(duel, entryMap)).filter(Boolean);
+  } else {
+    cloned.duels = cloned.duels.map((duel) => ({
+      ...duel,
+      id: normalizeSlug(duel.id),
+      label: normalizeWhitespace(duel.label || `${duel.a.displayName} vs ${duel.b.displayName}`),
+      visibility: duel.visibility || cloned.visibility,
+      createdAt: isNonEmptyString(duel.createdAt) ? normalizeWhitespace(duel.createdAt) : null,
+      updatedAt: isNonEmptyString(duel.updatedAt) ? normalizeWhitespace(duel.updatedAt) : null,
+      a: {
+        ...duel.a,
+        id: normalizeSlug(duel.a.id),
+        displayName: normalizeWhitespace(duel.a.displayName || duel.a.name),
+        ownerId: duel.a.ownerId != null ? normalizeWhitespace(duel.a.ownerId) : null,
+        createdAt: isNonEmptyString(duel.a.createdAt) ? normalizeWhitespace(duel.a.createdAt) : null,
+        updatedAt: isNonEmptyString(duel.a.updatedAt) ? normalizeWhitespace(duel.a.updatedAt) : null,
+        submittedAt: isNonEmptyString(duel.a.submittedAt) ? normalizeWhitespace(duel.a.submittedAt) : null,
+        picks: deepClone(duel.a.picks || {})
+      },
+      b: {
+        ...duel.b,
+        id: normalizeSlug(duel.b.id),
+        displayName: normalizeWhitespace(duel.b.displayName || duel.b.name),
+        ownerId: duel.b.ownerId != null ? normalizeWhitespace(duel.b.ownerId) : null,
+        createdAt: isNonEmptyString(duel.b.createdAt) ? normalizeWhitespace(duel.b.createdAt) : null,
+        updatedAt: isNonEmptyString(duel.b.updatedAt) ? normalizeWhitespace(duel.b.updatedAt) : null,
+        submittedAt: isNonEmptyString(duel.b.submittedAt) ? normalizeWhitespace(duel.b.submittedAt) : null,
+        picks: deepClone(duel.b.picks || {})
+      }
+    }));
+    cloned.entryRecords = cloned.duels.flatMap((duel) => ([
+      {
+        id: duel.a.id,
+        duelId: duel.id,
+        ownerId: duel.a.ownerId || null,
+        displayName: duel.a.displayName,
+        createdAt: duel.a.createdAt || null,
+        updatedAt: duel.a.updatedAt || null,
+        submittedAt: duel.a.submittedAt || null,
+        picks: deepClone(duel.a.picks || {})
+      },
+      {
+        id: duel.b.id,
+        duelId: duel.id,
+        ownerId: duel.b.ownerId || null,
+        displayName: duel.b.displayName,
+        createdAt: duel.b.createdAt || null,
+        updatedAt: duel.b.updatedAt || null,
+        submittedAt: duel.b.submittedAt || null,
+        picks: deepClone(duel.b.picks || {})
+      }
+    ]));
+    cloned.duelRecords = cloned.duels.map((duel) => ({
+      id: duel.id,
+      label: duel.label,
+      visibility: duel.visibility || cloned.visibility,
+      state: duel.state || 'locked',
+      createdAt: duel.createdAt || null,
+      updatedAt: duel.updatedAt || null,
+      entryIds: [duel.a.id, duel.b.id]
+    }));
+  }
   return cloned;
 }
 
@@ -179,16 +379,21 @@ function buildMatchupsFromWarRoom(room) {
     id: duel.id,
     label: duel.label || `${duel.a.displayName} vs ${duel.b.displayName}`,
     state: duel.state || 'locked',
+    visibility: duel.visibility || normalized.visibility || 'public',
+    createdAt: duel.createdAt || null,
+    updatedAt: duel.updatedAt || null,
     a: {
       name: duel.a.displayName,
       entryId: duel.a.id,
       ownerId: duel.a.ownerId || null,
+      submittedAt: duel.a.submittedAt || null,
       picks: deepClone(duel.a.picks || {})
     },
     b: {
       name: duel.b.displayName,
       entryId: duel.b.id,
       ownerId: duel.b.ownerId || null,
+      submittedAt: duel.b.submittedAt || null,
       picks: deepClone(duel.b.picks || {})
     }
   }));

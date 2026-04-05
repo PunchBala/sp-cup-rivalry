@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const liveFixture = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../fixtures/live_early_season.json'), 'utf8'));
 
-test('war room v1 renders a single public duel page with a duel picker and stat value chips without runtime errors', async ({ page }) => {
+test('war room v1 renders a public duel directory with deep-linked duel pages and stat value chips without runtime errors', async ({ page }) => {
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(String(error)));
 
@@ -28,14 +28,21 @@ test('war room v1 renders a single public duel page with a duel picker and stat 
   await expect(page.locator('#duelPicker')).toHaveValue('senthil-vibeesh');
   await expect(page.locator('#viewTabs')).toContainText('Active duel: Senthil vs Vibeesh');
   await expect(page.locator('#viewTabs')).toContainText('Visibility: public duel page');
+  await expect(page.locator('#duelDirectorySummary')).toContainText('public duel');
+  await expect(page.locator('#duelDirectory [data-duel-card]')).toHaveCount(2);
+  await expect(page.locator('#duelDirectory')).toContainText('Leader');
+  await expect(page.locator('#duelDirectory')).toContainText('Margin');
+  await expect(page.locator('#duelDirectory')).toContainText('Last updated');
 
   await expect(page.locator('#scoreboard .player-box')).toHaveCount(2);
   await expect(page.locator('#breakdownTable tbody tr')).toHaveCount(15);
   await expect(page.locator('#wormChart')).toBeVisible();
   await expect(page.locator('#breakdownTable tbody tr').nth(1).locator('.live-value-pill').first()).toBeVisible();
 
-  await page.selectOption('#duelPicker', 'senthil-sai');
+  await page.locator('#duelDirectory [data-duel-id="senthil-sai"]').click();
   await expect(page.locator('#viewTabs')).toContainText('Active duel: Senthil vs Sai');
+  await expect(page.locator('#duelPicker')).toHaveValue('senthil-sai');
+  await expect(page).toHaveURL(/duel=senthil-sai/);
 
   await page.getByRole('button', { name: 'Nerd Room' }).click();
   await expect(page.locator('#statsSummary')).toContainText('board');

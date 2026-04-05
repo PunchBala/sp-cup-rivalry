@@ -148,6 +148,31 @@
       -moz-appearance:none;
     }
     .duel-picker select option{background:#0f1731;color:#f7f9ff}
+    .duel-directory-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:14px}
+    .duel-directory-card{
+      width:100%;
+      text-align:left;
+      background:linear-gradient(180deg, rgba(20,31,60,.98), rgba(11,20,40,.98));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      color:var(--text);
+      cursor:pointer;
+      transition:.18s ease;
+      box-shadow:var(--glow);
+    }
+    .duel-directory-card:hover{transform:translateY(-2px);border-color:rgba(124,196,255,.35)}
+    .duel-directory-card.active{border-color:rgba(123,167,255,.55);box-shadow:0 0 0 1px rgba(123,167,255,.18) inset, var(--glow)}
+    .duel-directory-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .duel-directory-label{font-size:18px;font-weight:900;line-height:1.1;color:#fff}
+    .duel-directory-score{font-size:30px;font-weight:900;line-height:1;margin-top:14px;color:#fff}
+    .duel-directory-meta{display:grid;gap:8px;margin-top:14px}
+    .duel-directory-row{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:12px;color:var(--muted)}
+    .duel-directory-row strong{color:#fff;font-size:13px}
+    .duel-directory-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--accent)}
+    .duel-directory-note{margin-top:12px;line-height:1.5}
+    .duel-directory-cta{margin-top:14px;display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid rgba(124,196,255,.18);background:rgba(124,196,255,.10);color:#dbeaff;font-size:11px;font-weight:900;letter-spacing:.03em;text-transform:uppercase}
+    .status-wait{background:rgba(255,200,87,.16);color:#ffd67e}
     .view-tab{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.18s}
     .view-tab.active{background:linear-gradient(180deg,rgba(84,138,255,.22),rgba(84,138,255,.1));border-color:rgba(123,167,255,.45);box-shadow:0 0 0 1px rgba(123,167,255,.18) inset}
     .section-hidden{display:none !important}
@@ -265,6 +290,11 @@
     </div>
 
     <div class="grid top-summary" id="warRoomSection">
+      <div class="card span-12">
+        <div class="section-title">Public duel directory</div>
+        <div class="small" id="duelDirectorySummary">Loading public duel board…</div>
+        <div class="duel-directory-grid" id="duelDirectory"></div>
+      </div>
       <div class="card span-12">
         <div class="layout-side">
           <div>
@@ -2646,6 +2676,17 @@ function titleBandScore(pick, live){
       return MATCHUPS.find(m => m.id === activeId) || MATCHUPS[0] || null;
     }
 
+    function latestBoardUpdatedAt(){
+      return LIVE_2026?.fetchedAt || LIVE_2026?.meta?.providerStatus?.lastAttemptAt || null;
+    }
+
+    function formatTimestamp(value){
+      if (!value) return '--';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '--';
+      return new Intl.DateTimeFormat(undefined, { dateStyle:'medium', timeStyle:'short' }).format(date);
+    }
+
     function updateWarRoomHeader(room){
       const titleEl = document.getElementById('leagueTitle');
       const subtitleEl = document.getElementById('leagueSubtitle');
@@ -2686,6 +2727,13 @@ function titleBandScore(pick, live){
         requestedDuelMissing = Boolean(requestedDuelId) && !MATCHUPS.some((m) => m.id === requestedDuelId);
         activeId = MATCHUPS.find((m) => m.id === requestedDuelId)?.id || MATCHUPS[0]?.id || null;
         updateWarRoomHeader(ACTIVE_ROOM);
+        if (ACTIVE_ROOM) {
+          const duelCount = Array.isArray(ACTIVE_ROOM.duels) ? ACTIVE_ROOM.duels.length : 0;
+          const liveCount = Array.isArray(ACTIVE_ROOM.duels) ? ACTIVE_ROOM.duels.filter((duel) => duel.state === 'locked').length : 0;
+          const waitingCount = Math.max(0, duelCount - liveCount);
+          const stateLabel = ACTIVE_ROOM.state === 'locked' ? 'sealed' : 'draft';
+          document.getElementById('leagueSubtitle').textContent = `${duelCount} public duel${duelCount === 1 ? '' : 's'} • ${liveCount} live${waitingCount ? ` • ${waitingCount} waiting` : ''} • ${stateLabel} duel-first room. Browse every public duel from the directory, then drop into one deep-linked head-to-head battle at a time while the same player can still carry different picks in different duels.`;
+        }
       } catch (err) {
         console.error('War room data load failed:', err);
         ACTIVE_ROOM = null;
@@ -2703,6 +2751,15 @@ function titleBandScore(pick, live){
       params.set('duel', duelId);
       const next = `${window.location.pathname}?${params.toString()}`;
       window.history.replaceState({}, '', next);
+    }
+
+    function selectDuel(duelId){
+      if (!duelId) return;
+      activeId = duelId;
+      activeView = 'warroom';
+      requestedDuelMissing = false;
+      setRequestedDuelIdInUrl(duelId);
+      render();
     }
 
     function renderEmptyWarRoomState(){
@@ -2727,6 +2784,8 @@ function titleBandScore(pick, live){
       document.getElementById('metricConfidenceNote').textContent = 'Confidence comes after data.';
       document.getElementById('clutchHeadline').textContent = 'Recent momentum is still loading';
       document.getElementById('clutchNote').textContent = 'Need a valid war room fixture before recent-form tracking means anything.';
+      document.getElementById('duelDirectorySummary').textContent = 'No public duel board is available until a valid war room fixture is loaded.';
+      document.getElementById('duelDirectory').innerHTML = '<div class="small">Load a valid room fixture to browse public duels.</div>';
       resetWormGraph();
     }
 
@@ -2832,6 +2891,98 @@ function titleBandScore(pick, live){
           render();
         };
       }
+    }
+
+    function renderPublicDuelLayer(){
+      const nav = document.getElementById('viewTabs');
+      const directory = document.getElementById('duelDirectory');
+      const summary = document.getElementById('duelDirectorySummary');
+      const matchup = activeMatchup();
+
+      if (!nav || !directory || !summary) return;
+      if (!ACTIVE_ROOM || !matchup || !MATCHUPS.length) {
+        nav.innerHTML = '';
+        summary.textContent = 'No public duels are available yet.';
+        directory.innerHTML = '<div class="small">Add a duel fixture to populate the directory.</div>';
+        return;
+      }
+
+      const waitingTag = matchup.state !== 'locked' ? ' • waiting on picks' : '';
+      const fallbackTag = requestedDuelMissing ? 'Requested duel was not found, so this page fell back to the first available duel.' : '';
+      nav.innerHTML = `
+        <div class="duel-picker">
+          <label for="duelPicker">Jump to duel</label>
+          <select id="duelPicker" aria-label="Browse public duel">
+            ${MATCHUPS.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === matchup.id ? 'selected' : ''}>${escapeHtml(item.label || `${item.a.name} vs ${item.b.name}`)}${item.state !== 'locked' ? ' (Waiting)' : ''}</option>`).join('')}
+          </select>
+        </div>
+        <div class="pill">Active duel: ${escapeHtml(matchup.label || `${matchup.a.name} vs ${matchup.b.name}`)}${escapeHtml(waitingTag)}</div>
+        <div class="pill">Visibility: public duel page • ${MATCHUPS.length} listed</div>
+        <div class="pill">Room: ${escapeHtml(ACTIVE_ROOM.name || ACTIVE_ROOM.slug || 'War Room')}</div>
+        ${fallbackTag ? `<div class="pill">${escapeHtml(fallbackTag)}</div>` : ''}
+      `;
+
+      const duelPicker = document.getElementById('duelPicker');
+      if (duelPicker) duelPicker.onchange = () => selectDuel(duelPicker.value);
+
+      const liveCount = MATCHUPS.filter((item) => item.state === 'locked').length;
+      const waitingCount = Math.max(0, MATCHUPS.length - liveCount);
+      const boardUpdatedAt = latestBoardUpdatedAt();
+      summary.textContent = `${MATCHUPS.length} public duel${MATCHUPS.length === 1 ? '' : 's'} in the room, ${liveCount} live${waitingCount ? `, ${waitingCount} waiting on picks` : ''}. Open any card to jump to its deep-linked duel page.${boardUpdatedAt ? ` Board last updated ${formatTimestamp(boardUpdatedAt)}.` : ''}`;
+
+      directory.innerHTML = MATCHUPS.map((item) => {
+        let statusLabel = 'Waiting on picks';
+        let statusClass = 'status-wait';
+        let leaderLabel = 'Awaiting both pick sheets';
+        let marginLabel = 'No live margin yet';
+        let scoreLabel = '—';
+        let note = 'This duel will go live once both duel entries are sealed.';
+
+        if (item.state === 'locked') {
+          const { rows, totalA, totalB } = computeMatchup(item);
+          const frontsA = rows.filter((row) => row.a > row.b).length;
+          const frontsB = rows.filter((row) => row.b > row.a).length;
+          const leaderName = totalA === totalB ? null : (totalA > totalB ? item.a.name : item.b.name);
+          const margin = Math.abs(totalA - totalB);
+          statusLabel = totalA === totalB ? 'Level duel' : 'Live duel';
+          statusClass = totalA === totalB ? 'status-tie' : 'status-good';
+          leaderLabel = leaderName ? `${leaderName} leads` : 'No leader yet';
+          marginLabel = leaderName ? `${margin} point${margin === 1 ? '' : 's'}` : '0 points';
+          scoreLabel = `${totalA} - ${totalB}`;
+          note = leaderName
+            ? `${frontsA}-${frontsB} on category fronts. ${leaderName} has the current edge.`
+            : `Fronts are split ${frontsA}-${frontsB}. One clean swing category flips the whole mood.`;
+        }
+
+        const updatedLabel = formatTimestamp(boardUpdatedAt || item.updatedAt || ACTIVE_ROOM.updatedAt || null);
+        const duelLabel = item.label || `${item.a.name} vs ${item.b.name}`;
+        const activeClass = item.id === activeId ? 'active' : '';
+        const ctaLabel = item.id === activeId ? 'Viewing duel page' : 'Open duel page';
+
+        return `
+          <button class="duel-directory-card ${activeClass}" type="button" data-duel-card data-duel-id="${escapeHtml(item.id)}" aria-label="Open ${escapeHtml(duelLabel)} duel">
+            <div class="duel-directory-top">
+              <div>
+                <div class="duel-directory-label">${escapeHtml(duelLabel)}</div>
+                <div class="small">${escapeHtml(item.visibility || ACTIVE_ROOM.visibility || 'public')} duel</div>
+              </div>
+              <span class="status-chip ${statusClass}">${escapeHtml(statusLabel)}</span>
+            </div>
+            <div class="duel-directory-score">${escapeHtml(scoreLabel)}</div>
+            <div class="duel-directory-meta">
+              <div class="duel-directory-row"><span class="duel-directory-kicker">Leader</span><strong>${escapeHtml(leaderLabel)}</strong></div>
+              <div class="duel-directory-row"><span class="duel-directory-kicker">Margin</span><strong>${escapeHtml(marginLabel)}</strong></div>
+              <div class="duel-directory-row"><span class="duel-directory-kicker">Last updated</span><strong>${escapeHtml(updatedLabel)}</strong></div>
+            </div>
+            <div class="small duel-directory-note">${escapeHtml(note)}</div>
+            <div class="duel-directory-cta">${escapeHtml(ctaLabel)}</div>
+          </button>
+        `;
+      }).join('');
+
+      directory.querySelectorAll('[data-duel-card]').forEach((button) => {
+        button.onclick = () => selectDuel(button.dataset.duelId);
+      });
     }
 
     function renderScoreboard(matchup, totalA, totalB){
@@ -3585,6 +3736,7 @@ function titleBandScore(pick, live){
     function render(){
       renderTabs();
       renderViewTabs();
+      renderPublicDuelLayer();
       document.getElementById('warRoomSection').classList.toggle('section-hidden', activeView !== 'warroom');
       document.getElementById('statsSection').classList.toggle('section-hidden', activeView !== 'stats');
       document.getElementById('scheduleSection').classList.toggle('section-hidden', activeView !== 'schedule');

@@ -13,26 +13,39 @@
     "enableClutch": true,
     "enableWormGraph": true
   },
-  "duels": [
+  "duelRecords": [
     {
       "id": "arun-bala",
       "label": "Arun vs Bala",
+      "visibility": "unlisted",
       "state": "draft",
-      "a": {
-        "id": "arun-bala-arun",
-        "displayName": "Arun",
-        "ownerId": "arun",
-        "picks": {
-          "titleWinner": "MI",
-          "orangeCap": "Virat Kohli"
-        }
-      },
-      "b": {
-        "id": "arun-bala-bala",
-        "displayName": "Bala",
-        "ownerId": "bala",
-        "picks": {}
+      "createdAt": "2026-03-25T12:00:00Z",
+      "updatedAt": "2026-03-25T12:10:00Z",
+      "entryIds": [
+        "arun-bala-arun",
+        "arun-bala-bala"
+      ]
+    }
+  ],
+  "entryRecords": [
+    {
+      "id": "arun-bala-arun",
+      "duelId": "arun-bala",
+      "displayName": "Arun",
+      "ownerId": "arun",
+      "submittedAt": "2026-03-25T12:08:00Z",
+      "updatedAt": "2026-03-25T12:08:00Z",
+      "picks": {
+        "titleWinner": "MI",
+        "orangeCap": "Virat Kohli"
       }
+    },
+    {
+      "id": "arun-bala-bala",
+      "duelId": "arun-bala",
+      "displayName": "Bala",
+      "ownerId": "bala",
+      "picks": {}
     }
   ]
 }
