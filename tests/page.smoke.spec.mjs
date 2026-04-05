@@ -99,7 +99,7 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   });
 
   await page.locator('#submitPicksButton').click();
-  await expect(page.locator('#duelControlsPanel')).toContainText('still drafting');
+  await expect(page.locator('#duelControlsPanel')).toContainText('Waiting for both pick sheets');
 
   await page.getByRole('button', { name: 'Sign out' }).click();
   await page.locator('#authDisplayName').fill('Bala');
