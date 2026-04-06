@@ -15,8 +15,9 @@ import {
 export const MINI_FANTASY_ENGINE_VERSION = 'mini_fantasy_v1';
 export const MINI_FANTASY_PRICE_BOOK_VERSION = 'mini_fantasy_price_book_v1';
 export const MINI_FANTASY_SEASON = 'IPL 2026';
-export const MINI_FANTASY_LAUNCH_AT_UTC = '2026-04-08T00:00:00Z';
+export const MINI_FANTASY_LAUNCH_AT_UTC = '2026-04-06T00:00:00Z';
 export const MINI_FANTASY_FIRST_OPEN_MATCH_NO = 14;
+export const MINI_FANTASY_FIRST_MATCH_OPEN_AT_UTC = '2026-04-06T00:00:00Z';
 export const MINI_FANTASY_TEAM_SIZE = 4;
 export const MINI_FANTASY_BUDGET = 30;
 export const MINI_FANTASY_CAPTAIN_MULTIPLIER = 1.5;
@@ -224,40 +225,66 @@ export function getLaunchStatus(schedule = [], now = new Date(), options = {}) {
   };
 }
 
-export function getMiniFantasyOpenFixtures(schedule = [], now = new Date(), options = {}) {
+function startOfUtcDayMs(dateValue) {
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return Number.NaN;
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+}
+
+export function getMiniFantasyFixtureOpenAtUtc(fixture, options = {}) {
+  const firstOpenMatchNo = Number(options.first_open_match_no || MINI_FANTASY_FIRST_OPEN_MATCH_NO);
+  const firstMatchOpenAtUtc = options.first_match_open_at_utc || MINI_FANTASY_FIRST_MATCH_OPEN_AT_UTC;
+  const startMs = Date.parse(fixture?.datetime_utc || fixture?.starts_at_utc || '');
+  if (!Number.isFinite(startMs)) return null;
+  const regularOpenMs = startOfUtcDayMs(startMs) - 24 * 60 * 60 * 1000;
+  if (Number(fixture?.match_no || 0) === firstOpenMatchNo) {
+    const firstOpenMs = Date.parse(firstMatchOpenAtUtc);
+    const effectiveMs = Number.isFinite(firstOpenMs) ? Math.min(firstOpenMs, regularOpenMs) : regularOpenMs;
+    return new Date(effectiveMs).toISOString();
+  }
+  return new Date(regularOpenMs).toISOString();
+}
+
+export function getMiniFantasyFixtureAvailability(schedule = [], now = new Date(), options = {}) {
   const firstOpenMatchNo = Number(options.first_open_match_no || MINI_FANTASY_FIRST_OPEN_MATCH_NO);
   const lockOffsetMinutes = Number(options.lock_offset_minutes || MINI_FANTASY_LOCK_OFFSET_MINUTES);
   const launchStatus = getLaunchStatus(schedule, now, options);
-  const todayKey = getFixtureDateKeyLocal(now);
-  const tomorrow = new Date(now.getTime());
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowKey = getFixtureDateKeyLocal(tomorrow);
-
-  const candidates = (Array.isArray(schedule) ? schedule : [])
+  const availability = (Array.isArray(schedule) ? schedule : [])
     .filter((fixture) => Number(fixture.match_no) >= firstOpenMatchNo)
     .map((fixture) => {
       const startMs = Date.parse(fixture.datetime_utc || '');
       const lockMs = startMs - lockOffsetMinutes * 60 * 1000;
-      const fixtureDate = Number.isFinite(startMs) ? new Date(startMs) : null;
-      const dateKey = fixtureDate ? getFixtureDateKeyLocal(fixtureDate) : '';
+      const opensAtUtc = getMiniFantasyFixtureOpenAtUtc(fixture, options);
+      const openMs = Date.parse(opensAtUtc || '');
+      const isLocked = !Number.isFinite(lockMs) || now.getTime() >= lockMs;
+      const isOpen = Number.isFinite(openMs) && now.getTime() >= openMs && !isLocked;
       return {
         ...fixture,
         home_team_code: resolveFixtureTeamCode(fixture.home_team),
         away_team_code: resolveFixtureTeamCode(fixture.away_team),
         starts_at_utc: fixture.datetime_utc || null,
+        opens_at_utc: opensAtUtc,
         locks_at_utc: Number.isFinite(lockMs) ? new Date(lockMs).toISOString() : null,
-        is_today: dateKey === todayKey,
-        is_tomorrow: dateKey === tomorrowKey,
-        is_locked: !Number.isFinite(lockMs) || now.getTime() >= lockMs
+        is_open: isOpen,
+        is_locked: isLocked,
+        availability_status: isLocked ? 'locked' : isOpen ? 'open' : 'upcoming'
       };
     })
-    .filter((fixture) => fixture.is_today || fixture.is_tomorrow)
-    .filter((fixture) => !fixture.is_locked)
     .sort((a, b) => Date.parse(a.datetime_utc || '') - Date.parse(b.datetime_utc || ''));
 
   return {
     launch: launchStatus,
-    fixtures: launchStatus.is_live ? candidates : []
+    fixtures: availability.filter((fixture) => fixture.is_open),
+    availability
+  };
+}
+
+export function getMiniFantasyOpenFixtures(schedule = [], now = new Date(), options = {}) {
+  const availability = getMiniFantasyFixtureAvailability(schedule, now, options);
+  return {
+    launch: availability.launch,
+    fixtures: availability.fixtures,
+    availability: availability.availability
   };
 }
 
@@ -274,6 +301,7 @@ export function deriveCompletedMatchHistories(liveData = {}, schedule = []) {
       histories.set(canonical, {
         player_name: playerName,
         match_points: [],
+        points_by_match_no: {},
         matches_played: 0,
         last_match_played_at_utc: null
       });
@@ -309,7 +337,10 @@ export function deriveCompletedMatchHistories(liveData = {}, schedule = []) {
       const scoreDelta = roundTo(currentScore - previousScore, 2);
       const history = ensureHistory(playerName);
       for (let step = 0; step < matchDelta; step += 1) {
-        history.match_points.push(step === 0 ? scoreDelta : 0);
+        const effectiveMatchNo = Math.max(1, matchNo - (matchDelta - 1) + step);
+        const matchPoints = step === matchDelta - 1 ? scoreDelta : 0;
+        history.match_points.push(matchPoints);
+        history.points_by_match_no[effectiveMatchNo] = matchPoints;
       }
       history.matches_played += matchDelta;
       history.last_match_played_at_utc = playedAt;
@@ -595,4 +626,137 @@ export function scoreMiniFantasyLineup({
     total += rawPoints * multiplier;
   });
   return roundTo(total, 2);
+}
+
+export function getCompletedMiniFantasyMatchCount(liveData = {}) {
+  const scoreHistory = Array.isArray(liveData?.meta?.scoreHistory) ? liveData.meta.scoreHistory : [];
+  return scoreHistory.reduce((best, item) => Math.max(best, Number(item?.processedMatchCount || 0)), 0);
+}
+
+export function buildMiniFantasyPlayerPointsIndex({
+  liveData = {},
+  schedule = [],
+  squads = {}
+} = {}) {
+  const historyMap = deriveCompletedMatchHistories(liveData, schedule);
+  const index = new Map();
+  Object.entries(squads || {}).forEach(([teamCode, squadPlayers]) => {
+    (Array.isArray(squadPlayers) ? squadPlayers : []).forEach((playerName) => {
+      const history = historyMap.get(normalizeName(playerName));
+      index.set(buildMiniFantasyPlayerId(teamCode, playerName), {
+        player_id: buildMiniFantasyPlayerId(teamCode, playerName),
+        name: playerName,
+        team: teamCode,
+        match_points: [...(history?.match_points || [])],
+        points_by_match_no: { ...(history?.points_by_match_no || {}) },
+        matches_played: Number(history?.matches_played || 0),
+        last_match_played_at_utc: history?.last_match_played_at_utc || null
+      });
+    });
+  });
+  return index;
+}
+
+export function scoreMiniFantasyEntry({
+  entry = {},
+  liveData = {},
+  schedule = [],
+  squads = {}
+} = {}) {
+  const matchNo = Number(entry?.matchNo || entry?.match_no || 0) || null;
+  const completedMatchCount = getCompletedMiniFantasyMatchCount(liveData);
+  const pointsIndex = buildMiniFantasyPlayerPointsIndex({ liveData, schedule, squads });
+  const pointsByPlayerId = Object.fromEntries(
+    (Array.isArray(entry?.selectedPlayerIds) ? entry.selectedPlayerIds : []).map((playerId) => [
+      playerId,
+      pointsIndex.get(playerId)?.points_by_match_no?.[matchNo] || 0
+    ])
+  );
+  const totalPoints = matchNo && matchNo <= completedMatchCount
+    ? scoreMiniFantasyLineup({
+        selectedPlayerIds: entry?.selectedPlayerIds || [],
+        captainPlayerId: entry?.captainPlayerId || '',
+        pointsByPlayerId
+      })
+    : 0;
+  return {
+    match_no: matchNo,
+    is_scored: Boolean(matchNo && matchNo <= completedMatchCount),
+    total_points: totalPoints,
+    points_by_player_id: pointsByPlayerId
+  };
+}
+
+export function buildMiniFantasyLeaderboard({
+  entries = [],
+  liveData = {},
+  schedule = [],
+  squads = {}
+} = {}) {
+  const pointsIndex = buildMiniFantasyPlayerPointsIndex({ liveData, schedule, squads });
+  const completedMatchCount = getCompletedMiniFantasyMatchCount(liveData);
+  const grouped = new Map();
+
+  (Array.isArray(entries) ? entries : []).forEach((entry) => {
+    const ownerHandle = normalizeWhitespace(entry?.ownerHandle || entry?.owner_handle || '');
+    if (!ownerHandle) return;
+    const matchNo = Number(entry?.matchNo || entry?.match_no || 0) || null;
+    const pointsByPlayerId = Object.fromEntries(
+      (Array.isArray(entry?.selectedPlayerIds || entry?.selected_player_ids) ? (entry.selectedPlayerIds || entry.selected_player_ids) : []).map((playerId) => [
+        playerId,
+        pointsIndex.get(playerId)?.points_by_match_no?.[matchNo] || 0
+      ])
+    );
+    const scored = Boolean(matchNo && matchNo <= completedMatchCount);
+    const totalPoints = scored
+      ? scoreMiniFantasyLineup({
+          selectedPlayerIds: entry?.selectedPlayerIds || entry?.selected_player_ids || [],
+          captainPlayerId: entry?.captainPlayerId || entry?.captain_player_id || '',
+          pointsByPlayerId
+        })
+      : 0;
+    const existing = grouped.get(ownerHandle) || {
+      owner_handle: ownerHandle,
+      total_points: 0,
+      saved_entries: 0,
+      scored_entries: 0,
+      pending_entries: 0,
+      latest_saved_at: null,
+      matches: []
+    };
+    existing.total_points = roundTo(existing.total_points + totalPoints, 2);
+    existing.saved_entries += 1;
+    existing.scored_entries += scored ? 1 : 0;
+    existing.pending_entries += scored ? 0 : 1;
+    existing.latest_saved_at = [existing.latest_saved_at, entry?.savedAt || entry?.saved_at || entry?.updatedAt || entry?.updated_at || null]
+      .filter(Boolean)
+      .sort()
+      .slice(-1)[0] || existing.latest_saved_at;
+    existing.matches.push({
+      match_no: matchNo,
+      total_points: totalPoints,
+      is_scored: scored,
+      captain_player_id: entry?.captainPlayerId || entry?.captain_player_id || null
+    });
+    grouped.set(ownerHandle, existing);
+  });
+
+  const medalByIndex = ['gold', 'silver', 'bronze'];
+  const rows = [...grouped.values()]
+    .sort((a, b) =>
+      b.total_points - a.total_points ||
+      b.scored_entries - a.scored_entries ||
+      b.saved_entries - a.saved_entries ||
+      a.owner_handle.localeCompare(b.owner_handle)
+    )
+    .map((row, index) => ({
+      ...row,
+      rank: index + 1,
+      medal: medalByIndex[index] || null
+    }));
+
+  return {
+    completed_match_count: completedMatchCount,
+    rows
+  };
 }

@@ -562,6 +562,12 @@
     .fantasy-sub{font-size:13px;color:var(--muted);line-height:1.55;max-width:860px}
     .fantasy-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
     .fantasy-fixture-list{display:grid;gap:12px}
+    .fantasy-window-note{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.55}
+    .fantasy-availability-list{display:grid;gap:8px;margin-top:12px}
+    .fantasy-availability-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .fantasy-availability-copy{display:grid;gap:4px}
+    .fantasy-availability-title{font-size:13px;font-weight:900;color:#fff}
+    .fantasy-availability-note{font-size:12px;color:var(--muted);line-height:1.45}
     .fantasy-fixture-card{
       width:100%;
       text-align:left;
@@ -636,6 +642,20 @@
     }
     .fantasy-saved-list{display:grid;gap:8px;margin-top:14px}
     .fantasy-saved-item{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .fantasy-leaderboard-list{display:grid;gap:10px;margin-top:14px}
+    .fantasy-leaderboard-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .fantasy-leaderboard-row.top-1{border-color:rgba(255,200,87,.34);background:rgba(255,200,87,.10)}
+    .fantasy-leaderboard-row.top-2{border-color:rgba(209,220,237,.24);background:rgba(209,220,237,.08)}
+    .fantasy-leaderboard-row.top-3{border-color:rgba(217,154,100,.26);background:rgba(217,154,100,.09)}
+    .fantasy-leaderboard-copy{display:grid;gap:5px}
+    .fantasy-leaderboard-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:16px;font-weight:900;color:#fff}
+    .fantasy-leaderboard-rank{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:12px;font-weight:900;color:#fff}
+    .fantasy-medal{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+    .fantasy-medal.gold{background:rgba(255,200,87,.18);border:1px solid rgba(255,200,87,.34);color:#ffe3a5}
+    .fantasy-medal.silver{background:rgba(209,220,237,.12);border:1px solid rgba(209,220,237,.22);color:#eef5ff}
+    .fantasy-medal.bronze{background:rgba(217,154,100,.12);border:1px solid rgba(217,154,100,.24);color:#ffd8b9}
+    .fantasy-leaderboard-score{display:grid;justify-items:end;gap:4px}
+    .fantasy-leaderboard-points{font-size:28px;font-weight:900;color:#fff;line-height:1}
 
   </style>
 
@@ -790,6 +810,10 @@
               <div id="miniFantasyBuilder"></div>
             </div>
             <div class="card">
+              <div class="section-title">Global leaderboard</div>
+              <div id="miniFantasyLeaderboard"></div>
+            </div>
+            <div class="card">
               <div class="section-title">My entries</div>
               <div id="miniFantasyMyEntries"></div>
             </div>
@@ -929,13 +953,16 @@
     import {
       MINI_FANTASY_BUDGET,
       MINI_FANTASY_CAPTAIN_MULTIPLIER,
+      MINI_FANTASY_FIRST_MATCH_OPEN_AT_UTC,
       MINI_FANTASY_FIRST_OPEN_MATCH_NO,
       MINI_FANTASY_LAUNCH_AT_UTC,
       MINI_FANTASY_SEASON,
       applyPriceSnapshotToPool,
+      buildMiniFantasyLeaderboard,
       buildEntryPriceSnapshot,
       buildFixturePlayerPool,
       generateMiniFantasyPriceBook,
+      getMiniFantasyFixtureAvailability,
       getMiniFantasyOpenFixtures,
       isFixtureLocked,
       validateMiniFantasyEntry
@@ -967,6 +994,7 @@
     let CUSTOM_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_MINI_FANTASY_ENTRIES = [];
+    let REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = [];
     const DUELS_BACKEND = window.DUELS_BACKEND_API || window.createDuelsBackend?.(window.DUELS_BACKEND_CONFIG || {}) || { enabled: false, label: 'Local beta storage' };
     let DUEL_STUDIO_NOTICE = null;
     let IPL_SQUADS = {};
@@ -3665,12 +3693,21 @@ function titleBandScore(pick, live){
       return REMOTE_MINI_FANTASY_ENTRIES;
     }
 
+    function setRemoteMiniFantasyLeaderboardEntries(entries = []){
+      REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = Array.isArray(entries) ? cloneJson(entries) : [];
+      return REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES;
+    }
+
     function upsertRemoteMiniFantasyEntry(entry){
       if (!entry) return null;
       const nextEntries = (Array.isArray(REMOTE_MINI_FANTASY_ENTRIES) ? REMOTE_MINI_FANTASY_ENTRIES : [])
         .filter((item) => miniFantasyEntryStoreKey(item) !== miniFantasyEntryStoreKey(entry));
       nextEntries.push(cloneJson(entry));
       REMOTE_MINI_FANTASY_ENTRIES = nextEntries;
+      const leaderboardEntries = (Array.isArray(REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES) ? REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES : [])
+        .filter((item) => miniFantasyEntryStoreKey(item) !== miniFantasyEntryStoreKey(entry));
+      leaderboardEntries.push(cloneJson(entry));
+      REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = leaderboardEntries;
       return entry;
     }
 
@@ -3680,6 +3717,12 @@ function titleBandScore(pick, live){
 
     function currentMiniFantasyEntries(){
       return usesHostedDuelsBackend() ? cloneJson(REMOTE_MINI_FANTASY_ENTRIES || []) : localMiniFantasyEntriesForCurrentUser();
+    }
+
+    function currentMiniFantasyLeaderboardEntries(){
+      return usesHostedDuelsBackend()
+        ? cloneJson(REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES || [])
+        : loadStoredMiniFantasyEntriesStore().entries;
     }
 
     function findMiniFantasyEntryForMatch(matchNo){
@@ -3701,21 +3744,25 @@ function titleBandScore(pick, live){
     }
 
     async function syncMiniFantasyEntries(){
-      if (!CURRENT_USER) {
-        setRemoteMiniFantasyEntries([]);
-        resetMiniFantasyDrafts();
-        return [];
-      }
       if (!usesHostedDuelsBackend()) {
         resetMiniFantasyDrafts();
         return localMiniFantasyEntriesForCurrentUser();
       }
       try {
-        const entries = await DUELS_BACKEND.listMiniFantasyEntries({
-          season: MINI_FANTASY_SEASON,
-          currentUser: CURRENT_USER
-        });
+        const [entries, leaderboardEntries] = await Promise.all([
+          CURRENT_USER
+            ? DUELS_BACKEND.listMiniFantasyEntries({
+                season: MINI_FANTASY_SEASON,
+                currentUser: CURRENT_USER
+              })
+            : Promise.resolve([]),
+          DUELS_BACKEND.listPublicMiniFantasyEntries({
+            season: MINI_FANTASY_SEASON,
+            currentUser: CURRENT_USER
+          })
+        ]);
         setRemoteMiniFantasyEntries(entries || []);
+        setRemoteMiniFantasyLeaderboardEntries(leaderboardEntries || []);
       } catch (error) {
         console.error('Hosted mini fantasy load failed:', error);
         MINI_FANTASY_NOTICE = {
@@ -3724,6 +3771,7 @@ function titleBandScore(pick, live){
           text: error.message || `Could not load your saved Mini Fantasy entries from ${currentAuthLabel()}.`
         };
         setRemoteMiniFantasyEntries([]);
+        setRemoteMiniFantasyLeaderboardEntries([]);
       }
       resetMiniFantasyDrafts();
       return currentMiniFantasyEntries();
@@ -4270,10 +4318,12 @@ function titleBandScore(pick, live){
       const pillEl = document.getElementById('leaguePill');
       const launchData = buildMiniFantasyLaunchData();
       const openCount = launchData.fixtures.length;
+      const nextOpening = nextMiniFantasyOpeningFixture();
+      const openMatches = launchData.fixtures.map((fixture) => `Match ${fixture.match_no}`).join(', ');
       titleEl.textContent = `${ACTIVE_ROOM?.name || 'IPL 2026'} Mini Fantasy`;
-      subtitleEl.textContent = launchData.launch.is_live
-        ? `${openCount} eligible fixture${openCount === 1 ? '' : 's'} in the today-and-tomorrow window. Build one 4-player team per match, stay inside the credit cap, and freeze prices inside your saved entry.`
-        : `Mini Fantasy launches on 8 April 2026 from Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO}. Pricing is seeded from the earlier season, but entries stay closed until the launch gate opens.`;
+      subtitleEl.textContent = openCount
+        ? `${openMatches} ${openCount === 1 ? 'is' : 'are'} open for submission right now. Later matches unlock from the day before, every lineup is 4 players inside 30 credits, and saved teams keep their own frozen price snapshot.`
+        : `${nextOpening ? `No match is open right now. Match ${nextOpening.match_no} opens on ${formatDate(nextOpening.opens_at_utc)}.` : 'No Mini Fantasy match is currently open.'} Build one team per match, captain one player for 1.5x, and rankings update from completed fixtures.`;
       pillEl.textContent = `Mini Fantasy: ${ACTIVE_ROOM?.name || SERIES_TAG}`;
     }
 
@@ -6091,18 +6141,13 @@ function titleBandScore(pick, live){
       if (activeView === 'fantasy') {
         const launchData = buildMiniFantasyLaunchData();
         const activeFixture = activeMiniFantasyFixture();
-        nav.innerHTML = launchData.launch.is_live
-          ? `
-            <div class="pill">Mini Fantasy: live</div>
-            <div class="pill">Window: today + tomorrow</div>
-            <div class="pill">Open fixtures: ${escapeHtml(String(launchData.fixtures.length))}</div>
-            <div class="pill">${activeFixture ? `Active match: #${escapeHtml(String(activeFixture.match_no))}` : 'No eligible fixture right now'}</div>
-          `
-          : `
-            <div class="pill">Mini Fantasy: prelaunch</div>
-            <div class="pill">Launch: ${escapeHtml(formatDate(MINI_FANTASY_LAUNCH_AT_UTC))}</div>
-            <div class="pill">First live match: #${escapeHtml(String(MINI_FANTASY_FIRST_OPEN_MATCH_NO))}</div>
-          `;
+        const nextOpening = nextMiniFantasyOpeningFixture();
+        nav.innerHTML = `
+          <div class="pill">Mini Fantasy: live</div>
+          <div class="pill">Open now: ${launchData.fixtures.length ? launchData.fixtures.map((fixture) => `#${fixture.match_no}`).join(', ') : 'none'}</div>
+          <div class="pill">${activeFixture ? `Active match: #${escapeHtml(String(activeFixture.match_no))}` : 'No open match right now'}</div>
+          ${nextOpening ? `<div class="pill">Next opening: #${escapeHtml(String(nextOpening.match_no))} on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}</div>` : ''}
+        `;
       }
       if (!ACTIVE_ROOM || !matchup || !MATCHUPS.length) {
         if (activeView !== 'fantasy') nav.innerHTML = '';
@@ -7049,12 +7094,25 @@ function titleBandScore(pick, live){
     function buildMiniFantasyLaunchData(){
       return getMiniFantasyOpenFixtures(LEAGUE_STAGE_SCHEDULE, currentNowDate(), {
         launch_at_utc: MINI_FANTASY_LAUNCH_AT_UTC,
-        first_open_match_no: MINI_FANTASY_FIRST_OPEN_MATCH_NO
+        first_open_match_no: MINI_FANTASY_FIRST_OPEN_MATCH_NO,
+        first_match_open_at_utc: MINI_FANTASY_FIRST_MATCH_OPEN_AT_UTC
+      });
+    }
+
+    function buildMiniFantasyAvailabilityData(){
+      return getMiniFantasyFixtureAvailability(LEAGUE_STAGE_SCHEDULE, currentNowDate(), {
+        launch_at_utc: MINI_FANTASY_LAUNCH_AT_UTC,
+        first_open_match_no: MINI_FANTASY_FIRST_OPEN_MATCH_NO,
+        first_match_open_at_utc: MINI_FANTASY_FIRST_MATCH_OPEN_AT_UTC
       });
     }
 
     function availableMiniFantasyFixtures(){
       return buildMiniFantasyLaunchData().fixtures || [];
+    }
+
+    function miniFantasyAvailabilityRows(){
+      return buildMiniFantasyAvailabilityData().availability || [];
     }
 
     function activeMiniFantasyFixture(){
@@ -7098,6 +7156,26 @@ function titleBandScore(pick, live){
       return savedEntry?.priceSnapshot && Object.keys(savedEntry.priceSnapshot).length
         ? applyPriceSnapshotToPool(basePool, savedEntry.priceSnapshot)
         : basePool;
+    }
+
+    function nextMiniFantasyOpeningFixture(){
+      return miniFantasyAvailabilityRows().find((fixture) => fixture.availability_status === 'upcoming') || null;
+    }
+
+    function miniFantasyLeaderboardData(){
+      return buildMiniFantasyLeaderboard({
+        entries: currentMiniFantasyLeaderboardEntries(),
+        liveData: LIVE_2026,
+        schedule: LEAGUE_STAGE_SCHEDULE,
+        squads: IPL_SQUADS
+      });
+    }
+
+    function miniFantasyMedalLabel(medal){
+      if (medal === 'gold') return 'Gold medal';
+      if (medal === 'silver') return 'Silver medal';
+      if (medal === 'bronze') return 'Bronze medal';
+      return '';
     }
 
     function miniFantasyPoolMap(fixture = activeMiniFantasyFixture()){
@@ -7197,45 +7275,47 @@ function titleBandScore(pick, live){
       if (!slot || !meta || !headline || !summary) return;
 
       const launchData = buildMiniFantasyLaunchData();
+      const availability = miniFantasyAvailabilityRows();
       const fixtures = launchData.fixtures || [];
-      const nextLaunchFixture = launchData.launch.next_launch_fixture;
+      const nextOpening = nextMiniFantasyOpeningFixture();
+      const openMatchList = fixtures.map((fixture) => `Match ${fixture.match_no}`).join(', ');
       meta.innerHTML = '';
 
-      if (!launchData.launch.is_live) {
-        headline.textContent = 'Mini Fantasy opens from Match 14';
-        summary.textContent = nextLaunchFixture
-          ? `Mini Fantasy launches on 8 April 2026 and starts from Match ${nextLaunchFixture.match_no}. We can already price the pool from earlier season form, but entries stay closed until the launch gate opens.`
-          : 'Mini Fantasy will open after the launch gate clears.';
-        meta.innerHTML = `
-          <span class="pill">Launch: ${escapeHtml(formatDate(MINI_FANTASY_LAUNCH_AT_UTC))}</span>
-          <span class="pill">First entry match: #${escapeHtml(String(MINI_FANTASY_FIRST_OPEN_MATCH_NO))}</span>
-        `;
+      headline.textContent = fixtures.length
+        ? `Submit now: ${openMatchList}`
+        : 'No Mini Fantasy entry is open right now';
+      summary.textContent = fixtures.length
+        ? `${openMatchList} ${fixtures.length === 1 ? 'is' : 'are'} open right now. Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO} is already live for entries, later matches open from the day before, and every fixture locks 1 minute before the start time.`
+        : nextOpening
+          ? `No entry is open at this moment. Match ${nextOpening.match_no} opens on ${formatDate(nextOpening.opens_at_utc)} and then locks 1 minute before the start time.`
+          : `Mini Fantasy entries are only accepted for upcoming Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO}+ fixtures before lock.`;
+      meta.innerHTML = `
+        <span class="pill">Eligible fixtures: ${fixtures.length}</span>
+        <span class="pill">Open now: ${fixtures.length ? escapeHtml(openMatchList) : 'None'}</span>
+        <span class="pill">First entry match: #${escapeHtml(String(MINI_FANTASY_FIRST_OPEN_MATCH_NO))}</span>
+        ${nextOpening ? `<span class="pill">Next opening: Match ${escapeHtml(String(nextOpening.match_no))} on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}</span>` : ''}
+        <span class="pill">Lock: 1 minute before start</span>
+      `;
+
+      if (!fixtures.length) {
         slot.innerHTML = `
           <div class="fantasy-empty">
-            Mini Fantasy is not live yet. The first eligible fixture is ${nextLaunchFixture ? `Match ${nextLaunchFixture.match_no} - ${escapeHtml(formatFixtureLabel(nextLaunchFixture.fixture || `${nextLaunchFixture.away_team} vs ${nextLaunchFixture.home_team}`))}` : 'still being prepared'}.
+            No Mini Fantasy match is open right now. ${nextOpening ? `Next up: Match ${nextOpening.match_no} - ${escapeHtml(formatFixtureLabel(nextOpening.fixture || `${nextOpening.away_team} vs ${nextOpening.home_team}`))} opens on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : 'The next eligible entry window will appear here automatically.'}
           </div>
         `;
         return;
       }
 
-      headline.textContent = 'Mini Fantasy is live for today and tomorrow';
-      summary.textContent = `Set one 4-player lineup per match, keep it under ${MINI_FANTASY_BUDGET} credits, and captain one player for a ${MINI_FANTASY_CAPTAIN_MULTIPLIER}x boost. Prices are frozen inside your saved entry for that fixture.`;
-      meta.innerHTML = `
-        <span class="pill">Eligible fixtures: ${fixtures.length}</span>
-        <span class="pill">Window: today + tomorrow</span>
-        <span class="pill">Lock: 1 minute before start</span>
-      `;
-
-      if (!fixtures.length) {
-        slot.innerHTML = '<div class="fantasy-empty">No eligible Mini Fantasy fixtures are open in the current today-and-tomorrow window.</div>';
-        return;
-      }
-
       const activeFixture = activeMiniFantasyFixture();
-      slot.innerHTML = fixtures.map((fixture) => {
+      const upcoming = availability.filter((fixture) => fixture.availability_status === 'upcoming').slice(0, 3);
+      slot.innerHTML = `
+        <div class="fantasy-window-note">You can currently submit ${escapeHtml(openMatchList)}. ${nextOpening ? `Next opening: Match ${escapeHtml(String(nextOpening.match_no))} on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : 'No later opening is queued yet.'}</div>
+        ${fixtures.map((fixture) => {
         const savedEntry = findMiniFantasyEntryForMatch(fixture.match_no);
         const fixtureLabel = formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`);
-        const whenLabel = fixture.is_today ? 'Today' : 'Tomorrow';
+        const whenLabel = Number(fixture.match_no) === MINI_FANTASY_FIRST_OPEN_MATCH_NO && currentNowDate().getTime() < Date.parse(fixture.opens_at_utc || '')
+          ? 'Opening soon'
+          : 'Open now';
         return `
           <button type="button" class="fantasy-fixture-card ${Number(activeFixture?.match_no) === Number(fixture.match_no) ? 'active' : ''}" data-mini-fixture="${fixture.match_no}">
             <div class="fantasy-fixture-top">
@@ -7252,7 +7332,24 @@ function titleBandScore(pick, live){
             </div>
           </button>
         `;
-      }).join('');
+      }).join('')}
+        ${upcoming.length ? `
+          <div class="fantasy-availability-list">
+            ${upcoming.map((fixture) => `
+              <div class="fantasy-availability-item">
+                <div class="fantasy-availability-copy">
+                  <div class="fantasy-availability-title">Match ${escapeHtml(String(fixture.match_no))} opens next</div>
+                  <div class="fantasy-availability-note">${escapeHtml(formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`))}</div>
+                </div>
+                <div class="studio-inline">
+                  <span class="pill">Opens: ${escapeHtml(formatDate(fixture.opens_at_utc))}</span>
+                  <span class="pill">Locks: ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      `;
       slot.querySelectorAll('[data-mini-fixture]').forEach((button) => {
         button.onclick = () => {
           MINI_FANTASY_ACTIVE_MATCH_NO = Number(button.dataset.miniFixture || 0) || null;
@@ -7299,6 +7396,38 @@ function titleBandScore(pick, live){
           render();
         };
       });
+    }
+
+    function renderMiniFantasyLeaderboard(){
+      const panel = document.getElementById('miniFantasyLeaderboard');
+      if (!panel) return;
+      const leaderboard = miniFantasyLeaderboardData();
+      const rows = Array.isArray(leaderboard.rows) ? leaderboard.rows : [];
+      if (!rows.length) {
+        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams have been saved yet. Once players start locking lineups, everyone will be ranked here by total points.</div>';
+        return;
+      }
+      panel.innerHTML = `
+        <div class="fantasy-window-note">Everyone is ranked by total Mini Fantasy points across saved matches. Top three get medal tags, and points start moving as completed matches land in the live data feed.</div>
+        <div class="fantasy-leaderboard-list">
+          ${rows.map((row) => `
+            <div class="fantasy-leaderboard-row ${row.rank <= 3 ? `top-${row.rank}` : ''}">
+              <div class="fantasy-leaderboard-copy">
+                <div class="fantasy-leaderboard-name">
+                  <span class="fantasy-leaderboard-rank">#${escapeHtml(String(row.rank))}</span>
+                  <span>${escapeHtml(row.owner_handle)}</span>
+                  ${row.medal ? `<span class="fantasy-medal ${escapeHtml(row.medal)}">${escapeHtml(miniFantasyMedalLabel(row.medal))}</span>` : ''}
+                </div>
+                <div class="small">${escapeHtml(String(row.scored_entries))} scored match${row.scored_entries === 1 ? '' : 'es'} - ${escapeHtml(String(row.pending_entries))} pending - ${escapeHtml(String(row.saved_entries))} saved entry${row.saved_entries === 1 ? '' : 'ies'}</div>
+              </div>
+              <div class="fantasy-leaderboard-score">
+                <div class="fantasy-leaderboard-points">${escapeHtml(String(row.total_points))}</div>
+                <div class="small">points</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
     }
 
     async function saveMiniFantasyEntry(){
@@ -7386,15 +7515,10 @@ function titleBandScore(pick, live){
     function renderMiniFantasyBuilder(){
       const panel = document.getElementById('miniFantasyBuilder');
       if (!panel) return;
-      const launchData = buildMiniFantasyLaunchData();
-      if (!launchData.launch.is_live) {
-        panel.innerHTML = '<div class="fantasy-empty">Mini Fantasy is still behind the launch gate. Pricing is ready, but entries open from Match 14 on 8 April 2026.</div>';
-        return;
-      }
-
       const fixture = activeMiniFantasyFixture();
       if (!fixture) {
-        panel.innerHTML = '<div class="fantasy-empty">No eligible today-or-tomorrow fixture is open right now.</div>';
+        const nextOpening = nextMiniFantasyOpeningFixture();
+        panel.innerHTML = `<div class="fantasy-empty">No Mini Fantasy fixture is open right now.${nextOpening ? ` Match ${escapeHtml(String(nextOpening.match_no))} opens on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : ''}</div>`;
         return;
       }
 
@@ -7584,6 +7708,7 @@ function titleBandScore(pick, live){
     function renderMiniFantasySection(){
       renderMiniFantasyFixtures();
       renderMiniFantasyBuilder();
+      renderMiniFantasyLeaderboard();
       renderMiniFantasyMyEntries();
       renderMiniFantasyPicker();
     }
@@ -7713,6 +7838,7 @@ function titleBandScore(pick, live){
       CUSTOM_DUEL_STORE = loadStoredCustomDuels();
       REMOTE_DUEL_STORE = emptyCustomDuelStore();
       setRemoteMiniFantasyEntries([]);
+      setRemoteMiniFantasyLeaderboardEntries([]);
       resetMiniFantasyDrafts();
       if (usesHostedDuelsBackend()) {
         try {

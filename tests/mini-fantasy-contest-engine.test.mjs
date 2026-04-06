@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 
 import {
   MINI_FANTASY_BUDGET,
+  buildMiniFantasyLeaderboard,
+  buildMiniFantasyPlayerId,
   buildFixturePlayerPool,
   deriveCompletedMatchHistories,
   generateMiniFantasyPriceBook,
@@ -70,7 +72,7 @@ test('deriveCompletedMatchHistories keeps zero-point appearances when playerMatc
   assert.deepEqual(histories.get('player c')?.match_points, [60]);
 });
 
-test('getMiniFantasyOpenFixtures respects launch gate, today-tomorrow window, and pre-lock cutoff', () => {
+test('getMiniFantasyOpenFixtures opens Match 14 now and later fixtures from the day-before window', () => {
   const schedule = [
     { match_no: 13, datetime_utc: '2026-04-07T14:00:00Z', home_team: 'Mumbai Indians', away_team: 'Rajasthan Royals' },
     { match_no: 14, datetime_utc: '2026-04-08T14:00:00Z', home_team: 'Delhi Capitals', away_team: 'Gujarat Titans' },
@@ -78,9 +80,9 @@ test('getMiniFantasyOpenFixtures respects launch gate, today-tomorrow window, an
     { match_no: 16, datetime_utc: '2026-04-10T14:00:00Z', home_team: 'Rajasthan Royals', away_team: 'Royal Challengers Bengaluru' }
   ];
 
-  const beforeLaunch = getMiniFantasyOpenFixtures(schedule, new Date('2026-04-07T10:00:00Z'));
-  assert.equal(beforeLaunch.launch.is_live, false);
-  assert.deepEqual(beforeLaunch.fixtures, []);
+  const openNow = getMiniFantasyOpenFixtures(schedule, new Date('2026-04-06T10:00:00Z'));
+  assert.equal(openNow.launch.is_live, true);
+  assert.deepEqual(openNow.fixtures.map((fixture) => fixture.match_no), [14]);
 
   const afterLaunch = getMiniFantasyOpenFixtures(schedule, new Date('2026-04-08T08:00:00Z'));
   assert.equal(afterLaunch.launch.is_live, true);
@@ -186,4 +188,80 @@ test('generateMiniFantasyPriceBook and buildFixturePlayerPool work from live his
 
   assert.equal(pool.length, 4);
   assert.equal(pool[0].team <= pool[pool.length - 1].team, true);
+});
+
+test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy points', () => {
+  const liveData = {
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 14,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'DC Batter': 1,
+                  'DC Bowler': 1,
+                  'GT Bowler': 1,
+                  'GT Keeper': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'DC Batter': { score: 40 },
+                'DC Bowler': { score: 20 },
+                'GT Bowler': { score: 10 },
+                'GT Keeper': { score: 12 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 14, datetime_utc: '2026-04-08T14:00:00Z', home_team: 'Delhi Capitals', away_team: 'Gujarat Titans' }
+  ];
+  const squads = {
+    DC: ['DC Batter', 'DC Bowler'],
+    GT: ['GT Bowler', 'GT Keeper']
+  };
+
+  const leaderboard = buildMiniFantasyLeaderboard({
+    entries: [
+      {
+        ownerHandle: 'senthil',
+        matchNo: 14,
+        selectedPlayerIds: [
+          buildMiniFantasyPlayerId('DC', 'DC Batter'),
+          buildMiniFantasyPlayerId('DC', 'DC Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Keeper')
+        ],
+        captainPlayerId: buildMiniFantasyPlayerId('DC', 'DC Batter')
+      },
+      {
+        ownerHandle: 'sai',
+        matchNo: 14,
+        selectedPlayerIds: [
+          buildMiniFantasyPlayerId('DC', 'DC Batter'),
+          buildMiniFantasyPlayerId('DC', 'DC Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Keeper')
+        ],
+        captainPlayerId: buildMiniFantasyPlayerId('GT', 'GT Keeper')
+      }
+    ],
+    liveData,
+    schedule,
+    squads
+  });
+
+  assert.equal(leaderboard.completed_match_count, 14);
+  assert.equal(leaderboard.rows[0].owner_handle, 'senthil');
+  assert.equal(leaderboard.rows[0].medal, 'gold');
+  assert.equal(leaderboard.rows[1].medal, 'silver');
+  assert.equal(leaderboard.rows[0].total_points, 102);
+  assert.equal(leaderboard.rows[1].total_points, 88);
 });

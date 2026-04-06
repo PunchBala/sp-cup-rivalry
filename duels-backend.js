@@ -144,12 +144,13 @@
       async signIn() { throw disabledError(); },
       async signOut() { return true; },
       async listPublicBundles() { return []; },
-      async createPublicDuel() { throw disabledError(); },
-      async claimOpenEntry() { throw disabledError(); },
-      async saveOwnedEntry() { throw disabledError(); },
-      async listMiniFantasyEntries() { return []; },
-      async upsertMiniFantasyEntry() { throw disabledError(); }
-    };
+        async createPublicDuel() { throw disabledError(); },
+        async claimOpenEntry() { throw disabledError(); },
+        async saveOwnedEntry() { throw disabledError(); },
+        async listMiniFantasyEntries() { return []; },
+        async listPublicMiniFantasyEntries() { return []; },
+        async upsertMiniFantasyEntry() { throw disabledError(); }
+      };
   }
 
   function createSupabaseBackend(rawConfig = {}) {
@@ -631,6 +632,21 @@
             order: 'fixture_datetime_utc.asc.nullslast,match_no.asc'
           },
           accessToken: activeSession.access_token
+        });
+        return (Array.isArray(rows) ? rows : []).map(normalizeMiniFantasyEntryRow).filter(Boolean);
+      },
+
+      async listPublicMiniFantasyEntries({ season, currentUser } = {}) {
+        const activeSession = await ensureFreshSession();
+        const safeSeason = normalizeWhitespace(season || '');
+        const rows = await restRequest(config.tables.miniFantasyEntries, {
+          method: 'GET',
+          query: {
+            select: 'id,user_id,owner_handle,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
+            ...(safeSeason ? { season: `eq.${safeSeason}` } : {}),
+            order: 'saved_at.desc.nullslast,fixture_datetime_utc.asc.nullslast,match_no.asc'
+          },
+          accessToken: activeSession?.access_token || currentUser?.accessToken || null
         });
         return (Array.isArray(rows) ? rows : []).map(normalizeMiniFantasyEntryRow).filter(Boolean);
       },

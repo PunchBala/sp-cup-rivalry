@@ -187,10 +187,11 @@ with check (
 );
 
 drop policy if exists "users read their own mini fantasy entries" on public.mini_fantasy_entries;
-create policy "users read their own mini fantasy entries"
+drop policy if exists "mini fantasy entries are public readable" on public.mini_fantasy_entries;
+create policy "mini fantasy entries are public readable"
 on public.mini_fantasy_entries
 for select
-using (auth.uid() = user_id);
+using (true);
 
 drop policy if exists "users insert their own mini fantasy entries before lock" on public.mini_fantasy_entries;
 create policy "users insert their own mini fantasy entries before lock"

@@ -4,25 +4,28 @@ Mini Fantasy is a separate game mode from Duels.
 
 This document covers the live contest layer that sits above the pricing engine.
 
-## Launch gate
+## Entry availability
 
-- launch date: `2026-04-08`
 - first eligible fixture: `Match 14`
+- `Match 14` opens early for entries now
+- later fixtures open from the day before their start date
+- every fixture locks at `start_time - 1 minute`
 
-Earlier season data can still be used to seed player prices, but user entries do not open before that gate.
+Earlier season data is still used to seed player prices, but user-facing entry windows are controlled by the contest layer.
 
 ## User flow
 
 1. Sign in.
 2. Open the `Mini Fantasy` tab.
-3. See eligible fixtures from today and tomorrow only.
+3. See which fixtures are open for submission now and which one opens next.
 4. Open one fixture and build a 4-player lineup.
 5. Stay under `30` credits.
 6. Include at least one player from each real team.
 7. Include at least one batter and one bowler.
 8. Choose one captain for a `1.5x` multiplier.
 9. Save one entry per user per match.
-10. Entry locks one minute before the match starts.
+10. Watch the global leaderboard rank every saved user by Mini Fantasy points.
+11. Entry locks one minute before the match starts.
 
 ## Data sources
 
@@ -70,10 +73,13 @@ Each row stores:
 
 If hosted backend is disabled, the page falls back to local browser storage for Mini Fantasy entries.
 
+Leaderboard reads the same saved entries and aggregates them into a public ranking surface in the page.
+
 ## Locking
 
 - A fixture becomes read-only at `start_time - 1 minute`.
 - Backend RLS enforces that hosted entries cannot be inserted or updated after lock.
+- Hosted reads are public so the global leaderboard can rank everyone in one table.
 - The browser also disables editing when the fixture is locked.
 
 ## Tests

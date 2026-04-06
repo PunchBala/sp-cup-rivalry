@@ -24,6 +24,7 @@ test('backend config, adapter, and setup docs are present for real auth + duel a
   assert.match(backendJs, /claimOpenEntry/);
   assert.match(backendJs, /saveOwnedEntry/);
   assert.match(backendJs, /listMiniFantasyEntries/);
+  assert.match(backendJs, /listPublicMiniFantasyEntries/);
   assert.match(backendJs, /upsertMiniFantasyEntry/);
 
   assert.match(setupDoc, /Supabase/i);

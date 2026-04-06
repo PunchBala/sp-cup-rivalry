@@ -10,14 +10,15 @@ This document covers only the portable pricing layer that turns upstream player 
 - `Mini Fantasy` is a per-match 4-player salary-cap game
 - the pricing engine lives at the platform data layer and must stay independent from duel logic, UI, or database writes
 
-## Launch gate
+## Contest availability note
 
-Mini Fantasy user entries open from:
+Mini Fantasy contest entry windows belong to the separate contest layer.
 
-- `2026-04-08`
-- `Match 14 onward`
+Current live product behavior:
 
-That launch gate belongs to the Mini Fantasy contest layer.
+- `Match 14` is open for entry now
+- later fixtures open from the day before
+- the pricing layer stays independent from those UI and lock-window rules
 
 The pricing engine can still use earlier completed-match point histories to seed fair starting prices.
 

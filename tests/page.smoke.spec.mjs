@@ -192,12 +192,12 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   expect(pageErrors).toEqual([]);
 });
 
-test('mini fantasy opens from match 14, supports local lineup building, and saves one team per match', async ({ page }) => {
+test('mini fantasy opens Match 14 early, shows future submit windows, and ranks saved users in the leaderboard', async ({ page }) => {
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(String(error)));
 
   await page.addInitScript(() => {
-    window.__DUELS_TEST_NOW__ = '2026-04-08T08:00:00Z';
+    window.__DUELS_TEST_NOW__ = '2026-04-06T08:00:00Z';
     window.DUELS_BACKEND_CONFIG = { enabled: false };
   });
 
@@ -219,8 +219,9 @@ test('mini fantasy opens from match 14, supports local lineup building, and save
 
   await page.getByRole('button', { name: 'Mini Fantasy', exact: true }).click();
   await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Mini Fantasy');
-  await expect(page.locator('#miniFantasyFixtures [data-mini-fixture]')).toHaveCount(2);
+  await expect(page.locator('#miniFantasyFixtures [data-mini-fixture]')).toHaveCount(1);
   await expect(page.locator('#miniFantasyFixtures')).toContainText('Match 14');
+  await expect(page.locator('#miniFantasyFixtures')).toContainText('Match 15 opens next');
   await expect(page.locator('#miniFantasyBuilder')).toContainText('Match 14');
 
   await page.locator('[data-mini-pick="0"]').click();
@@ -249,6 +250,8 @@ test('mini fantasy opens from match 14, supports local lineup building, and save
   await expect(page.locator('#miniFantasyBuilder')).toContainText('team saved');
   await expect(page.locator('#miniFantasyMyEntries')).toContainText('Match 14');
   await expect(page.locator('#miniFantasyMyEntries')).toContainText('Captain locked');
+  await expect(page.locator('#miniFantasyLeaderboard')).toContainText('mini-bala');
+  await expect(page.locator('#miniFantasyLeaderboard')).toContainText('Gold medal');
 
   expect(pageErrors).toEqual([]);
 });

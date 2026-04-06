@@ -51,6 +51,7 @@ Once configured:
 - public duel browsing reads directly from backend records
 - `Mini Fantasy` saves one hosted entry per user per match
 - saved Mini Fantasy entries carry a fixture-specific price snapshot
+- Mini Fantasy leaderboard reads from the hosted Mini Fantasy entry table
 
 ## Current scope
 
@@ -60,6 +61,7 @@ The backend owns:
 - public duel rows
 - duel entries
 - Mini Fantasy match entries
+- Mini Fantasy leaderboard source rows
 - entry ownership
 - persisted submitted picks
 - persisted saved Mini Fantasy lineups plus captain choice
@@ -72,6 +74,16 @@ The front end still derives:
 - opponent reveal timing
 
 That is intentional for the current product phase.
+
+## Important schema refresh note
+
+If you already ran the SQL once before Mini Fantasy leaderboard support landed, rerun [docs/duels_backend_supabase.sql](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/docs/duels_backend_supabase.sql).
+
+That refresh keeps:
+
+- `mini_fantasy_entries` present
+- latest insert/update lock policies in place
+- public read policy in place for the leaderboard
 
 ## Public vs private
 

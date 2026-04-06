@@ -20,15 +20,17 @@ The app is hosted as a static site, with live cricket data refreshed into `data/
 - at least 1 player from each real team
 - at least 1 batter and 1 bowler
 - one captain at `1.5x`
-- entries open only for today/tomorrow fixtures from Match 14 onward
+- Match 14 is open for entry now
+- later fixtures open from the day before
 - saved entries freeze their own fixture price snapshot
+- a global leaderboard ranks users by Mini Fantasy points
 
 Mini Fantasy stays isolated from duel scoring and duel UI at the data/model layer.
 
 ## Current product shape
 
 - `Board` is the main viewing surface: scoreboard, live category board, worm, and key duel metrics
-- `Mini Fantasy` is a separate tab with today/tomorrow fixture cards, a 4-slot lineup builder, and saved match entries
+- `Mini Fantasy` is a separate tab with open-fixture awareness, a 4-slot lineup builder, a global leaderboard, and saved match entries
 - `Nerd Room` shows deeper ranking and board context
 - `Schedule` shows the fixture timeline used by the duel lifecycle
 - `Profile`, `Create duel`, `Manage duel`, and `Browse duels` live in drawers so the main page stays board-first
@@ -58,7 +60,7 @@ These filenames are legacy, but they are still the live duel-first room model an
 - [duels-backend.config.js](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/duels-backend.config.js)
 - [docs/DUELS_BACKEND_SETUP.md](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/docs/DUELS_BACKEND_SETUP.md)
 
-Supabase-backed auth, public duel persistence, and Mini Fantasy match-entry persistence. If backend config is disabled, the page falls back to local beta storage.
+Supabase-backed auth, public duel persistence, and Mini Fantasy match-entry persistence plus leaderboard reads. If backend config is disabled, the page falls back to local beta storage.
 
 ### Live data worker
 
