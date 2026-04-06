@@ -1,7 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { isCricketDataFallbackEligibleError, isCricketDataQuotaError, parseCricketDataQuotaDetails } from '../scripts/update-live-data.mjs';
+import {
+  isCricketDataFallbackEligibleError,
+  isCricketDataQuotaError,
+  isCricketDataScorecardNotFoundError,
+  parseCricketDataQuotaDetails,
+  parseCricketDataScorecardNotFoundDetails
+} from '../scripts/update-live-data.mjs';
 
 test('detects quota exceeded errors from attached API payload', () => {
   const error = new Error('API error');
@@ -130,4 +136,30 @@ test('fallback retry still works when the provider payload is only embedded in t
     status: 'failure',
     apikey: null
   });
+});
+
+test('detects scorecard not found failures without treating them as fallback-eligible', () => {
+  const error = new Error('API error');
+  error.api = {
+    apikey: '***',
+    status: 'failure',
+    reason: 'ERR: Scorecard 547b47e3-b2d9-4f51-8a49-8e7e4c946a6e not found'
+  };
+
+  assert.equal(isCricketDataScorecardNotFoundError(error), true);
+  assert.equal(isCricketDataFallbackEligibleError(error), false);
+  assert.deepEqual(parseCricketDataScorecardNotFoundDetails(error), {
+    reason: 'scorecard_not_found',
+    rawReason: 'ERR: Scorecard 547b47e3-b2d9-4f51-8a49-8e7e4c946a6e not found',
+    matchId: '547b47e3-b2d9-4f51-8a49-8e7e4c946a6e',
+    status: 'failure',
+    apikey: '***'
+  });
+});
+
+test('detects scorecard not found failures when the provider payload is embedded in the error message', () => {
+  const error = new Error('API error: {"status":"failure","reason":"ERR: Scorecard 547b47e3-b2d9-4f51-8a49-8e7e4c946a6e not found"}');
+
+  assert.equal(isCricketDataScorecardNotFoundError(error), true);
+  assert.equal(parseCricketDataScorecardNotFoundDetails(error)?.matchId, '547b47e3-b2d9-4f51-8a49-8e7e4c946a6e');
 });
