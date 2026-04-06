@@ -2,7 +2,7 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-04-06T15:34:07.159Z",
+  "fetchedAt": "2026-04-06T20:03:41.860Z",
   "scrapeStatus": "skipped (outside_scheduled_window: outside planned refresh windows)",
   "scrapeReport": {
     "costControl": {
@@ -28,16 +28,16 @@
       "lastLiveRefreshAt": null,
       "lastSeriesInfoAt": "2026-04-05T18:51:35.311Z",
       "lastDecision": {
-        "at": "2026-04-06T15:34:07.159Z",
+        "at": "2026-04-06T20:03:41.860Z",
         "shouldRefresh": false,
         "mode": "outside_scheduled_window",
         "reason": "outside planned refresh windows",
-        "nextPlannedAt": "2026-04-06T18:00:00.000Z"
+        "nextPlannedAt": "2026-04-07T13:00:00.000Z"
       },
-      "nextPlannedRefreshAt": "2026-04-06T18:00:00.000Z",
+      "nextPlannedRefreshAt": "2026-04-07T13:00:00.000Z",
       "nextPlannedMode": "scheduled_window",
       "nextPlannedReason": "league-stage refresh plan",
-      "nextPlannedCalculatedAt": "2026-04-06T15:34:07.159Z"
+      "nextPlannedCalculatedAt": "2026-04-06T20:03:41.860Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -48067,7 +48067,7 @@
     "aggregateSchemaVersion": 2,
     "providerStatus": {
       "state": "quota_exceeded",
-      "lastAttemptAt": "2026-04-06T15:34:07.156Z",
+      "lastAttemptAt": "2026-04-06T20:03:41.857Z",
       "lastErrorAt": "2026-04-06T13:24:50.790Z",
       "reason": "hits_today_exceeded_hits_limit",
       "hitsToday": 114,

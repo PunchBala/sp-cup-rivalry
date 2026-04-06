@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-04-06T15:34:07.159Z",
+    "as_of_utc": "2026-04-06T20:03:41.860Z",
     "price_min": 4,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -11,7 +11,7 @@
     "notes": "Daily pricing refresh after all completed matches for the day",
     "engine_version": "mini_fantasy_price_book_v1",
     "pricing_engine_version": "pricing_v1",
-    "launch_at_utc": "2026-04-08T00:00:00Z",
+    "launch_at_utc": "2026-04-06T00:00:00Z",
     "first_open_match_no": 14
   },
   "summary": {
@@ -28,7 +28,7 @@
       "team": "CSK",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -43,8 +43,7 @@
       "adjusted_score": 20.5,
       "percentile": 88.15,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -54,7 +53,7 @@
       "team": "CSK",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -69,8 +68,7 @@
       "adjusted_score": 24.5,
       "percentile": 90.36,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -80,7 +78,7 @@
       "team": "CSK",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -95,8 +93,7 @@
       "adjusted_score": 19.25,
       "percentile": 87.15,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -106,7 +103,7 @@
       "team": "CSK",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -121,8 +118,7 @@
       "adjusted_score": 15,
       "percentile": 81.53,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -132,7 +128,7 @@
       "team": "CSK",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -147,8 +143,7 @@
       "adjusted_score": 11.75,
       "percentile": 75.3,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-30T14:00:00Z"
     },
@@ -158,7 +153,7 @@
       "team": "CSK",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -173,8 +168,7 @@
       "adjusted_score": 12,
       "percentile": 76.31,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -184,7 +178,7 @@
       "team": "CSK",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -199,8 +193,7 @@
       "adjusted_score": 8.5,
       "percentile": 70.28,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -210,7 +203,7 @@
       "team": "CSK",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -225,8 +218,7 @@
       "adjusted_score": 5.25,
       "percentile": 62.65,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -236,7 +228,7 @@
       "team": "CSK",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -251,8 +243,7 @@
       "adjusted_score": 0.5,
       "percentile": 53.61,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -262,7 +253,7 @@
       "team": "CSK",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -277,8 +268,7 @@
       "adjusted_score": 1,
       "percentile": 55.02,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -288,7 +278,7 @@
       "team": "CSK",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -303,8 +293,7 @@
       "adjusted_score": 1.5,
       "percentile": 55.42,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -314,7 +303,7 @@
       "team": "CSK",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -329,8 +318,7 @@
       "adjusted_score": 0.75,
       "percentile": 54.42,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -340,7 +328,7 @@
       "team": "CSK",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -355,8 +343,7 @@
       "adjusted_score": 3.25,
       "percentile": 59.64,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -366,7 +353,7 @@
       "team": "CSK",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -381,7 +368,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -392,7 +379,7 @@
       "team": "CSK",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -407,7 +394,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -418,7 +405,7 @@
       "team": "CSK",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -433,7 +420,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -444,7 +431,7 @@
       "team": "CSK",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -459,7 +446,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -470,7 +457,7 @@
       "team": "CSK",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -485,7 +472,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -496,7 +483,7 @@
       "team": "CSK",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -511,7 +498,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -522,7 +509,7 @@
       "team": "CSK",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -537,7 +524,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -548,7 +535,7 @@
       "team": "CSK",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -563,7 +550,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -574,7 +561,7 @@
       "team": "CSK",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -589,7 +576,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -600,7 +587,7 @@
       "team": "CSK",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -615,7 +602,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -626,7 +613,7 @@
       "team": "CSK",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -641,7 +628,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -652,7 +639,7 @@
       "team": "CSK",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -667,7 +654,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -678,7 +665,7 @@
       "team": "DC",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -693,8 +680,7 @@
       "adjusted_score": 51.75,
       "percentile": 100,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -704,7 +690,7 @@
       "team": "DC",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -719,8 +705,7 @@
       "adjusted_score": 14.5,
       "percentile": 80.72,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -730,7 +715,7 @@
       "team": "DC",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -745,8 +730,7 @@
       "adjusted_score": 23.5,
       "percentile": 89.16,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -756,7 +740,7 @@
       "team": "DC",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -771,8 +755,7 @@
       "adjusted_score": 17,
       "percentile": 83.53,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -782,7 +765,7 @@
       "team": "DC",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -797,8 +780,7 @@
       "adjusted_score": 14,
       "percentile": 79.72,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -808,7 +790,7 @@
       "team": "DC",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -823,8 +805,7 @@
       "adjusted_score": 7.25,
       "percentile": 67.67,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -834,7 +815,7 @@
       "team": "DC",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -849,8 +830,7 @@
       "adjusted_score": 12,
       "percentile": 76.31,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -860,7 +840,7 @@
       "team": "DC",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -875,8 +855,7 @@
       "adjusted_score": 11.75,
       "percentile": 75.3,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -886,7 +865,7 @@
       "team": "DC",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -901,8 +880,7 @@
       "adjusted_score": 2.25,
       "percentile": 57.03,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -912,7 +890,7 @@
       "team": "DC",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -927,8 +905,7 @@
       "adjusted_score": 6.25,
       "percentile": 64.26,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -938,7 +915,7 @@
       "team": "DC",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -953,8 +930,7 @@
       "adjusted_score": 5,
       "percentile": 62.25,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -964,7 +940,7 @@
       "team": "DC",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -979,7 +955,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -990,7 +966,7 @@
       "team": "DC",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1005,7 +981,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1016,7 +992,7 @@
       "team": "DC",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1031,7 +1007,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1042,7 +1018,7 @@
       "team": "DC",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1057,7 +1033,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1068,7 +1044,7 @@
       "team": "DC",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1083,7 +1059,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1094,7 +1070,7 @@
       "team": "DC",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1109,7 +1085,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1120,7 +1096,7 @@
       "team": "DC",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1135,7 +1111,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1146,7 +1122,7 @@
       "team": "DC",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1161,7 +1137,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1172,7 +1148,7 @@
       "team": "DC",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1187,7 +1163,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1198,7 +1174,7 @@
       "team": "DC",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1213,7 +1189,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1224,7 +1200,7 @@
       "team": "DC",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1239,7 +1215,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1250,7 +1226,7 @@
       "team": "DC",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1265,7 +1241,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1276,7 +1252,7 @@
       "team": "DC",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1291,7 +1267,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1302,7 +1278,7 @@
       "team": "DC",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1317,7 +1293,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1328,7 +1304,7 @@
       "team": "GT",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -1343,8 +1319,7 @@
       "adjusted_score": 26.75,
       "percentile": 93.78,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1354,7 +1329,7 @@
       "team": "GT",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -1369,8 +1344,7 @@
       "adjusted_score": 21.5,
       "percentile": 88.76,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1380,7 +1354,7 @@
       "team": "GT",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -1395,8 +1369,7 @@
       "adjusted_score": 20.5,
       "percentile": 88.15,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1406,7 +1379,7 @@
       "team": "GT",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -1421,8 +1394,7 @@
       "adjusted_score": 25,
       "percentile": 91.37,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1432,7 +1404,7 @@
       "team": "GT",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -1447,8 +1419,7 @@
       "adjusted_score": 18,
       "percentile": 84.94,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1458,7 +1429,7 @@
       "team": "GT",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -1473,8 +1444,7 @@
       "adjusted_score": 14.25,
       "percentile": 80.32,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-31T14:00:00Z"
     },
@@ -1484,7 +1454,7 @@
       "team": "GT",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -1499,8 +1469,7 @@
       "adjusted_score": 12,
       "percentile": 76.31,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1510,7 +1479,7 @@
       "team": "GT",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -1525,8 +1494,7 @@
       "adjusted_score": 11.5,
       "percentile": 74.5,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1536,7 +1504,7 @@
       "team": "GT",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -1551,8 +1519,7 @@
       "adjusted_score": 6.5,
       "percentile": 65.26,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1562,7 +1529,7 @@
       "team": "GT",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -1577,8 +1544,7 @@
       "adjusted_score": 12.5,
       "percentile": 77.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1588,7 +1554,7 @@
       "team": "GT",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -1603,8 +1569,7 @@
       "adjusted_score": 5.75,
       "percentile": 63.45,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1614,7 +1579,7 @@
       "team": "GT",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -1629,8 +1594,7 @@
       "adjusted_score": 6.25,
       "percentile": 64.26,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1640,7 +1604,7 @@
       "team": "GT",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -1655,8 +1619,7 @@
       "adjusted_score": 4.25,
       "percentile": 60.64,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -1666,7 +1629,7 @@
       "team": "GT",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1681,7 +1644,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1692,7 +1655,7 @@
       "team": "GT",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1707,7 +1670,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1718,7 +1681,7 @@
       "team": "GT",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1733,7 +1696,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1744,7 +1707,7 @@
       "team": "GT",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1759,7 +1722,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1770,7 +1733,7 @@
       "team": "GT",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1785,7 +1748,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1796,7 +1759,7 @@
       "team": "GT",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1811,7 +1774,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1822,7 +1785,7 @@
       "team": "GT",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1837,7 +1800,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1848,7 +1811,7 @@
       "team": "GT",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1863,7 +1826,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1874,7 +1837,7 @@
       "team": "GT",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1889,7 +1852,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1900,7 +1863,7 @@
       "team": "GT",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1915,7 +1878,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1926,7 +1889,7 @@
       "team": "GT",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1941,7 +1904,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1952,7 +1915,7 @@
       "team": "GT",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -1967,7 +1930,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -1978,7 +1941,7 @@
       "team": "KKR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -1993,8 +1956,7 @@
       "adjusted_score": 26.25,
       "percentile": 92.57,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2004,7 +1966,7 @@
       "team": "KKR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -2019,8 +1981,7 @@
       "adjusted_score": 34.75,
       "percentile": 96.79,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2030,7 +1991,7 @@
       "team": "KKR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -2045,8 +2006,7 @@
       "adjusted_score": 26.75,
       "percentile": 93.78,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2056,7 +2016,7 @@
       "team": "KKR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -2071,8 +2031,7 @@
       "adjusted_score": 20.25,
       "percentile": 87.55,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2082,7 +2041,7 @@
       "team": "KKR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -2097,8 +2056,7 @@
       "adjusted_score": 24,
       "percentile": 89.96,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2108,7 +2066,7 @@
       "team": "KKR",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -2123,8 +2081,7 @@
       "adjusted_score": 7,
       "percentile": 66.47,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2134,7 +2091,7 @@
       "team": "KKR",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -2149,8 +2106,7 @@
       "adjusted_score": 7.5,
       "percentile": 68.47,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2160,7 +2116,7 @@
       "team": "KKR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -2175,8 +2131,7 @@
       "adjusted_score": 10,
       "percentile": 73.29,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2186,7 +2141,7 @@
       "team": "KKR",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -2201,8 +2156,7 @@
       "adjusted_score": 9,
       "percentile": 71.49,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2212,7 +2166,7 @@
       "team": "KKR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -2227,8 +2181,7 @@
       "adjusted_score": 14,
       "percentile": 79.72,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2238,7 +2191,7 @@
       "team": "KKR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -2253,8 +2206,7 @@
       "adjusted_score": 2,
       "percentile": 56.02,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-29T14:00:00Z"
     },
@@ -2264,7 +2216,7 @@
       "team": "KKR",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -2279,8 +2231,7 @@
       "adjusted_score": 5.5,
       "percentile": 63.05,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2290,7 +2241,7 @@
       "team": "KKR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -2305,8 +2256,7 @@
       "adjusted_score": 2.75,
       "percentile": 58.23,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -2316,7 +2266,7 @@
       "team": "KKR",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2331,7 +2281,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2342,7 +2292,7 @@
       "team": "KKR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2357,7 +2307,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2368,7 +2318,7 @@
       "team": "KKR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2383,7 +2333,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2394,7 +2344,7 @@
       "team": "KKR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2409,7 +2359,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2420,7 +2370,7 @@
       "team": "KKR",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2435,7 +2385,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2446,7 +2396,7 @@
       "team": "KKR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2461,7 +2411,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2472,7 +2422,7 @@
       "team": "KKR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2487,7 +2437,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2498,7 +2448,7 @@
       "team": "KKR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2513,7 +2463,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2524,7 +2474,7 @@
       "team": "KKR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2539,7 +2489,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2550,7 +2500,7 @@
       "team": "KKR",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2565,7 +2515,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2576,7 +2526,7 @@
       "team": "KKR",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2591,7 +2541,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2602,7 +2552,7 @@
       "team": "KKR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2617,7 +2567,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2628,7 +2578,7 @@
       "team": "LSG",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -2643,8 +2593,7 @@
       "adjusted_score": 26.63,
       "percentile": 93.17,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -2654,7 +2603,7 @@
       "team": "LSG",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -2669,8 +2618,7 @@
       "adjusted_score": 27.25,
       "percentile": 94.38,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -2680,7 +2628,7 @@
       "team": "LSG",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -2695,8 +2643,7 @@
       "adjusted_score": 16,
       "percentile": 82.73,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -2706,7 +2653,7 @@
       "team": "LSG",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -2721,8 +2668,7 @@
       "adjusted_score": 18.75,
       "percentile": 86.55,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -2732,7 +2678,7 @@
       "team": "LSG",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -2747,8 +2693,7 @@
       "adjusted_score": 12.63,
       "percentile": 77.91,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -2758,7 +2703,7 @@
       "team": "LSG",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -2773,8 +2718,7 @@
       "adjusted_score": 13.75,
       "percentile": 78.92,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -2784,7 +2728,7 @@
       "team": "LSG",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -2799,8 +2743,7 @@
       "adjusted_score": 9,
       "percentile": 71.49,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-01T14:00:00Z"
     },
@@ -2810,7 +2753,7 @@
       "team": "LSG",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -2825,8 +2768,7 @@
       "adjusted_score": 3,
       "percentile": 59.04,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -2836,7 +2778,7 @@
       "team": "LSG",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -2851,8 +2793,7 @@
       "adjusted_score": 4,
       "percentile": 60.24,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -2862,7 +2803,7 @@
       "team": "LSG",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -2877,8 +2818,7 @@
       "adjusted_score": 2.25,
       "percentile": 57.03,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -2888,7 +2828,7 @@
       "team": "LSG",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2903,7 +2843,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2914,7 +2854,7 @@
       "team": "LSG",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2929,7 +2869,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2940,7 +2880,7 @@
       "team": "LSG",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2955,8 +2895,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-01T14:00:00Z"
     },
@@ -2966,7 +2905,7 @@
       "team": "LSG",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -2981,7 +2920,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -2992,7 +2931,7 @@
       "team": "LSG",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3007,7 +2946,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3018,7 +2957,7 @@
       "team": "LSG",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3033,7 +2972,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3044,7 +2983,7 @@
       "team": "LSG",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3059,7 +2998,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3070,7 +3009,7 @@
       "team": "LSG",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3085,7 +3024,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3096,7 +3035,7 @@
       "team": "LSG",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3111,7 +3050,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3122,7 +3061,7 @@
       "team": "LSG",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3137,7 +3076,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3148,7 +3087,7 @@
       "team": "LSG",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3163,7 +3102,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3174,7 +3113,7 @@
       "team": "LSG",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3189,7 +3128,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3200,7 +3139,7 @@
       "team": "LSG",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3215,7 +3154,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3226,7 +3165,7 @@
       "team": "LSG",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3241,7 +3180,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3252,7 +3191,7 @@
       "team": "LSG",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3267,7 +3206,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3278,7 +3217,7 @@
       "team": "MI",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -3293,8 +3232,7 @@
       "adjusted_score": 36.25,
       "percentile": 98.59,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -3304,7 +3242,7 @@
       "team": "MI",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -3319,8 +3257,7 @@
       "adjusted_score": 32.25,
       "percentile": 95.58,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -3330,7 +3267,7 @@
       "team": "MI",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -3345,8 +3282,7 @@
       "adjusted_score": 16.75,
       "percentile": 83.13,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -3356,7 +3292,7 @@
       "team": "MI",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -3371,8 +3307,7 @@
       "adjusted_score": 6.5,
       "percentile": 65.26,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -3382,7 +3317,7 @@
       "team": "MI",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -3397,8 +3332,7 @@
       "adjusted_score": 10.25,
       "percentile": 73.9,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-29T14:00:00Z"
     },
@@ -3408,7 +3342,7 @@
       "team": "MI",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -3423,8 +3357,7 @@
       "adjusted_score": 10,
       "percentile": 73.29,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -3434,7 +3367,7 @@
       "team": "MI",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -3449,8 +3382,7 @@
       "adjusted_score": 9.25,
       "percentile": 72.69,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -3460,7 +3392,7 @@
       "team": "MI",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -3475,8 +3407,7 @@
       "adjusted_score": 6.25,
       "percentile": 64.26,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -3486,7 +3417,7 @@
       "team": "MI",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -3501,8 +3432,7 @@
       "adjusted_score": 0.5,
       "percentile": 53.61,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -3512,7 +3442,7 @@
       "team": "MI",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -3527,8 +3457,7 @@
       "adjusted_score": 0.75,
       "percentile": 54.42,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -3538,7 +3467,7 @@
       "team": "MI",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -3553,8 +3482,7 @@
       "adjusted_score": 3.25,
       "percentile": 59.64,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -3564,7 +3492,7 @@
       "team": "MI",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3579,7 +3507,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3590,7 +3518,7 @@
       "team": "MI",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3605,7 +3533,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3616,7 +3544,7 @@
       "team": "MI",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3631,7 +3559,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3642,7 +3570,7 @@
       "team": "MI",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3657,7 +3585,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3668,7 +3596,7 @@
       "team": "MI",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3683,7 +3611,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3694,7 +3622,7 @@
       "team": "MI",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3709,7 +3637,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3720,7 +3648,7 @@
       "team": "MI",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3735,7 +3663,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3746,7 +3674,7 @@
       "team": "MI",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3761,7 +3689,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3772,7 +3700,7 @@
       "team": "MI",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3787,7 +3715,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3798,7 +3726,7 @@
       "team": "MI",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3813,7 +3741,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3824,7 +3752,7 @@
       "team": "MI",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3839,7 +3767,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3850,7 +3778,7 @@
       "team": "MI",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3865,7 +3793,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3876,7 +3804,7 @@
       "team": "MI",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3891,8 +3819,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-29T14:00:00Z"
     },
@@ -3902,7 +3829,7 @@
       "team": "MI",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -3917,7 +3844,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -3928,7 +3855,7 @@
       "team": "PBKS",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -3943,8 +3870,7 @@
       "adjusted_score": 35.25,
       "percentile": 97.59,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -3954,7 +3880,7 @@
       "team": "PBKS",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -3969,8 +3895,7 @@
       "adjusted_score": 15.25,
       "percentile": 81.93,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -3980,7 +3905,7 @@
       "team": "PBKS",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -3995,8 +3920,7 @@
       "adjusted_score": 25,
       "percentile": 91.37,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -4006,7 +3930,7 @@
       "team": "PBKS",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -4021,8 +3945,7 @@
       "adjusted_score": 18,
       "percentile": 84.94,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -4032,7 +3955,7 @@
       "team": "PBKS",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -4047,8 +3970,7 @@
       "adjusted_score": 25.25,
       "percentile": 91.97,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -4058,7 +3980,7 @@
       "team": "PBKS",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -4073,8 +3995,7 @@
       "adjusted_score": 17.5,
       "percentile": 84.34,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -4084,7 +4005,7 @@
       "team": "PBKS",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -4099,8 +4020,7 @@
       "adjusted_score": 7.75,
       "percentile": 69.08,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -4110,7 +4030,7 @@
       "team": "PBKS",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -4125,8 +4045,7 @@
       "adjusted_score": 9,
       "percentile": 71.49,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -4136,7 +4055,7 @@
       "team": "PBKS",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -4151,8 +4070,7 @@
       "adjusted_score": 2.75,
       "percentile": 58.23,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -4162,7 +4080,7 @@
       "team": "PBKS",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -4177,8 +4095,7 @@
       "adjusted_score": 2.25,
       "percentile": 57.03,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -4188,7 +4105,7 @@
       "team": "PBKS",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -4203,8 +4120,7 @@
       "adjusted_score": 4.5,
       "percentile": 61.65,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -4214,7 +4130,7 @@
       "team": "PBKS",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4229,7 +4145,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4240,7 +4156,7 @@
       "team": "PBKS",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4255,7 +4171,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4266,7 +4182,7 @@
       "team": "PBKS",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4281,7 +4197,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4292,7 +4208,7 @@
       "team": "PBKS",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4307,7 +4223,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4318,7 +4234,7 @@
       "team": "PBKS",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4333,7 +4249,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4344,7 +4260,7 @@
       "team": "PBKS",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4359,7 +4275,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4370,7 +4286,7 @@
       "team": "PBKS",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4385,7 +4301,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4396,7 +4312,7 @@
       "team": "PBKS",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4411,7 +4327,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4422,7 +4338,7 @@
       "team": "PBKS",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4437,7 +4353,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4448,7 +4364,7 @@
       "team": "PBKS",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4463,7 +4379,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4474,7 +4390,7 @@
       "team": "PBKS",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4489,7 +4405,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4500,7 +4416,7 @@
       "team": "PBKS",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4515,7 +4431,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4526,7 +4442,7 @@
       "team": "PBKS",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4541,7 +4457,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4552,7 +4468,7 @@
       "team": "PBKS",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4567,7 +4483,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4578,7 +4494,7 @@
       "team": "RCB",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -4593,8 +4509,7 @@
       "adjusted_score": 27.75,
       "percentile": 94.78,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-28T14:00:00Z"
     },
@@ -4604,7 +4519,7 @@
       "team": "RCB",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -4619,8 +4534,7 @@
       "adjusted_score": 26.25,
       "percentile": 92.57,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-28T14:00:00Z"
     },
@@ -4630,7 +4544,7 @@
       "team": "RCB",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -4645,8 +4559,7 @@
       "adjusted_score": 24.88,
       "percentile": 90.76,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-28T14:00:00Z"
     },
@@ -4656,7 +4569,7 @@
       "team": "RCB",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -4671,8 +4584,7 @@
       "adjusted_score": 18.63,
       "percentile": 85.94,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-28T14:00:00Z"
     },
@@ -4682,7 +4594,7 @@
       "team": "RCB",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -4697,8 +4609,7 @@
       "adjusted_score": 8.38,
       "percentile": 69.88,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-28T14:00:00Z"
     },
@@ -4708,7 +4619,7 @@
       "team": "RCB",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -4723,8 +4634,7 @@
       "adjusted_score": 8.88,
       "percentile": 70.68,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-28T14:00:00Z"
     },
@@ -4734,7 +4644,7 @@
       "team": "RCB",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -4749,8 +4659,7 @@
       "adjusted_score": 13.25,
       "percentile": 78.31,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-28T14:00:00Z"
     },
@@ -4760,7 +4669,7 @@
       "team": "RCB",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -4775,8 +4684,7 @@
       "adjusted_score": 7.25,
       "percentile": 67.67,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-28T14:00:00Z"
     },
@@ -4786,7 +4694,7 @@
       "team": "RCB",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -4801,8 +4709,7 @@
       "adjusted_score": 2,
       "percentile": 56.02,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-28T14:00:00Z"
     },
@@ -4812,7 +4719,7 @@
       "team": "RCB",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -4827,8 +4734,7 @@
       "adjusted_score": 4.5,
       "percentile": 61.65,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-28T14:00:00Z"
     },
@@ -4838,7 +4744,7 @@
       "team": "RCB",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4853,7 +4759,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4864,7 +4770,7 @@
       "team": "RCB",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4879,7 +4785,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4890,7 +4796,7 @@
       "team": "RCB",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4905,7 +4811,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4916,7 +4822,7 @@
       "team": "RCB",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4931,7 +4837,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4942,7 +4848,7 @@
       "team": "RCB",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4957,7 +4863,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4968,7 +4874,7 @@
       "team": "RCB",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -4983,7 +4889,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -4994,7 +4900,7 @@
       "team": "RCB",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5009,7 +4915,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5020,7 +4926,7 @@
       "team": "RCB",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5035,7 +4941,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5046,7 +4952,7 @@
       "team": "RCB",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5061,7 +4967,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5072,7 +4978,7 @@
       "team": "RCB",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5087,7 +4993,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5098,7 +5004,7 @@
       "team": "RCB",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5113,7 +5019,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5124,7 +5030,7 @@
       "team": "RCB",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5139,7 +5045,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5150,7 +5056,7 @@
       "team": "RCB",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5165,7 +5071,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5176,7 +5082,7 @@
       "team": "RCB",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5191,7 +5097,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5202,7 +5108,7 @@
       "team": "RCB",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 4,
       "initial_price": 4,
       "target_price": 4,
       "smoothed_price": 4,
@@ -5217,8 +5123,7 @@
       "adjusted_score": -0.87,
       "percentile": 0,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-28T14:00:00Z"
     },
@@ -5228,7 +5133,7 @@
       "team": "RR",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -5243,8 +5148,7 @@
       "adjusted_score": 36.25,
       "percentile": 98.59,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5254,7 +5158,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -5269,8 +5173,7 @@
       "adjusted_score": 35,
       "percentile": 97.19,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5280,7 +5183,7 @@
       "team": "RR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -5295,8 +5198,7 @@
       "adjusted_score": 29.75,
       "percentile": 95.18,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5306,7 +5208,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -5321,8 +5223,7 @@
       "adjusted_score": 14.75,
       "percentile": 81.12,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5332,7 +5233,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -5347,8 +5248,7 @@
       "adjusted_score": 15.5,
       "percentile": 82.33,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5358,7 +5258,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -5373,8 +5273,7 @@
       "adjusted_score": 7,
       "percentile": 66.47,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-30T14:00:00Z"
     },
@@ -5384,7 +5283,7 @@
       "team": "RR",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -5399,8 +5298,7 @@
       "adjusted_score": 13.75,
       "percentile": 78.92,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5410,7 +5308,7 @@
       "team": "RR",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -5425,8 +5323,7 @@
       "adjusted_score": 11.5,
       "percentile": 74.5,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5436,7 +5333,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -5451,8 +5348,7 @@
       "adjusted_score": 7,
       "percentile": 66.47,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5462,7 +5358,7 @@
       "team": "RR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -5477,8 +5373,7 @@
       "adjusted_score": 7.5,
       "percentile": 68.47,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5488,7 +5383,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -5503,8 +5398,7 @@
       "adjusted_score": 7,
       "percentile": 66.47,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5514,7 +5408,7 @@
       "team": "RR",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -5529,8 +5423,7 @@
       "adjusted_score": 0.25,
       "percentile": 53.01,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5540,7 +5433,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5555,7 +5448,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5566,7 +5459,7 @@
       "team": "RR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5581,7 +5474,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5592,7 +5485,7 @@
       "team": "RR",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5607,7 +5500,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5618,7 +5511,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5633,7 +5526,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5644,7 +5537,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5659,7 +5552,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5670,7 +5563,7 @@
       "team": "RR",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5685,7 +5578,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5696,7 +5589,7 @@
       "team": "RR",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5711,7 +5604,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5722,7 +5615,7 @@
       "team": "RR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5737,7 +5630,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5748,7 +5641,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5763,7 +5656,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5774,7 +5667,7 @@
       "team": "RR",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5789,7 +5682,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5800,7 +5693,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5815,7 +5708,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5826,7 +5719,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5841,7 +5734,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5852,7 +5745,7 @@
       "team": "RR",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -5867,7 +5760,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -5878,7 +5771,7 @@
       "team": "SRH",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -5893,8 +5786,7 @@
       "adjusted_score": 32.63,
       "percentile": 95.98,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5904,7 +5796,7 @@
       "team": "SRH",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -5919,8 +5811,7 @@
       "adjusted_score": 47.75,
       "percentile": 99.6,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5930,7 +5821,7 @@
       "team": "SRH",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -5945,8 +5836,7 @@
       "adjusted_score": 34.75,
       "percentile": 96.39,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5956,7 +5846,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -5971,8 +5861,7 @@
       "adjusted_score": 35.87,
       "percentile": 97.99,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -5982,7 +5871,7 @@
       "team": "SRH",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 10,
       "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
@@ -5997,8 +5886,7 @@
       "adjusted_score": 46.88,
       "percentile": 99.2,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -6008,7 +5896,7 @@
       "team": "SRH",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -6023,8 +5911,7 @@
       "adjusted_score": 18.62,
       "percentile": 85.54,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -6034,7 +5921,7 @@
       "team": "SRH",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -6049,8 +5936,7 @@
       "adjusted_score": 17.5,
       "percentile": 83.94,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -6060,7 +5946,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -6075,8 +5961,7 @@
       "adjusted_score": 23.75,
       "percentile": 89.56,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -6086,7 +5971,7 @@
       "team": "SRH",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 9,
       "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
@@ -6101,8 +5986,7 @@
       "adjusted_score": 18.75,
       "percentile": 86.55,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -6112,7 +5996,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -6127,8 +6011,7 @@
       "adjusted_score": 12.13,
       "percentile": 77.11,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -6138,7 +6021,7 @@
       "team": "SRH",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -6153,8 +6036,7 @@
       "adjusted_score": 8,
       "percentile": 69.48,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -6164,7 +6046,7 @@
       "team": "SRH",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 8,
       "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
@@ -6179,8 +6061,7 @@
       "adjusted_score": 9.13,
       "percentile": 72.29,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -6190,7 +6071,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -6205,8 +6086,7 @@
       "adjusted_score": 4.38,
       "percentile": 61.04,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -6216,7 +6096,7 @@
       "team": "SRH",
       "role": "wicket_keeper",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 7,
       "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
@@ -6231,8 +6111,7 @@
       "adjusted_score": 2.75,
       "percentile": 58.23,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
-        "Missing historical old_price; reported price_change as 0 for initialization"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
@@ -6242,7 +6121,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -6257,7 +6136,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -6268,7 +6147,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -6283,7 +6162,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -6294,7 +6173,7 @@
       "team": "SRH",
       "role": "all_rounder",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -6309,7 +6188,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -6320,7 +6199,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -6335,7 +6214,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -6346,7 +6225,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -6361,7 +6240,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -6372,7 +6251,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -6387,7 +6266,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -6398,7 +6277,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -6413,7 +6292,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -6424,7 +6303,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -6439,7 +6318,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -6450,7 +6329,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -6465,7 +6344,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -6476,7 +6355,7 @@
       "team": "SRH",
       "role": "batter",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -6491,7 +6370,7 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
@@ -6502,7 +6381,7 @@
       "team": "SRH",
       "role": "bowler",
       "pricing_eligible": true,
-      "old_price": null,
+      "old_price": 6,
       "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
@@ -6517,11 +6396,11 @@
       "adjusted_score": 0,
       "percentile": 26.51,
       "calculation_notes": [
-        "Missing old_price; used initial_price as base",
+        "Used old_price for smoothing",
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-04-06T15:34:07.159Z"
+  "generated_at_utc": "2026-04-06T20:03:41.860Z"
 }
