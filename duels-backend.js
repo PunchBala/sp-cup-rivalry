@@ -9,7 +9,8 @@
     tables: {
       profiles: 'profiles',
       duels: 'duels',
-      duelEntries: 'duel_entries'
+      duelEntries: 'duel_entries',
+      miniFantasyEntries: 'mini_fantasy_entries'
     }
   };
 
@@ -145,7 +146,9 @@
       async listPublicBundles() { return []; },
       async createPublicDuel() { throw disabledError(); },
       async claimOpenEntry() { throw disabledError(); },
-      async saveOwnedEntry() { throw disabledError(); }
+      async saveOwnedEntry() { throw disabledError(); },
+      async listMiniFantasyEntries() { return []; },
+      async upsertMiniFantasyEntry() { throw disabledError(); }
     };
   }
 
@@ -321,6 +324,28 @@
         accessToken
       });
       return { duelRow, entryRows: Array.isArray(entryRows) ? entryRows : [] };
+    }
+
+    function normalizeMiniFantasyEntryRow(row) {
+      if (!row) return null;
+      return {
+        id: row.id || null,
+        userId: row.user_id || null,
+        ownerHandle: normalizeSlug(row.owner_handle || ''),
+        season: normalizeWhitespace(row.season || ''),
+        matchNo: Number(row.match_no || 0) || null,
+        homeTeamCode: normalizeWhitespace(row.home_team_code || ''),
+        awayTeamCode: normalizeWhitespace(row.away_team_code || ''),
+        fixtureLabel: normalizeWhitespace(row.fixture_label || ''),
+        fixtureDatetimeUtc: row.fixture_datetime_utc || null,
+        selectedPlayerIds: Array.isArray(row.selected_player_ids) ? row.selected_player_ids.filter(Boolean) : [],
+        captainPlayerId: normalizeWhitespace(row.captain_player_id || '') || null,
+        priceSnapshot: cloneJson(row.price_snapshot || {}),
+        spentCredits: Number(row.spent_credits || 0) || 0,
+        savedAt: row.saved_at || null,
+        createdAt: row.created_at || null,
+        updatedAt: row.updated_at || null
+      };
     }
 
     return {
@@ -589,6 +614,62 @@
         });
         const refreshed = await loadBundleRowsBySlug(duelSlug, activeSession.access_token);
         return makeBundleFromRows(refreshed.duelRow, refreshed.entryRows);
+      },
+
+      async listMiniFantasyEntries({ season, currentUser }) {
+        const activeSession = await ensureFreshSession();
+        if (!activeSession?.access_token || !currentUser?.userId) {
+          return [];
+        }
+        const safeSeason = normalizeWhitespace(season || '');
+        const rows = await restRequest(config.tables.miniFantasyEntries, {
+          method: 'GET',
+          query: {
+            select: 'id,user_id,owner_handle,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
+            user_id: `eq.${currentUser.userId}`,
+            ...(safeSeason ? { season: `eq.${safeSeason}` } : {}),
+            order: 'fixture_datetime_utc.asc.nullslast,match_no.asc'
+          },
+          accessToken: activeSession.access_token
+        });
+        return (Array.isArray(rows) ? rows : []).map(normalizeMiniFantasyEntryRow).filter(Boolean);
+      },
+
+      async upsertMiniFantasyEntry({ currentUser, entry }) {
+        const activeSession = await ensureFreshSession();
+        if (!activeSession?.access_token || !currentUser?.userId) {
+          throw new Error('Sign in with a backend account before saving Mini Fantasy picks.');
+        }
+        const safeSeason = normalizeWhitespace(entry?.season || '');
+        const matchNo = Number(entry?.matchNo || 0);
+        if (!safeSeason || !matchNo) {
+          throw new Error('Mini Fantasy save needs a season and match number.');
+        }
+        const rows = await restRequest(config.tables.miniFantasyEntries, {
+          method: 'POST',
+          query: {
+            on_conflict: 'user_id,season,match_no',
+            select: 'id,user_id,owner_handle,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at'
+          },
+          body: {
+            user_id: currentUser.userId,
+            owner_handle: currentUser.ownerId,
+            season: safeSeason,
+            match_no: matchNo,
+            home_team_code: normalizeWhitespace(entry?.homeTeamCode || ''),
+            away_team_code: normalizeWhitespace(entry?.awayTeamCode || ''),
+            fixture_label: normalizeWhitespace(entry?.fixtureLabel || ''),
+            fixture_datetime_utc: entry?.fixtureDatetimeUtc || null,
+            selected_player_ids: cloneJson(entry?.selectedPlayerIds || []),
+            captain_player_id: normalizeWhitespace(entry?.captainPlayerId || '') || null,
+            price_snapshot: cloneJson(entry?.priceSnapshot || {}),
+            spent_credits: Number(entry?.spentCredits || 0) || 0,
+            saved_at: entry?.savedAt || new Date().toISOString()
+          },
+          accessToken: activeSession.access_token,
+          prefer: 'resolution=merge-duplicates,return=representation'
+        });
+        return normalizeMiniFantasyEntryRow(firstArrayItem(rows));
       }
     };
   }

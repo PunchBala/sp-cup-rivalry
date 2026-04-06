@@ -13,11 +13,22 @@ The live product today is `Duels`, a sealed head-to-head game where:
 
 The app is hosted as a static site, with live cricket data refreshed into `data/live.json` by GitHub Actions.
 
-Mini Fantasy now has a separate portable pricing engine in the repo. It is intentionally isolated from duel scoring and duel UI.
+`Mini Fantasy` is now a real sibling game mode in the app:
+
+- one entry per user per eligible match
+- 4-player team under a 30-credit budget
+- at least 1 player from each real team
+- at least 1 batter and 1 bowler
+- one captain at `1.5x`
+- entries open only for today/tomorrow fixtures from Match 14 onward
+- saved entries freeze their own fixture price snapshot
+
+Mini Fantasy stays isolated from duel scoring and duel UI at the data/model layer.
 
 ## Current product shape
 
 - `Board` is the main viewing surface: scoreboard, live category board, worm, and key duel metrics
+- `Mini Fantasy` is a separate tab with today/tomorrow fixture cards, a 4-slot lineup builder, and saved match entries
 - `Nerd Room` shows deeper ranking and board context
 - `Schedule` shows the fixture timeline used by the duel lifecycle
 - `Profile`, `Create duel`, `Manage duel`, and `Browse duels` live in drawers so the main page stays board-first
@@ -30,6 +41,8 @@ Mini Fantasy now has a separate portable pricing engine in the repo. It is inten
 - [index.html](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/index.html)
 
 Static browser app, duel lifecycle UI, pickers, drawers, live board, and page logic.
+
+Mini Fantasy UI also lives here for now: fixture windowing, team builder, captain selection, and local/hosted entry flows.
 
 ### Duel room and scoring model
 
@@ -45,7 +58,7 @@ These filenames are legacy, but they are still the live duel-first room model an
 - [duels-backend.config.js](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/duels-backend.config.js)
 - [docs/DUELS_BACKEND_SETUP.md](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/docs/DUELS_BACKEND_SETUP.md)
 
-Supabase-backed auth and public duel persistence. If backend config is disabled, the page falls back to local beta storage.
+Supabase-backed auth, public duel persistence, and Mini Fantasy match-entry persistence. If backend config is disabled, the page falls back to local beta storage.
 
 ### Live data worker
 
@@ -54,13 +67,18 @@ Supabase-backed auth and public duel persistence. If backend config is disabled,
 
 Fetches IPL season data, updates `data/live.json`, caches completed scorecards, and pushes refresh commits through GitHub Actions.
 
-### Mini Fantasy pricing engine
+### Mini Fantasy contest and pricing
+
+- [mini-fantasy/contest-engine.js](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/mini-fantasy/contest-engine.js)
+- [data/mini_fantasy_prices.json](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/data/mini_fantasy_prices.json)
+- [ipl_2026_team_roles.json](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/ipl_2026_team_roles.json)
+- [docs/MINI_FANTASY_GAME.md](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/docs/MINI_FANTASY_GAME.md)
 
 - [mini-fantasy/pricing-engine.ts](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/mini-fantasy/pricing-engine.ts)
 - [mini-fantasy/pricing-engine.js](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/mini-fantasy/pricing-engine.js)
 - [docs/MINI_FANTASY_PRICING_ENGINE.md](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/docs/MINI_FANTASY_PRICING_ENGINE.md)
 
-Pure JSON-in/JSON-out pricing layer for the upcoming Mini Fantasy mode. It consumes upstream per-player fantasy-point histories and emits daily integer player prices with explanation metadata.
+Contest helpers live in `mini-fantasy/contest-engine.js`, while the pure JSON-in/JSON-out pricing layer still lives in `mini-fantasy/pricing-engine.*`. Daily generated prices are committed into `data/mini_fantasy_prices.json`.
 
 ## Duel data model
 
@@ -74,6 +92,7 @@ Hosted backend uses:
 - `duels`
 - `duel_entries`
 - `profiles`
+- `mini_fantasy_entries`
 
 The product is duel-first in both cases.
 
@@ -89,7 +108,7 @@ The same display name can appear in multiple duels with different picks because 
 Serve the site from the repo root:
 
 ```bash
-python -m http.server 4173
+npm run serve-static
 ```
 
 Then open:
@@ -113,6 +132,7 @@ node --test \
   tests/live-data.contract.test.mjs \
   tests/warroom-room-model.test.mjs \
   tests/mini-fantasy-pricing-engine.test.mjs \
+  tests/mini-fantasy-contest-engine.test.mjs \
   tests/update-live-data.quota.test.mjs \
   tests/update-live-data.schedule.test.mjs \
   tests/update-live-data.scorecard-cache.test.mjs \
@@ -153,6 +173,12 @@ Example:
 node scripts/generate-mini-fantasy-prices.mjs fixtures/mini_fantasy_pricing_job_example.json
 ```
 
+Daily price-book refresh from live season data:
+
+```bash
+node scripts/update-mini-fantasy-prices.mjs
+```
+
 This prints one JSON pricing job output with:
 
 - derived averages and adjusted scores
@@ -167,6 +193,7 @@ This prints one JSON pricing job output with:
 - [WARROOM_RELEASE_CHECKLIST.md](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/WARROOM_RELEASE_CHECKLIST.md)
 - [docs/DUELS_BACKEND_SETUP.md](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/docs/DUELS_BACKEND_SETUP.md)
 - [docs/LIVE_DATA_WORKER.md](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/docs/LIVE_DATA_WORKER.md)
+- [docs/MINI_FANTASY_GAME.md](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/docs/MINI_FANTASY_GAME.md)
 - [docs/MINI_FANTASY_PRICING_ENGINE.md](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/docs/MINI_FANTASY_PRICING_ENGINE.md)
 
 ## Legacy note

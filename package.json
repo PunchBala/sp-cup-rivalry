@@ -4,9 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "serve-static": "node scripts/serve-static.mjs",
     "update-live-data": "node scripts/update-live-data.mjs",
     "generate-war-room-duel": "node scripts/generate-war-room-duel.mjs",
-    "generate-mini-fantasy-prices": "node scripts/generate-mini-fantasy-prices.mjs"
+    "generate-mini-fantasy-prices": "node scripts/generate-mini-fantasy-prices.mjs",
+    "update-mini-fantasy-prices": "node scripts/update-mini-fantasy-prices.mjs"
   },
   "devDependencies": {
     "playwright": "^1.53.0"

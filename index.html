@@ -554,6 +554,88 @@
     .worm-swatch{width:10px;height:10px;border-radius:999px;display:inline-block}
     .worm-swatch-a{background:#7cc4ff}
     .worm-swatch-b{background:#ff8ba2}
+    .fantasy-layout{display:grid;grid-template-columns:minmax(280px,.86fr) minmax(440px,1.14fr);gap:16px}
+    @media (max-width:1100px){.fantasy-layout{grid-template-columns:1fr}}
+    .fantasy-stack{display:grid;gap:16px}
+    .fantasy-lead{display:grid;gap:8px}
+    .fantasy-headline{font-size:clamp(22px,3.2vw,32px);font-weight:900;line-height:1.06;color:#fff}
+    .fantasy-sub{font-size:13px;color:var(--muted);line-height:1.55;max-width:860px}
+    .fantasy-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .fantasy-fixture-list{display:grid;gap:12px}
+    .fantasy-fixture-card{
+      width:100%;
+      text-align:left;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      color:var(--text);
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    .fantasy-fixture-card:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.3)}
+    .fantasy-fixture-card.active{border-color:rgba(95,240,200,.35);box-shadow:0 0 0 1px rgba(95,240,200,.15) inset}
+    .fantasy-fixture-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .fantasy-fixture-match{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:800}
+    .fantasy-fixture-teams{font-size:20px;font-weight:900;line-height:1.1;color:#fff;margin-top:6px}
+    .fantasy-fixture-note{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.45}
+    .fantasy-fixture-status{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .fantasy-builder-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .fantasy-summary-grid{display:flex;gap:10px;flex-wrap:wrap}
+    .fantasy-slot-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+    @media (max-width:760px){.fantasy-slot-grid{grid-template-columns:1fr}}
+    .fantasy-slot-card{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:rgba(255,255,255,.03);
+      padding:14px;
+      display:grid;
+      gap:10px;
+      min-height:164px;
+    }
+    .fantasy-slot-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--muted)}
+    .fantasy-slot-name{font-size:18px;font-weight:900;line-height:1.15;color:#fff}
+    .fantasy-slot-meta{display:flex;gap:8px;flex-wrap:wrap}
+    .fantasy-slot-empty{font-size:13px;color:var(--muted);line-height:1.5}
+    .fantasy-slot-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+    .fantasy-rules{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .fantasy-empty{
+      border:1px dashed rgba(255,255,255,.14);
+      border-radius:16px;
+      padding:18px;
+      color:var(--muted);
+      background:rgba(255,255,255,.025);
+      line-height:1.6;
+    }
+    .fantasy-picker-list{display:grid;gap:10px}
+    .fantasy-picker-card{
+      width:100%;
+      text-align:left;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+      padding:12px 14px;
+      color:var(--text);
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    .fantasy-picker-card:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.3)}
+    .fantasy-picker-card.disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .fantasy-picker-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .fantasy-picker-price{font-size:22px;font-weight:900;color:#fff;line-height:1}
+    .fantasy-picker-role{margin-top:6px;font-size:12px;color:var(--muted)}
+    .fantasy-pill-strong{color:#fff}
+    .fantasy-highlight{
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid rgba(95,240,200,.22);
+      background:rgba(95,240,200,.10);
+      color:#d9fff3;
+      line-height:1.5;
+      margin-top:14px;
+    }
+    .fantasy-saved-list{display:grid;gap:8px;margin-top:14px}
+    .fantasy-saved-item{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
 
   </style>
 
@@ -674,6 +756,48 @@
       </div>
     </div>
 
+    <div id="miniFantasySection" class="section-hidden">
+      <div class="grid">
+        <div class="card span-12">
+          <div class="fantasy-lead">
+            <div class="section-title">Mini Fantasy</div>
+            <div class="fantasy-headline" id="miniFantasyHeadline">Mini Fantasy opens from Match 14</div>
+            <div class="fantasy-sub" id="miniFantasySummary">Pick a 4-player team for each eligible match, stay under 30 credits, lock one captain for a 1.5x boost, and get your entries saved match by match.</div>
+            <div class="fantasy-meta" id="miniFantasyMeta"></div>
+          </div>
+        </div>
+        <div class="span-12 fantasy-layout">
+          <div class="fantasy-stack">
+            <div class="card">
+              <div class="section-title">Open fixtures</div>
+              <div id="miniFantasyFixtures" class="fantasy-fixture-list"></div>
+            </div>
+            <div class="card">
+              <div class="section-title">Rules</div>
+              <div class="fantasy-rules">
+                <div class="pill">Exactly 4 players</div>
+                <div class="pill">Budget: 30 credits</div>
+                <div class="pill">At least 1 player from each team</div>
+                <div class="pill">At least 1 batter</div>
+                <div class="pill">At least 1 bowler</div>
+                <div class="pill">Captain scores 1.5x</div>
+              </div>
+            </div>
+          </div>
+          <div class="fantasy-stack">
+            <div class="card">
+              <div class="section-title">Match builder</div>
+              <div id="miniFantasyBuilder"></div>
+            </div>
+            <div class="card">
+              <div class="section-title">My entries</div>
+              <div id="miniFantasyMyEntries"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="scheduleSection" class="section-hidden">
       <div class="card">
         <div class="section-title">League-stage schedule</div>
@@ -775,12 +899,48 @@
       </div>
     </div>
 
+    <div id="miniFantasyPickerModal" class="picker-modal section-hidden" aria-hidden="true">
+      <div class="picker-shell" role="dialog" aria-modal="true" aria-labelledby="miniFantasyPickerTitle">
+        <div class="picker-top">
+          <div>
+            <div class="picker-title" id="miniFantasyPickerTitle">Choose a player</div>
+            <div class="picker-sub" id="miniFantasyPickerSubtitle">Filter by team or search by name, then lock one player into the slot.</div>
+          </div>
+          <button class="picker-close" id="miniFantasyPickerClose" type="button">Close picker</button>
+        </div>
+        <div class="picker-toolbar" id="miniFantasyPickerToolbar"></div>
+        <div id="miniFantasyPickerBody"></div>
+        <div class="picker-footer">
+          <div class="picker-count" id="miniFantasyPickerCount">0 options</div>
+          <div class="studio-inline">
+            <button class="studio-button ghost" id="miniFantasyPickerClear" type="button">Clear slot</button>
+            <button class="studio-button ghost" id="miniFantasyPickerDone" type="button">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="warroom-room-model.js"></script>
   <script src="duels-backend.config.js"></script>
   <script src="duels-backend.js"></script>
-  <script>
+  <script type="module">
+    import {
+      MINI_FANTASY_BUDGET,
+      MINI_FANTASY_CAPTAIN_MULTIPLIER,
+      MINI_FANTASY_FIRST_OPEN_MATCH_NO,
+      MINI_FANTASY_LAUNCH_AT_UTC,
+      MINI_FANTASY_SEASON,
+      applyPriceSnapshotToPool,
+      buildEntryPriceSnapshot,
+      buildFixturePlayerPool,
+      generateMiniFantasyPriceBook,
+      getMiniFantasyOpenFixtures,
+      isFixtureLocked,
+      validateMiniFantasyEntry
+    } from './mini-fantasy/contest-engine.js';
+
     const SEASON = 2026;
     const SERIES_TAG = 'IPL 2026';
 
@@ -798,6 +958,7 @@
     };
     const LOCAL_AUTH_STORAGE_KEY = 'sp-cup-duels-auth-v1';
     const LOCAL_CUSTOM_DUELS_STORAGE_KEY = 'sp-cup-duels-custom-v1';
+    const LOCAL_MINI_FANTASY_ENTRIES_STORAGE_KEY = 'sp-cup-mini-fantasy-entries-v1';
     const EMPTY_CUSTOM_DUEL_STORE = { version: 1, rooms: {} };
     let BASE_ROOM = null;
     let ACTIVE_ROOM = null;
@@ -805,9 +966,22 @@
     let CURRENT_USER = null;
     let CUSTOM_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_DUEL_STORE = { version: 1, rooms: {} };
+    let REMOTE_MINI_FANTASY_ENTRIES = [];
     const DUELS_BACKEND = window.DUELS_BACKEND_API || window.createDuelsBackend?.(window.DUELS_BACKEND_CONFIG || {}) || { enabled: false, label: 'Local beta storage' };
     let DUEL_STUDIO_NOTICE = null;
     let IPL_SQUADS = {};
+    let IPL_TEAM_ROLES = {};
+    let MINI_FANTASY_PRICE_BOOK = null;
+    let MINI_FANTASY_NOTICE = null;
+    let MINI_FANTASY_DRAFTS = {};
+    let MINI_FANTASY_ACTIVE_MATCH_NO = null;
+    let MINI_FANTASY_PICKER_STATE = {
+      open: false,
+      matchNo: null,
+      slotIndex: null,
+      teamFilter: 'ALL',
+      search: ''
+    };
     let ACTIVE_PICKER_STATE = {
       open: false,
       categoryKey: null,
@@ -3271,6 +3445,50 @@ function titleBandScore(pick, live){
       }
     }
 
+    async function loadTeamRolesData(){
+      try {
+        const cacheBust = `t=${Date.now()}`;
+        const res = await fetch(`ipl_2026_team_roles.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        IPL_TEAM_ROLES = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+      } catch (err) {
+        console.warn('Falling back to empty team roles directory', err);
+        IPL_TEAM_ROLES = {};
+      }
+    }
+
+    async function loadMiniFantasyPriceBook(){
+      try {
+        const cacheBust = `t=${Date.now()}`;
+        const res = await fetch(`data/mini_fantasy_prices.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        MINI_FANTASY_PRICE_BOOK = data && typeof data === 'object' && !Array.isArray(data) ? data : null;
+      } catch (err) {
+        console.warn('Mini Fantasy price book fetch failed, regenerating in browser', err);
+        try {
+          MINI_FANTASY_PRICE_BOOK = generateMiniFantasyPriceBook({
+            liveData: LIVE_2026,
+            schedule: LEAGUE_STAGE_SCHEDULE,
+            squads: IPL_SQUADS,
+            teamRoles: IPL_TEAM_ROLES,
+            previousPriceBook: MINI_FANTASY_PRICE_BOOK,
+            asOfUtc: LIVE_2026?.fetchedAt || new Date().toISOString()
+          });
+        } catch (fallbackError) {
+          console.error('Mini Fantasy price book fallback generation failed', fallbackError);
+          MINI_FANTASY_PRICE_BOOK = { players: [], summary: { total_players_received: 0, eligible_players_ranked: 0, price_rises: 0, price_drops: 0, price_unchanged: 0 } };
+        }
+      }
+    }
+
 
     
     function formatFixtureLabel(fixture){
@@ -3327,6 +3545,10 @@ function titleBandScore(pick, live){
       return getWarRoomModelApi().normalizeSlug(value || '') || null;
     }
 
+    function normalizeTextValue(value){
+      return getWarRoomModelApi().normalizeWhitespace(value || '');
+    }
+
     function normalizeUserProfile(profile = {}){
       const model = getWarRoomModelApi();
       const displayName = model.normalizeWhitespace(profile.displayName || profile.name || '');
@@ -3360,8 +3582,151 @@ function titleBandScore(pick, live){
       CURRENT_USER = null;
     }
 
+    function emptyMiniFantasyEntryStore(){
+      return { version: 1, entries: [] };
+    }
+
+    function loadStoredMiniFantasyEntriesStore(){
+      const raw = readStoredJson(LOCAL_MINI_FANTASY_ENTRIES_STORAGE_KEY, emptyMiniFantasyEntryStore());
+      if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return emptyMiniFantasyEntryStore();
+      if (!Array.isArray(raw.entries)) return emptyMiniFantasyEntryStore();
+      return {
+        version: 1,
+        entries: raw.entries.map((entry) => ({
+          id: entry?.id || null,
+          userId: entry?.userId || null,
+          ownerHandle: normalizeOwnerId(entry?.ownerHandle || entry?.ownerId || ''),
+          season: normalizeTextValue(entry?.season || MINI_FANTASY_SEASON),
+          matchNo: Number(entry?.matchNo || 0) || null,
+          homeTeamCode: normalizeTextValue(entry?.homeTeamCode || ''),
+          awayTeamCode: normalizeTextValue(entry?.awayTeamCode || ''),
+          fixtureLabel: normalizeTextValue(entry?.fixtureLabel || ''),
+          fixtureDatetimeUtc: entry?.fixtureDatetimeUtc || null,
+          selectedPlayerIds: Array.isArray(entry?.selectedPlayerIds) ? entry.selectedPlayerIds.filter(Boolean) : [],
+          captainPlayerId: normalizeTextValue(entry?.captainPlayerId || '') || null,
+          priceSnapshot: cloneJson(entry?.priceSnapshot || {}),
+          spentCredits: Number(entry?.spentCredits || 0) || 0,
+          savedAt: entry?.savedAt || null,
+          createdAt: entry?.createdAt || null,
+          updatedAt: entry?.updatedAt || null
+        })).filter((entry) => entry.ownerHandle && entry.matchNo)
+      };
+    }
+
+    function miniFantasyEntryStoreKey(entry = {}){
+      return `${normalizeOwnerId(entry.ownerHandle || entry.ownerId || '') || ''}:${normalizeTextValue(entry.season || MINI_FANTASY_SEASON)}:${Number(entry.matchNo || 0) || 0}`;
+    }
+
+    function writeStoredMiniFantasyEntries(entries = []){
+      return writeStoredJson(LOCAL_MINI_FANTASY_ENTRIES_STORAGE_KEY, {
+        version: 1,
+        entries: Array.isArray(entries) ? entries : []
+      });
+    }
+
+    function localMiniFantasyEntriesForCurrentUser(){
+      if (!CURRENT_USER?.ownerId) return [];
+      return loadStoredMiniFantasyEntriesStore().entries.filter((entry) =>
+        normalizeOwnerId(entry.ownerHandle || '') === normalizeOwnerId(CURRENT_USER.ownerId || '')
+      );
+    }
+
+    function upsertStoredMiniFantasyEntry(entry){
+      const normalizedOwner = normalizeOwnerId(entry?.ownerHandle || CURRENT_USER?.ownerId || '');
+      const matchNo = Number(entry?.matchNo || 0) || null;
+      if (!normalizedOwner || !matchNo) return null;
+      const store = loadStoredMiniFantasyEntriesStore();
+      const normalized = {
+        id: entry?.id || `local-mini-${normalizedOwner}-${matchNo}`,
+        userId: entry?.userId || CURRENT_USER?.userId || null,
+        ownerHandle: normalizedOwner,
+        season: normalizeTextValue(entry?.season || MINI_FANTASY_SEASON),
+        matchNo,
+        homeTeamCode: normalizeTextValue(entry?.homeTeamCode || ''),
+        awayTeamCode: normalizeTextValue(entry?.awayTeamCode || ''),
+        fixtureLabel: normalizeTextValue(entry?.fixtureLabel || ''),
+        fixtureDatetimeUtc: entry?.fixtureDatetimeUtc || null,
+        selectedPlayerIds: Array.isArray(entry?.selectedPlayerIds) ? entry.selectedPlayerIds.filter(Boolean) : [],
+        captainPlayerId: normalizeTextValue(entry?.captainPlayerId || '') || null,
+        priceSnapshot: cloneJson(entry?.priceSnapshot || {}),
+        spentCredits: Number(entry?.spentCredits || 0) || 0,
+        savedAt: entry?.savedAt || new Date().toISOString(),
+        createdAt: entry?.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const nextEntries = store.entries.filter((item) => miniFantasyEntryStoreKey(item) !== miniFantasyEntryStoreKey(normalized));
+      nextEntries.push(normalized);
+      writeStoredMiniFantasyEntries(nextEntries);
+      return normalized;
+    }
+
+    function setRemoteMiniFantasyEntries(entries = []){
+      REMOTE_MINI_FANTASY_ENTRIES = Array.isArray(entries) ? cloneJson(entries) : [];
+      return REMOTE_MINI_FANTASY_ENTRIES;
+    }
+
+    function upsertRemoteMiniFantasyEntry(entry){
+      if (!entry) return null;
+      const nextEntries = (Array.isArray(REMOTE_MINI_FANTASY_ENTRIES) ? REMOTE_MINI_FANTASY_ENTRIES : [])
+        .filter((item) => miniFantasyEntryStoreKey(item) !== miniFantasyEntryStoreKey(entry));
+      nextEntries.push(cloneJson(entry));
+      REMOTE_MINI_FANTASY_ENTRIES = nextEntries;
+      return entry;
+    }
+
     function usesHostedDuelsBackend(){
       return Boolean(DUELS_BACKEND?.enabled);
+    }
+
+    function currentMiniFantasyEntries(){
+      return usesHostedDuelsBackend() ? cloneJson(REMOTE_MINI_FANTASY_ENTRIES || []) : localMiniFantasyEntriesForCurrentUser();
+    }
+
+    function findMiniFantasyEntryForMatch(matchNo){
+      const target = Number(matchNo || 0) || null;
+      if (!target) return null;
+      return currentMiniFantasyEntries().find((entry) => Number(entry.matchNo || 0) === target) || null;
+    }
+
+    function resetMiniFantasyDrafts(){
+      MINI_FANTASY_DRAFTS = {};
+      MINI_FANTASY_PICKER_STATE = {
+        open: false,
+        matchNo: null,
+        slotIndex: null,
+        teamFilter: 'ALL',
+        search: ''
+      };
+      MINI_FANTASY_NOTICE = null;
+    }
+
+    async function syncMiniFantasyEntries(){
+      if (!CURRENT_USER) {
+        setRemoteMiniFantasyEntries([]);
+        resetMiniFantasyDrafts();
+        return [];
+      }
+      if (!usesHostedDuelsBackend()) {
+        resetMiniFantasyDrafts();
+        return localMiniFantasyEntriesForCurrentUser();
+      }
+      try {
+        const entries = await DUELS_BACKEND.listMiniFantasyEntries({
+          season: MINI_FANTASY_SEASON,
+          currentUser: CURRENT_USER
+        });
+        setRemoteMiniFantasyEntries(entries || []);
+      } catch (error) {
+        console.error('Hosted mini fantasy load failed:', error);
+        MINI_FANTASY_NOTICE = {
+          type: 'bad',
+          title: 'Mini Fantasy entries could not load',
+          text: error.message || `Could not load your saved Mini Fantasy entries from ${currentAuthLabel()}.`
+        };
+        setRemoteMiniFantasyEntries([]);
+      }
+      resetMiniFantasyDrafts();
+      return currentMiniFantasyEntries();
     }
 
     function currentAuthLabel(){
@@ -3893,6 +4258,23 @@ function titleBandScore(pick, live){
       titleEl.textContent = `${room.name} Duels`;
       subtitleEl.textContent = `${duelCount} public duel${duelCount === 1 ? '' : 's'} - ${liveCount} live${armedCount ? ` - ${armedCount} armed` : ''}${clashCount ? ` - ${clashCount} in clash state` : ''}${waitingCount ? ` - ${waitingCount} in draft` : ''} - ${stateLabel} duel-first room. Each page view focuses on one head-to-head battle while the model still supports the same player appearing in different duels with different picks.`;
       pillEl.textContent = `Duels: ${room.name}`;
+    }
+
+    function renderActiveHeroHeader(){
+      if (activeView !== 'fantasy') {
+        updateWarRoomHeader(ACTIVE_ROOM);
+        return;
+      }
+      const titleEl = document.getElementById('leagueTitle');
+      const subtitleEl = document.getElementById('leagueSubtitle');
+      const pillEl = document.getElementById('leaguePill');
+      const launchData = buildMiniFantasyLaunchData();
+      const openCount = launchData.fixtures.length;
+      titleEl.textContent = `${ACTIVE_ROOM?.name || 'IPL 2026'} Mini Fantasy`;
+      subtitleEl.textContent = launchData.launch.is_live
+        ? `${openCount} eligible fixture${openCount === 1 ? '' : 's'} in the today-and-tomorrow window. Build one 4-player team per match, stay inside the credit cap, and freeze prices inside your saved entry.`
+        : `Mini Fantasy launches on 8 April 2026 from Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO}. Pricing is seeded from the earlier season, but entries stay closed until the launch gate opens.`;
+      pillEl.textContent = `Mini Fantasy: ${ACTIVE_ROOM?.name || SERIES_TAG}`;
     }
 
     async function loadWarRoomData(){
@@ -4601,6 +4983,7 @@ function titleBandScore(pick, live){
               }
             }
             clearStoredUserProfile();
+            await syncMiniFantasyEntries();
             setStudioNotice('info', usesHostedDuelsBackend()
               ? 'Signed out of the hosted Duels account.'
               : 'Signed out of the local Duels beta account.');
@@ -4673,6 +5056,7 @@ function titleBandScore(pick, live){
               setStudioNotice('good', action === 'signup'
                 ? `Account created for ${CURRENT_USER.displayName}. You can now create, join, and submit public duels from the hosted backend.`
                 : `Signed in as ${CURRENT_USER.displayName}. Hosted public duels are now live in this browser.`);
+              await syncMiniFantasyEntries();
             } catch (error) {
               setStudioNotice('bad', error.message || 'Could not complete hosted sign-in.');
             }
@@ -4690,6 +5074,7 @@ function titleBandScore(pick, live){
             return;
           }
           setStudioNotice('good', `Signed in as ${saved.displayName}. You can now create, join, and submit public duels from this browser.`);
+          await syncMiniFantasyEntries();
           render();
         };
       }
@@ -5410,17 +5795,20 @@ function titleBandScore(pick, live){
       const el = document.getElementById('tabs');
       const tabs = [
         { key:'warroom', label:'Board', type:'warroom' },
+        { key:'fantasy', label:'Mini Fantasy', type:'fantasy' },
         { key:'stats', label:'Nerd Room', type:'stats' },
         { key:'schedule', label:'Schedule', type:'schedule' }
       ];
       el.innerHTML = tabs.map(t => `
-        <button class="tab ${((t.type==='warroom' && activeView==='warroom') || (t.type==='stats' && activeView==='stats') || (t.type==='schedule' && activeView==='schedule')) ? 'active' : ''}" data-key="${t.key}" data-type="${t.type}">${escapeHtml(t.label)}</button>
+        <button class="tab ${((t.type==='warroom' && activeView==='warroom') || (t.type==='fantasy' && activeView==='fantasy') || (t.type==='stats' && activeView==='stats') || (t.type==='schedule' && activeView==='schedule')) ? 'active' : ''}" data-key="${t.key}" data-type="${t.type}">${escapeHtml(t.label)}</button>
       `).join('');
       el.querySelectorAll('.tab').forEach(btn => {
         btn.onclick = () => {
           const type = btn.dataset.type;
           if (type === 'warroom') {
             activeView = 'warroom';
+          } else if (type === 'fantasy') {
+            activeView = 'fantasy';
           } else if (type === 'stats') {
             activeView = 'stats';
           } else if (type === 'schedule') {
@@ -5700,8 +6088,24 @@ function titleBandScore(pick, live){
       const matchup = activeMatchup();
 
       if (!nav || !directory || !summary) return;
+      if (activeView === 'fantasy') {
+        const launchData = buildMiniFantasyLaunchData();
+        const activeFixture = activeMiniFantasyFixture();
+        nav.innerHTML = launchData.launch.is_live
+          ? `
+            <div class="pill">Mini Fantasy: live</div>
+            <div class="pill">Window: today + tomorrow</div>
+            <div class="pill">Open fixtures: ${escapeHtml(String(launchData.fixtures.length))}</div>
+            <div class="pill">${activeFixture ? `Active match: #${escapeHtml(String(activeFixture.match_no))}` : 'No eligible fixture right now'}</div>
+          `
+          : `
+            <div class="pill">Mini Fantasy: prelaunch</div>
+            <div class="pill">Launch: ${escapeHtml(formatDate(MINI_FANTASY_LAUNCH_AT_UTC))}</div>
+            <div class="pill">First live match: #${escapeHtml(String(MINI_FANTASY_FIRST_OPEN_MATCH_NO))}</div>
+          `;
+      }
       if (!ACTIVE_ROOM || !matchup || !MATCHUPS.length) {
-        nav.innerHTML = '';
+        if (activeView !== 'fantasy') nav.innerHTML = '';
         summary.textContent = 'No public duels are available yet.';
         directory.innerHTML = '<div class="small">Add a duel fixture to populate the directory.</div>';
         return;
@@ -5713,13 +6117,15 @@ function titleBandScore(pick, live){
       const activeLabel = matchup.label || `${matchup.a.name} vs ${matchup.b.name}`;
       const statusLabel = matchup.lifecycle?.status === 'live' ? 'Live duel' : lifecycleHeadline(matchup.lifecycle);
       const fallbackTag = requestedDuelMissing ? 'Requested duel was not found, so this page fell back to the first available duel.' : '';
-      nav.innerHTML = `
-        <div class="pill">Active duel: ${escapeHtml(activeLabel)}</div>
-        <div class="pill">Status: ${escapeHtml(statusLabel)}</div>
-        <div class="pill">Visibility: public duel page | ${MATCHUPS.length} listed</div>
-        <div class="pill">Series: ${escapeHtml(ACTIVE_ROOM.name || ACTIVE_ROOM.slug || 'Duels')}</div>
-        ${fallbackTag ? `<div class="pill">${escapeHtml(fallbackTag)}</div>` : ''}
-      `;
+      if (activeView !== 'fantasy') {
+        nav.innerHTML = `
+          <div class="pill">Active duel: ${escapeHtml(activeLabel)}</div>
+          <div class="pill">Status: ${escapeHtml(statusLabel)}</div>
+          <div class="pill">Visibility: public duel page | ${MATCHUPS.length} listed</div>
+          <div class="pill">Series: ${escapeHtml(ACTIVE_ROOM.name || ACTIVE_ROOM.slug || 'Duels')}</div>
+          ${fallbackTag ? `<div class="pill">${escapeHtml(fallbackTag)}</div>` : ''}
+        `;
+      }
 
       const liveCount = orderedDuels.filter((item) => item.isLive).length;
       const armedCount = orderedDuels.filter((item) => item.status === 'armed').length;
@@ -6623,12 +7029,574 @@ function titleBandScore(pick, live){
       `;
     }
 
+    function setMiniFantasyNotice(type, payload){
+      if (!payload) {
+        MINI_FANTASY_NOTICE = null;
+        return;
+      }
+      MINI_FANTASY_NOTICE = typeof payload === 'string'
+        ? { type, title: '', text: payload }
+        : { type, ...payload };
+    }
+
+    function emptyMiniFantasyDraft(){
+      return {
+        selectedPlayerIds: ['', '', '', ''],
+        captainPlayerId: ''
+      };
+    }
+
+    function buildMiniFantasyLaunchData(){
+      return getMiniFantasyOpenFixtures(LEAGUE_STAGE_SCHEDULE, currentNowDate(), {
+        launch_at_utc: MINI_FANTASY_LAUNCH_AT_UTC,
+        first_open_match_no: MINI_FANTASY_FIRST_OPEN_MATCH_NO
+      });
+    }
+
+    function availableMiniFantasyFixtures(){
+      return buildMiniFantasyLaunchData().fixtures || [];
+    }
+
+    function activeMiniFantasyFixture(){
+      const fixtures = availableMiniFantasyFixtures();
+      if (!fixtures.length) {
+        MINI_FANTASY_ACTIVE_MATCH_NO = null;
+        return null;
+      }
+      const active = fixtures.find((fixture) => Number(fixture.match_no) === Number(MINI_FANTASY_ACTIVE_MATCH_NO));
+      if (active) return active;
+      MINI_FANTASY_ACTIVE_MATCH_NO = Number(fixtures[0].match_no);
+      return fixtures[0];
+    }
+
+    function ensureMiniFantasyDraft(matchNo){
+      const target = Number(matchNo || 0) || null;
+      if (!target) return emptyMiniFantasyDraft();
+      if (!MINI_FANTASY_DRAFTS[target]) {
+        const savedEntry = findMiniFantasyEntryForMatch(target);
+        const fromSaved = savedEntry
+          ? {
+              selectedPlayerIds: [...(savedEntry.selectedPlayerIds || [])].slice(0, 4),
+              captainPlayerId: savedEntry.captainPlayerId || ''
+            }
+          : emptyMiniFantasyDraft();
+        while (fromSaved.selectedPlayerIds.length < 4) fromSaved.selectedPlayerIds.push('');
+        MINI_FANTASY_DRAFTS[target] = fromSaved;
+      }
+      return MINI_FANTASY_DRAFTS[target];
+    }
+
+    function currentMiniFantasyPlayerPool(fixture = activeMiniFantasyFixture()){
+      if (!fixture) return [];
+      const basePool = buildFixturePlayerPool({
+        fixture,
+        priceBook: MINI_FANTASY_PRICE_BOOK || { players: [] },
+        squads: IPL_SQUADS,
+        teamRoles: IPL_TEAM_ROLES
+      });
+      const savedEntry = findMiniFantasyEntryForMatch(fixture.match_no);
+      return savedEntry?.priceSnapshot && Object.keys(savedEntry.priceSnapshot).length
+        ? applyPriceSnapshotToPool(basePool, savedEntry.priceSnapshot)
+        : basePool;
+    }
+
+    function miniFantasyPoolMap(fixture = activeMiniFantasyFixture()){
+      return new Map(currentMiniFantasyPlayerPool(fixture).map((player) => [player.player_id, player]));
+    }
+
+    function setMiniFantasyDraftSlot(matchNo, slotIndex, playerId){
+      const draft = ensureMiniFantasyDraft(matchNo);
+      const nextIds = [...draft.selectedPlayerIds];
+      nextIds.forEach((value, index) => {
+        if (index !== slotIndex && value === playerId) nextIds[index] = '';
+      });
+      nextIds[slotIndex] = playerId || '';
+      draft.selectedPlayerIds = nextIds;
+      if (draft.captainPlayerId && !nextIds.includes(draft.captainPlayerId)) {
+        draft.captainPlayerId = '';
+      }
+      MINI_FANTASY_DRAFTS[matchNo] = draft;
+    }
+
+    function clearMiniFantasyDraftSlot(matchNo, slotIndex){
+      const draft = ensureMiniFantasyDraft(matchNo);
+      const nextIds = [...draft.selectedPlayerIds];
+      const removed = nextIds[slotIndex] || '';
+      nextIds[slotIndex] = '';
+      draft.selectedPlayerIds = nextIds;
+      if (draft.captainPlayerId === removed) draft.captainPlayerId = '';
+      MINI_FANTASY_DRAFTS[matchNo] = draft;
+    }
+
+    function openMiniFantasyPicker(matchNo, slotIndex){
+      const fixture = availableMiniFantasyFixtures().find((item) => Number(item.match_no) === Number(matchNo));
+      if (!fixture || isFixtureLocked(fixture, currentNowDate()) || !CURRENT_USER) return;
+      MINI_FANTASY_PICKER_STATE = {
+        open: true,
+        matchNo: Number(matchNo),
+        slotIndex: Number(slotIndex),
+        teamFilter: 'ALL',
+        search: ''
+      };
+      renderMiniFantasyPicker();
+    }
+
+    function closeMiniFantasyPicker(){
+      MINI_FANTASY_PICKER_STATE = {
+        open: false,
+        matchNo: null,
+        slotIndex: null,
+        teamFilter: 'ALL',
+        search: ''
+      };
+      renderMiniFantasyPicker();
+    }
+
+    function filteredMiniFantasyPickerPool(){
+      const fixture = availableMiniFantasyFixtures().find((item) => Number(item.match_no) === Number(MINI_FANTASY_PICKER_STATE.matchNo));
+      if (!fixture) return [];
+      const draft = ensureMiniFantasyDraft(fixture.match_no);
+      const otherSelected = new Set(
+        draft.selectedPlayerIds.filter((playerId, index) => index !== MINI_FANTASY_PICKER_STATE.slotIndex && playerId)
+      );
+      return currentMiniFantasyPlayerPool(fixture)
+        .filter((player) => !otherSelected.has(player.player_id))
+        .filter((player) => MINI_FANTASY_PICKER_STATE.teamFilter === 'ALL' || player.team === MINI_FANTASY_PICKER_STATE.teamFilter)
+        .filter((player) => {
+          const needle = normalizeName(MINI_FANTASY_PICKER_STATE.search || '');
+          if (!needle) return true;
+          return normalizeName(player.name).includes(needle);
+        });
+    }
+
+    function applyMiniFantasyPickerSelection(playerId){
+      const matchNo = Number(MINI_FANTASY_PICKER_STATE.matchNo || 0);
+      const slotIndex = Number(MINI_FANTASY_PICKER_STATE.slotIndex || 0);
+      if (!matchNo && matchNo !== 0) return;
+      if (!Number.isFinite(slotIndex)) return;
+      setMiniFantasyDraftSlot(matchNo, slotIndex, playerId || '');
+      closeMiniFantasyPicker();
+      render();
+    }
+
+    function miniFantasyStatusChip(entry, fixture){
+      if (entry && isFixtureLocked(fixture, currentNowDate())) {
+        return '<span class="status-chip status-tie">Locked</span>';
+      }
+      if (entry) {
+        return '<span class="status-chip status-good">Saved</span>';
+      }
+      return '<span class="status-chip status-wait">Open</span>';
+    }
+
+    function renderMiniFantasyFixtures(){
+      const slot = document.getElementById('miniFantasyFixtures');
+      const meta = document.getElementById('miniFantasyMeta');
+      const headline = document.getElementById('miniFantasyHeadline');
+      const summary = document.getElementById('miniFantasySummary');
+      if (!slot || !meta || !headline || !summary) return;
+
+      const launchData = buildMiniFantasyLaunchData();
+      const fixtures = launchData.fixtures || [];
+      const nextLaunchFixture = launchData.launch.next_launch_fixture;
+      meta.innerHTML = '';
+
+      if (!launchData.launch.is_live) {
+        headline.textContent = 'Mini Fantasy opens from Match 14';
+        summary.textContent = nextLaunchFixture
+          ? `Mini Fantasy launches on 8 April 2026 and starts from Match ${nextLaunchFixture.match_no}. We can already price the pool from earlier season form, but entries stay closed until the launch gate opens.`
+          : 'Mini Fantasy will open after the launch gate clears.';
+        meta.innerHTML = `
+          <span class="pill">Launch: ${escapeHtml(formatDate(MINI_FANTASY_LAUNCH_AT_UTC))}</span>
+          <span class="pill">First entry match: #${escapeHtml(String(MINI_FANTASY_FIRST_OPEN_MATCH_NO))}</span>
+        `;
+        slot.innerHTML = `
+          <div class="fantasy-empty">
+            Mini Fantasy is not live yet. The first eligible fixture is ${nextLaunchFixture ? `Match ${nextLaunchFixture.match_no} - ${escapeHtml(formatFixtureLabel(nextLaunchFixture.fixture || `${nextLaunchFixture.away_team} vs ${nextLaunchFixture.home_team}`))}` : 'still being prepared'}.
+          </div>
+        `;
+        return;
+      }
+
+      headline.textContent = 'Mini Fantasy is live for today and tomorrow';
+      summary.textContent = `Set one 4-player lineup per match, keep it under ${MINI_FANTASY_BUDGET} credits, and captain one player for a ${MINI_FANTASY_CAPTAIN_MULTIPLIER}x boost. Prices are frozen inside your saved entry for that fixture.`;
+      meta.innerHTML = `
+        <span class="pill">Eligible fixtures: ${fixtures.length}</span>
+        <span class="pill">Window: today + tomorrow</span>
+        <span class="pill">Lock: 1 minute before start</span>
+      `;
+
+      if (!fixtures.length) {
+        slot.innerHTML = '<div class="fantasy-empty">No eligible Mini Fantasy fixtures are open in the current today-and-tomorrow window.</div>';
+        return;
+      }
+
+      const activeFixture = activeMiniFantasyFixture();
+      slot.innerHTML = fixtures.map((fixture) => {
+        const savedEntry = findMiniFantasyEntryForMatch(fixture.match_no);
+        const fixtureLabel = formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`);
+        const whenLabel = fixture.is_today ? 'Today' : 'Tomorrow';
+        return `
+          <button type="button" class="fantasy-fixture-card ${Number(activeFixture?.match_no) === Number(fixture.match_no) ? 'active' : ''}" data-mini-fixture="${fixture.match_no}">
+            <div class="fantasy-fixture-top">
+              <div>
+                <div class="fantasy-fixture-match">Match ${escapeHtml(String(fixture.match_no))} - ${escapeHtml(whenLabel)}</div>
+                <div class="fantasy-fixture-teams">${escapeHtml(teamShort(fixture.home_team))} vs ${escapeHtml(teamShort(fixture.away_team))}</div>
+              </div>
+              ${miniFantasyStatusChip(savedEntry, fixture)}
+            </div>
+            <div class="fantasy-fixture-note">${escapeHtml(fixtureLabel)}</div>
+            <div class="fantasy-fixture-status">
+              <span class="pill">Starts: ${escapeHtml(formatDate(fixture.datetime_utc))}</span>
+              <span class="pill">Locks: ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
+            </div>
+          </button>
+        `;
+      }).join('');
+      slot.querySelectorAll('[data-mini-fixture]').forEach((button) => {
+        button.onclick = () => {
+          MINI_FANTASY_ACTIVE_MATCH_NO = Number(button.dataset.miniFixture || 0) || null;
+          setMiniFantasyNotice(null);
+          render();
+        };
+      });
+    }
+
+    function renderMiniFantasyMyEntries(){
+      const panel = document.getElementById('miniFantasyMyEntries');
+      if (!panel) return;
+      if (!CURRENT_USER) {
+        panel.innerHTML = '<div class="fantasy-empty">Sign in to save Mini Fantasy entries match by match.</div>';
+        return;
+      }
+      const entries = currentMiniFantasyEntries()
+        .slice()
+        .sort((a, b) => Number(a.matchNo || 0) - Number(b.matchNo || 0));
+      if (!entries.length) {
+        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy entries saved yet. Pick a fixture, build your 4-player team, and lock one captain.</div>';
+        return;
+      }
+      panel.innerHTML = `
+        <div class="fantasy-saved-list">
+          ${entries.map((entry) => `
+            <div class="fantasy-saved-item">
+              <div>
+                <strong>Match ${escapeHtml(String(entry.matchNo || '?'))} - ${escapeHtml(entry.fixtureLabel || 'Fixture pending')}</strong>
+                <div class="small">Saved ${escapeHtml(formatTimestamp(entry.savedAt || entry.updatedAt))} - spent ${escapeHtml(String(entry.spentCredits || 0))} / ${MINI_FANTASY_BUDGET}</div>
+              </div>
+              <div class="studio-inline">
+                <span class="pill">${escapeHtml(entry.captainPlayerId ? 'Captain locked' : 'Captain pending')}</span>
+                <button class="pill-button" type="button" data-open-mini-entry="${entry.matchNo}">Open</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      panel.querySelectorAll('[data-open-mini-entry]').forEach((button) => {
+        button.onclick = () => {
+          activeView = 'fantasy';
+          MINI_FANTASY_ACTIVE_MATCH_NO = Number(button.dataset.openMiniEntry || 0) || null;
+          render();
+        };
+      });
+    }
+
+    async function saveMiniFantasyEntry(){
+      const fixture = activeMiniFantasyFixture();
+      if (!fixture) {
+        setMiniFantasyNotice('bad', 'No eligible fixture is selected right now.');
+        render();
+        return;
+      }
+      if (!CURRENT_USER) {
+        setMiniFantasyNotice('bad', 'Sign in before saving a Mini Fantasy team.');
+        render();
+        return;
+      }
+      if (isFixtureLocked(fixture, currentNowDate())) {
+        setMiniFantasyNotice('bad', 'This fixture is locked, so the entry can no longer change.');
+        render();
+        return;
+      }
+
+      const draft = ensureMiniFantasyDraft(fixture.match_no);
+      const playerPool = currentMiniFantasyPlayerPool(fixture);
+      const selectedPlayerIds = draft.selectedPlayerIds.filter(Boolean);
+      const validation = validateMiniFantasyEntry({
+        fixture,
+        selectedPlayerIds,
+        captainPlayerId: draft.captainPlayerId,
+        playerPool
+      });
+      if (!validation.valid) {
+        setMiniFantasyNotice('bad', {
+          title: 'Mini Fantasy lineup not ready',
+          text: validation.errors.join(' ')
+        });
+        render();
+        return;
+      }
+
+      const existing = findMiniFantasyEntryForMatch(fixture.match_no);
+      const priceSnapshot = existing?.priceSnapshot && Object.keys(existing.priceSnapshot).length
+        ? existing.priceSnapshot
+        : buildEntryPriceSnapshot(playerPool);
+      const payload = {
+        ownerHandle: CURRENT_USER.ownerId,
+        userId: CURRENT_USER.userId || null,
+        season: MINI_FANTASY_SEASON,
+        matchNo: Number(fixture.match_no),
+        homeTeamCode: fixture.home_team_code,
+        awayTeamCode: fixture.away_team_code,
+        fixtureLabel: formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`),
+        fixtureDatetimeUtc: fixture.datetime_utc,
+        selectedPlayerIds,
+        captainPlayerId: draft.captainPlayerId,
+        priceSnapshot,
+        spentCredits: validation.total_cost,
+        savedAt: new Date().toISOString()
+      };
+
+      try {
+        const saved = usesHostedDuelsBackend()
+          ? upsertRemoteMiniFantasyEntry(await DUELS_BACKEND.upsertMiniFantasyEntry({
+              currentUser: CURRENT_USER,
+              entry: payload
+            }))
+          : upsertStoredMiniFantasyEntry(payload);
+        if (saved) {
+          MINI_FANTASY_DRAFTS[fixture.match_no] = {
+            selectedPlayerIds: [...selectedPlayerIds, '', '', '', ''].slice(0, 4),
+            captainPlayerId: draft.captainPlayerId
+          };
+        }
+        setMiniFantasyNotice('good', {
+          title: `Match ${fixture.match_no} team saved`,
+          text: `Your ${payload.homeTeamCode} vs ${payload.awayTeamCode} Mini Fantasy team is saved with ${validation.total_cost} credits spent.`
+        });
+      } catch (error) {
+        setMiniFantasyNotice('bad', {
+          title: 'Mini Fantasy save failed',
+          text: error.message || 'Could not save the Mini Fantasy entry right now.'
+        });
+      }
+      render();
+    }
+
+    function renderMiniFantasyBuilder(){
+      const panel = document.getElementById('miniFantasyBuilder');
+      if (!panel) return;
+      const launchData = buildMiniFantasyLaunchData();
+      if (!launchData.launch.is_live) {
+        panel.innerHTML = '<div class="fantasy-empty">Mini Fantasy is still behind the launch gate. Pricing is ready, but entries open from Match 14 on 8 April 2026.</div>';
+        return;
+      }
+
+      const fixture = activeMiniFantasyFixture();
+      if (!fixture) {
+        panel.innerHTML = '<div class="fantasy-empty">No eligible today-or-tomorrow fixture is open right now.</div>';
+        return;
+      }
+
+      if (!CURRENT_USER) {
+        panel.innerHTML = '<div class="fantasy-empty">Sign in to build and save one Mini Fantasy entry per match.</div>';
+        return;
+      }
+
+      const entry = findMiniFantasyEntryForMatch(fixture.match_no);
+      const draft = ensureMiniFantasyDraft(fixture.match_no);
+      const playerPool = currentMiniFantasyPlayerPool(fixture);
+      const poolById = new Map(playerPool.map((player) => [player.player_id, player]));
+      const selectedPlayerIds = draft.selectedPlayerIds.filter(Boolean);
+      const selectedPlayers = draft.selectedPlayerIds.map((playerId) => poolById.get(playerId) || null);
+      const validation = validateMiniFantasyEntry({
+        fixture,
+        selectedPlayerIds,
+        captainPlayerId: draft.captainPlayerId,
+        playerPool
+      });
+      const locked = isFixtureLocked(fixture, currentNowDate());
+      const spentCredits = validation.total_cost;
+      const budgetRemaining = validation.budget_remaining;
+      const notice = MINI_FANTASY_NOTICE;
+
+      panel.innerHTML = `
+        <div class="fantasy-builder-top">
+          <div>
+            <div class="fantasy-fixture-match">Match ${escapeHtml(String(fixture.match_no))}</div>
+            <div class="fantasy-fixture-teams">${escapeHtml(teamShort(fixture.home_team))} vs ${escapeHtml(teamShort(fixture.away_team))}</div>
+            <div class="small">${escapeHtml(formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`))}</div>
+          </div>
+          <div class="fantasy-summary-grid">
+            <span class="pill">Spent: ${escapeHtml(String(spentCredits))} / ${MINI_FANTASY_BUDGET}</span>
+            <span class="pill">Left: ${escapeHtml(String(budgetRemaining))}</span>
+            <span class="pill">Captain: ${draft.captainPlayerId ? 'Set' : 'Pick 1'}</span>
+            ${entry ? '<span class="pill">Saved entry</span>' : '<span class="pill">Draft only</span>'}
+          </div>
+        </div>
+        <div class="fantasy-slot-grid">
+          ${selectedPlayers.map((player, slotIndex) => `
+            <div class="fantasy-slot-card" data-mini-slot="${slotIndex}">
+              <div class="fantasy-slot-kicker">Slot ${slotIndex + 1}</div>
+              ${player ? `
+                <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
+                <div class="fantasy-slot-meta">
+                  <span class="pill">${escapeHtml(player.team)}</span>
+                  <span class="pill">${escapeHtml(player.role.replace('_', ' '))}</span>
+                  <span class="pill">${escapeHtml(String(player.final_price))} cr</span>
+                </div>
+              ` : `
+                <div class="fantasy-slot-empty">Choose a player from ${escapeHtml(teamShort(fixture.home_team))} or ${escapeHtml(teamShort(fixture.away_team))}. Every team needs 4 players total.</div>
+              `}
+              <div class="fantasy-slot-actions">
+                <button class="studio-button ${player ? 'ghost' : ''}" type="button" data-mini-pick="${slotIndex}" ${locked ? 'disabled' : ''}>${player ? 'Change player' : 'Choose player'}</button>
+                <button class="studio-button ghost" type="button" data-mini-clear="${slotIndex}" ${player && !locked ? '' : 'disabled'}>Clear</button>
+                <button class="studio-button secondary" type="button" data-mini-captain="${slotIndex}" ${player && !locked ? '' : 'disabled'}>${draft.captainPlayerId === player?.player_id ? 'Captain locked' : 'Make captain'}</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        ${notice ? `<div class="studio-alert ${escapeHtml(notice.type || 'info')}">
+          ${notice.title ? `<div class="studio-alert-title">${escapeHtml(notice.title)}</div>` : ''}
+          <div class="studio-alert-detail">${escapeHtml(notice.text || '')}</div>
+        </div>` : ''}
+        <div class="fantasy-highlight">
+          ${locked
+            ? 'This fixture is locked. Your saved lineup is now read-only and will score once the match begins.'
+            : validation.valid
+              ? `Lineup ready. You have ${budgetRemaining} credits left and the captain boost is set for ${draft.captainPlayerId ? escapeHtml((poolById.get(draft.captainPlayerId) || {}).name || 'your captain') : 'nobody yet'}.`
+              : validation.errors.length
+                ? escapeHtml(validation.errors.join(' '))
+                : 'Build your lineup, keep one player from each team, and remember the captain 1.5x boost.'}
+        </div>
+        <div class="studio-actions">
+          <button class="studio-button" type="button" id="saveMiniFantasyButton" ${locked ? 'disabled' : ''}>${entry ? 'Update team' : 'Save team'}</button>
+        </div>
+      `;
+
+      panel.querySelectorAll('[data-mini-pick]').forEach((button) => {
+        button.onclick = () => openMiniFantasyPicker(fixture.match_no, Number(button.dataset.miniPick || 0));
+      });
+      panel.querySelectorAll('[data-mini-clear]').forEach((button) => {
+        button.onclick = () => {
+          clearMiniFantasyDraftSlot(fixture.match_no, Number(button.dataset.miniClear || 0));
+          setMiniFantasyNotice(null);
+          render();
+        };
+      });
+      panel.querySelectorAll('[data-mini-captain]').forEach((button) => {
+        button.onclick = () => {
+          const slotIndex = Number(button.dataset.miniCaptain || 0);
+          const playerId = draft.selectedPlayerIds[slotIndex] || '';
+          if (!playerId) return;
+          draft.captainPlayerId = playerId;
+          MINI_FANTASY_DRAFTS[fixture.match_no] = draft;
+          setMiniFantasyNotice(null);
+          render();
+        };
+      });
+      const saveButton = document.getElementById('saveMiniFantasyButton');
+      if (saveButton) saveButton.onclick = () => saveMiniFantasyEntry();
+    }
+
+    function renderMiniFantasyPicker(){
+      const modal = document.getElementById('miniFantasyPickerModal');
+      const toolbar = document.getElementById('miniFantasyPickerToolbar');
+      const body = document.getElementById('miniFantasyPickerBody');
+      const count = document.getElementById('miniFantasyPickerCount');
+      const title = document.getElementById('miniFantasyPickerTitle');
+      const subtitle = document.getElementById('miniFantasyPickerSubtitle');
+      const closeButton = document.getElementById('miniFantasyPickerClose');
+      const clearButton = document.getElementById('miniFantasyPickerClear');
+      const doneButton = document.getElementById('miniFantasyPickerDone');
+      if (!modal || !toolbar || !body || !count || !title || !subtitle || !closeButton || !clearButton || !doneButton) return;
+
+      if (!MINI_FANTASY_PICKER_STATE.open) {
+        modal.classList.add('section-hidden');
+        modal.setAttribute('aria-hidden', 'true');
+        toolbar.innerHTML = '';
+        body.innerHTML = '';
+        count.textContent = '0 options';
+        return;
+      }
+
+      const fixture = availableMiniFantasyFixtures().find((item) => Number(item.match_no) === Number(MINI_FANTASY_PICKER_STATE.matchNo));
+      if (!fixture) {
+        closeMiniFantasyPicker();
+        return;
+      }
+
+      const filtered = filteredMiniFantasyPickerPool();
+      modal.classList.remove('section-hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      title.textContent = `Choose player for Match ${fixture.match_no}`;
+      subtitle.textContent = `Search the ${teamShort(fixture.home_team)} and ${teamShort(fixture.away_team)} pool, then lock one player into the slot.`;
+      toolbar.innerHTML = `
+        <input class="picker-search" id="miniFantasyPickerSearch" placeholder="Search player name" value="${escapeHtml(MINI_FANTASY_PICKER_STATE.search)}" autocomplete="off" />
+        <div class="picker-chip-row">
+          <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.teamFilter === 'ALL' ? 'active' : ''}" data-mini-picker-team="ALL">All teams</button>
+          <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.teamFilter === fixture.home_team_code ? 'active' : ''}" data-mini-picker-team="${fixture.home_team_code}">${fixture.home_team_code}</button>
+          <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.teamFilter === fixture.away_team_code ? 'active' : ''}" data-mini-picker-team="${fixture.away_team_code}">${fixture.away_team_code}</button>
+        </div>
+      `;
+      body.innerHTML = filtered.length
+        ? `<div class="fantasy-picker-list">
+            ${filtered.map((player) => `
+              <button type="button" class="fantasy-picker-card" data-mini-picker-value="${escapeHtml(player.player_id)}">
+                <div class="fantasy-picker-row">
+                  <div>
+                    <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
+                    <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml(player.role.replace('_', ' '))}${player.matches_played ? ` - ${escapeHtml(String(player.matches_played))} matches` : ''}</div>
+                  </div>
+                  <div class="fantasy-picker-price">${escapeHtml(String(player.final_price))}</div>
+                </div>
+              </button>
+            `).join('')}
+          </div>`
+        : '<div class="fantasy-empty">No player matches the current search and team filter.</div>';
+      count.textContent = `${filtered.length} option${filtered.length === 1 ? '' : 's'}`;
+
+      const searchInput = document.getElementById('miniFantasyPickerSearch');
+      if (searchInput) {
+        searchInput.oninput = (event) => {
+          MINI_FANTASY_PICKER_STATE.search = event.target.value || '';
+          renderMiniFantasyPicker();
+        };
+      }
+      toolbar.querySelectorAll('[data-mini-picker-team]').forEach((button) => {
+        button.onclick = () => {
+          MINI_FANTASY_PICKER_STATE.teamFilter = button.dataset.miniPickerTeam || 'ALL';
+          renderMiniFantasyPicker();
+        };
+      });
+      body.querySelectorAll('[data-mini-picker-value]').forEach((button) => {
+        button.onclick = () => applyMiniFantasyPickerSelection(button.dataset.miniPickerValue || '');
+      });
+      closeButton.onclick = () => closeMiniFantasyPicker();
+      clearButton.onclick = () => {
+        clearMiniFantasyDraftSlot(Number(MINI_FANTASY_PICKER_STATE.matchNo || 0), Number(MINI_FANTASY_PICKER_STATE.slotIndex || 0));
+        closeMiniFantasyPicker();
+        render();
+      };
+      doneButton.onclick = () => closeMiniFantasyPicker();
+    }
+
+    function renderMiniFantasySection(){
+      renderMiniFantasyFixtures();
+      renderMiniFantasyBuilder();
+      renderMiniFantasyMyEntries();
+      renderMiniFantasyPicker();
+    }
+
     function render(){
       renderTabs();
+      renderActiveHeroHeader();
       renderPublicDuelLayer();
       renderDuelStudio();
       renderPickPicker();
+      renderMiniFantasySection();
       document.getElementById('warRoomSection').classList.toggle('section-hidden', activeView !== 'warroom');
+      document.getElementById('miniFantasySection').classList.toggle('section-hidden', activeView !== 'fantasy');
       document.getElementById('statsSection').classList.toggle('section-hidden', activeView !== 'stats');
       document.getElementById('scheduleSection').classList.toggle('section-hidden', activeView !== 'schedule');
       renderStatsTab();
@@ -6744,6 +7712,8 @@ function titleBandScore(pick, live){
     async function initializeDuelsApp(){
       CUSTOM_DUEL_STORE = loadStoredCustomDuels();
       REMOTE_DUEL_STORE = emptyCustomDuelStore();
+      setRemoteMiniFantasyEntries([]);
+      resetMiniFantasyDrafts();
       if (usesHostedDuelsBackend()) {
         try {
           CURRENT_USER = normalizeUserProfile(await DUELS_BACKEND.bootstrap()) || null;
@@ -6755,11 +7725,15 @@ function titleBandScore(pick, live){
       } else {
         CURRENT_USER = loadStoredUserProfile();
       }
+      await syncMiniFantasyEntries();
       renderDuelStudio();
-      loadWarRoomData().finally(() => render());
-      loadScheduleData().finally(() => render());
-      loadSquadsData().finally(() => render());
-      loadLiveData();
+      await loadWarRoomData().catch(() => {});
+      await loadScheduleData().catch(() => {});
+      await loadSquadsData().catch(() => {});
+      await loadTeamRolesData().catch(() => {});
+      await loadLiveData();
+      await loadMiniFantasyPriceBook();
+      render();
     }
 
     initializeDuelsApp();

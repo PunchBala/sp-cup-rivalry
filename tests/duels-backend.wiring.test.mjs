@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-test('backend config, adapter, and setup docs are present for real auth + duel records', async () => {
+test('backend config, adapter, and setup docs are present for real auth + duel and mini fantasy records', async () => {
   const root = process.cwd();
   const [configJs, backendJs, setupDoc, schemaSql] = await Promise.all([
     fs.readFile(path.resolve(root, 'duels-backend.config.js'), 'utf8'),
@@ -23,6 +23,8 @@ test('backend config, adapter, and setup docs are present for real auth + duel r
   assert.match(backendJs, /createPublicDuel/);
   assert.match(backendJs, /claimOpenEntry/);
   assert.match(backendJs, /saveOwnedEntry/);
+  assert.match(backendJs, /listMiniFantasyEntries/);
+  assert.match(backendJs, /upsertMiniFantasyEntry/);
 
   assert.match(setupDoc, /Supabase/i);
   assert.match(setupDoc, /duels-backend\.config\.js/);
@@ -31,5 +33,6 @@ test('backend config, adapter, and setup docs are present for real auth + duel r
   assert.match(schemaSql, /create table if not exists public\.profiles/i);
   assert.match(schemaSql, /create table if not exists public\.duels/i);
   assert.match(schemaSql, /create table if not exists public\.duel_entries/i);
+  assert.match(schemaSql, /create table if not exists public\.mini_fantasy_entries/i);
   assert.match(schemaSql, /enable row level security/i);
 });

@@ -4,6 +4,10 @@ The live duel board does not call CricketData directly from the browser. It read
 
 - [data/live.json](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/data/live.json)
 
+Mini Fantasy also reads a committed daily price book:
+
+- [data/mini_fantasy_prices.json](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/data/mini_fantasy_prices.json)
+
 That snapshot is refreshed by:
 
 - [scripts/update-live-data.mjs](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/scripts/update-live-data.mjs)
@@ -14,6 +18,7 @@ That snapshot is refreshed by:
 - runs on GitHub-hosted Actions, not a laptop-bound self-hosted runner
 - supports scheduled refresh windows and manual forced refresh
 - writes `data/live.json`
+- writes `data/mini_fantasy_prices.json`
 - writes cached completed scorecards under `data/scorecards/`
 
 ## APIs used
@@ -76,6 +81,7 @@ When debugging, check:
 - `meta.providerStatus`
 - `scrapeReport.costControl`
 - `meta.scoreHistory`
+- `data/mini_fantasy_prices.json`
 - cached files in `data/scorecards/`
 
 These fields tell you:

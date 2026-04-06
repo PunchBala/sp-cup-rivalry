@@ -28,6 +28,7 @@ jobs:
             tests/live-data.contract.test.mjs \
             tests/warroom-room-model.test.mjs \
             tests/mini-fantasy-pricing-engine.test.mjs \
+            tests/mini-fantasy-contest-engine.test.mjs \
             tests/update-live-data.quota.test.mjs \
             tests/update-live-data.schedule.test.mjs \
             tests/update-live-data.scorecard-cache.test.mjs \
@@ -59,7 +60,7 @@ jobs:
       - name: Run smoke test against local site
         shell: bash
         run: |
-          python3 -m http.server 4173 >/tmp/warroom-http.log 2>&1 &
+          node scripts/serve-static.mjs >/tmp/warroom-http.log 2>&1 &
           SERVER_PID=$!
           trap "kill $SERVER_PID" EXIT
           npx playwright test tests/page.smoke.spec.mjs --reporter=line

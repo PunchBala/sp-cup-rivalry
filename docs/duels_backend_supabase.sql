@@ -42,6 +42,26 @@ create table if not exists public.duel_entries (
   unique (duel_id, slot_index)
 );
 
+create table if not exists public.mini_fantasy_entries (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  owner_handle text not null,
+  season text not null,
+  match_no integer not null,
+  home_team_code text not null,
+  away_team_code text not null,
+  fixture_label text not null,
+  fixture_datetime_utc timestamptz not null,
+  selected_player_ids jsonb not null default '[]'::jsonb,
+  captain_player_id text,
+  price_snapshot jsonb not null default '{}'::jsonb,
+  spent_credits integer not null default 0,
+  saved_at timestamptz not null default timezone('utc', now()),
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  unique (user_id, season, match_no)
+);
+
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -67,9 +87,15 @@ create trigger duel_entries_set_updated_at
 before update on public.duel_entries
 for each row execute procedure public.set_updated_at();
 
+drop trigger if exists mini_fantasy_entries_set_updated_at on public.mini_fantasy_entries;
+create trigger mini_fantasy_entries_set_updated_at
+before update on public.mini_fantasy_entries
+for each row execute procedure public.set_updated_at();
+
 alter table public.profiles enable row level security;
 alter table public.duels enable row level security;
 alter table public.duel_entries enable row level security;
+alter table public.mini_fantasy_entries enable row level security;
 
 drop policy if exists "profiles are public readable" on public.profiles;
 create policy "profiles are public readable"
@@ -158,4 +184,34 @@ with check (
         and lower(profiles.handle) = lower(duel_entries.reserved_handle)
     )
   )
+);
+
+drop policy if exists "users read their own mini fantasy entries" on public.mini_fantasy_entries;
+create policy "users read their own mini fantasy entries"
+on public.mini_fantasy_entries
+for select
+using (auth.uid() = user_id);
+
+drop policy if exists "users insert their own mini fantasy entries before lock" on public.mini_fantasy_entries;
+create policy "users insert their own mini fantasy entries before lock"
+on public.mini_fantasy_entries
+for insert
+with check (
+  auth.uid() = user_id
+  and match_no >= 14
+  and timezone('utc', now()) < fixture_datetime_utc - interval '1 minute'
+);
+
+drop policy if exists "users update their own mini fantasy entries before lock" on public.mini_fantasy_entries;
+create policy "users update their own mini fantasy entries before lock"
+on public.mini_fantasy_entries
+for update
+using (
+  auth.uid() = user_id
+  and timezone('utc', now()) < fixture_datetime_utc - interval '1 minute'
+)
+with check (
+  auth.uid() = user_id
+  and match_no >= 14
+  and timezone('utc', now()) < fixture_datetime_utc - interval '1 minute'
 );

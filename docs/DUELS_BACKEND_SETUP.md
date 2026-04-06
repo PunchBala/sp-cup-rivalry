@@ -1,6 +1,6 @@
 # Duels backend setup
 
-The site is still a static page, but it can switch from local beta storage to a real hosted backend for auth and public duel records.
+The site is still a static page, but it can switch from local beta storage to a real hosted backend for auth, public duel records, and Mini Fantasy match entries.
 
 ## Recommended provider
 
@@ -9,7 +9,7 @@ Use Supabase for the current backend pass:
 - real email/password auth
 - browser-safe anon key for the static client
 - public-readable duel records
-- Row Level Security for create, join, and submit flows
+- Row Level Security for create, join, submit, and Mini Fantasy save flows
 
 ## Files involved
 
@@ -49,6 +49,8 @@ Once configured:
 - the challenger signs in and claims the open slot
 - `Submit picks` updates the caller's owned entry
 - public duel browsing reads directly from backend records
+- `Mini Fantasy` saves one hosted entry per user per match
+- saved Mini Fantasy entries carry a fixture-specific price snapshot
 
 ## Current scope
 
@@ -57,8 +59,10 @@ The backend owns:
 - users and profiles
 - public duel rows
 - duel entries
+- Mini Fantasy match entries
 - entry ownership
 - persisted submitted picks
+- persisted saved Mini Fantasy lineups plus captain choice
 
 The front end still derives:
 
@@ -94,5 +98,9 @@ If hosted config is disabled or blank:
 Hosted auth and backend persistence do not replace the live-data worker. The live duel board still reads season data from:
 
 - [data/live.json](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/data/live.json)
+
+Mini Fantasy also reads a generated price book from:
+
+- [data/mini_fantasy_prices.json](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/data/mini_fantasy_prices.json)
 
 That worker is documented separately in [docs/LIVE_DATA_WORKER.md](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/docs/LIVE_DATA_WORKER.md).

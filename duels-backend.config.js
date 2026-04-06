@@ -8,6 +8,7 @@ window.DUELS_BACKEND_CONFIG = Object.assign({
   tables: {
     profiles: 'profiles',
     duels: 'duels',
-    duelEntries: 'duel_entries'
+    duelEntries: 'duel_entries',
+    miniFantasyEntries: 'mini_fantasy_entries'
   }
 }, window.DUELS_BACKEND_CONFIG || {});

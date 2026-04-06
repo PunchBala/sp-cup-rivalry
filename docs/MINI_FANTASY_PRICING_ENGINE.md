@@ -25,7 +25,9 @@ The pricing engine can still use earlier completed-match point histories to seed
 
 - [mini-fantasy/pricing-engine.ts](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/mini-fantasy/pricing-engine.ts)
 - [mini-fantasy/pricing-engine.js](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/mini-fantasy/pricing-engine.js)
+- [mini-fantasy/contest-engine.js](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/mini-fantasy/contest-engine.js)
 - [scripts/generate-mini-fantasy-prices.mjs](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/scripts/generate-mini-fantasy-prices.mjs)
+- [scripts/update-mini-fantasy-prices.mjs](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/scripts/update-mini-fantasy-prices.mjs)
 - [tests/mini-fantasy-pricing-engine.test.mjs](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/tests/mini-fantasy-pricing-engine.test.mjs)
 
 The TypeScript file is the typed source of truth. The JavaScript file is a checked-in runtime mirror so the current repo can execute and test the engine without introducing a TypeScript build step first.
@@ -106,6 +108,12 @@ Or pipe JSON into stdin:
 cat pricing-job.json | node scripts/generate-mini-fantasy-prices.mjs
 ```
 
+From shared live season data:
+
+```bash
+node scripts/update-mini-fantasy-prices.mjs
+```
+
 ## What this engine does not own
 
 - contest entry windows
@@ -116,3 +124,5 @@ cat pricing-job.json | node scripts/generate-mini-fantasy-prices.mjs
 - UI or database writes
 
 Those belong to the Mini Fantasy contest layer that sits above pricing.
+
+That contest layer is documented in [docs/MINI_FANTASY_GAME.md](/C:/Users/Senthil%20Murugan/OneDrive%20-%20Raptor%20Aerospace%20Ltd/Documents/sp%20cup%20rivalry/docs/MINI_FANTASY_GAME.md).

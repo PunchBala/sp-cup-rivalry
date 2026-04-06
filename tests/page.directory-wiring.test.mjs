@@ -13,6 +13,11 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /id="createDrawer"/);
   assert.match(html, /id="manageDrawer"/);
   assert.match(html, /id="browseDrawer"/);
+  assert.match(html, /id="miniFantasySection"/);
+  assert.match(html, /id="miniFantasyFixtures"/);
+  assert.match(html, /id="miniFantasyBuilder"/);
+  assert.match(html, /id="miniFantasyMyEntries"/);
+  assert.match(html, /id="miniFantasyPickerModal"/);
   assert.match(html, /id="authPanel"/);
   assert.match(html, /id="profilePanel"/);
   assert.match(html, /id="createDuelPanel"/);
@@ -24,6 +29,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /id="pickPickerModal"/);
   assert.match(html, /duels-backend\.config\.js/);
   assert.match(html, /duels-backend\.js/);
+  assert.match(html, /mini-fantasy\/contest-engine\.js/);
   assert.match(html, /function sortedDirectoryDuels\(/);
   assert.match(html, /function buildDuelShareUrl\(/);
   assert.match(html, /function joinDuelByCode\(/);
@@ -43,9 +49,17 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function deriveCustomBundleLifecycle\(/);
   assert.match(html, /function withFreshLifecycle\(/);
   assert.match(html, /function syncRemoteBundlesForRoom\(/);
+  assert.match(html, /function syncMiniFantasyEntries\(/);
+  assert.match(html, /function renderMiniFantasySection\(/);
+  assert.match(html, /function renderMiniFantasyFixtures\(/);
+  assert.match(html, /function renderMiniFantasyBuilder\(/);
+  assert.match(html, /function renderMiniFantasyMyEntries\(/);
+  assert.match(html, /function renderMiniFantasyPicker\(/);
+  assert.match(html, /function saveMiniFantasyEntry\(/);
   assert.match(html, /function usesHostedDuelsBackend\(/);
   assert.match(html, /function initializeDuelsApp\(/);
   assert.match(html, /LOCAL_AUTH_STORAGE_KEY/);
+  assert.match(html, /LOCAL_MINI_FANTASY_ENTRIES_STORAGE_KEY/);
   assert.match(html, /data-copy-duel-link=/);
   assert.match(html, /data-pick-key=/);
   assert.match(html, /data-open-picker=/);
@@ -53,5 +67,8 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /id="joinByCodeForm"/);
   assert.match(html, /id="joinByCodeInput"/);
   assert.match(html, /data-directory-filter=/);
+  assert.match(html, /data-mini-fixture=/);
+  assert.match(html, /data-mini-pick=/);
+  assert.match(html, /data-mini-picker-value=/);
   assert.match(html, /window\.history\.replaceState/);
 });

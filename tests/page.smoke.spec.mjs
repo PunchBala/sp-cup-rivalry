@@ -43,6 +43,7 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Duels');
   await expect(page.locator('#leaguePill')).toContainText('Duels: SP Cup 2026');
   await expect(page.getByRole('button', { name: 'Board', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Mini Fantasy', exact: true })).toBeVisible();
   await expect(page.locator('#browseDuelsButton')).toBeVisible();
   await expect(page.locator('#createDuelButton')).toBeVisible();
   await expect(page.locator('#profileChipButton')).toContainText('Sign in');
@@ -187,6 +188,67 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await page.getByRole('button', { name: 'Schedule' }).click();
   await expect(page.locator('#scheduleSummary')).toContainText('League-stage schedule');
   await expect(page.locator('#scheduleTable tbody tr')).toHaveCount(70);
+
+  expect(pageErrors).toEqual([]);
+});
+
+test('mini fantasy opens from match 14, supports local lineup building, and saves one team per match', async ({ page }) => {
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(String(error)));
+
+  await page.addInitScript(() => {
+    window.__DUELS_TEST_NOW__ = '2026-04-08T08:00:00Z';
+    window.DUELS_BACKEND_CONFIG = { enabled: false };
+  });
+
+  await page.route(/data\/live\.json(\?.*)?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(liveFixture)
+    });
+  });
+
+  await page.goto('http://127.0.0.1:4173/index.html?room=sp-cup-2026');
+
+  await page.locator('#profileChipButton').click();
+  await page.locator('#authDisplayName').fill('Mini Bala');
+  await page.locator('#authOwnerId').fill('mini-bala');
+  await page.locator('#authForm button[type="submit"]').click();
+  await page.locator('#profileDrawer [data-close-drawer="profile"]').click();
+
+  await page.getByRole('button', { name: 'Mini Fantasy', exact: true }).click();
+  await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Mini Fantasy');
+  await expect(page.locator('#miniFantasyFixtures [data-mini-fixture]')).toHaveCount(2);
+  await expect(page.locator('#miniFantasyFixtures')).toContainText('Match 14');
+  await expect(page.locator('#miniFantasyBuilder')).toContainText('Match 14');
+
+  await page.locator('[data-mini-pick="0"]').click();
+  await expect(page.locator('#miniFantasyPickerModal')).toBeVisible();
+  await page.locator('#miniFantasyPickerSearch').fill('duckett');
+  await page.locator('[data-mini-picker-value="dc_ben-duckett"]').click();
+
+  await page.locator('[data-mini-pick="1"]').click();
+  await page.locator('#miniFantasyPickerSearch').fill('chameera');
+  await page.locator('[data-mini-picker-value="dc_dushmantha-chameera"]').click();
+
+  await page.locator('[data-mini-pick="2"]').click();
+  await page.locator('[data-mini-picker-team="GT"]').click();
+  await page.locator('#miniFantasyPickerSearch').fill('shahrukh');
+  await page.locator('[data-mini-picker-value="gt_shahrukh-khan"]').click();
+
+  await page.locator('[data-mini-pick="3"]').click();
+  await page.locator('[data-mini-picker-team="GT"]').click();
+  await page.locator('#miniFantasyPickerSearch').fill('kishore');
+  await page.locator('[data-mini-picker-value="gt_sai-kishore"]').click();
+
+  await page.locator('[data-mini-captain="0"]').click();
+  await expect(page.locator('#miniFantasyBuilder')).toContainText('Lineup ready');
+  await page.locator('#saveMiniFantasyButton').click();
+
+  await expect(page.locator('#miniFantasyBuilder')).toContainText('team saved');
+  await expect(page.locator('#miniFantasyMyEntries')).toContainText('Match 14');
+  await expect(page.locator('#miniFantasyMyEntries')).toContainText('Captain locked');
 
   expect(pageErrors).toEqual([]);
 });
