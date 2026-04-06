@@ -50,7 +50,7 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
 
   await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Duels');
   await expect(page.locator('#leaguePill')).toContainText('Duels: SP Cup 2026');
-  await expect(page.getByRole('button', { name: 'Board', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Duel', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Mini Fantasy', exact: true })).toBeVisible();
   await expect(page.locator('#browseDuelsButton')).toBeVisible();
   await expect(page.locator('#createDuelButton')).toBeVisible();
@@ -227,6 +227,11 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
 
   await page.getByRole('button', { name: 'Mini Fantasy', exact: true }).click();
   await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Mini Fantasy');
+  await expect(page.getByRole('button', { name: 'Duel', exact: true })).toBeVisible();
+  await expect(page.locator('#browseDuelsButton')).toHaveCount(0);
+  await expect(page.locator('#createDuelButton')).toHaveCount(0);
+  await expect(page.locator('#manageDuelButton')).toHaveCount(0);
+  await expect(page.locator('#profileChipButton')).toContainText('Mini Bala');
   await expectLocatorCountAtLeast(page.locator('#miniFantasyFixtures [data-mini-fixture]'), 1);
   await expect(page.locator('#miniFantasyFixtures')).toContainText('Match 14');
   await expect(page.locator('#miniFantasyFixtures')).toContainText('opens next');

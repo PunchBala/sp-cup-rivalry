@@ -5768,10 +5768,11 @@ function titleBandScore(pick, live){
       if (!el) return;
       const manageReady = canManageActiveDuel();
       const profileLabel = CURRENT_USER ? CURRENT_USER.displayName : 'Sign in';
+      const duelWorkspaceActive = activeView === 'warroom';
       el.innerHTML = `
-        <button class="pill-button" type="button" id="browseDuelsButton">${activeDrawer === 'browse' ? 'Close browse' : 'Browse duels'}</button>
-        <button class="pill-button primary" type="button" id="createDuelButton">${activeDrawer === 'create' ? 'Close create' : 'Create duel'}</button>
-        ${manageReady ? `<button class="pill-button" type="button" id="manageDuelButton">${activeDrawer === 'manage' ? 'Close manage' : 'Manage duel'}</button>` : ''}
+        ${duelWorkspaceActive ? `<button class="pill-button" type="button" id="browseDuelsButton">${activeDrawer === 'browse' ? 'Close browse' : 'Browse duels'}</button>` : ''}
+        ${duelWorkspaceActive ? `<button class="pill-button primary" type="button" id="createDuelButton">${activeDrawer === 'create' ? 'Close create' : 'Create duel'}</button>` : ''}
+        ${duelWorkspaceActive && manageReady ? `<button class="pill-button" type="button" id="manageDuelButton">${activeDrawer === 'manage' ? 'Close manage' : 'Manage duel'}</button>` : ''}
         <button class="pill-button" type="button" id="profileChipButton">${escapeHtml(profileLabel)}</button>
       `;
       const browseButton = document.getElementById('browseDuelsButton');
@@ -5823,6 +5824,7 @@ function titleBandScore(pick, live){
     }
 
     function syncSurfaceDrawers(){
+      if (activeView !== 'warroom' && ['browse', 'create', 'manage'].includes(activeDrawer)) activeDrawer = null;
       if (activeDrawer === 'manage' && !canManageActiveDuel()) activeDrawer = null;
       const backdrop = document.getElementById('surfaceBackdrop');
       if (backdrop) {
@@ -5844,7 +5846,7 @@ function titleBandScore(pick, live){
     function renderTabs(){
       const el = document.getElementById('tabs');
       const tabs = [
-        { key:'warroom', label:'Board', type:'warroom' },
+        { key:'warroom', label:'Duel', type:'warroom' },
         { key:'fantasy', label:'Mini Fantasy', type:'fantasy' },
         { key:'stats', label:'Nerd Room', type:'stats' },
         { key:'schedule', label:'Schedule', type:'schedule' }
