@@ -5,7 +5,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  canUseFreshScorecardCall,
   findMissingScorecardCaches,
+  freshScorecardBudgetRemaining,
   readCachedScorecard,
   rebuildHistoricalState,
   writeCachedScorecard
@@ -83,6 +85,21 @@ test('scorecard cache round-trips and reports missing cached matches', async () 
 
   assert.deepEqual(cached, scorecard);
   assert.deepEqual(missing, ['match-2']);
+});
+
+test('fresh scorecard budget helper hard-stops paid calls once the run cap is reached', () => {
+  const live = {
+    meta: {
+      lastRun: {
+        scorecardCalls: 1
+      }
+    }
+  };
+
+  assert.equal(freshScorecardBudgetRemaining(live, 1), 0);
+  assert.equal(canUseFreshScorecardCall(live, 1, 1), false);
+  assert.equal(freshScorecardBudgetRemaining({ meta: { lastRun: { scorecardCalls: 0 } } }, 2), 2);
+  assert.equal(canUseFreshScorecardCall({ meta: { lastRun: { scorecardCalls: 0 } } }, 1, 2), true);
 });
 
 test('historical rebuild tracks cache hits separately from paid API scorecard calls', async () => {

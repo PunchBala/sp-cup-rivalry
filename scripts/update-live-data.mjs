@@ -30,6 +30,7 @@ const STRIKER_MIN_RUNS = 100;
 const LIVE_SCORECARD_ENABLED = parseEnvBool(process.env.CRICKETDATA_ENABLE_LIVE_SCORECARD, false);
 const LIVE_SCORECARD_INTERVAL_MINUTES = parseEnvInt(process.env.CRICKETDATA_LIVE_SCORECARD_INTERVAL_MINUTES, 30);
 const MAX_BACKLOG_SCORECARDS_PER_RUN = parseEnvInt(process.env.CRICKETDATA_MAX_BACKLOG_SCORECARDS_PER_RUN, 2);
+const MAX_FRESH_SCORECARD_CALLS_PER_RUN = parseEnvNonNegativeInt(process.env.CRICKETDATA_MAX_FRESH_SCORECARD_CALLS_PER_RUN, 1);
 const ALLOW_HISTORICAL_REPLAY_API = parseEnvBool(process.env.CRICKETDATA_ALLOW_HISTORICAL_REPLAY, false);
 const IPLT20_MOST_DOTS_ENABLED = parseEnvBool(process.env.IPLT20_MOST_DOTS_ENABLED, true);
 const IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES = parseEnvInt(process.env.IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES, 120);
@@ -81,6 +82,11 @@ function parseEnvBool(value, fallback = false) {
 function parseEnvInt(value, fallback) {
   const n = Number.parseInt(String(value ?? ''), 10);
   return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+function parseEnvNonNegativeInt(value, fallback) {
+  const n = Number.parseInt(String(value ?? ''), 10);
+  return Number.isFinite(n) && n >= 0 ? n : fallback;
 }
 
 function buildSeriesInfoUrl(apiKey) {
@@ -282,9 +288,12 @@ function createEmptyLive() {
         liveEnabled: LIVE_SCORECARD_ENABLED,
         liveIntervalMinutes: LIVE_SCORECARD_INTERVAL_MINUTES,
         maxBacklogPerRun: MAX_BACKLOG_SCORECARDS_PER_RUN,
+        maxFreshPerRun: MAX_FRESH_SCORECARD_CALLS_PER_RUN,
         lastLiveScorecardAt: null,
         lastLiveScorecardMatchId: null,
-        lastBacklogProcessAt: null
+        lastBacklogProcessAt: null,
+        lastBudgetExhaustedAt: null,
+        lastBudgetSkipReason: null
       },
       officialMostDots: {
         enabled: IPLT20_MOST_DOTS_ENABLED,
@@ -307,7 +316,9 @@ function createEmptyLive() {
         historicalReplaySkipped: false,
         historicalReplayMissingCaches: 0,
         historicalReplayUsedApiFallback: false,
-        historicalReplayReason: null
+        historicalReplayReason: null,
+        freshScorecardBudgetExhausted: false,
+        freshScorecardBudgetSkips: 0
       },
       aggregateSchemaVersion: AGGREGATE_SCHEMA_VERSION,
       providerStatus: {
@@ -549,6 +560,23 @@ function applyProviderSafeExitState(live, details) {
       backlogRemaining: live.meta?.lastRun?.backlogRemaining || 0
     }
   };
+}
+
+export function freshScorecardBudgetRemaining(live, maxFreshPerRun = MAX_FRESH_SCORECARD_CALLS_PER_RUN) {
+  const allowed = Number.isFinite(Number(maxFreshPerRun)) ? Number(maxFreshPerRun) : MAX_FRESH_SCORECARD_CALLS_PER_RUN;
+  const used = Number(live?.meta?.lastRun?.scorecardCalls || 0);
+  return Math.max(0, allowed - used);
+}
+
+export function canUseFreshScorecardCall(live, requiredCalls = 1, maxFreshPerRun = MAX_FRESH_SCORECARD_CALLS_PER_RUN) {
+  return freshScorecardBudgetRemaining(live, maxFreshPerRun) >= Math.max(0, Number(requiredCalls || 0));
+}
+
+function noteFreshScorecardBudgetSkip(live, reason) {
+  live.meta.lastRun.freshScorecardBudgetExhausted = true;
+  live.meta.lastRun.freshScorecardBudgetSkips = Number(live.meta.lastRun.freshScorecardBudgetSkips || 0) + 1;
+  live.meta.scorecardBudget.lastBudgetExhaustedAt = isoNow();
+  live.meta.scorecardBudget.lastBudgetSkipReason = reason;
 }
 
 function normalizeScorecardResult(result) {
@@ -1532,6 +1560,7 @@ async function main() {
   live.meta.scorecardBudget.liveEnabled = LIVE_SCORECARD_ENABLED;
   live.meta.scorecardBudget.liveIntervalMinutes = LIVE_SCORECARD_INTERVAL_MINUTES;
   live.meta.scorecardBudget.maxBacklogPerRun = MAX_BACKLOG_SCORECARDS_PER_RUN;
+  live.meta.scorecardBudget.maxFreshPerRun = MAX_FRESH_SCORECARD_CALLS_PER_RUN;
   live.meta.officialMostDots.enabled = IPLT20_MOST_DOTS_ENABLED;
   live.meta.officialMostDots.minRefreshMinutes = IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES;
   live.meta.lastRun = {
@@ -1547,8 +1576,12 @@ async function main() {
     historicalReplaySkipped: false,
     historicalReplayMissingCaches: 0,
     historicalReplayUsedApiFallback: false,
-    historicalReplayReason: null
+    historicalReplayReason: null,
+    freshScorecardBudgetExhausted: false,
+    freshScorecardBudgetSkips: 0
   };
+  live.meta.scorecardBudget.lastBudgetExhaustedAt = null;
+  live.meta.scorecardBudget.lastBudgetSkipReason = null;
   live.meta.providerStatus = {
     ...(live.meta.providerStatus || {}),
     lastAttemptAt: isoNow(),
@@ -1582,6 +1615,7 @@ async function main() {
         liveScorecardsEnabled: LIVE_SCORECARD_ENABLED,
         liveScorecardIntervalMinutes: LIVE_SCORECARD_INTERVAL_MINUTES,
         maxBacklogScorecardsPerRun: MAX_BACKLOG_SCORECARDS_PER_RUN,
+        maxFreshScorecardCallsPerRun: MAX_FRESH_SCORECARD_CALLS_PER_RUN,
         scorecardCallsThisRun: live.meta.lastRun.scorecardCalls,
         backlogRemaining: live.meta.lastRun.backlogRemaining
       }
@@ -1614,14 +1648,17 @@ async function main() {
   const requiresScoreHistoryBackfill = needsScoreHistoryBackfill(live);
   let appliedHistoricalBackfill = false;
   if (requiresHistoricalBackfill || requiresScoreHistoryBackfill) {
-    const historicalReplayMissingCaches = ALLOW_HISTORICAL_REPLAY_API
-      ? []
-      : await findMissingScorecardCaches(live.meta.processedMatchIds || []);
+    const historicalReplayMissingCaches = await findMissingScorecardCaches(live.meta.processedMatchIds || []);
 
-    if (historicalReplayMissingCaches.length) {
+    if (historicalReplayMissingCaches.length && !ALLOW_HISTORICAL_REPLAY_API) {
       live.meta.lastRun.historicalReplaySkipped = true;
       live.meta.lastRun.historicalReplayMissingCaches = historicalReplayMissingCaches.length;
       live.meta.lastRun.historicalReplayReason = `cache-only replay skipped; ${historicalReplayMissingCaches.length} cached scorecard${historicalReplayMissingCaches.length === 1 ? '' : 's'} missing`;
+    } else if (historicalReplayMissingCaches.length > freshScorecardBudgetRemaining(live)) {
+      live.meta.lastRun.historicalReplaySkipped = true;
+      live.meta.lastRun.historicalReplayMissingCaches = historicalReplayMissingCaches.length;
+      live.meta.lastRun.historicalReplayReason = `fresh scorecard budget exhausted before historical replay (${historicalReplayMissingCaches.length} fresh call${historicalReplayMissingCaches.length === 1 ? '' : 's'} needed)`;
+      noteFreshScorecardBudgetSkip(live, 'historical replay');
     } else {
       const rebuiltState = await rebuildHistoricalState(
         live.meta.processedMatchIds || [],
@@ -1650,10 +1687,13 @@ async function main() {
 
   const endedBacklog = endedUnprocessedMatches(matchList, live.meta.processedMatchIds);
   const backlogToProcess = endedBacklog.slice(0, MAX_BACKLOG_SCORECARDS_PER_RUN);
-  const backlogRemaining = Math.max(0, endedBacklog.length - backlogToProcess.length);
   const activeMatch = liveMatchCandidate(matchList);
 
   for (const match of backlogToProcess) {
+    if (!(await readCachedScorecard(match.id)) && !canUseFreshScorecardCall(live, 1)) {
+      noteFreshScorecardBudgetSkip(live, `backlog match ${match.id}`);
+      break;
+    }
     const scorecardResult = await processScorecard(match.id, live, { preferCache: true });
     if (scorecardResult.source === 'cache') {
       live.meta.lastRun.scorecardCacheHits += 1;
@@ -1665,8 +1705,9 @@ async function main() {
     live.meta.lastRun.backlogProcessed += 1;
   }
 
+  const backlogRemaining = Math.max(0, endedBacklog.length - live.meta.lastRun.backlogProcessed);
   live.meta.lastRun.backlogRemaining = backlogRemaining;
-  if (backlogToProcess.length > 0) {
+  if (live.meta.lastRun.backlogProcessed > 0) {
     live.meta.scorecardBudget.lastBacklogProcessAt = isoNow();
   }
 
@@ -1674,24 +1715,38 @@ async function main() {
   const liveScorecardDecision = shouldFetchLiveScorecard(live, activeMatch, currentMs);
 
   if (activeMatch && !processedIds.has(activeMatch.id) && liveScorecardDecision.fetch) {
-    const scorecardResult = await processScorecard(activeMatch.id, live);
-    if (scorecardResult.source === 'cache') {
-      live.meta.lastRun.scorecardCacheHits += 1;
+    if (!canUseFreshScorecardCall(live, 1)) {
+      noteFreshScorecardBudgetSkip(live, `live overlay ${activeMatch.id}`);
+      live.meta.lastRun.liveOverlaySkippedReason = 'fresh scorecard budget exhausted';
+      overlayAgg = reusableOverlayAggregates(live, activeMatch);
+      live.meta.lastRun.liveOverlayReused = !!overlayAgg;
+      live.meta.liveOverlay = {
+        matchId: activeMatch.id,
+        generatedAt: overlayAgg ? live.meta.liveOverlay.generatedAt : isoNow(),
+        aggregates: overlayAgg,
+        status: activeMatch.status,
+        source: overlayAgg ? 'reused cached live overlay' : 'series_info only'
+      };
     } else {
-      live.meta.lastRun.scorecardCalls += 1;
+      const scorecardResult = await processScorecard(activeMatch.id, live);
+      if (scorecardResult.source === 'cache') {
+        live.meta.lastRun.scorecardCacheHits += 1;
+      } else {
+        live.meta.lastRun.scorecardCalls += 1;
+      }
+      live.meta.lastRun.liveOverlayFetched = true;
+      overlayAgg = createEmptyAggregates();
+      applyScorecardToAggregates(overlayAgg, scorecardResult.data, { isFinal: false });
+      live.meta.liveOverlay = {
+        matchId: activeMatch.id,
+        generatedAt: isoNow(),
+        aggregates: overlayAgg,
+        status: activeMatch.status,
+        source: `match_scorecard (${liveScorecardDecision.reason})`
+      };
+      live.meta.scorecardBudget.lastLiveScorecardAt = isoNow();
+      live.meta.scorecardBudget.lastLiveScorecardMatchId = activeMatch.id;
     }
-    live.meta.lastRun.liveOverlayFetched = true;
-    overlayAgg = createEmptyAggregates();
-    applyScorecardToAggregates(overlayAgg, scorecardResult.data, { isFinal: false });
-    live.meta.liveOverlay = {
-      matchId: activeMatch.id,
-      generatedAt: isoNow(),
-      aggregates: overlayAgg,
-      status: activeMatch.status,
-      source: `match_scorecard (${liveScorecardDecision.reason})`
-    };
-    live.meta.scorecardBudget.lastLiveScorecardAt = isoNow();
-    live.meta.scorecardBudget.lastLiveScorecardMatchId = activeMatch.id;
   } else if (activeMatch && !processedIds.has(activeMatch.id)) {
     overlayAgg = reusableOverlayAggregates(live, activeMatch);
     live.meta.lastRun.liveOverlayReused = !!overlayAgg;
@@ -1817,24 +1872,28 @@ async function main() {
       liveScorecardsEnabled: LIVE_SCORECARD_ENABLED,
       liveScorecardIntervalMinutes: LIVE_SCORECARD_INTERVAL_MINUTES,
       maxBacklogScorecardsPerRun: MAX_BACKLOG_SCORECARDS_PER_RUN,
+      maxFreshScorecardCallsPerRun: MAX_FRESH_SCORECARD_CALLS_PER_RUN,
       historicalReplayApiFallbackAllowed: ALLOW_HISTORICAL_REPLAY_API,
       scorecardCallsThisRun: live.meta.lastRun.scorecardCalls,
       scorecardCacheHitsThisRun: live.meta.lastRun.scorecardCacheHits,
       historicalReplaySkipped: live.meta.lastRun.historicalReplaySkipped,
       historicalReplayMissingCaches: live.meta.lastRun.historicalReplayMissingCaches,
+      freshScorecardBudgetExhausted: live.meta.lastRun.freshScorecardBudgetExhausted,
+      freshScorecardBudgetSkips: live.meta.lastRun.freshScorecardBudgetSkips,
+      freshScorecardBudgetRemaining: freshScorecardBudgetRemaining(live),
       backlogRemaining
     }
   };
 
     setProviderStatusOk(live);
     live.fetchedAt = isoNow();
-    live.scrapeStatus = `ok (${live.meta.processedMatchIds.length} processed matches${activeMatch ? ', live match tracked' : ''}, ${live.meta.lastRun.scorecardCalls} scorecard call${live.meta.lastRun.scorecardCalls === 1 ? '' : 's'} this run${live.meta.lastRun.scorecardCacheHits ? `, ${live.meta.lastRun.scorecardCacheHits} cached scorecard${live.meta.lastRun.scorecardCacheHits === 1 ? '' : 's'} reused` : ''}${backlogRemaining ? `, ${backlogRemaining} backlog remaining` : ''})`;
+    live.scrapeStatus = `ok (${live.meta.processedMatchIds.length} processed matches${activeMatch ? ', live match tracked' : ''}, ${live.meta.lastRun.scorecardCalls} scorecard call${live.meta.lastRun.scorecardCalls === 1 ? '' : 's'} this run${live.meta.lastRun.scorecardCacheHits ? `, ${live.meta.lastRun.scorecardCacheHits} cached scorecard${live.meta.lastRun.scorecardCacheHits === 1 ? '' : 's'} reused` : ''}${live.meta.lastRun.freshScorecardBudgetExhausted ? ', fresh scorecard budget exhausted' : ''}${backlogRemaining ? `, ${backlogRemaining} backlog remaining` : ''})`;
     upsertScoreHistorySnapshot(live, live.meta.processedMatchIds.length, live.fetchedAt);
 
     await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
 
     console.log(
-      `Updated live.json. Series info calls: ${live.meta.lastRun.seriesInfoCalls}. Scorecard calls: ${live.meta.lastRun.scorecardCalls}. Cached scorecards reused: ${live.meta.lastRun.scorecardCacheHits}. Backlog processed: ${live.meta.lastRun.backlogProcessed}. Backlog remaining: ${backlogRemaining}. Live overlay: ${live.meta.liveOverlay.source || 'none'}.`
+      `Updated live.json. Series info calls: ${live.meta.lastRun.seriesInfoCalls}. Scorecard calls: ${live.meta.lastRun.scorecardCalls}. Cached scorecards reused: ${live.meta.lastRun.scorecardCacheHits}. Fresh budget exhausted: ${live.meta.lastRun.freshScorecardBudgetExhausted}. Backlog processed: ${live.meta.lastRun.backlogProcessed}. Backlog remaining: ${backlogRemaining}. Live overlay: ${live.meta.liveOverlay.source || 'none'}.`
     );
   } catch (error) {
     if (isCricketDataQuotaError(error)) {
