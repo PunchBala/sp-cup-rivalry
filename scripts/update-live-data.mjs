@@ -6,6 +6,7 @@ import { pathToFileURL } from 'node:url';
 const ROOT = process.cwd();
 const DATA_DIR = path.join(ROOT, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'live.json');
+const SCORECARD_CACHE_DIR = path.join(DATA_DIR, 'scorecards');
 const SCHEDULE_FILE = path.join(ROOT, 'ipl_2026_schedule.json');
 
 const API_KEY = process.env.CRICKETDATA_API_KEY;
@@ -29,6 +30,7 @@ const STRIKER_MIN_RUNS = 100;
 const LIVE_SCORECARD_ENABLED = parseEnvBool(process.env.CRICKETDATA_ENABLE_LIVE_SCORECARD, false);
 const LIVE_SCORECARD_INTERVAL_MINUTES = parseEnvInt(process.env.CRICKETDATA_LIVE_SCORECARD_INTERVAL_MINUTES, 30);
 const MAX_BACKLOG_SCORECARDS_PER_RUN = parseEnvInt(process.env.CRICKETDATA_MAX_BACKLOG_SCORECARDS_PER_RUN, 2);
+const ALLOW_HISTORICAL_REPLAY_API = parseEnvBool(process.env.CRICKETDATA_ALLOW_HISTORICAL_REPLAY, false);
 const IPLT20_MOST_DOTS_ENABLED = parseEnvBool(process.env.IPLT20_MOST_DOTS_ENABLED, true);
 const IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES = parseEnvInt(process.env.IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES, 120);
 const IPLT20_MOST_DOTS_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/284-mostdotballsbowledtournament.js?callback=onmostdotballsbowledtournament';
@@ -296,11 +298,16 @@ function createEmptyLive() {
       lastRun: {
         seriesInfoCalls: 0,
         scorecardCalls: 0,
+        scorecardCacheHits: 0,
         backlogProcessed: 0,
         backlogRemaining: 0,
         liveOverlayFetched: false,
         liveOverlayReused: false,
-        liveOverlaySkippedReason: null
+        liveOverlaySkippedReason: null,
+        historicalReplaySkipped: false,
+        historicalReplayMissingCaches: 0,
+        historicalReplayUsedApiFallback: false,
+        historicalReplayReason: null
       },
       aggregateSchemaVersion: AGGREGATE_SCHEMA_VERSION,
       providerStatus: {
@@ -332,6 +339,7 @@ function createEmptyLive() {
 
 async function ensureDataDir() {
   await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.mkdir(SCORECARD_CACHE_DIR, { recursive: true });
 }
 
 async function readExistingLive() {
@@ -367,6 +375,44 @@ function makeApiError(json) {
   error.code = 'CRICKETDATA_API_ERROR';
   error.api = json;
   return error;
+}
+
+function scorecardCachePath(matchId, cacheDir = SCORECARD_CACHE_DIR) {
+  const safeMatchId = String(matchId || '').replace(/[^a-z0-9_-]+/gi, '_');
+  return path.join(cacheDir, `${safeMatchId}.json`);
+}
+
+export async function readCachedScorecard(matchId, { cacheDir = SCORECARD_CACHE_DIR } = {}) {
+  try {
+    const raw = await fs.readFile(scorecardCachePath(matchId, cacheDir), 'utf8');
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && parsed.data && typeof parsed.data === 'object') return parsed.data;
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function writeCachedScorecard(matchId, scorecard, { cacheDir = SCORECARD_CACHE_DIR } = {}) {
+  await fs.mkdir(cacheDir, { recursive: true });
+  await fs.writeFile(
+    scorecardCachePath(matchId, cacheDir),
+    JSON.stringify({
+      matchId,
+      cachedAt: isoNow(),
+      data: scorecard
+    }, null, 2),
+    'utf8'
+  );
+}
+
+export async function findMissingScorecardCaches(matchIds, { cacheDir = SCORECARD_CACHE_DIR } = {}) {
+  const missing = [];
+  for (const matchId of safeArray(matchIds)) {
+    const cached = await readCachedScorecard(matchId, { cacheDir });
+    if (!cached) missing.push(matchId);
+  }
+  return missing;
 }
 
 function tryParseApiPayloadFromError(error) {
@@ -502,6 +548,19 @@ function applyProviderSafeExitState(live, details) {
       failoversThisRun: live.meta?.lastRun?.cricketDataFailovers || 0,
       backlogRemaining: live.meta?.lastRun?.backlogRemaining || 0
     }
+  };
+}
+
+function normalizeScorecardResult(result) {
+  if (result && typeof result === 'object' && result.data && typeof result.data === 'object') {
+    return {
+      data: result.data,
+      source: result.source || 'unknown'
+    };
+  }
+  return {
+    data: result,
+    source: 'unknown'
   };
 }
 
@@ -1255,17 +1314,25 @@ function upsertScoreHistorySnapshot(live, processedMatchCount, fetchedAt = isoNo
   live.meta.scoreHistory = Array.from(byCount.values()).sort((a, b) => historyEntryCount(a) - historyEntryCount(b));
 }
 
-async function rebuildHistoricalState(processedIds, baseLive = null, { includeHistory = false } = {}) {
+export async function rebuildHistoricalState(processedIds, baseLive = null, { includeHistory = false, loadScorecard = null } = {}) {
   const rebuilt = createEmptyAggregates();
   const history = includeHistory ? [{
     processedMatchCount: 0,
     fetchedAt: baseLive?.meta?.scoreHistory?.find((entry) => historyEntryCount(entry) === 0)?.fetchedAt || null,
     snapshot: createEmptyLive()
   }] : null;
+  let cacheHits = 0;
+  let apiCalls = 0;
+  const resolveScorecard = loadScorecard || ((matchId) => processScorecard(matchId, baseLive, {
+    preferCache: true,
+    allowApiFallback: ALLOW_HISTORICAL_REPLAY_API
+  }));
 
   for (const matchId of processedIds) {
-    const scorecard = await processScorecard(matchId, baseLive);
-    applyScorecardToAggregates(rebuilt, scorecard, { isFinal: true });
+    const scorecardResult = normalizeScorecardResult(await resolveScorecard(matchId));
+    if (scorecardResult.source === 'cache') cacheHits += 1;
+    if (scorecardResult.source === 'api') apiCalls += 1;
+    applyScorecardToAggregates(rebuilt, scorecardResult.data, { isFinal: true });
     if (includeHistory) {
       history.push({
         processedMatchCount: history.length,
@@ -1275,7 +1342,9 @@ async function rebuildHistoricalState(processedIds, baseLive = null, { includeHi
     }
   }
 
-  return includeHistory ? { aggregates: rebuilt, scoreHistory: history } : { aggregates: rebuilt };
+  return includeHistory
+    ? { aggregates: rebuilt, scoreHistory: history, cacheHits, apiCalls }
+    : { aggregates: rebuilt, cacheHits, apiCalls };
 }
 
 function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = null) {
@@ -1396,9 +1465,18 @@ function liveMatchCandidate(matchList) {
   return safeArray(matchList).find((m) => m.matchStarted && !m.matchEnded) || null;
 }
 
-async function processScorecard(matchId, live) {
+async function processScorecard(matchId, live, { preferCache = false, allowApiFallback = true } = {}) {
+  if (preferCache) {
+    const cached = await readCachedScorecard(matchId);
+    if (cached) return { data: cached, source: 'cache' };
+    if (!allowApiFallback) {
+      throw new Error(`Missing cached scorecard for processed match ${matchId}`);
+    }
+  }
+
   const json = await fetchCricketDataJson((apiKey) => buildScorecardUrl(apiKey, matchId), live);
-  return json.data;
+  await writeCachedScorecard(matchId, json.data);
+  return { data: json.data, source: 'api' };
 }
 
 function shouldFetchLiveScorecard(live, activeMatch, currentMs) {
@@ -1459,12 +1537,17 @@ async function main() {
   live.meta.lastRun = {
     seriesInfoCalls: 0,
     scorecardCalls: 0,
+    scorecardCacheHits: 0,
     backlogProcessed: 0,
     backlogRemaining: 0,
     liveOverlayFetched: false,
     liveOverlayReused: false,
     liveOverlaySkippedReason: null,
-    cricketDataFailovers: 0
+    cricketDataFailovers: 0,
+    historicalReplaySkipped: false,
+    historicalReplayMissingCaches: 0,
+    historicalReplayUsedApiFallback: false,
+    historicalReplayReason: null
   };
   live.meta.providerStatus = {
     ...(live.meta.providerStatus || {}),
@@ -1529,19 +1612,39 @@ async function main() {
 
   const requiresHistoricalBackfill = needsHistoricalAggregateBackfill(live);
   const requiresScoreHistoryBackfill = needsScoreHistoryBackfill(live);
+  let appliedHistoricalBackfill = false;
   if (requiresHistoricalBackfill || requiresScoreHistoryBackfill) {
-    const rebuiltState = await rebuildHistoricalState(
-      live.meta.processedMatchIds || [],
-      live,
-      { includeHistory: requiresScoreHistoryBackfill }
-    );
-    finalizedAgg = rebuiltState.aggregates;
-    if (requiresScoreHistoryBackfill) {
-      live.meta.scoreHistory = rebuiltState.scoreHistory;
+    const historicalReplayMissingCaches = ALLOW_HISTORICAL_REPLAY_API
+      ? []
+      : await findMissingScorecardCaches(live.meta.processedMatchIds || []);
+
+    if (historicalReplayMissingCaches.length) {
+      live.meta.lastRun.historicalReplaySkipped = true;
+      live.meta.lastRun.historicalReplayMissingCaches = historicalReplayMissingCaches.length;
+      live.meta.lastRun.historicalReplayReason = `cache-only replay skipped; ${historicalReplayMissingCaches.length} cached scorecard${historicalReplayMissingCaches.length === 1 ? '' : 's'} missing`;
+    } else {
+      const rebuiltState = await rebuildHistoricalState(
+        live.meta.processedMatchIds || [],
+        live,
+        {
+          includeHistory: requiresScoreHistoryBackfill,
+          loadScorecard: (matchId) => processScorecard(matchId, live, {
+            preferCache: true,
+            allowApiFallback: ALLOW_HISTORICAL_REPLAY_API
+          })
+        }
+      );
+      finalizedAgg = rebuiltState.aggregates;
+      if (requiresScoreHistoryBackfill) {
+        live.meta.scoreHistory = rebuiltState.scoreHistory;
+      }
+      live.meta.lastRun.scorecardCalls += rebuiltState.apiCalls;
+      live.meta.lastRun.scorecardCacheHits += rebuiltState.cacheHits;
+      live.meta.lastRun.historicalReplayUsedApiFallback = rebuiltState.apiCalls > 0;
+      appliedHistoricalBackfill = true;
     }
-    live.meta.lastRun.scorecardCalls += safeArray(live.meta.processedMatchIds).length;
   }
-  if (requiresHistoricalBackfill) {
+  if (requiresHistoricalBackfill && appliedHistoricalBackfill) {
     live.meta.aggregateSchemaVersion = AGGREGATE_SCHEMA_VERSION;
   }
 
@@ -1551,9 +1654,13 @@ async function main() {
   const activeMatch = liveMatchCandidate(matchList);
 
   for (const match of backlogToProcess) {
-    const scorecard = await processScorecard(match.id, live);
-    live.meta.lastRun.scorecardCalls += 1;
-    applyScorecardToAggregates(finalizedAgg, scorecard, { isFinal: true });
+    const scorecardResult = await processScorecard(match.id, live, { preferCache: true });
+    if (scorecardResult.source === 'cache') {
+      live.meta.lastRun.scorecardCacheHits += 1;
+    } else {
+      live.meta.lastRun.scorecardCalls += 1;
+    }
+    applyScorecardToAggregates(finalizedAgg, scorecardResult.data, { isFinal: true });
     processedIds.add(match.id);
     live.meta.lastRun.backlogProcessed += 1;
   }
@@ -1567,11 +1674,15 @@ async function main() {
   const liveScorecardDecision = shouldFetchLiveScorecard(live, activeMatch, currentMs);
 
   if (activeMatch && !processedIds.has(activeMatch.id) && liveScorecardDecision.fetch) {
-    const scorecard = await processScorecard(activeMatch.id, live);
-    live.meta.lastRun.scorecardCalls += 1;
+    const scorecardResult = await processScorecard(activeMatch.id, live);
+    if (scorecardResult.source === 'cache') {
+      live.meta.lastRun.scorecardCacheHits += 1;
+    } else {
+      live.meta.lastRun.scorecardCalls += 1;
+    }
     live.meta.lastRun.liveOverlayFetched = true;
     overlayAgg = createEmptyAggregates();
-    applyScorecardToAggregates(overlayAgg, scorecard, { isFinal: false });
+    applyScorecardToAggregates(overlayAgg, scorecardResult.data, { isFinal: false });
     live.meta.liveOverlay = {
       matchId: activeMatch.id,
       generatedAt: isoNow(),
@@ -1702,24 +1813,28 @@ async function main() {
     costControl: {
       ok: true,
       source: 'worker',
-      method: 'scheduled league-stage windows, cached completed matches forever, capped backlog catch-up, throttled live scorecards',
+      method: 'scheduled league-stage windows, cached completed matches forever, cache-first historical replay, capped backlog catch-up, throttled live scorecards',
       liveScorecardsEnabled: LIVE_SCORECARD_ENABLED,
       liveScorecardIntervalMinutes: LIVE_SCORECARD_INTERVAL_MINUTES,
       maxBacklogScorecardsPerRun: MAX_BACKLOG_SCORECARDS_PER_RUN,
+      historicalReplayApiFallbackAllowed: ALLOW_HISTORICAL_REPLAY_API,
       scorecardCallsThisRun: live.meta.lastRun.scorecardCalls,
+      scorecardCacheHitsThisRun: live.meta.lastRun.scorecardCacheHits,
+      historicalReplaySkipped: live.meta.lastRun.historicalReplaySkipped,
+      historicalReplayMissingCaches: live.meta.lastRun.historicalReplayMissingCaches,
       backlogRemaining
     }
   };
 
     setProviderStatusOk(live);
     live.fetchedAt = isoNow();
-    live.scrapeStatus = `ok (${live.meta.processedMatchIds.length} processed matches${activeMatch ? ', live match tracked' : ''}, ${live.meta.lastRun.scorecardCalls} scorecard call${live.meta.lastRun.scorecardCalls === 1 ? '' : 's'} this run${backlogRemaining ? `, ${backlogRemaining} backlog remaining` : ''})`;
+    live.scrapeStatus = `ok (${live.meta.processedMatchIds.length} processed matches${activeMatch ? ', live match tracked' : ''}, ${live.meta.lastRun.scorecardCalls} scorecard call${live.meta.lastRun.scorecardCalls === 1 ? '' : 's'} this run${live.meta.lastRun.scorecardCacheHits ? `, ${live.meta.lastRun.scorecardCacheHits} cached scorecard${live.meta.lastRun.scorecardCacheHits === 1 ? '' : 's'} reused` : ''}${backlogRemaining ? `, ${backlogRemaining} backlog remaining` : ''})`;
     upsertScoreHistorySnapshot(live, live.meta.processedMatchIds.length, live.fetchedAt);
 
     await fs.writeFile(DATA_FILE, JSON.stringify(live, null, 2), 'utf8');
 
     console.log(
-      `Updated live.json. Series info calls: ${live.meta.lastRun.seriesInfoCalls}. Scorecard calls: ${live.meta.lastRun.scorecardCalls}. Backlog processed: ${live.meta.lastRun.backlogProcessed}. Backlog remaining: ${backlogRemaining}. Live overlay: ${live.meta.liveOverlay.source || 'none'}.`
+      `Updated live.json. Series info calls: ${live.meta.lastRun.seriesInfoCalls}. Scorecard calls: ${live.meta.lastRun.scorecardCalls}. Cached scorecards reused: ${live.meta.lastRun.scorecardCacheHits}. Backlog processed: ${live.meta.lastRun.backlogProcessed}. Backlog remaining: ${backlogRemaining}. Live overlay: ${live.meta.liveOverlay.source || 'none'}.`
     );
   } catch (error) {
     if (isCricketDataQuotaError(error)) {

@@ -22,7 +22,16 @@ jobs:
 
       - name: Run engine, contract, schedule, and room-model tests
         run: |
-          node --test             tests/warroom-engine.golden.test.mjs             tests/warroom-engine.fixtures.test.mjs             tests/live-data.contract.test.mjs             tests/warroom-room-model.test.mjs             tests/update-live-data.quota.test.mjs             tests/update-live-data.schedule.test.mjs             tests/page.directory-wiring.test.mjs             tests/duels-backend.wiring.test.mjs
+          node --test \
+            tests/warroom-engine.golden.test.mjs \
+            tests/warroom-engine.fixtures.test.mjs \
+            tests/live-data.contract.test.mjs \
+            tests/warroom-room-model.test.mjs \
+            tests/update-live-data.quota.test.mjs \
+            tests/update-live-data.schedule.test.mjs \
+            tests/update-live-data.scorecard-cache.test.mjs \
+            tests/page.directory-wiring.test.mjs \
+            tests/duels-backend.wiring.test.mjs
 
       - name: Validate live-data and war-room fixtures
         run: |

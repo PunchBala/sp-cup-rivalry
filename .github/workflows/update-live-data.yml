@@ -46,6 +46,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/live.json
+          if [ -d data/scorecards ]; then
+            git add data/scorecards
+          fi
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
