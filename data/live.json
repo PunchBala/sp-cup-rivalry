@@ -2,7 +2,7 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-04-06T23:15:33.795Z",
+  "fetchedAt": "2026-04-06T23:25:00.290Z",
   "scrapeStatus": "ok (10 processed matches, 0 scorecard calls this run, 12 backlog remaining)",
   "scrapeReport": {
     "orangeCap": {
@@ -56,10 +56,11 @@
       "method": "computed standings from completed matches"
     },
     "mostDots": {
-      "ok": true,
+      "ok": false,
       "source": "IPLT20 official most dots feed",
       "method": "parsed JSONP mostdotballsbowledtournament feed from Sports Mechanic stats feed",
-      "rows": 73
+      "reason": "refresh interval not reached",
+      "cachedRows": 73
     },
     "mvp": {
       "ok": true,
@@ -89,16 +90,16 @@
       "method": "scheduled league-stage windows, cached completed matches forever, cache-first historical replay, capped backlog catch-up, throttled live scorecards",
       "liveScorecardsEnabled": false,
       "liveScorecardIntervalMinutes": 30,
-      "maxBacklogScorecardsPerRun": 2,
-      "maxFreshScorecardCallsPerRun": 1,
-      "historicalReplayApiFallbackAllowed": false,
+      "maxBacklogScorecardsPerRun": 12,
+      "maxFreshScorecardCallsPerRun": 12,
+      "historicalReplayApiFallbackAllowed": true,
       "scorecardCallsThisRun": 0,
       "scorecardCacheHitsThisRun": 0,
       "historicalReplaySkipped": true,
-      "historicalReplayMissingCaches": 10,
+      "historicalReplayMissingCaches": 0,
       "freshScorecardBudgetExhausted": false,
       "freshScorecardBudgetSkips": 0,
-      "freshScorecardBudgetRemaining": 1,
+      "freshScorecardBudgetRemaining": 12,
       "backlogRemaining": 12
     }
   },
@@ -107,10 +108,10 @@
       "dayKey": "2026-04-07",
       "quietRefreshesUsed": 0,
       "lastQuietRefreshAt": null,
-      "lastLiveRefreshAt": "2026-04-06T23:15:31.779Z",
-      "lastSeriesInfoAt": "2026-04-06T23:15:31.779Z",
+      "lastLiveRefreshAt": "2026-04-06T23:24:58.673Z",
+      "lastSeriesInfoAt": "2026-04-06T23:24:58.673Z",
       "lastDecision": {
-        "at": "2026-04-06T23:15:30.576Z",
+        "at": "2026-04-06T23:24:57.030Z",
         "shouldRefresh": true,
         "mode": "forced_refresh",
         "reason": "forced refresh requested",
@@ -119,7 +120,7 @@
       "nextPlannedRefreshAt": "2026-04-07T13:00:00.000Z",
       "nextPlannedMode": "scheduled_window",
       "nextPlannedReason": "league-stage refresh plan",
-      "nextPlannedCalculatedAt": "2026-04-06T23:15:31.780Z"
+      "nextPlannedCalculatedAt": "2026-04-06T23:24:58.673Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -40519,7 +40520,7 @@
       },
       {
         "processedMatchCount": 10,
-        "fetchedAt": "2026-04-06T23:15:33.795Z",
+        "fetchedAt": "2026-04-06T23:25:00.290Z",
         "snapshot": {
           "season": 2026,
           "provider": "CricketData.org",
@@ -41814,8 +41815,8 @@
             "scorecardBudget": {
               "liveEnabled": false,
               "liveIntervalMinutes": 30,
-              "maxBacklogPerRun": 2,
-              "maxFreshPerRun": 1,
+              "maxBacklogPerRun": 12,
+              "maxFreshPerRun": 12,
               "lastLiveScorecardAt": null,
               "lastLiveScorecardMatchId": null,
               "lastBacklogProcessAt": null,
@@ -48120,7 +48121,7 @@
     },
     "liveOverlay": {
       "matchId": null,
-      "generatedAt": "2026-04-06T23:15:31.921Z",
+      "generatedAt": "2026-04-06T23:24:59.469Z",
       "aggregates": null,
       "status": null,
       "source": null
@@ -48128,14 +48129,14 @@
     "scorecardBudget": {
       "liveEnabled": false,
       "liveIntervalMinutes": 30,
-      "maxBacklogPerRun": 2,
-      "maxFreshPerRun": 1,
+      "maxBacklogPerRun": 12,
+      "maxFreshPerRun": 12,
       "lastLiveScorecardAt": null,
       "lastLiveScorecardMatchId": null,
       "lastBacklogProcessAt": "2026-04-05T18:50:55.775Z",
       "lastBudgetExhaustedAt": null,
       "lastBudgetSkipReason": null,
-      "lastDeferredAt": "2026-04-06T23:15:31.921Z",
+      "lastDeferredAt": "2026-04-06T23:24:59.469Z",
       "lastDeferredMatchId": "547b47e3-b2d9-4f51-8a49-8e7e4c946a6e",
       "lastDeferredReason": "backlog: ERR: Scorecard 547b47e3-b2d9-4f51-8a49-8e7e4c946a6e not found"
     },
@@ -48159,13 +48160,14 @@
       "liveOverlaySkippedReason": null,
       "cricketDataFailovers": 0,
       "historicalReplaySkipped": true,
-      "historicalReplayMissingCaches": 10,
+      "historicalReplayMissingCaches": 0,
       "historicalReplayUsedApiFallback": false,
-      "historicalReplayReason": "cache-only replay skipped; 10 cached scorecards missing",
+      "historicalReplayReason": "historical replay deferred; ERR: Scorecard 55fe0f15-6eb0-4ad5-835b-5564be4f6a21 not found",
       "freshScorecardBudgetExhausted": false,
       "freshScorecardBudgetSkips": 0,
-      "deferredScorecards": 1,
+      "deferredScorecards": 2,
       "deferredScorecardMatchIds": [
+        "55fe0f15-6eb0-4ad5-835b-5564be4f6a21",
         "547b47e3-b2d9-4f51-8a49-8e7e4c946a6e"
       ],
       "deferredScorecardReason": "backlog: ERR: Scorecard 547b47e3-b2d9-4f51-8a49-8e7e4c946a6e not found"
@@ -48173,7 +48175,7 @@
     "aggregateSchemaVersion": 2,
     "providerStatus": {
       "state": "ok",
-      "lastAttemptAt": "2026-04-06T23:15:30.574Z",
+      "lastAttemptAt": "2026-04-06T23:24:57.028Z",
       "lastErrorAt": null,
       "reason": null,
       "hitsToday": null,
