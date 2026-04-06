@@ -35,6 +35,9 @@ jobs:
           CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY }}
           CRICKETDATA_API_KEY_FALLBACK: ${{ secrets.CRICKETDATA_API_KEY_FALLBACK }}
           CRICKETDATA_FORCE_REFRESH: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+          CRICKETDATA_MAX_BACKLOG_SCORECARDS_PER_RUN: ${{ github.event_name == 'workflow_dispatch' && '12' || '2' }}
+          CRICKETDATA_MAX_FRESH_SCORECARD_CALLS_PER_RUN: ${{ github.event_name == 'workflow_dispatch' && '12' || '1' }}
+          CRICKETDATA_ALLOW_HISTORICAL_REPLAY: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         run: node scripts/update-live-data.mjs
 
       - name: Validate live data contract
