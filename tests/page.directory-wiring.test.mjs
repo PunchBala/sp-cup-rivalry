@@ -6,7 +6,13 @@ import path from 'node:path';
 test('public duel directory wiring exists in the page shell', async () => {
   const html = await fs.readFile(path.resolve(process.cwd(), 'index.html'), 'utf8');
 
-  assert.match(html, /id="duelStudioCard"/);
+  assert.match(html, /id="heroActions"/);
+  assert.match(html, /id="participantBannerSlot"/);
+  assert.match(html, /id="surfaceBackdrop"/);
+  assert.match(html, /id="profileDrawer"/);
+  assert.match(html, /id="createDrawer"/);
+  assert.match(html, /id="manageDrawer"/);
+  assert.match(html, /id="browseDrawer"/);
   assert.match(html, /id="authPanel"/);
   assert.match(html, /id="profilePanel"/);
   assert.match(html, /id="createDuelPanel"/);
@@ -23,6 +29,9 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function joinDuelByCode\(/);
   assert.match(html, /function copyDuelCode\(/);
   assert.match(html, /function copyInviteMessage\(/);
+  assert.match(html, /function renderHeroActions\(/);
+  assert.match(html, /function renderParticipantBanner\(/);
+  assert.match(html, /function syncSurfaceDrawers\(/);
   assert.match(html, /function renderProfilePanel\(/);
   assert.match(html, /function renderMyDuelsPanel\(/);
   assert.match(html, /function renderOpsPanel\(/);

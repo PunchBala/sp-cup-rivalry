@@ -42,35 +42,44 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
 
   await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Duels');
   await expect(page.locator('#leaguePill')).toContainText('Duels: SP Cup 2026');
-  await expect(page.getByRole('button', { name: 'Duels', exact: true })).toBeVisible();
-  await expect(page.getByLabel('Browse public duel')).toBeVisible();
-  await expect(page.locator('#profilePanel')).toContainText('Create or sign in');
-  await expect(page.locator('#myDuelsPanel')).toContainText('Sign in');
+  await expect(page.getByRole('button', { name: 'Board', exact: true })).toBeVisible();
+  await expect(page.locator('#browseDuelsButton')).toBeVisible();
+  await expect(page.locator('#createDuelButton')).toBeVisible();
+  await expect(page.locator('#profileChipButton')).toContainText('Sign in');
+
+  await page.locator('#browseDuelsButton').click();
+  await expect(page.locator('#browseDrawer')).toBeVisible();
   await expect(page.locator('#duelDirectory [data-duel-card]')).toHaveCount(2);
   await expect(page.locator('#duelDirectory')).toContainText('Senthil vs Sai');
   await expect(page.locator('#duelDirectory')).toContainText('Senthil vs Vibeesh');
+  await page.locator('#browseDrawer [data-close-drawer="browse"]').click();
 
+  await page.locator('#profileChipButton').click();
+  await expect(page.locator('#profileDrawer')).toBeVisible();
   await page.locator('#authDisplayName').fill('Senthil');
   await page.locator('#authOwnerId').fill('senthil');
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.locator('#authForm button[type="submit"]').click();
   await expect(page.locator('#myDuelsPanel')).toContainText('Senthil vs Sai');
   await expect(page.locator('#myDuelsPanel')).toContainText('Live from Match 1');
-  await page.getByRole('button', { name: 'Sign out' }).click();
+  await page.locator('#authPanel').getByRole('button', { name: 'Sign out' }).click();
 
   await page.locator('#authDisplayName').fill('Anand');
   await page.locator('#authOwnerId').fill('anand');
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.locator('#authForm button[type="submit"]').click();
   await expect(page.locator('#authPanel')).toContainText('Signed in as Anand');
   await expect(page.locator('#profilePanel')).toContainText('Anand');
+  await expect(page.locator('#myDuelsPanel')).toContainText('No duels yet');
+  await page.locator('#profileDrawer [data-close-drawer="profile"]').click();
+  await page.locator('#createDuelButton').click();
+  await expect(page.locator('#createDrawer')).toBeVisible();
   await expect(page.locator('#createDuelPanel')).toContainText('Join duel by code');
 
   await page.getByRole('button', { name: 'Create public duel' }).click();
+  await expect(page.locator('#manageDrawer')).toBeVisible();
   await expect(page.locator('#viewTabs')).toContainText('Active duel: Anand vs Open challenger');
-  await expect(page.locator('#duelDirectory')).toContainText('Anand vs Open challenger');
   await expect(page).toHaveURL(/share=/);
   await expect(page.locator('#duelControlsPanel')).toContainText('Code:');
   await expect(page.locator('#duelControlsPanel')).toContainText('Duel readiness');
-  await expect(page.locator('#myDuelsPanel')).toContainText('Anand vs Open challenger');
   await expect(page.getByRole('button', { name: 'Copy invite message' })).toBeVisible();
   const duelCode = new URL(page.url()).searchParams.get('duel');
   expect(duelCode).toBeTruthy();
@@ -108,16 +117,26 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await page.locator('#submitPicksButton').click();
   await expect(page.locator('#duelControlsPanel')).toContainText('Waiting for both pick sheets');
 
-  await page.getByRole('button', { name: 'Sign out' }).click();
+  await page.locator('#manageDrawer [data-close-drawer="manage"]').click();
+  await page.locator('#profileChipButton').click();
+  await page.locator('#authPanel').getByRole('button', { name: 'Sign out' }).click();
   await page.locator('#authDisplayName').fill('Bala');
   await page.locator('#authOwnerId').fill('bala');
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.locator('#authForm button[type="submit"]').click();
+  await page.locator('#profileDrawer [data-close-drawer="profile"]').click();
+  await page.locator('#createDuelButton').click();
   await page.locator('#joinByCodeInput').fill(duelCode);
   await page.getByRole('button', { name: 'Join by code' }).click();
+  await expect(page.locator('#manageDrawer')).toBeVisible();
   await expect(page.locator('#viewTabs')).toContainText('Active duel: Anand vs Bala');
+  await page.locator('#manageDrawer [data-close-drawer="manage"]').click();
+  await page.locator('#browseDuelsButton').click();
+  await expect(page.locator('#browseDrawer')).toBeVisible();
   await page.getByRole('button', { name: 'My duels' }).click();
   await expect(page.locator('#duelDirectory')).toContainText('Anand vs Bala');
   await page.getByRole('button', { name: 'All' }).click();
+  await page.locator('#browseDrawer [data-close-drawer="browse"]').click();
+  await page.locator('#manageDuelButton').click();
 
   await page.locator('[data-open-picker="titleWinner"]').click();
   await page.getByRole('button', { name: 'Mumbai Indians' }).click();
@@ -160,6 +179,7 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await expect(page.locator('#metricOverall')).toContainText('--');
   await expect(page.locator('#breakdownTable')).not.toContainText('Shubman Gill');
   await expect(page.locator('#duelDirectory')).toContainText('Armed duel');
+  await page.locator('#manageDrawer [data-close-drawer="manage"]').click();
 
   await page.getByRole('button', { name: 'Nerd Room' }).click();
   await expect(page.locator('#statsSummary')).toContainText('board');

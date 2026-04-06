@@ -48,6 +48,8 @@
       box-shadow:var(--glow);
       margin-bottom:18px;
     }
+    .hero-toolbar{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:16px}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;width:100%}
     h1,h2,h3,p{margin:0}
     h1{font-size:clamp(32px,4.5vw,46px);line-height:1.02}
     .sub{color:var(--muted);margin-top:8px;max-width:900px;font-size:13px;line-height:1.45}
@@ -122,6 +124,21 @@
     .roast-tag.banter{background:rgba(124,196,255,.14);color:#bfe2ff}
     .roast-tag.extreme{background:rgba(255,127,150,.16);color:#ffd0d8}
     .view-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+    .participant-banner-card{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid rgba(124,196,255,.18);
+      background:linear-gradient(180deg, rgba(124,196,255,.08), rgba(95,240,200,.06));
+      box-shadow:var(--glow);
+    }
+    .participant-banner-copy{display:grid;gap:4px}
+    .participant-banner-title{font-size:14px;font-weight:900;color:#fff}
+    .participant-banner-note{font-size:12px;color:var(--muted);line-height:1.45}
     .duel-picker{
       display:inline-flex;
       align-items:center;
@@ -309,10 +326,52 @@
     .studio-invite-code{display:inline-flex;align-items:center;gap:8px;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(7,12,24,.38);font-size:16px;font-weight:900;color:#fff;overflow-wrap:anywhere;word-break:break-word}
     .studio-invite-actions{display:flex;gap:10px;flex-wrap:wrap}
     .studio-callout{padding:12px 14px;border-radius:14px;border:1px solid rgba(124,196,255,.16);background:rgba(124,196,255,.08);font-size:13px;line-height:1.55;color:#dceaff}
+    .surface-backdrop{
+      position:fixed;
+      inset:0;
+      z-index:70;
+      background:rgba(3,8,18,.72);
+      backdrop-filter:blur(4px);
+    }
+    .surface-drawer{
+      position:fixed;
+      top:0;
+      right:0;
+      bottom:0;
+      z-index:80;
+      width:min(460px, 100vw);
+      padding:18px;
+      overflow:auto;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(124,196,255,.14), transparent 30%),
+        linear-gradient(180deg, rgba(18,29,58,.99), rgba(10,18,38,.99));
+      border-left:1px solid var(--line);
+      box-shadow:var(--glow);
+    }
+    .surface-drawer.wide{width:min(560px, 100vw)}
+    .surface-drawer-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+    .surface-drawer-title{font-size:24px;font-weight:900;line-height:1.05;color:#fff}
+    .surface-drawer-sub{font-size:12px;color:var(--muted);line-height:1.45;max-width:320px}
+    .surface-drawer-close{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .surface-drawer-stack{display:grid;gap:14px}
+    .surface-drawer-section{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:16px}
+    .surface-drawer-advanced{margin-top:14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03)}
+    .surface-drawer-advanced summary{cursor:pointer;list-style:none;padding:14px 16px;font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+    .surface-drawer-advanced summary::-webkit-details-marker{display:none}
+    .surface-drawer-advanced-body{padding:0 16px 16px}
     .picker-modal{
       position:fixed;
       inset:0;
-      z-index:60;
+      z-index:120;
       display:flex;
       align-items:flex-end;
       justify-content:center;
@@ -385,12 +444,14 @@
     @media (max-width:720px){
       .wrap{padding:14px}
       .hero{padding:18px;border-radius:20px}
+      .hero-toolbar{margin-top:14px}
       .card{padding:14px}
       .duel-directory-grid{grid-template-columns:1fr}
       .duel-directory-footer,.duel-directory-actions,.studio-actions,.studio-inline,.studio-invite-actions{align-items:stretch}
       .pill-button,.mini-action,.studio-button{width:100%;justify-content:center}
       .duel-picker{width:100%;justify-content:space-between}
       .duel-picker select{min-width:0;width:100%}
+      .surface-drawer{width:100%;padding:16px}
       .studio-alert-code{font-size:14px}
       .studio-invite-code{font-size:14px}
       .studio-pick-row{padding:12px}
@@ -502,6 +563,10 @@
     <div class="hero">
       <h1 id="leagueTitle">IPL 2026 Prediction Duels</h1>
       <p class="sub" id="leagueSubtitle">Public sealed-duel tracker for the SP Cup board. Browse live head-to-head battles, jump into any duel, and follow how different pick sheets move as the season shifts.</p>
+      <div class="hero-toolbar">
+        <div class="hero-actions" id="heroActions"></div>
+      </div>
+      <div id="duelStudioFlash"></div>
       <div class="tabs" id="tabs"></div>
       <div class="view-tabs" id="viewTabs"></div>
       <div class="meta">
@@ -514,44 +579,7 @@
     </div>
 
     <div class="grid top-summary" id="warRoomSection">
-      <div class="card span-12" id="duelStudioCard">
-        <div class="section-title">Duels beta</div>
-        <div class="studio-summary" id="duelStudioSummary">Create a duel, share the invite link or duel code, and lock in your sealed picks before the duel goes live from its start match.</div>
-        <div id="duelStudioFlash"></div>
-        <div class="studio-layout">
-          <div class="studio-stack">
-            <div class="studio-panel">
-              <div class="studio-kicker">Account</div>
-              <div id="authPanel"></div>
-            </div>
-            <div class="studio-panel">
-              <div class="studio-kicker">Profile</div>
-              <div id="profilePanel"></div>
-            </div>
-            <div class="studio-panel">
-              <div class="studio-kicker">Create duel</div>
-              <div id="createDuelPanel"></div>
-            </div>
-            <div class="studio-panel">
-              <div class="studio-kicker">My duels</div>
-              <div id="myDuelsPanel"></div>
-            </div>
-            <div class="studio-panel">
-              <div class="studio-kicker">Ops tools</div>
-              <div id="opsPanel"></div>
-            </div>
-          </div>
-          <div class="studio-panel">
-            <div class="studio-kicker">Active duel controls</div>
-            <div id="duelControlsPanel"></div>
-          </div>
-        </div>
-      </div>
-      <div class="card span-12">
-        <div class="section-title">Public duel directory</div>
-        <div class="small" id="duelDirectorySummary">Loading public duel board...</div>
-        <div class="duel-directory-grid" id="duelDirectory"></div>
-      </div>
+      <div class="span-12" id="participantBannerSlot"></div>
       <div class="card span-12">
         <div class="layout-side">
           <div>
@@ -653,6 +681,78 @@
         <div class="table-wrap"><table id="scheduleTable" class="schedule-table"></table></div>
       </div>
     </div>
+
+    <div id="surfaceBackdrop" class="surface-backdrop section-hidden"></div>
+
+    <aside id="profileDrawer" class="surface-drawer section-hidden" aria-hidden="true">
+      <div class="surface-drawer-head">
+        <div>
+          <div class="surface-drawer-title">Profile</div>
+          <div class="surface-drawer-sub">Sign in, check your duels, and jump back into the boards you care about.</div>
+        </div>
+        <button class="surface-drawer-close" type="button" data-close-drawer="profile">Close</button>
+      </div>
+      <div class="surface-drawer-stack">
+        <div class="surface-drawer-section">
+          <div class="studio-kicker">Account</div>
+          <div id="authPanel"></div>
+        </div>
+        <div class="surface-drawer-section">
+          <div class="studio-kicker">Profile</div>
+          <div id="profilePanel"></div>
+        </div>
+        <div class="surface-drawer-section">
+          <div class="studio-kicker">My duels</div>
+          <div id="myDuelsPanel"></div>
+        </div>
+      </div>
+    </aside>
+
+    <aside id="createDrawer" class="surface-drawer section-hidden" aria-hidden="true">
+      <div class="surface-drawer-head">
+        <div>
+          <div class="surface-drawer-title">Create duel</div>
+          <div class="surface-drawer-sub">Start a new public duel, get the code instantly, and keep building your picks while your challenger joins.</div>
+        </div>
+        <button class="surface-drawer-close" type="button" data-close-drawer="create">Close</button>
+      </div>
+      <div class="surface-drawer-section">
+        <div id="createDuelPanel"></div>
+      </div>
+    </aside>
+
+    <aside id="manageDrawer" class="surface-drawer wide section-hidden" aria-hidden="true">
+      <div class="surface-drawer-head">
+        <div>
+          <div class="surface-drawer-title">Manage duel</div>
+          <div class="surface-drawer-sub">Invite your challenger, finish sealed picks, resolve clashes, and only touch advanced ops when you really need them.</div>
+        </div>
+        <button class="surface-drawer-close" type="button" data-close-drawer="manage">Close</button>
+      </div>
+      <div class="surface-drawer-section">
+        <div id="duelControlsPanel"></div>
+      </div>
+      <details class="surface-drawer-advanced">
+        <summary>Advanced</summary>
+        <div class="surface-drawer-advanced-body">
+          <div id="opsPanel"></div>
+        </div>
+      </details>
+    </aside>
+
+    <aside id="browseDrawer" class="surface-drawer wide section-hidden" aria-hidden="true">
+      <div class="surface-drawer-head">
+        <div>
+          <div class="surface-drawer-title">Browse duels</div>
+          <div class="surface-drawer-sub">Switch public duels without crowding the main board. We can evolve this into a bigger public feed later.</div>
+        </div>
+        <button class="surface-drawer-close" type="button" data-close-drawer="browse">Close</button>
+      </div>
+      <div class="surface-drawer-section">
+        <div class="small" id="duelDirectorySummary">Loading public duel board...</div>
+        <div class="duel-directory-grid" id="duelDirectory"></div>
+      </div>
+    </aside>
 
     <div id="pickPickerModal" class="picker-modal section-hidden" aria-hidden="true">
       <div class="picker-shell" role="dialog" aria-modal="true" aria-labelledby="pickPickerTitle">
@@ -3851,6 +3951,7 @@ function titleBandScore(pick, live){
       if (!duelId) return;
       activeId = duelId;
       activeView = 'warroom';
+      setActiveDrawer(null);
       requestedDuelMissing = false;
       setRequestedDuelIdInUrl(duelId);
       render();
@@ -3873,6 +3974,7 @@ function titleBandScore(pick, live){
         refreshMergedRoom(storedRemote?.duelRecord?.id || duelId);
         requestedDuelMissing = false;
         activeView = 'warroom';
+        setActiveDrawer('manage');
         setRequestedDuelIdInUrl(storedRemote?.duelRecord?.id || duelId);
         setStudioNotice('good', {
           title: 'Public duel created',
@@ -3917,6 +4019,7 @@ function titleBandScore(pick, live){
       refreshMergedRoom(stored?.duelRecord?.id || duelId);
       requestedDuelMissing = false;
       activeView = 'warroom';
+      setActiveDrawer('manage');
       setRequestedDuelIdInUrl(stored?.duelRecord?.id || duelId);
       setStudioNotice('good', {
         title: 'Public duel created',
@@ -3969,6 +4072,7 @@ function titleBandScore(pick, live){
         })), BASE_ROOM || ACTIVE_ROOM);
         refreshMergedRoom(storedRemote?.duelRecord?.id || activeId);
         requestedDuelMissing = false;
+        setActiveDrawer('manage');
         setRequestedDuelIdInUrl(storedRemote?.duelRecord?.id || activeId);
         setStudioNotice('good', {
           title: `Joined ${storedRemote?.duelRecord?.label || 'the duel'}`,
@@ -3986,6 +4090,7 @@ function titleBandScore(pick, live){
       const stored = upsertCustomBundle(syncBundleDerivedState(bundle), BASE_ROOM || ACTIVE_ROOM);
       refreshMergedRoom(stored?.duelRecord?.id || activeId);
       requestedDuelMissing = false;
+      setActiveDrawer('manage');
       setRequestedDuelIdInUrl(stored?.duelRecord?.id || activeId);
       setStudioNotice('good', {
         title: `Joined ${stored?.duelRecord?.label || 'the duel'}`,
@@ -5053,15 +5158,7 @@ function titleBandScore(pick, live){
     }
 
     function renderDuelStudio(){
-      const summary = document.getElementById('duelStudioSummary');
       const flash = document.getElementById('duelStudioFlash');
-      if (summary) {
-        summary.textContent = CURRENT_USER
-          ? `Signed in as ${CURRENT_USER.displayName}. Create a duel, share the invite link or duel code, fill the 15-category pick sheet with search and team filters, and resolve clashes before the duel becomes armed for its start match.${usesHostedDuelsBackend() ? ` This browser is connected to ${currentAuthLabel()} for real auth and persisted duel records.` : ''}`
-          : usesHostedDuelsBackend()
-            ? `Create or sign in to a real Duels account on ${currentAuthLabel()} so duel invites, duel-code joins, and sealed pick submissions persist across browsers.`
-            : 'Sign in to create a duel, claim a challenger slot, and submit picks. Search-first category pickers, clash checks, duel codes, and frozen reveal rules now run in the browser.';
-      }
       if (flash) {
         flash.innerHTML = DUEL_STUDIO_NOTICE
           ? `<div class="studio-alert ${studioAlertClass(DUEL_STUDIO_NOTICE.type)}">
@@ -5072,12 +5169,15 @@ function titleBandScore(pick, live){
             </div>`
           : '';
       }
+      renderHeroActions();
+      renderParticipantBanner();
       renderAuthPanel();
       renderProfilePanel();
       renderCreateDuelPanel();
       renderMyDuelsPanel();
       renderOpsPanel();
       renderDuelControlsPanel();
+      syncSurfaceDrawers();
     }
 
     function renderEmptyWarRoomState(){
@@ -5204,11 +5304,112 @@ function titleBandScore(pick, live){
     let activeView = 'warroom';
     let activeStatsKey = 'orangeCap';
     let directoryFilter = 'all';
+    let activeDrawer = null;
+
+    function canManageActiveDuel(bundle = activeCustomBundle()){
+      if (!bundle || !CURRENT_USER) return false;
+      const lifecycle = deriveCustomBundleLifecycle(bundle);
+      if (lifecycle.status === 'live') return false;
+      return Boolean(activeOwnedEntry(bundle) || activeOpenEntry(bundle));
+    }
+
+    function setActiveDrawer(nextDrawer = null){
+      activeDrawer = nextDrawer;
+    }
+
+    function toggleDrawer(nextDrawer){
+      activeDrawer = activeDrawer === nextDrawer ? null : nextDrawer;
+      render();
+    }
+
+    function closeDrawer(){
+      if (!activeDrawer) return;
+      activeDrawer = null;
+      render();
+    }
+
+    function renderHeroActions(){
+      const el = document.getElementById('heroActions');
+      if (!el) return;
+      const manageReady = canManageActiveDuel();
+      const profileLabel = CURRENT_USER ? CURRENT_USER.displayName : 'Sign in';
+      el.innerHTML = `
+        <button class="pill-button" type="button" id="browseDuelsButton">${activeDrawer === 'browse' ? 'Close browse' : 'Browse duels'}</button>
+        <button class="pill-button primary" type="button" id="createDuelButton">${activeDrawer === 'create' ? 'Close create' : 'Create duel'}</button>
+        ${manageReady ? `<button class="pill-button" type="button" id="manageDuelButton">${activeDrawer === 'manage' ? 'Close manage' : 'Manage duel'}</button>` : ''}
+        <button class="pill-button" type="button" id="profileChipButton">${escapeHtml(profileLabel)}</button>
+      `;
+      const browseButton = document.getElementById('browseDuelsButton');
+      if (browseButton) browseButton.onclick = () => toggleDrawer('browse');
+      const createButton = document.getElementById('createDuelButton');
+      if (createButton) createButton.onclick = () => toggleDrawer('create');
+      const manageButton = document.getElementById('manageDuelButton');
+      if (manageButton) manageButton.onclick = () => toggleDrawer('manage');
+      const profileButton = document.getElementById('profileChipButton');
+      if (profileButton) profileButton.onclick = () => toggleDrawer('profile');
+    }
+
+    function renderParticipantBanner(){
+      const slot = document.getElementById('participantBannerSlot');
+      if (!slot) return;
+      const bundle = activeCustomBundle();
+      const lifecycle = bundle ? deriveCustomBundleLifecycle(bundle) : null;
+      const ownEntry = activeOwnedEntry(bundle);
+      const openEntry = activeOpenEntry(bundle);
+      if (!bundle || !CURRENT_USER || !lifecycle || lifecycle.status === 'live' || (!ownEntry && !openEntry)) {
+        slot.innerHTML = '';
+        return;
+      }
+      const title = openEntry
+        ? 'Open challenger slot'
+        : lifecycle.status === 'armed'
+          ? `Armed for Match ${lifecycle.startsScoringFromMatchNo || '?'}`
+          : lifecycle.status === 'clash'
+            ? `${lifecycle.clashCount || 0} clash${lifecycle.clashCount === 1 ? '' : 'es'} still need fixing`
+            : 'Draft duel in progress';
+      const note = openEntry
+        ? 'Claim the duel, then fill your 15 picks so this board can move toward its armed state.'
+        : lifecycle.status === 'armed'
+          ? 'This duel is locked and waiting for its start match. Open Manage duel if you need the invite or readiness view.'
+          : lifecycle.status === 'clash'
+            ? 'Both sides have submitted enough to collide. Open Manage duel to resolve clashes and get this armed.'
+            : 'This duel is still pre-live. Open Manage duel to invite your challenger or finish the sealed pick sheet.';
+      slot.innerHTML = `
+        <div class="participant-banner-card">
+          <div class="participant-banner-copy">
+            <div class="participant-banner-title">${escapeHtml(title)}</div>
+            <div class="participant-banner-note">${escapeHtml(note)}</div>
+          </div>
+          <button class="pill-button primary" type="button" id="participantManageButton">Open Manage duel</button>
+        </div>
+      `;
+      const manageButton = document.getElementById('participantManageButton');
+      if (manageButton) manageButton.onclick = () => toggleDrawer('manage');
+    }
+
+    function syncSurfaceDrawers(){
+      if (activeDrawer === 'manage' && !canManageActiveDuel()) activeDrawer = null;
+      const backdrop = document.getElementById('surfaceBackdrop');
+      if (backdrop) {
+        backdrop.classList.toggle('section-hidden', !activeDrawer);
+        backdrop.onclick = () => closeDrawer();
+      }
+      ['profile', 'create', 'manage', 'browse'].forEach((key) => {
+        const el = document.getElementById(`${key}Drawer`);
+        if (!el) return;
+        const open = activeDrawer === key;
+        el.classList.toggle('section-hidden', !open);
+        el.setAttribute('aria-hidden', open ? 'false' : 'true');
+      });
+      document.querySelectorAll('[data-close-drawer]').forEach((button) => {
+        button.onclick = () => closeDrawer();
+      });
+    }
 
     function renderTabs(){
       const el = document.getElementById('tabs');
       const tabs = [
-        { key:'warroom', label:'Duels', type:'warroom' },
+        { key:'warroom', label:'Board', type:'warroom' },
         { key:'stats', label:'Nerd Room', type:'stats' },
         { key:'schedule', label:'Schedule', type:'schedule' }
       ];
@@ -5510,32 +5711,15 @@ function titleBandScore(pick, live){
       if (directoryFilter === 'mine' && !CURRENT_USER) directoryFilter = 'all';
       const visibleDuels = filteredDirectoryDuels(orderedDuels);
       const activeLabel = matchup.label || `${matchup.a.name} vs ${matchup.b.name}`;
-      const waitingTag = matchup.lifecycle?.status === 'live' ? '' : ` | ${lifecycleHeadline(matchup.lifecycle).toLowerCase()}`;
+      const statusLabel = matchup.lifecycle?.status === 'live' ? 'Live duel' : lifecycleHeadline(matchup.lifecycle);
       const fallbackTag = requestedDuelMissing ? 'Requested duel was not found, so this page fell back to the first available duel.' : '';
       nav.innerHTML = `
-        <div class="duel-picker">
-          <label for="duelPicker">Jump to duel</label>
-          <select id="duelPicker" aria-label="Browse public duel">
-            ${orderedDuels.map(({ matchup: item, lifecycle }) => `<option value="${escapeHtml(item.id)}" ${item.id === matchup.id ? 'selected' : ''}>${escapeHtml(item.label || `${item.a.name} vs ${item.b.name}`)}${lifecycle?.status === 'live' ? '' : ` (${escapeHtml(lifecycleHeadline(lifecycle))})`}</option>`).join('')}
-          </select>
-        </div>
-        <div class="pill">Active duel: ${escapeHtml(activeLabel)}${escapeHtml(waitingTag)}</div>
-        <button class="pill pill-button" id="copyActiveDuelLink" type="button">Copy link</button>
-        <button class="pill pill-button" id="copyActiveDuelCode" type="button">Copy code</button>
-        <button class="pill pill-button primary" id="copyActiveInvite" type="button">Copy invite</button>
+        <div class="pill">Active duel: ${escapeHtml(activeLabel)}</div>
+        <div class="pill">Status: ${escapeHtml(statusLabel)}</div>
         <div class="pill">Visibility: public duel page | ${MATCHUPS.length} listed</div>
         <div class="pill">Series: ${escapeHtml(ACTIVE_ROOM.name || ACTIVE_ROOM.slug || 'Duels')}</div>
         ${fallbackTag ? `<div class="pill">${escapeHtml(fallbackTag)}</div>` : ''}
       `;
-
-      const duelPicker = document.getElementById('duelPicker');
-      if (duelPicker) duelPicker.onchange = () => selectDuel(duelPicker.value);
-      const copyActiveButton = document.getElementById('copyActiveDuelLink');
-      if (copyActiveButton) copyActiveButton.onclick = () => copyDuelLink(matchup.id, copyActiveButton);
-      const copyCodeButton = document.getElementById('copyActiveDuelCode');
-      if (copyCodeButton) copyCodeButton.onclick = () => copyDuelCode(matchup.id, copyCodeButton);
-      const copyInviteButton = document.getElementById('copyActiveInvite');
-      if (copyInviteButton) copyInviteButton.onclick = () => copyInviteMessage(matchup.id, copyInviteButton);
 
       const liveCount = orderedDuels.filter((item) => item.isLive).length;
       const armedCount = orderedDuels.filter((item) => item.status === 'armed').length;
