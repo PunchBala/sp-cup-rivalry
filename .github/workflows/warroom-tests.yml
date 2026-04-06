@@ -20,13 +20,14 @@ jobs:
         with:
           node-version: 20
 
-      - name: Run engine, contract, schedule, and room-model tests
+      - name: Run engine, contract, schedule, room-model, and pricing tests
         run: |
           node --test \
             tests/warroom-engine.golden.test.mjs \
             tests/warroom-engine.fixtures.test.mjs \
             tests/live-data.contract.test.mjs \
             tests/warroom-room-model.test.mjs \
+            tests/mini-fantasy-pricing-engine.test.mjs \
             tests/update-live-data.quota.test.mjs \
             tests/update-live-data.schedule.test.mjs \
             tests/update-live-data.scorecard-cache.test.mjs \

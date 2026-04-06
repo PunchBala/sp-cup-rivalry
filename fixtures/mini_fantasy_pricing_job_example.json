@@ -1,0 +1,63 @@
+{
+  "job_meta": {
+    "season": "IPL 2026",
+    "as_of_utc": "2026-04-06T23:59:59Z",
+    "price_min": 4,
+    "price_max": 10,
+    "recent_matches_window": 3,
+    "max_daily_price_step": 1,
+    "default_initial_price": 6,
+    "scoring_source": "existing_mvp_points_formula_v1",
+    "notes": "Daily pricing refresh after all completed matches for the day"
+  },
+  "players": [
+    {
+      "player_id": "rcb_virat_kohli",
+      "name": "Virat Kohli",
+      "team": "RCB",
+      "role": "batter",
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "match_points": [72, 48, 81, 22, 64],
+      "matches_played": 5,
+      "last_match_played_at_utc": "2026-04-06T18:30:00Z"
+    },
+    {
+      "player_id": "mi_jasprit_bumrah",
+      "name": "Jasprit Bumrah",
+      "team": "MI",
+      "role": "bowler",
+      "pricing_eligible": true,
+      "old_price": 9,
+      "initial_price": 9,
+      "match_points": [44, 68, 25, 92],
+      "matches_played": 4,
+      "last_match_played_at_utc": "2026-04-05T18:30:00Z"
+    },
+    {
+      "player_id": "csk_fringe_player_x",
+      "name": "Fringe Player X",
+      "team": "CSK",
+      "role": "all_rounder",
+      "pricing_eligible": true,
+      "old_price": 5,
+      "initial_price": 5,
+      "match_points": [88],
+      "matches_played": 1,
+      "last_match_played_at_utc": "2026-04-06T18:30:00Z"
+    },
+    {
+      "player_id": "gt_new_player_y",
+      "name": "New Player Y",
+      "team": "GT",
+      "role": "bowler",
+      "pricing_eligible": true,
+      "old_price": null,
+      "initial_price": 6,
+      "match_points": [],
+      "matches_played": 0,
+      "last_match_played_at_utc": null
+    }
+  ]
+}
