@@ -275,6 +275,7 @@ function createEmptyLive() {
       },
       cache: { seriesId: SERIES_ID, matchList: [] },
       processedMatchIds: [],
+      processedMatchKeys: [],
       scoreHistory: [],
       aggregates: createEmptyAggregates(),
       liveOverlay: {
@@ -372,6 +373,7 @@ async function readExistingLive() {
         scheduler: { ...fresh.meta.scheduler, ...(parsed.meta?.scheduler || {}) },
         cache: { ...fresh.meta.cache, ...(parsed.meta?.cache || {}) },
         processedMatchIds: Array.isArray(parsed.meta?.processedMatchIds) ? parsed.meta.processedMatchIds : [],
+        processedMatchKeys: Array.isArray(parsed.meta?.processedMatchKeys) ? parsed.meta.processedMatchKeys : [],
         scoreHistory: Array.isArray(parsed.meta?.scoreHistory) ? parsed.meta.scoreHistory : [],
         aggregates: { ...fresh.meta.aggregates, ...(parsed.meta?.aggregates || {}) },
         liveOverlay: { ...fresh.meta.liveOverlay, ...(parsed.meta?.liveOverlay || {}) },
@@ -940,6 +942,7 @@ function resetDailySchedulerIfNeeded(live, currentMs = Date.now()) {
 }
 
 function toMinimalMatch(m) {
+  const matchNo = parseMatchNoFromText(m.name);
   return {
     id: m.id,
     name: m.name,
@@ -948,7 +951,9 @@ function toMinimalMatch(m) {
     teams: safeArray(m.teams),
     matchStarted: !!m.matchStarted,
     matchEnded: !!m.matchEnded,
-    venue: m.venue
+    venue: m.venue,
+    matchNo,
+    matchKey: matchNo ? `match:${matchNo}` : null
   };
 }
 
@@ -1052,6 +1057,89 @@ function parseTeamFromInningName(inningName) {
   const raw = String(inningName || '');
   const idx = raw.toLowerCase().indexOf(' inning');
   return normalizeName(idx >= 0 ? raw.slice(0, idx) : raw);
+}
+
+function parseMatchNoFromText(value) {
+  const match = String(value || '').match(/(?:^|,\s*)(\d+)(?:st|nd|rd|th)\s+match\b/i);
+  const matchNo = Number(match?.[1] || 0);
+  return Number.isFinite(matchNo) && matchNo > 0 ? matchNo : null;
+}
+
+export function matchKeyForMatch(match) {
+  const matchNo = Number(match?.matchNo || parseMatchNoFromText(match?.name) || 0);
+  if (Number.isFinite(matchNo) && matchNo > 0) return `match:${matchNo}`;
+
+  const teams = safeArray(match?.teams)
+    .map((team) => normalizeName(team))
+    .filter(Boolean)
+    .sort()
+    .join('_');
+  const dateKey = String(match?.dateTimeGMT || '').slice(0, 10);
+  return teams && dateKey ? `fixture:${dateKey}:${teams}` : null;
+}
+
+function compareMatchesChronologically(a, b) {
+  const dateDiff = Date.parse(a?.dateTimeGMT || 0) - Date.parse(b?.dateTimeGMT || 0);
+  if (dateDiff) return dateDiff;
+  const aMatchNo = Number(a?.matchNo || parseMatchNoFromText(a?.name) || 0);
+  const bMatchNo = Number(b?.matchNo || parseMatchNoFromText(b?.name) || 0);
+  if (aMatchNo !== bMatchNo) return aMatchNo - bMatchNo;
+  return String(a?.name || '').localeCompare(String(b?.name || ''));
+}
+
+function processedMatchCount(live) {
+  const keyedCount = safeArray(live?.meta?.processedMatchKeys).length;
+  const idCount = safeArray(live?.meta?.processedMatchIds).length;
+  return Math.max(keyedCount, idCount);
+}
+
+export function inferProcessedMatchKeys(live, matchList) {
+  const stored = safeArray(live?.meta?.processedMatchKeys).filter(Boolean);
+  if (stored.length) return stored;
+
+  const inferredCount = processedMatchCount(live);
+  if (!inferredCount) return [];
+
+  const orderedEnded = safeArray(matchList)
+    .filter((match) => match.matchEnded)
+    .sort(compareMatchesChronologically);
+  const uniqueKeys = [];
+  const seenKeys = new Set();
+
+  for (const match of orderedEnded) {
+    const key = matchKeyForMatch(match);
+    if (!key || seenKeys.has(key)) continue;
+    seenKeys.add(key);
+    uniqueKeys.push(key);
+    if (uniqueKeys.length >= inferredCount) break;
+  }
+
+  return uniqueKeys;
+}
+
+function buildProcessedMatchRefs(matchList, processedKeys, processedIds = []) {
+  const currentByKey = new Map();
+  for (const match of safeArray(matchList).slice().sort(compareMatchesChronologically)) {
+    const key = matchKeyForMatch(match);
+    if (key && !currentByKey.has(key)) currentByKey.set(key, match);
+  }
+
+  return safeArray(processedKeys).map((key, index) => {
+    const current = currentByKey.get(key);
+    if (current) return current;
+    return {
+      id: safeArray(processedIds)[index] || null,
+      name: null,
+      status: null,
+      dateTimeGMT: null,
+      teams: [],
+      matchStarted: true,
+      matchEnded: true,
+      venue: null,
+      matchNo: parseMatchNoFromText(key),
+      matchKey: key
+    };
+  });
 }
 
 function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true } = {}) {
@@ -1354,7 +1442,7 @@ function historyEntryCount(entry) {
 }
 
 export function needsScoreHistoryBackfill(live) {
-  const processedCount = safeArray(live?.meta?.processedMatchIds).length;
+  const processedCount = processedMatchCount(live);
   if (processedCount <= 0) return false;
   const counts = new Set(safeArray(live?.meta?.scoreHistory).map((entry) => historyEntryCount(entry)));
   if (!counts.has(0)) return true;
@@ -1413,6 +1501,58 @@ export async function rebuildHistoricalState(processedIds, baseLive = null, { in
   return includeHistory
     ? { aggregates: rebuilt, scoreHistory: history, cacheHits, apiCalls }
     : { aggregates: rebuilt, cacheHits, apiCalls };
+}
+
+export async function repairScoreHistoryGaps(live, processedRefs, { loadScorecard = null } = {}) {
+  const byCount = new Map(safeArray(live?.meta?.scoreHistory).map((entry) => [historyEntryCount(entry), entry]));
+  if (!byCount.has(0)) {
+    byCount.set(0, {
+      processedMatchCount: 0,
+      fetchedAt: isoNow(),
+      snapshot: createEmptyLive()
+    });
+  }
+
+  let cacheHits = 0;
+  let apiCalls = 0;
+  let repaired = 0;
+  const resolveScorecard = loadScorecard || ((matchId) => processScorecard(matchId, live, {
+    preferCache: true,
+    allowApiFallback: ALLOW_HISTORICAL_REPLAY_API
+  }));
+
+  for (let count = 1; count < safeArray(processedRefs).length; count += 1) {
+    if (byCount.has(count)) continue;
+    const previousEntry = byCount.get(count - 1);
+    const previousAgg = previousEntry?.snapshot?.meta?.aggregates;
+    const matchRef = processedRefs[count - 1];
+    if (!previousAgg || !matchRef?.id) break;
+
+    let scorecardResult;
+    try {
+      scorecardResult = normalizeScorecardResult(await resolveScorecard(matchRef.id));
+    } catch (error) {
+      const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
+      if (!missingScorecard) throw error;
+      noteDeferredScorecard(live, `score history gap ${count}`, matchRef.id, missingScorecard);
+      break;
+    }
+
+    if (scorecardResult.source === 'cache') cacheHits += 1;
+    if (scorecardResult.source === 'api') apiCalls += 1;
+
+    const nextAgg = cloneJson(previousAgg);
+    applyScorecardToAggregates(nextAgg, scorecardResult.data, { isFinal: true });
+    byCount.set(count, {
+      processedMatchCount: count,
+      fetchedAt: isoNow(),
+      snapshot: createScoreHistorySnapshotFromAggregates(nextAgg, live)
+    });
+    repaired += 1;
+  }
+
+  live.meta.scoreHistory = Array.from(byCount.values()).sort((a, b) => historyEntryCount(a) - historyEntryCount(b));
+  return { repaired, cacheHits, apiCalls };
 }
 
 function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = null) {
@@ -1522,11 +1662,21 @@ function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = nul
   };
 }
 
-function endedUnprocessedMatches(matchList, processedIds) {
-  const set = new Set(processedIds || []);
+export function endedUnprocessedMatches(matchList, processedIds, processedKeys = []) {
+  const idSet = new Set(processedIds || []);
+  const keySet = new Set(processedKeys || []);
+  const seenKeys = new Set();
   return safeArray(matchList)
-    .filter((m) => m.matchEnded && !set.has(m.id))
-    .sort((a, b) => Date.parse(a.dateTimeGMT) - Date.parse(b.dateTimeGMT));
+    .filter((m) => {
+      if (!m.matchEnded) return false;
+      const key = m.matchKey || matchKeyForMatch(m);
+      if (idSet.has(m.id)) return false;
+      if (key && keySet.has(key)) return false;
+      if (key && seenKeys.has(key)) return false;
+      if (key) seenKeys.add(key);
+      return true;
+    })
+    .sort(compareMatchesChronologically);
 }
 
 function liveMatchCandidate(matchList) {
@@ -1571,7 +1721,7 @@ function countKeys(mapObj) {
 }
 
 function needsHistoricalAggregateBackfill(live) {
-  const processedCount = safeArray(live.meta.processedMatchIds).length;
+  const processedCount = processedMatchCount(live);
   if (!processedCount) return false;
   if (Number(live.meta.aggregateSchemaVersion || 0) < AGGREGATE_SCHEMA_VERSION) return true;
 
@@ -1687,14 +1837,32 @@ async function main() {
   live.meta.scheduler.nextPlannedReason = nextPlanned ? 'league-stage refresh plan' : 'league-stage refresh plan completed';
   live.meta.scheduler.nextPlannedCalculatedAt = isoNow();
 
-  const processedIds = new Set(live.meta.processedMatchIds || []);
+  const processedMatchKeys = inferProcessedMatchKeys(live, matchList);
+  live.meta.processedMatchKeys = processedMatchKeys;
+  const processedRefs = buildProcessedMatchRefs(matchList, processedMatchKeys, live.meta.processedMatchIds || []);
+  const processedIds = new Set(processedRefs.map((match) => match?.id).filter(Boolean));
+  const processedKeySet = new Set(processedMatchKeys);
   let finalizedAgg = live.meta.aggregates || createEmptyAggregates();
 
-  const requiresHistoricalBackfill = needsHistoricalAggregateBackfill(live);
-  const requiresScoreHistoryBackfill = needsScoreHistoryBackfill(live);
+  let requiresHistoricalBackfill = needsHistoricalAggregateBackfill(live);
+  let requiresScoreHistoryBackfill = needsScoreHistoryBackfill(live);
+
+  if (requiresScoreHistoryBackfill && processedRefs.length) {
+    const gapRepair = await repairScoreHistoryGaps(live, processedRefs, {
+      loadScorecard: (matchId) => processScorecard(matchId, live, {
+        preferCache: true,
+        allowApiFallback: ALLOW_HISTORICAL_REPLAY_API
+      })
+    });
+    live.meta.lastRun.scorecardCalls += gapRepair.apiCalls;
+    live.meta.lastRun.scorecardCacheHits += gapRepair.cacheHits;
+    requiresScoreHistoryBackfill = needsScoreHistoryBackfill(live);
+  }
+
   let appliedHistoricalBackfill = false;
   if (requiresHistoricalBackfill || requiresScoreHistoryBackfill) {
-    const historicalReplayMissingCaches = await findMissingScorecardCaches(live.meta.processedMatchIds || []);
+    const replayIds = processedRefs.map((match) => match?.id).filter(Boolean);
+    const historicalReplayMissingCaches = await findMissingScorecardCaches(replayIds);
 
     if (historicalReplayMissingCaches.length && !ALLOW_HISTORICAL_REPLAY_API) {
       live.meta.lastRun.historicalReplaySkipped = true;
@@ -1708,7 +1876,7 @@ async function main() {
     } else {
       try {
         const rebuiltState = await rebuildHistoricalState(
-          live.meta.processedMatchIds || [],
+          replayIds,
           live,
           {
             includeHistory: requiresScoreHistoryBackfill,
@@ -1739,7 +1907,7 @@ async function main() {
     live.meta.aggregateSchemaVersion = AGGREGATE_SCHEMA_VERSION;
   }
 
-  const endedBacklog = endedUnprocessedMatches(matchList, live.meta.processedMatchIds);
+  const endedBacklog = endedUnprocessedMatches(matchList, [...processedIds], processedMatchKeys);
   const backlogToProcess = endedBacklog.slice(0, MAX_BACKLOG_SCORECARDS_PER_RUN);
   const activeMatch = liveMatchCandidate(matchList);
 
@@ -1755,7 +1923,7 @@ async function main() {
       const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
       if (!missingScorecard) throw error;
       noteDeferredScorecard(live, 'backlog', match.id, missingScorecard);
-      break;
+      continue;
     }
     if (scorecardResult.source === 'cache') {
       live.meta.lastRun.scorecardCacheHits += 1;
@@ -1764,6 +1932,10 @@ async function main() {
     }
     applyScorecardToAggregates(finalizedAgg, scorecardResult.data, { isFinal: true });
     processedIds.add(match.id);
+    if (match.matchKey) {
+      processedKeySet.add(match.matchKey);
+      processedMatchKeys.push(match.matchKey);
+    }
     live.meta.lastRun.backlogProcessed += 1;
   }
 
@@ -1847,6 +2019,7 @@ async function main() {
   }
 
   live.meta.processedMatchIds = [...processedIds];
+  live.meta.processedMatchKeys = Array.from(new Set(processedMatchKeys));
   live.meta.aggregates = finalizedAgg;
   live.meta.aggregateSchemaVersion = AGGREGATE_SCHEMA_VERSION;
 

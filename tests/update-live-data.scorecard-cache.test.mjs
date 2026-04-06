@@ -5,10 +5,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  endedUnprocessedMatches,
   canUseFreshScorecardCall,
   findMissingScorecardCaches,
   freshScorecardBudgetRemaining,
+  inferProcessedMatchKeys,
+  matchKeyForMatch,
   readCachedScorecard,
+  repairScoreHistoryGaps,
   rebuildHistoricalState,
   writeCachedScorecard
 } from '../scripts/update-live-data.mjs';
@@ -159,4 +163,139 @@ test('historical rebuild tracks cache hits separately from paid API scorecard ca
   assert.equal(rebuilt.scoreHistory[2].processedMatchCount, 2);
   assert.equal(rebuilt.aggregates.battingRuns['Prabhsimran Singh'], 61);
   assert.equal(rebuilt.aggregates.battingRuns['Virat Kohli'], 88);
+});
+
+test('stable processed match keys prevent duplicate backlog when CricketData rotates match ids', () => {
+  const live = {
+    meta: {
+      processedMatchIds: ['old-match-1', 'old-match-2']
+    }
+  };
+  const matchList = [
+    {
+      id: 'new-match-1',
+      name: 'Royal Challengers Bengaluru vs Sunrisers Hyderabad, 1st Match, Indian Premier League 2026',
+      dateTimeGMT: '2026-03-28T00:00:00',
+      teams: ['Royal Challengers Bengaluru', 'Sunrisers Hyderabad'],
+      matchEnded: true
+    },
+    {
+      id: 'new-match-2',
+      name: 'Mumbai Indians vs Kolkata Knight Riders, 2nd Match, Indian Premier League 2026',
+      dateTimeGMT: '2026-03-29T00:00:00',
+      teams: ['Mumbai Indians', 'Kolkata Knight Riders'],
+      matchEnded: true
+    },
+    {
+      id: 'new-match-3',
+      name: 'Rajasthan Royals vs Chennai Super Kings, 3rd Match, Indian Premier League 2026',
+      dateTimeGMT: '2026-03-30T00:00:00',
+      teams: ['Rajasthan Royals', 'Chennai Super Kings'],
+      matchEnded: true
+    }
+  ].map((match) => ({ ...match, matchKey: matchKeyForMatch(match) }));
+
+  const processedKeys = inferProcessedMatchKeys(live, matchList);
+  const backlog = endedUnprocessedMatches(matchList, live.meta.processedMatchIds, processedKeys);
+
+  assert.deepEqual(processedKeys, ['match:1', 'match:2']);
+  assert.equal(backlog.length, 1);
+  assert.equal(backlog[0].id, 'new-match-3');
+});
+
+test('repairs missing score-history checkpoints from the nearest earlier snapshot', async () => {
+  const scorecards = {
+    'match-1': makeFinalScorecard({
+      teams: ['Punjab Kings', 'Delhi Capitals'],
+      winner: 'Punjab Kings',
+      batter: 'Prabhsimran Singh',
+      bowler: 'Kuldeep Yadav',
+      catcher: 'Shashank Singh',
+      runs: 61,
+      balls: 36,
+      sixes: 3,
+      wickets: 2,
+      concededRuns: 31,
+      overs: '4',
+      scoreA: 176,
+      scoreB: 161
+    }),
+    'match-2': makeFinalScorecard({
+      teams: ['Royal Challengers Bengaluru', 'Rajasthan Royals'],
+      winner: 'Royal Challengers Bengaluru',
+      batter: 'Virat Kohli',
+      bowler: 'Jofra Archer',
+      catcher: 'Rajat Patidar',
+      runs: 88,
+      balls: 50,
+      sixes: 5,
+      wickets: 1,
+      concededRuns: 38,
+      overs: '4',
+      scoreA: 189,
+      scoreB: 175
+    }),
+    'match-3': makeFinalScorecard({
+      teams: ['Mumbai Indians', 'Lucknow Super Giants'],
+      winner: 'Lucknow Super Giants',
+      batter: 'Nicholas Pooran',
+      bowler: 'Jasprit Bumrah',
+      catcher: 'Rohit Sharma',
+      runs: 54,
+      balls: 31,
+      sixes: 4,
+      wickets: 2,
+      concededRuns: 29,
+      overs: '4',
+      scoreA: 167,
+      scoreB: 171
+    })
+  };
+
+  const baseLive = {
+    mostDots: { ranking: [], extendedRanking: [], values: {} },
+    fairPlay: { winner: null, ranking: [], extendedRanking: [], values: {}, updatedAt: null, source: null },
+    meta: {
+      scoreHistory: [{ processedMatchCount: 0, fetchedAt: '2026-04-01T00:00:00.000Z' }]
+    }
+  };
+
+  const throughOneMatch = await rebuildHistoricalState(
+    ['match-1'],
+    baseLive,
+    {
+      includeHistory: true,
+      loadScorecard: async (matchId) => ({ data: scorecards[matchId], source: 'cache' })
+    }
+  );
+
+  const live = {
+    ...baseLive,
+    meta: {
+      processedMatchIds: ['legacy-1', 'legacy-2', 'legacy-3'],
+      processedMatchKeys: ['match:1', 'match:2', 'match:3'],
+      scoreHistory: throughOneMatch.scoreHistory
+    }
+  };
+
+  const repaired = await repairScoreHistoryGaps(
+    live,
+    [
+      { id: 'match-1', matchKey: 'match:1' },
+      { id: 'match-2', matchKey: 'match:2' },
+      { id: 'match-3', matchKey: 'match:3' }
+    ],
+    {
+      loadScorecard: async (matchId) => ({ data: scorecards[matchId], source: matchId === 'match-2' ? 'api' : 'cache' })
+    }
+  );
+
+  const repairedCounts = live.meta.scoreHistory.map((entry) => entry.processedMatchCount);
+  const repairedSnapshot = live.meta.scoreHistory.find((entry) => entry.processedMatchCount === 2);
+
+  assert.equal(repaired.repaired, 1);
+  assert.equal(repaired.apiCalls, 1);
+  assert.equal(repaired.cacheHits, 0);
+  assert.deepEqual(repairedCounts, [0, 1, 2]);
+  assert.equal(repairedSnapshot.snapshot.meta.aggregates.battingRuns['Virat Kohli'], 88);
 });
