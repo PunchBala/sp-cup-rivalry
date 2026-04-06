@@ -3,18 +3,15 @@
   "provider": "data/live.json",
   "source": "data/live.json",
   "fetchedAt": "2026-04-06T11:38:33.882Z",
-  "scrapeStatus": "skipped (outside_scheduled_window: outside planned refresh windows)",
+  "scrapeStatus": "delayed (CricketData quota reached; showing last good data from 2026-04-06T11:38:33.882Z)",
   "scrapeReport": {
     "costControl": {
-      "ok": true,
+      "ok": false,
       "source": "worker",
-      "method": "scheduled league-stage windows, cached completed matches forever, capped backlog catch-up, throttled live scorecards",
-      "skipped": true,
-      "mode": "outside_scheduled_window",
-      "reason": "outside planned refresh windows",
-      "liveScorecardsEnabled": false,
-      "liveScorecardIntervalMinutes": 30,
-      "maxBacklogScorecardsPerRun": 2,
+      "method": "provider quota exceeded; kept previous live snapshot",
+      "quotaExceeded": true,
+      "hitsToday": 114,
+      "hitsLimit": 100,
       "scorecardCallsThisRun": 0,
       "backlogRemaining": 0
     }
@@ -27,16 +24,16 @@
       "lastLiveRefreshAt": null,
       "lastSeriesInfoAt": "2026-04-05T18:51:35.311Z",
       "lastDecision": {
-        "at": "2026-04-06T11:38:33.882Z",
-        "shouldRefresh": false,
-        "mode": "outside_scheduled_window",
-        "reason": "outside planned refresh windows",
-        "nextPlannedAt": "2026-04-06T13:00:00.000Z"
+        "at": "2026-04-06T13:24:48.606Z",
+        "shouldRefresh": true,
+        "mode": "forced_refresh",
+        "reason": "forced refresh requested",
+        "nextPlannedAt": "2026-04-06T18:00:00.000Z"
       },
-      "nextPlannedRefreshAt": "2026-04-06T13:00:00.000Z",
+      "nextPlannedRefreshAt": "2026-04-06T18:00:00.000Z",
       "nextPlannedMode": "scheduled_window",
       "nextPlannedReason": "league-stage refresh plan",
-      "nextPlannedCalculatedAt": "2026-04-06T11:38:33.882Z"
+      "nextPlannedCalculatedAt": "2026-04-06T13:24:48.606Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -48051,19 +48048,19 @@
       "liveOverlayFetched": false,
       "liveOverlayReused": false,
       "liveOverlaySkippedReason": null,
-      "cricketDataFailovers": 0
+      "cricketDataFailovers": 1
     },
     "aggregateSchemaVersion": 2,
     "providerStatus": {
       "state": "quota_exceeded",
-      "lastAttemptAt": "2026-04-06T11:38:33.880Z",
-      "lastErrorAt": "2026-04-05T19:50:38.468Z",
+      "lastAttemptAt": "2026-04-06T13:24:48.605Z",
+      "lastErrorAt": "2026-04-06T13:24:50.790Z",
       "reason": "hits_today_exceeded_hits_limit",
-      "hitsToday": 113,
+      "hitsToday": 114,
       "hitsLimit": 100,
       "activeKeyTier": "fallback",
       "fallbackAvailable": true,
-      "lastFallbackAt": "2026-04-05T19:50:38.280Z",
+      "lastFallbackAt": "2026-04-06T13:24:49.960Z",
       "lastFallbackReason": "hits today exceeded hits limit"
     },
     "cricmetricDots": {
