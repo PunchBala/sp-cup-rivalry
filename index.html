@@ -782,7 +782,7 @@
           <div class="fantasy-lead">
             <div class="section-title">Mini Fantasy</div>
             <div class="fantasy-headline" id="miniFantasyHeadline">Mini Fantasy opens from Match 14</div>
-            <div class="fantasy-sub" id="miniFantasySummary">Pick a 4-player team for each eligible match, stay under 30 credits, lock one captain for a 1.5x boost, and get your entries saved match by match.</div>
+            <div class="fantasy-sub" id="miniFantasySummary">Pick a 4-player team for each eligible match, stay under 31 credits, lock one captain for a 1.5x boost, and get your entries saved match by match.</div>
             <div class="fantasy-meta" id="miniFantasyMeta"></div>
           </div>
         </div>
@@ -796,7 +796,7 @@
               <div class="section-title">Rules</div>
               <div class="fantasy-rules">
                 <div class="pill">Exactly 4 players</div>
-                <div class="pill">Budget: 30 credits</div>
+                <div class="pill">Budget: 31 credits</div>
                 <div class="pill">At least 1 player from each team</div>
                 <div class="pill">At least 1 batter</div>
                 <div class="pill">At least 1 bowler</div>
@@ -4349,7 +4349,7 @@ function titleBandScore(pick, live){
       const openMatches = launchData.fixtures.map((fixture) => `Match ${fixture.match_no}`).join(', ');
       titleEl.textContent = `${ACTIVE_ROOM?.name || 'IPL 2026'} Mini Fantasy`;
       subtitleEl.textContent = openCount
-        ? `${openMatches} ${openCount === 1 ? 'is' : 'are'} open for submission right now. Later matches unlock from the day before, every lineup is 4 players inside 30 credits, and saved teams keep their own frozen price snapshot.`
+        ? `${openMatches} ${openCount === 1 ? 'is' : 'are'} open for submission right now. Later matches unlock from the day before, every lineup is 4 players inside 31 credits, and saved teams keep their own frozen price snapshot.`
         : `${nextOpening ? `No match is open right now. Match ${nextOpening.match_no} opens on ${formatDate(nextOpening.opens_at_utc)}.` : 'No Mini Fantasy match is currently open.'} Build one team per match, captain one player for 1.5x, and rankings update from completed fixtures.`;
       pillEl.textContent = `Mini Fantasy: ${ACTIVE_ROOM?.name || SERIES_TAG}`;
     }

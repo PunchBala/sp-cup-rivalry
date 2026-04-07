@@ -122,7 +122,7 @@ test('validateMiniFantasyEntry enforces budget, team split, and role minimums', 
     selectedPlayerIds: ['dc_a', 'dc_b', 'gt_c', 'gt_b'],
     captainPlayerId: 'gt_c',
     playerPool: pool,
-    budget: 30
+    budget: MINI_FANTASY_BUDGET - 1
   });
   assert.equal(invalid.valid, false);
   assert.match(invalid.errors.join(' | '), /Squad budget exceeded/);

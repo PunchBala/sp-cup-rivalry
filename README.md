@@ -16,7 +16,7 @@ The app is hosted as a static site, with live cricket data refreshed into `data/
 `Mini Fantasy` is now a real sibling game mode in the app:
 
 - one entry per user per eligible match
-- 4-player team under a 30-credit budget
+- 4-player team under a 31-credit budget
 - at least 1 player from each real team
 - at least 1 batter and 1 bowler
 - one captain at `1.5x`
