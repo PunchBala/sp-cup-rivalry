@@ -363,15 +363,16 @@
       return { duelRow, entryRows: Array.isArray(entryRows) ? entryRows : [] };
     }
 
-    function normalizeMiniFantasyEntryRow(row) {
-      if (!row) return null;
-      return {
-        id: row.id || null,
-        userId: row.user_id || null,
-        ownerHandle: normalizeSlug(row.owner_handle || ''),
-        season: normalizeWhitespace(row.season || ''),
-        matchNo: Number(row.match_no || 0) || null,
-        homeTeamCode: normalizeWhitespace(row.home_team_code || ''),
+function normalizeMiniFantasyEntryRow(row) {
+  if (!row) return null;
+  return {
+    id: row.id || null,
+    userId: row.user_id || null,
+    ownerHandle: normalizeSlug(row.owner_handle || ''),
+    displayName: normalizeWhitespace(row.display_name || row.owner_handle || ''),
+    season: normalizeWhitespace(row.season || ''),
+    matchNo: Number(row.match_no || 0) || null,
+    homeTeamCode: normalizeWhitespace(row.home_team_code || ''),
         awayTeamCode: normalizeWhitespace(row.away_team_code || ''),
         fixtureLabel: normalizeWhitespace(row.fixture_label || ''),
         fixtureDatetimeUtc: row.fixture_datetime_utc || null,
@@ -672,7 +673,7 @@
         const rows = await restRequest(config.tables.miniFantasyEntries, {
           method: 'GET',
           query: {
-            select: 'id,user_id,owner_handle,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
+            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
             user_id: `eq.${currentUser.userId}`,
             ...(safeSeason ? { season: `eq.${safeSeason}` } : {}),
             order: 'fixture_datetime_utc.asc.nullslast,match_no.asc'
@@ -688,7 +689,7 @@
         const rows = await restRequest(config.tables.miniFantasyEntries, {
           method: 'GET',
           query: {
-            select: 'id,user_id,owner_handle,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
+            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
             ...(safeSeason ? { season: `eq.${safeSeason}` } : {}),
             order: 'saved_at.desc.nullslast,fixture_datetime_utc.asc.nullslast,match_no.asc'
           },
@@ -711,11 +712,12 @@
           method: 'POST',
           query: {
             on_conflict: 'user_id,season,match_no',
-            select: 'id,user_id,owner_handle,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at'
+            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at'
           },
           body: {
             user_id: currentUser.userId,
             owner_handle: currentUser.ownerId,
+            display_name: normalizeWhitespace(entry?.displayName || currentUser.displayName || currentUser.ownerId || ''),
             season: safeSeason,
             match_no: matchNo,
             home_team_code: normalizeWhitespace(entry?.homeTeamCode || ''),

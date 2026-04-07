@@ -46,6 +46,7 @@ create table if not exists public.mini_fantasy_entries (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
   owner_handle text not null,
+  display_name text not null default '',
   season text not null,
   match_no integer not null,
   home_team_code text not null,
@@ -61,6 +62,9 @@ create table if not exists public.mini_fantasy_entries (
   updated_at timestamptz not null default timezone('utc', now()),
   unique (user_id, season, match_no)
 );
+
+alter table public.mini_fantasy_entries
+  add column if not exists display_name text not null default '';
 
 create or replace function public.set_updated_at()
 returns trigger

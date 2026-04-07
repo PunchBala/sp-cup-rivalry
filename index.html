@@ -793,6 +793,12 @@
               <div id="miniFantasyFixtures" class="fantasy-fixture-list"></div>
             </div>
             <div class="card">
+              <div class="section-title">How Mini Fantasy works</div>
+              <div class="studio-note">Pick one 4-player team for each open match. Save it before lock, and keep one captain for the 1.5x boost.</div>
+              <div class="studio-note">You must stay inside 31 credits, take at least 1 batter, at least 1 bowler, and at least 1 player from each real team.</div>
+              <div class="studio-note">Matches open the day before and lock 1 minute before the official start time, so tomorrow's fixtures can be entered today.</div>
+            </div>
+            <div class="card">
               <div class="section-title">Rules</div>
               <div class="fantasy-rules">
                 <div class="pill">Exactly 4 players</div>
@@ -836,7 +842,7 @@
       <div class="surface-drawer-head">
         <div>
           <div class="surface-drawer-title">Profile</div>
-          <div class="surface-drawer-sub">Create an account once, then use the same login for Duels and Mini Fantasy.</div>
+          <div class="surface-drawer-sub">Create your account once with four fields, then come back with email + password for both Duels and Mini Fantasy.</div>
         </div>
         <button class="surface-drawer-close" type="button" data-close-drawer="profile">Close</button>
       </div>
@@ -860,7 +866,7 @@
       <div class="surface-drawer-head">
         <div>
           <div class="surface-drawer-title">Create duel</div>
-          <div class="surface-drawer-sub">Start a new public duel, get the code instantly, and keep building your picks while your challenger joins.</div>
+          <div class="surface-drawer-sub">Start a new public duel, get the code instantly, and keep building your sealed picks while your challenger joins.</div>
         </div>
         <button class="surface-drawer-close" type="button" data-close-drawer="create">Close</button>
       </div>
@@ -993,6 +999,7 @@
     let CURRENT_USER = null;
     let HOSTED_AUTH_MODE = 'signin';
     let AUTH_FORM_PREFILL = { displayName: '', ownerId: '', email: '' };
+    let AUTH_PANEL_NOTICE = null;
     let CUSTOM_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_MINI_FANTASY_ENTRIES = [];
@@ -3386,6 +3393,28 @@ function titleBandScore(pick, live){
       }).format(new Date(dt));
     }
 
+    function friendlyHostedAuthError(action, error){
+      const raw = String(error?.message || '').trim();
+      const normalized = raw.toLowerCase();
+      if (normalized.includes('invalid login credentials')) {
+        return 'That email + password did not match. Try again, or switch to Create account first.';
+      }
+      if (normalized.includes('already registered') || normalized.includes('already been registered')) {
+        return 'That email already has an account. Switch to Sign in and use email + password there.';
+      }
+      if (normalized.includes('no active session yet') || normalized.includes('confirm the account first')) {
+        return 'Your account exists, but email confirmation is still blocking sign-in. Confirm the account first, or turn email confirmation off in Supabase.';
+      }
+      if (normalized.includes('password')) {
+        return action === 'signup'
+          ? 'That password was not accepted. Use the four fields again and try a stronger password.'
+          : 'That email + password did not go through. Check them and try again.';
+      }
+      return action === 'signup'
+        ? 'That account could not be created right now. Check the four fields and try again.'
+        : 'That sign-in did not go through. Check your email + password and try again.';
+    }
+
     function formatUtcStamp(iso){
       const dt = new Date(iso);
       const date = dt.toISOString().slice(0, 10);
@@ -3794,8 +3823,8 @@ function titleBandScore(pick, live){
         console.error('Hosted mini fantasy load failed:', error);
         MINI_FANTASY_NOTICE = {
           type: 'bad',
-          title: 'Mini Fantasy entries could not load',
-          text: error.message || `Could not load your saved Mini Fantasy entries from ${currentAuthLabel()}.`
+          title: 'Mini Fantasy could not refresh just now',
+          text: 'Your saved teams could not be refreshed right now. Please try again in a moment.'
         };
         setRemoteMiniFantasyEntries([]);
         setRemoteMiniFantasyLeaderboardEntries([]);
@@ -3873,6 +3902,16 @@ function titleBandScore(pick, live){
       DUEL_STUDIO_NOTICE = typeof text === 'string'
         ? { type, text }
         : { type, ...text };
+    }
+
+    function setAuthPanelNotice(type, payload){
+      if (!payload) {
+        AUTH_PANEL_NOTICE = null;
+        return;
+      }
+      AUTH_PANEL_NOTICE = typeof payload === 'string'
+        ? { type, text: payload }
+        : { type, ...payload };
     }
 
     function createEmptyPicks(){
@@ -5045,7 +5084,7 @@ function titleBandScore(pick, live){
             <span class="studio-chip">${escapeHtml(currentAuthLabel())}</span>
           </div>
           <div class="studio-note">${usesHostedDuelsBackend()
-            ? `Real Duels account live. Your session and public duel records are coming from ${escapeHtml(currentAuthLabel())}.`
+            ? `You are signed in. The same hosted account now works for both Duels and Mini Fantasy.`
             : 'This lightweight beta keeps your duel identity in this browser. Use the same handle whenever you open or share invite links.'}</div>
           <div class="studio-actions">
             <button class="studio-button ghost" type="button" id="signOutButton">Sign out</button>
@@ -5064,12 +5103,13 @@ function titleBandScore(pick, live){
               try {
                 await DUELS_BACKEND.signOut();
               } catch (error) {
-                setStudioNotice('bad', error.message || 'Could not sign out of the hosted Duels account.');
+                setStudioNotice('bad', 'That sign-out did not finish cleanly. Please try again.');
                 render();
                 return;
               }
             }
             clearStoredUserProfile();
+            setAuthPanelNotice(null);
             await syncMiniFantasyEntries();
             setStudioNotice('info', usesHostedDuelsBackend()
               ? 'Signed out of the hosted Duels account.'
@@ -5084,13 +5124,20 @@ function titleBandScore(pick, live){
       const isHosted = usesHostedDuelsBackend();
       const isHostedSignUp = isHosted && HOSTED_AUTH_MODE === 'signup';
       const authTitle = isHosted
-        ? (isHostedSignUp ? 'Create your account once, then use the same login everywhere in the app.' : 'Sign in with your email address and password only.')
+        ? (isHostedSignUp ? 'Create your account once for both Duels and Mini Fantasy.' : 'Sign in with the same email + password you used at account creation.')
         : 'Use your display name and handle in this browser to create, join, and manage duels.';
       const authHint = isHosted
         ? (isHostedSignUp
-          ? 'Create account needs all four fields: display name, handle, email, and password.'
-          : 'Already created an account? Sign in uses only email + password. Display name and handle are not needed here.')
+          ? 'Create account uses all four fields below: display name, handle, email, and password.'
+          : 'Only email + password are needed here. Display name and handle are only for account creation.')
         : 'No password yet. Your handle is the minimal beta identity for creating, joining, and updating public duels.';
+      const authNotice = !CURRENT_USER && AUTH_PANEL_NOTICE
+        ? `<div class="studio-alert ${studioAlertClass(AUTH_PANEL_NOTICE.type)}">
+             ${AUTH_PANEL_NOTICE.title ? `<div class="studio-alert-title">${escapeHtml(AUTH_PANEL_NOTICE.title)}</div>` : ''}
+             ${AUTH_PANEL_NOTICE.text ? `<div class="studio-alert-detail">${escapeHtml(AUTH_PANEL_NOTICE.text)}</div>` : ''}
+             ${AUTH_PANEL_NOTICE.nextStep ? `<div class="studio-alert-next">${escapeHtml(AUTH_PANEL_NOTICE.nextStep)}</div>` : ''}
+           </div>`
+        : '';
 
       panel.innerHTML = `
         ${isHosted ? `
@@ -5100,6 +5147,7 @@ function titleBandScore(pick, live){
           </div>
         ` : ''}
         <form id="authForm" data-auth-mode="${isHosted ? (isHostedSignUp ? 'signup' : 'signin') : 'local'}">
+          ${authNotice}
           <div class="studio-note">${escapeHtml(authTitle)}</div>
           <div class="studio-form-grid">
             ${!isHosted || isHostedSignUp ? `
@@ -5138,6 +5186,7 @@ function titleBandScore(pick, live){
             const form = document.getElementById('authForm');
             storeAuthFormPrefill(form);
             HOSTED_AUTH_MODE = button.dataset.authMode === 'signup' ? 'signup' : 'signin';
+            if (AUTH_PANEL_NOTICE?.type !== 'good') setAuthPanelNotice(null);
             renderAuthPanel();
           };
         });
@@ -5147,6 +5196,7 @@ function titleBandScore(pick, live){
             const form = document.getElementById('authForm');
             storeAuthFormPrefill(form);
             HOSTED_AUTH_MODE = isHostedSignUp ? 'signin' : 'signup';
+            if (AUTH_PANEL_NOTICE?.type !== 'good') setAuthPanelNotice(null);
             renderAuthPanel();
           };
         }
@@ -5175,23 +5225,49 @@ function titleBandScore(pick, live){
                     email: formData.get('email'),
                     password: formData.get('password')
                   });
+              if (action === 'signup') {
+                const createdUser = normalizeUserProfile(remoteUser || {}) || null;
+                storeAuthFormPrefill({
+                  displayName: createdUser?.displayName || formData.get('displayName') || AUTH_FORM_PREFILL.displayName || '',
+                  ownerId: createdUser?.ownerId || formData.get('ownerId') || AUTH_FORM_PREFILL.ownerId || '',
+                  email: createdUser?.email || formData.get('email') || AUTH_FORM_PREFILL.email || ''
+                });
+                try {
+                  await DUELS_BACKEND.signOut();
+                } catch (signOutError) {
+                  console.warn('Hosted signup sign-out handoff failed', signOutError);
+                }
+                clearStoredUserProfile();
+                HOSTED_AUTH_MODE = 'signin';
+                setAuthPanelNotice('good', {
+                  title: 'Account created successfully',
+                  text: 'Your account is ready. Sign in now with the same email + password.',
+                  nextStep: 'Use only email + password in Sign in. Display name and handle are already saved.'
+                });
+                setStudioNotice('info', 'Account created. Sign in now with the same email + password.');
+                await syncMiniFantasyEntries();
+                render();
+                return;
+              }
               CURRENT_USER = normalizeUserProfile(remoteUser || {}) || null;
               if (!CURRENT_USER) {
+                setAuthPanelNotice('bad', 'Your account exists, but the profile could not load yet. Please try signing in again.');
                 setStudioNotice('bad', 'The hosted account signed in, but the Duels profile is incomplete.');
                 render();
                 return;
               }
+              setAuthPanelNotice(null);
               storeAuthFormPrefill({
                 displayName: CURRENT_USER.displayName,
                 ownerId: CURRENT_USER.ownerId,
                 email: CURRENT_USER.email || formData.get('email') || AUTH_FORM_PREFILL.email || ''
               });
-              setStudioNotice('good', action === 'signup'
-                ? `Account created for ${CURRENT_USER.displayName}. You are signed in now and can jump straight into Duels or Mini Fantasy.`
-                : `Signed in as ${CURRENT_USER.displayName}. Your Duels and Mini Fantasy account is ready in this browser.`);
+              setStudioNotice('good', `Signed in as ${CURRENT_USER.displayName}. Your Duels and Mini Fantasy account is ready in this browser.`);
               await syncMiniFantasyEntries();
             } catch (error) {
-              setStudioNotice('bad', error.message || `Could not ${action === 'signup' ? 'create the account' : 'sign in'} right now.`);
+              const friendlyError = friendlyHostedAuthError(action, error);
+              setAuthPanelNotice('bad', friendlyError);
+              setStudioNotice('bad', friendlyError);
             }
             render();
             return;
@@ -5206,6 +5282,7 @@ function titleBandScore(pick, live){
             render();
             return;
           }
+          setAuthPanelNotice(null);
           setStudioNotice('good', `Signed in as ${saved.displayName}. You can now create, join, and submit public duels from this browser.`);
           await syncMiniFantasyEntries();
           render();
@@ -5219,6 +5296,15 @@ function titleBandScore(pick, live){
       if (!panel) return;
       const disabledAttr = CURRENT_USER ? '' : 'disabled';
       panel.innerHTML = `
+        <div class="studio-list" style="margin-bottom:16px">
+          <div class="studio-list-card">
+            <div class="studio-list-title">How Duel works</div>
+            <div class="studio-list-note">1. Create the duel and copy the code or invite link.</div>
+            <div class="studio-list-note">2. Your challenger joins the open slot and fills their sealed 15 picks.</div>
+            <div class="studio-list-note">3. Both sides submit. Shared picks become clashes and must be changed.</div>
+            <div class="studio-list-note">4. Once both sheets are full and clash-free, the duel arms and goes live from the next eligible match.</div>
+          </div>
+        </div>
         <form id="createDuelForm">
           <div class="studio-callout">Create the duel first. You will get a duel code instantly, and your challenger can create an account later from the invite link or duel code.</div>
           <div class="studio-note">${usesHostedDuelsBackend()
@@ -5254,7 +5340,7 @@ function titleBandScore(pick, live){
           try {
             await createCustomDuel();
           } catch (error) {
-            setStudioNotice('bad', error.message || 'Could not create duel.');
+            setStudioNotice('bad', 'That duel was not created. Please try again.');
           }
           render();
         };
@@ -5272,7 +5358,7 @@ function titleBandScore(pick, live){
           try {
             await joinDuelByCode(formData.get('duelCode'));
           } catch (error) {
-            setStudioNotice('bad', error.message || 'Could not join duel by code.');
+            setStudioNotice('bad', 'That duel code did not go through. Check the code and try again.');
           }
           render();
         };
@@ -5283,7 +5369,7 @@ function titleBandScore(pick, live){
       const panel = document.getElementById('profilePanel');
       if (!panel) return;
       if (!CURRENT_USER) {
-        panel.innerHTML = '<div class="studio-empty">Create an account once, then come back with the same email + password. If you are using the local beta mode, sign in here with your display name and handle only.</div>';
+        panel.innerHTML = '<div class="studio-empty">New here? Create your account with display name, handle, email, and password. Returning later? Just use email + password to sign back in.</div>';
         return;
       }
       const profile = profileSnapshot();
@@ -5322,12 +5408,12 @@ function titleBandScore(pick, live){
       const panel = document.getElementById('myDuelsPanel');
       if (!panel) return;
       if (!CURRENT_USER) {
-        panel.innerHTML = '<div class="studio-empty">Sign in to see the duels you created, the duels you joined, and which ones are draft, clash, armed, or live right now.</div>';
+        panel.innerHTML = '<div class="studio-empty">Sign in to see your live duels, any draft or clash states, and the invites you are already part of.</div>';
         return;
       }
       const items = myDirectorySummaries();
       if (!items.length) {
-        panel.innerHTML = '<div class="studio-empty">No duels yet. Create your first duel above, or paste a duel code from a friend to claim their open challenger slot.</div>';
+        panel.innerHTML = '<div class="studio-empty">No duels yet. Open Duel, tap Create duel, or paste a friend\'s duel code to claim the open challenger slot.</div>';
         return;
       }
       panel.innerHTML = `
@@ -5448,12 +5534,12 @@ function titleBandScore(pick, live){
       const matchup = activeMatchup();
       const bundle = activeCustomBundle();
       if (!matchup) {
-        panel.innerHTML = '<div class="studio-empty">Open a duel from the public feed, or create one above, to manage invites, joining, and sealed picks.</div>';
+        panel.innerHTML = '<div class="studio-empty">Open a duel, then use Manage duel for invites, sealed picks, clash fixes, and readiness.</div>';
         return;
       }
 
       if (!bundle) {
-        panel.innerHTML = '<div class="studio-empty">This is a featured public duel from the shipped fixture, so it is read-only. Create your own public duel above if you want the full invite, join, and sealed-picks flow.</div>';
+        panel.innerHTML = '<div class="studio-empty">This is a featured public duel from the shipped fixture, so it is read-only. Create your own duel if you want invites, joining, and sealed picks.</div>';
         return;
       }
 
@@ -5472,7 +5558,7 @@ function titleBandScore(pick, live){
             <span class="studio-chip">${escapeHtml(bundle.duelRecord.label || `${entryA?.displayName || 'Entry A'} vs ${entryB?.displayName || 'Entry B'}`)}</span>
             <span class="studio-chip">${escapeHtml(lifecycleHeadline(lifecycle))}</span>
           </div>
-          <div class="studio-empty">Create or sign in to a Duels account to claim the open challenger slot on this duel invite and submit your sealed picks.</div>
+          <div class="studio-empty">Create an account or sign in to claim the open challenger slot on this duel invite, then submit your sealed picks.</div>
           <div class="studio-invite-card">
             <div class="studio-invite-title">Invite your challenger</div>
             <div class="studio-invite-copy">Send the link or duel code below. Your challenger creates an account, joins the duel, then fills all 15 picks. Opponent picks stay hidden until the duel is clash-free and live.</div>
@@ -7371,9 +7457,9 @@ function titleBandScore(pick, live){
         ? `Submit now: ${openMatchList}`
         : 'No Mini Fantasy entry is open right now';
       summary.textContent = fixtures.length
-        ? `${openMatchList} ${fixtures.length === 1 ? 'is' : 'are'} open right now. Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO} is already live for entries, later matches open from the day before, and every fixture locks 1 minute before the start time.`
+        ? `${openMatchList} ${fixtures.length === 1 ? 'is' : 'are'} open right now. Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO} is already live for entries, later matches open the day before, and every fixture locks 1 minute before the official start time.`
         : nextOpening
-          ? `No entry is open at this moment. Match ${nextOpening.match_no} opens on ${formatDate(nextOpening.opens_at_utc)} and then locks 1 minute before the start time.`
+          ? `No entry is open at this moment. Match ${nextOpening.match_no} opens on ${formatDate(nextOpening.opens_at_utc)} and then locks 1 minute before the official start time.`
           : `Mini Fantasy entries are only accepted for upcoming Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO}+ fixtures before lock.`;
       meta.innerHTML = `
         <span class="pill">Eligible fixtures: ${fixtures.length}</span>
@@ -7386,7 +7472,7 @@ function titleBandScore(pick, live){
       if (!fixtures.length) {
         slot.innerHTML = `
           <div class="fantasy-empty">
-            No Mini Fantasy match is open right now. ${nextOpening ? `Next up: Match ${nextOpening.match_no} - ${escapeHtml(formatFixtureLabel(nextOpening.fixture || `${nextOpening.away_team} vs ${nextOpening.home_team}`))} opens on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : 'The next eligible entry window will appear here automatically.'}
+            No Mini Fantasy match is open right now. ${nextOpening ? `Next up: Match ${nextOpening.match_no} - ${escapeHtml(formatFixtureLabel(nextOpening.fixture || `${nextOpening.away_team} vs ${nextOpening.home_team}`))} opens on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}. It will lock 1 minute before the start time.` : 'The next eligible entry window will appear here automatically.'}
           </div>
         `;
         return;
@@ -7395,13 +7481,16 @@ function titleBandScore(pick, live){
       const activeFixture = activeMiniFantasyFixture();
       const upcoming = availability.filter((fixture) => fixture.availability_status === 'upcoming').slice(0, 3);
       slot.innerHTML = `
-        <div class="fantasy-window-note">You can currently submit ${escapeHtml(openMatchList)}. ${nextOpening ? `Next opening: Match ${escapeHtml(String(nextOpening.match_no))} on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : 'No later opening is queued yet.'}</div>
+        <div class="fantasy-window-note">You can currently submit ${escapeHtml(openMatchList)}. Later matches open the day before. ${nextOpening ? `Next opening: Match ${escapeHtml(String(nextOpening.match_no))} on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : 'No later opening is queued yet.'}</div>
         ${fixtures.map((fixture) => {
         const savedEntry = findMiniFantasyEntryForMatch(fixture.match_no);
         const fixtureLabel = formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`);
         const whenLabel = Number(fixture.match_no) === MINI_FANTASY_FIRST_OPEN_MATCH_NO && currentNowDate().getTime() < Date.parse(fixture.opens_at_utc || '')
           ? 'Opening soon'
           : 'Open now';
+        const openingRuleLabel = Number(fixture.match_no) === MINI_FANTASY_FIRST_OPEN_MATCH_NO
+          ? `Opened from Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO} launch`
+          : 'Opens the day before';
         return `
           <button type="button" class="fantasy-fixture-card ${Number(activeFixture?.match_no) === Number(fixture.match_no) ? 'active' : ''}" data-mini-fixture="${fixture.match_no}">
             <div class="fantasy-fixture-top">
@@ -7413,8 +7502,9 @@ function titleBandScore(pick, live){
             </div>
             <div class="fantasy-fixture-note">${escapeHtml(fixtureLabel)}</div>
             <div class="fantasy-fixture-status">
-              <span class="pill">Starts: ${escapeHtml(formatDate(fixture.datetime_utc))}</span>
-              <span class="pill">Locks: ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
+              <span class="pill">Open now</span>
+              <span class="pill">Locks at ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
+              <span class="pill">${escapeHtml(openingRuleLabel)}</span>
             </div>
           </button>
         `;
@@ -7428,8 +7518,9 @@ function titleBandScore(pick, live){
                   <div class="fantasy-availability-note">${escapeHtml(formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`))}</div>
                 </div>
                 <div class="studio-inline">
-                  <span class="pill">Opens: ${escapeHtml(formatDate(fixture.opens_at_utc))}</span>
-                  <span class="pill">Locks: ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
+                  <span class="pill">Opens the day before</span>
+                  <span class="pill">Opens at ${escapeHtml(formatDate(fixture.opens_at_utc))}</span>
+                  <span class="pill">Locks at ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
                 </div>
               </div>
             `).join('')}
@@ -7449,14 +7540,14 @@ function titleBandScore(pick, live){
       const panel = document.getElementById('miniFantasyMyEntries');
       if (!panel) return;
       if (!CURRENT_USER) {
-        panel.innerHTML = '<div class="fantasy-empty">Sign in to save Mini Fantasy entries match by match.</div>';
+        panel.innerHTML = '<div class="fantasy-empty">Sign in to save one Mini Fantasy team per match and come back to edit it until lock.</div>';
         return;
       }
       const entries = currentMiniFantasyEntries()
         .slice()
         .sort((a, b) => Number(a.matchNo || 0) - Number(b.matchNo || 0));
       if (!entries.length) {
-        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy entries saved yet. Pick a fixture, build your 4-player team, and lock one captain.</div>';
+        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams saved yet. Start with any open fixture, pick 4 players, and lock one captain before the fixture closes.</div>';
         return;
       }
       panel.innerHTML = `
@@ -7490,7 +7581,7 @@ function titleBandScore(pick, live){
       const leaderboard = miniFantasyLeaderboardData();
       const rows = Array.isArray(leaderboard.rows) ? leaderboard.rows : [];
       if (!rows.length) {
-        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams have been saved yet. Once players start locking lineups, everyone will be ranked here by total points.</div>';
+        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams have been saved yet. Once lineups start locking, everyone will be ranked here by total points and the top three will show medal tags.</div>';
         return;
       }
       panel.innerHTML = `
@@ -7501,10 +7592,10 @@ function titleBandScore(pick, live){
               <div class="fantasy-leaderboard-copy">
                 <div class="fantasy-leaderboard-name">
                   <span class="fantasy-leaderboard-rank">#${escapeHtml(String(row.rank))}</span>
-                  <span>${escapeHtml(row.owner_handle)}</span>
+                  <span>${escapeHtml(row.display_name || row.owner_handle)}</span>
                   ${row.medal ? `<span class="fantasy-medal ${escapeHtml(row.medal)}">${escapeHtml(miniFantasyMedalLabel(row.medal))}</span>` : ''}
                 </div>
-                <div class="small">${escapeHtml(String(row.scored_entries))} scored match${row.scored_entries === 1 ? '' : 'es'} - ${escapeHtml(String(row.pending_entries))} pending - ${escapeHtml(String(row.saved_entries))} saved entry${row.saved_entries === 1 ? '' : 'ies'}</div>
+                <div class="small">@${escapeHtml(row.owner_handle)} - ${escapeHtml(String(row.scored_entries))} scored match${row.scored_entries === 1 ? '' : 'es'} - ${escapeHtml(String(row.pending_entries))} pending - ${escapeHtml(String(row.saved_entries))} saved entry${row.saved_entries === 1 ? '' : 'ies'}</div>
               </div>
               <div class="fantasy-leaderboard-score">
                 <div class="fantasy-leaderboard-points">${escapeHtml(String(row.total_points))}</div>
@@ -7545,7 +7636,7 @@ function titleBandScore(pick, live){
       });
       if (!validation.valid) {
         setMiniFantasyNotice('bad', {
-          title: 'Mini Fantasy lineup not ready',
+          title: 'Your team is not ready yet',
           text: validation.errors.join(' ')
         });
         render();
@@ -7558,6 +7649,7 @@ function titleBandScore(pick, live){
         : buildEntryPriceSnapshot(playerPool);
       const payload = {
         ownerHandle: CURRENT_USER.ownerId,
+        displayName: CURRENT_USER.displayName,
         userId: CURRENT_USER.userId || null,
         season: MINI_FANTASY_SEASON,
         matchNo: Number(fixture.match_no),
@@ -7587,12 +7679,12 @@ function titleBandScore(pick, live){
         }
         setMiniFantasyNotice('good', {
           title: `Match ${fixture.match_no} team saved`,
-          text: `Your ${payload.homeTeamCode} vs ${payload.awayTeamCode} Mini Fantasy team is saved with ${validation.total_cost} credits spent.`
+          text: `Your ${payload.homeTeamCode} vs ${payload.awayTeamCode} Mini Fantasy team is saved with ${validation.total_cost} credits spent. You can still edit it until lock.`
         });
       } catch (error) {
         setMiniFantasyNotice('bad', {
-          title: 'Mini Fantasy save failed',
-          text: error.message || 'Could not save the Mini Fantasy entry right now.'
+          title: 'That team was not saved',
+          text: 'Please try again. If the match has locked, the lineup can no longer change.'
         });
       }
       render();
@@ -7604,12 +7696,12 @@ function titleBandScore(pick, live){
       const fixture = activeMiniFantasyFixture();
       if (!fixture) {
         const nextOpening = nextMiniFantasyOpeningFixture();
-        panel.innerHTML = `<div class="fantasy-empty">No Mini Fantasy fixture is open right now.${nextOpening ? ` Match ${escapeHtml(String(nextOpening.match_no))} opens on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : ''}</div>`;
+        panel.innerHTML = `<div class="fantasy-empty">No Mini Fantasy fixture is open right now.${nextOpening ? ` Match ${escapeHtml(String(nextOpening.match_no))} opens on ${escapeHtml(formatDate(nextOpening.opens_at_utc))} and locks 1 minute before the start time.` : ''}</div>`;
         return;
       }
 
       if (!CURRENT_USER) {
-        panel.innerHTML = '<div class="fantasy-empty">Sign in to build and save one Mini Fantasy entry per match.</div>';
+        panel.innerHTML = '<div class="fantasy-empty">Sign in to build one 4-player team for this match, choose one captain, and save it before lock.</div>';
         return;
       }
 
@@ -7656,7 +7748,7 @@ function titleBandScore(pick, live){
                   <span class="pill">${escapeHtml(String(player.final_price))} cr</span>
                 </div>
               ` : `
-                <div class="fantasy-slot-empty">Choose a player from ${escapeHtml(teamShort(fixture.home_team))} or ${escapeHtml(teamShort(fixture.away_team))}. Every team needs 4 players total.</div>
+                <div class="fantasy-slot-empty">Choose a player from ${escapeHtml(teamShort(fixture.home_team))} or ${escapeHtml(teamShort(fixture.away_team))}. Every lineup needs 4 players total, at least 1 batter, at least 1 bowler, and at least 1 player from each team.</div>
               `}
               <div class="fantasy-slot-actions">
                 <button class="studio-button ${player ? 'ghost' : ''}" type="button" data-mini-pick="${slotIndex}" ${locked ? 'disabled' : ''}>${player ? 'Change player' : 'Choose player'}</button>
@@ -7677,7 +7769,7 @@ function titleBandScore(pick, live){
               ? `Lineup ready. You have ${budgetRemaining} credits left and the captain boost is set for ${draft.captainPlayerId ? escapeHtml((poolById.get(draft.captainPlayerId) || {}).name || 'your captain') : 'nobody yet'}.`
               : validation.errors.length
                 ? escapeHtml(validation.errors.join(' '))
-                : 'Build your lineup, keep one player from each team, and remember the captain 1.5x boost.'}
+                : 'Build your lineup, keep one player from each team, take at least 1 batter and 1 bowler, then lock the 1.5x captain.'}
         </div>
         <div class="studio-actions">
           <button class="studio-button" type="button" id="saveMiniFantasyButton" ${locked ? 'disabled' : ''}>${entry ? 'Update team' : 'Save team'}</button>

@@ -731,6 +731,7 @@ export function buildMiniFantasyLeaderboard({
 
   (Array.isArray(entries) ? entries : []).forEach((entry) => {
     const ownerHandle = normalizeWhitespace(entry?.ownerHandle || entry?.owner_handle || '');
+    const displayName = normalizeWhitespace(entry?.displayName || entry?.display_name || ownerHandle || '');
     if (!ownerHandle) return;
     const matchNo = Number(entry?.matchNo || entry?.match_no || 0) || null;
     const pointsByPlayerId = Object.fromEntries(
@@ -749,6 +750,7 @@ export function buildMiniFantasyLeaderboard({
       : 0;
     const existing = grouped.get(ownerHandle) || {
       owner_handle: ownerHandle,
+      display_name: displayName,
       total_points: 0,
       saved_entries: 0,
       scored_entries: 0,
@@ -756,6 +758,7 @@ export function buildMiniFantasyLeaderboard({
       latest_saved_at: null,
       matches: []
     };
+    if (!existing.display_name && displayName) existing.display_name = displayName;
     existing.total_points = roundTo(existing.total_points + totalPoints, 2);
     existing.saved_entries += 1;
     existing.scored_entries += scored ? 1 : 0;
