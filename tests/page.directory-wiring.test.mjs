@@ -68,6 +68,10 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /data-open-duel=/);
   assert.match(html, /id="joinByCodeForm"/);
   assert.match(html, /id="joinByCodeInput"/);
+  assert.match(html, /data-auth-mode="signin"/);
+  assert.match(html, /data-auth-mode="signup"/);
+  assert.match(html, /Sign in with your email address and password only\./);
+  assert.match(html, /Already created an account\? Sign in uses only email \+ password\./);
   assert.match(html, /data-directory-filter=/);
   assert.match(html, /data-mini-fixture=/);
   assert.match(html, /data-mini-pick=/);

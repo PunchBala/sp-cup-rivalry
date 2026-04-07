@@ -27,6 +27,37 @@
       .replace(/^-|-$/g, '');
   }
 
+  function emailLocalPart(email) {
+    return normalizeWhitespace(String(email || '').split('@')[0] || '');
+  }
+
+  function fallbackDisplayNameFromEmail(email) {
+    const local = emailLocalPart(email);
+    return normalizeWhitespace(local.replace(/[._-]+/g, ' '));
+  }
+
+  function deriveFallbackIdentity(user, email) {
+    const metadata = user?.user_metadata || {};
+    const safeEmail = normalizeWhitespace(user?.email || email || '');
+    const displayName = normalizeWhitespace(
+      metadata.display_name
+      || metadata.displayName
+      || metadata.name
+      || fallbackDisplayNameFromEmail(safeEmail)
+      || 'Duels player'
+    );
+    const ownerId = normalizeSlug(
+      metadata.handle
+      || metadata.ownerId
+      || emailLocalPart(safeEmail)
+      || displayName
+    );
+    return {
+      displayName,
+      ownerId: ownerId || normalizeSlug(`player-${String(user?.id || '').slice(0, 6)}`) || 'duels-player'
+    };
+  }
+
   function cloneJson(value) {
     return JSON.parse(JSON.stringify(value));
   }
@@ -296,12 +327,17 @@
     }
 
     async function currentUserProfile() {
-      const activeSession = await ensureFreshSession();
-      if (!activeSession?.access_token) return null;
-      const user = await fetchAuthedUser();
-      if (!user?.id) return null;
-      const profile = await fetchProfile(user.id, activeSession.access_token).catch(() => null);
-      return profileToCurrentUser(user, profile);
+      try {
+        const activeSession = await ensureFreshSession();
+        if (!activeSession?.access_token) return null;
+        const user = await fetchAuthedUser();
+        if (!user?.id) return null;
+        const profile = await fetchProfile(user.id, activeSession.access_token).catch(() => null);
+        return profileToCurrentUser(user, profile);
+      } catch (error) {
+        console.warn('Supabase current user lookup failed', error);
+        return null;
+      }
     }
 
     async function loadBundleRowsBySlug(duelSlug, accessToken) {
@@ -414,17 +450,27 @@
         storeSession(payload);
         let profile = await fetchProfile(payload.user.id, payload.access_token).catch(() => null);
         if (!profile) {
-          const safeDisplayName = normalizeWhitespace(displayName || payload.user.user_metadata?.display_name || '');
-          const safeOwnerId = normalizeSlug(ownerId || payload.user.user_metadata?.handle || safeDisplayName);
-          if (!safeDisplayName || !safeOwnerId) {
-            throw new Error('This account is missing a Duels profile. Sign in with display name and handle filled once so the profile can be created.');
+          const fallbackIdentity = deriveFallbackIdentity(payload.user, safeEmail);
+          const requestedDisplayName = normalizeWhitespace(displayName || fallbackIdentity.displayName || '');
+          const requestedOwnerId = normalizeSlug(ownerId || fallbackIdentity.ownerId || requestedDisplayName);
+          try {
+            profile = await upsertProfile({
+              id: payload.user.id,
+              email: payload.user.email || safeEmail,
+              display_name: requestedDisplayName,
+              handle: requestedOwnerId
+            }, payload.access_token);
+          } catch (error) {
+            const fallbackHandle = normalizeSlug(`${requestedOwnerId || 'player'}-${String(payload.user.id || '').slice(0, 6)}`);
+            profile = await upsertProfile({
+              id: payload.user.id,
+              email: payload.user.email || safeEmail,
+              display_name: requestedDisplayName || fallbackIdentity.displayName,
+              handle: fallbackHandle || 'duels-player'
+            }, payload.access_token).catch(() => {
+              throw new Error('This account signed in, but its Duels profile could not be repaired automatically. Please contact support and mention profile repair.');
+            });
           }
-          profile = await upsertProfile({
-            id: payload.user.id,
-            email: payload.user.email || safeEmail,
-            display_name: safeDisplayName,
-            handle: safeOwnerId
-          }, payload.access_token);
         }
         return profileToCurrentUser(payload.user, profile);
       },

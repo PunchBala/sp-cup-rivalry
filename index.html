@@ -836,7 +836,7 @@
       <div class="surface-drawer-head">
         <div>
           <div class="surface-drawer-title">Profile</div>
-          <div class="surface-drawer-sub">Sign in, check your duels, and jump back into the boards you care about.</div>
+          <div class="surface-drawer-sub">Create an account once, then use the same login for Duels and Mini Fantasy.</div>
         </div>
         <button class="surface-drawer-close" type="button" data-close-drawer="profile">Close</button>
       </div>
@@ -991,6 +991,8 @@
     let ACTIVE_ROOM = null;
     let MATCHUPS = [];
     let CURRENT_USER = null;
+    let HOSTED_AUTH_MODE = 'signin';
+    let AUTH_FORM_PREFILL = { displayName: '', ownerId: '', email: '' };
     let CUSTOM_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_MINI_FANTASY_ENTRIES = [];
@@ -3610,6 +3612,31 @@ function titleBandScore(pick, live){
       CURRENT_USER = null;
     }
 
+    function updateAuthFormPrefill(partial = {}){
+      const next = { ...AUTH_FORM_PREFILL };
+      if (Object.prototype.hasOwnProperty.call(partial, 'displayName')) next.displayName = normalizeTextValue(partial.displayName || '');
+      if (Object.prototype.hasOwnProperty.call(partial, 'ownerId')) next.ownerId = getWarRoomModelApi().normalizeSlug(partial.ownerId || '');
+      if (Object.prototype.hasOwnProperty.call(partial, 'email')) next.email = normalizeTextValue(partial.email || '');
+      AUTH_FORM_PREFILL = next;
+      return AUTH_FORM_PREFILL;
+    }
+
+    function storeAuthFormPrefill(source){
+      if (!source) return AUTH_FORM_PREFILL;
+      if (source instanceof HTMLFormElement) {
+        const partial = {};
+        const displayNameField = source.querySelector('[name="displayName"]');
+        const ownerIdField = source.querySelector('[name="ownerId"]');
+        const emailField = source.querySelector('[name="email"]');
+        if (displayNameField) partial.displayName = displayNameField.value;
+        if (ownerIdField) partial.ownerId = ownerIdField.value;
+        if (emailField) partial.email = emailField.value;
+        return updateAuthFormPrefill(partial);
+      }
+      if (typeof source === 'object') return updateAuthFormPrefill(source);
+      return AUTH_FORM_PREFILL;
+    }
+
     function emptyMiniFantasyEntryStore(){
       return { version: 1, entries: [] };
     }
@@ -5023,6 +5050,12 @@ function titleBandScore(pick, live){
         const button = document.getElementById('signOutButton');
         if (button) {
           button.onclick = async () => {
+            storeAuthFormPrefill({
+              displayName: CURRENT_USER?.displayName || '',
+              ownerId: CURRENT_USER?.ownerId || '',
+              email: CURRENT_USER?.email || AUTH_FORM_PREFILL.email || ''
+            });
+            HOSTED_AUTH_MODE = 'signin';
             if (usesHostedDuelsBackend()) {
               try {
                 await DUELS_BACKEND.signOut();
@@ -5043,46 +5076,84 @@ function titleBandScore(pick, live){
         return;
       }
 
+      const isHosted = usesHostedDuelsBackend();
+      const isHostedSignUp = isHosted && HOSTED_AUTH_MODE === 'signup';
+      const authTitle = isHosted
+        ? (isHostedSignUp ? 'Create your account once, then use the same login everywhere in the app.' : 'Sign in with your email address and password only.')
+        : 'Use your display name and handle in this browser to create, join, and manage duels.';
+      const authHint = isHosted
+        ? (isHostedSignUp
+          ? 'Create account needs all four fields: display name, handle, email, and password.'
+          : 'Already created an account? Sign in uses only email + password. Display name and handle are not needed here.')
+        : 'No password yet. Your handle is the minimal beta identity for creating, joining, and updating public duels.';
+
       panel.innerHTML = `
-        <form id="authForm">
+        ${isHosted ? `
+          <div class="studio-filter-row" style="margin-bottom:12px">
+            <button class="studio-filter-chip ${!isHostedSignUp ? 'active' : ''}" type="button" data-auth-mode="signin">Sign in</button>
+            <button class="studio-filter-chip ${isHostedSignUp ? 'active' : ''}" type="button" data-auth-mode="signup">Create account</button>
+          </div>
+        ` : ''}
+        <form id="authForm" data-auth-mode="${isHosted ? (isHostedSignUp ? 'signup' : 'signin') : 'local'}">
+          <div class="studio-note">${escapeHtml(authTitle)}</div>
           <div class="studio-form-grid">
-            <div class="studio-field">
-              <label for="authDisplayName">Display name</label>
-              <input class="studio-input" id="authDisplayName" name="displayName" placeholder="Senthil" autocomplete="nickname" />
-            </div>
-            <div class="studio-field">
-              <label for="authOwnerId">Handle</label>
-              <input class="studio-input" id="authOwnerId" name="ownerId" placeholder="senthil" autocomplete="username" />
-            </div>
-            ${usesHostedDuelsBackend() ? `
+            ${!isHosted || isHostedSignUp ? `
+              <div class="studio-field">
+                <label for="authDisplayName">Display name</label>
+                <input class="studio-input" id="authDisplayName" name="displayName" placeholder="Senthil" autocomplete="nickname" value="${escapeHtml(AUTH_FORM_PREFILL.displayName || '')}" />
+              </div>
+              <div class="studio-field">
+                <label for="authOwnerId">Handle</label>
+                <input class="studio-input" id="authOwnerId" name="ownerId" placeholder="senthil" autocomplete="${isHosted ? 'username' : 'username'}" value="${escapeHtml(AUTH_FORM_PREFILL.ownerId || '')}" />
+              </div>
+            ` : ''}
+            ${isHosted ? `
               <div class="studio-field">
                 <label for="authEmail">Email</label>
-                <input class="studio-input" id="authEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" />
+                <input class="studio-input" id="authEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" value="${escapeHtml(AUTH_FORM_PREFILL.email || '')}" />
               </div>
               <div class="studio-field">
                 <label for="authPassword">Password</label>
-                <input class="studio-input" id="authPassword" name="password" type="password" placeholder="Minimum 6 characters" autocomplete="current-password" />
+                <input class="studio-input" id="authPassword" name="password" type="password" placeholder="${isHostedSignUp ? 'Minimum 6 characters' : 'Your account password'}" autocomplete="${isHostedSignUp ? 'new-password' : 'current-password'}" />
               </div>
             ` : ''}
           </div>
-          <div class="studio-note">${usesHostedDuelsBackend()
-            ? `Hosted auth is enabled through ${escapeHtml(currentAuthLabel())}. Create account uses all four fields; sign in uses email and password, and will reuse display name plus handle if the profile still needs to be created.`
-            : 'No password yet. Your handle is the minimal beta identity for creating, joining, and updating public duels.'}</div>
+          <div class="studio-note">${escapeHtml(authHint)}</div>
           <div class="studio-actions">
-            ${usesHostedDuelsBackend()
-              ? `<button class="studio-button" type="submit" data-auth-action="signup">Create account</button>
-                 <button class="studio-button secondary" type="submit" data-auth-action="signin">Sign in</button>`
+            ${isHosted
+              ? `<button class="studio-button" type="submit">${isHostedSignUp ? 'Create account' : 'Sign in'}</button>
+                 <button class="studio-button ghost" type="button" id="authModeSwitchButton">${isHostedSignUp ? 'Already have an account?' : 'Need a new account?'}</button>`
               : `<button class="studio-button" type="submit">Sign in</button>`}
           </div>
         </form>
       `;
+      if (isHosted) {
+        panel.querySelectorAll('[data-auth-mode]').forEach((button) => {
+          button.onclick = () => {
+            const form = document.getElementById('authForm');
+            storeAuthFormPrefill(form);
+            HOSTED_AUTH_MODE = button.dataset.authMode === 'signup' ? 'signup' : 'signin';
+            renderAuthPanel();
+          };
+        });
+        const switchButton = document.getElementById('authModeSwitchButton');
+        if (switchButton) {
+          switchButton.onclick = () => {
+            const form = document.getElementById('authForm');
+            storeAuthFormPrefill(form);
+            HOSTED_AUTH_MODE = isHostedSignUp ? 'signin' : 'signup';
+            renderAuthPanel();
+          };
+        }
+      }
       const form = document.getElementById('authForm');
       if (form) {
         form.onsubmit = async (event) => {
           event.preventDefault();
           const formData = new FormData(form);
-          if (usesHostedDuelsBackend()) {
-            const action = event.submitter?.dataset?.authAction || 'signin';
+          storeAuthFormPrefill(form);
+          if (isHosted) {
+            const action = HOSTED_AUTH_MODE === 'signup' ? 'signup' : 'signin';
             try {
               const remoteUser = action === 'signup'
                 ? await DUELS_BACKEND.signUp({
@@ -5092,8 +5163,6 @@ function titleBandScore(pick, live){
                     password: formData.get('password')
                   })
                 : await DUELS_BACKEND.signIn({
-                    displayName: formData.get('displayName'),
-                    ownerId: formData.get('ownerId'),
                     email: formData.get('email'),
                     password: formData.get('password')
                   });
@@ -5103,12 +5172,17 @@ function titleBandScore(pick, live){
                 render();
                 return;
               }
+              storeAuthFormPrefill({
+                displayName: CURRENT_USER.displayName,
+                ownerId: CURRENT_USER.ownerId,
+                email: CURRENT_USER.email || formData.get('email') || AUTH_FORM_PREFILL.email || ''
+              });
               setStudioNotice('good', action === 'signup'
-                ? `Account created for ${CURRENT_USER.displayName}. You can now create, join, and submit public duels from the hosted backend.`
-                : `Signed in as ${CURRENT_USER.displayName}. Hosted public duels are now live in this browser.`);
+                ? `Account created for ${CURRENT_USER.displayName}. You are signed in now and can jump straight into Duels or Mini Fantasy.`
+                : `Signed in as ${CURRENT_USER.displayName}. Your Duels and Mini Fantasy account is ready in this browser.`);
               await syncMiniFantasyEntries();
             } catch (error) {
-              setStudioNotice('bad', error.message || 'Could not complete hosted sign-in.');
+              setStudioNotice('bad', error.message || `Could not ${action === 'signup' ? 'create the account' : 'sign in'} right now.`);
             }
             render();
             return;
@@ -5199,7 +5273,7 @@ function titleBandScore(pick, live){
       const panel = document.getElementById('profilePanel');
       if (!panel) return;
       if (!CURRENT_USER) {
-        panel.innerHTML = '<div class="studio-empty">Create or sign in to a Duels account to track your duels, share invite links, and come back to live or pre-live boards without losing your place.</div>';
+        panel.innerHTML = '<div class="studio-empty">Create an account once, then come back with the same email + password. If you are using the local beta mode, sign in here with your display name and handle only.</div>';
         return;
       }
       const profile = profileSnapshot();
@@ -7846,9 +7920,8 @@ function titleBandScore(pick, live){
         try {
           CURRENT_USER = normalizeUserProfile(await DUELS_BACKEND.bootstrap()) || null;
         } catch (error) {
-          console.error('Hosted auth bootstrap failed:', error);
+          console.warn('Hosted auth bootstrap fell back to signed-out state:', error);
           CURRENT_USER = null;
-          setStudioNotice('bad', `Hosted auth could not be restored from ${currentAuthLabel()}, so the page stayed signed out.`);
         }
       } else {
         CURRENT_USER = loadStoredUserProfile();
