@@ -5032,6 +5032,10 @@ function titleBandScore(pick, live){
     function renderAuthPanel(){
       const panel = document.getElementById('authPanel');
       if (!panel) return;
+      const renderKey = CURRENT_USER
+        ? `signed-in:${CURRENT_USER.userId || CURRENT_USER.ownerId || CURRENT_USER.displayName}`
+        : `signed-out:${usesHostedDuelsBackend() ? HOSTED_AUTH_MODE : 'local'}`;
+      if (panel.dataset.renderKey === renderKey) return;
 
       if (CURRENT_USER) {
         panel.innerHTML = `
@@ -5073,6 +5077,7 @@ function titleBandScore(pick, live){
             render();
           };
         }
+        panel.dataset.renderKey = renderKey;
         return;
       }
 
@@ -5148,6 +5153,10 @@ function titleBandScore(pick, live){
       }
       const form = document.getElementById('authForm');
       if (form) {
+        form.querySelectorAll('input[name="displayName"], input[name="ownerId"], input[name="email"]').forEach((input) => {
+          input.oninput = () => storeAuthFormPrefill(form);
+          input.onchange = () => storeAuthFormPrefill(form);
+        });
         form.onsubmit = async (event) => {
           event.preventDefault();
           const formData = new FormData(form);
@@ -5202,6 +5211,7 @@ function titleBandScore(pick, live){
           render();
         };
       }
+      panel.dataset.renderKey = renderKey;
     }
 
     function renderCreateDuelPanel(){
