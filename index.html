@@ -13,6 +13,8 @@
       --panel:#0f1830ee;
       --panel-2:#172448f2;
       --panel-3:#101a36;
+      --panel-soft:#142248;
+      --panel-strong:#0b1430;
       --muted:#9fb2d9;
       --text:#eef4ff;
       --accent:#7cc4ff;
@@ -23,6 +25,15 @@
       --good:#44d792;
       --line:rgba(255,255,255,.08);
       --chip:rgba(255,255,255,.05);
+      --field-bg:rgba(6,14,32,.88);
+      --field-line:rgba(124,196,255,.18);
+      --field-focus:rgba(95,240,200,.38);
+      --info-bg:rgba(124,196,255,.08);
+      --info-line:rgba(124,196,255,.18);
+      --action-bg:rgba(95,240,200,.10);
+      --action-line:rgba(95,240,200,.22);
+      --important-bg:rgba(255,200,87,.10);
+      --important-line:rgba(255,200,87,.22);
       --glow:0 18px 40px rgba(0,0,0,.28);
     }
     *{box-sizing:border-box}
@@ -69,21 +80,24 @@
     .tab.active{background:linear-gradient(180deg,#2f4577,#22345b);border-color:#6d8fe6;box-shadow:0 10px 20px rgba(0,0,0,.16)}
     .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .pill{
-      background:var(--chip);
-      border:1px solid var(--line);
-      color:var(--muted);
+      background:linear-gradient(180deg, rgba(20,33,64,.94), rgba(11,19,39,.94));
+      border:1px solid rgba(124,196,255,.12);
+      color:#d9e7ff;
       border-radius:999px;
       padding:8px 12px;
       font-size:12px;
       font-weight:700;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
     }
     .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
     .card{
-      background:linear-gradient(180deg,rgba(20,31,60,.98),rgba(11,20,40,.98));
-      border:1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(23,36,72,.98), rgba(10,18,38,.98));
+      border:1px solid rgba(124,196,255,.10);
       border-radius:18px;
       padding:16px;
       box-shadow:var(--glow);
+      box-shadow:var(--glow), inset 0 1px 0 rgba(255,255,255,.04);
     }
     .metric-card{min-height:122px;display:flex;flex-direction:column;justify-content:space-between}
     .metric-card .value{font-size:34px;font-weight:900;line-height:1.02;color:#fff}
@@ -95,7 +109,21 @@
     .span-4{grid-column:span 4}
     .span-3{grid-column:span 3}
     @media (max-width:1100px){.span-8,.span-6,.span-4,.span-3{grid-column:span 12}}
-    .section-title{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;font-weight:800}
+    .section-title{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:#cfe1ff;
+      margin-bottom:12px;
+      font-weight:900;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(124,196,255,.14);
+      background:rgba(124,196,255,.08)
+    }
     .scoreboard{display:grid;grid-template-columns:1fr 140px 1fr;gap:12px;align-items:center}
     .player-box{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:16px;padding:16px}
     .player-name{font-weight:900;font-size:18px}
@@ -194,8 +222,8 @@
     .duel-activity-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.05);font-size:11px;font-weight:800;color:#dbe7ff}
     .duel-activity-tag.hot{border-color:rgba(255,200,87,.28);background:rgba(255,200,87,.12);color:#ffe2a8}
     .pill-button,.mini-action{
-      border:1px solid rgba(124,196,255,.18);
-      background:rgba(124,196,255,.10);
+      border:1px solid rgba(124,196,255,.24);
+      background:linear-gradient(180deg, rgba(34,55,104,.92), rgba(19,32,65,.92));
       color:#e9f3ff;
       border-radius:999px;
       padding:8px 12px;
@@ -207,13 +235,13 @@
     .pill-button:hover,.mini-action:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.32)}
     .pill-button.copy-ok,.mini-action.copy-ok{background:rgba(68,215,146,.14);border-color:rgba(68,215,146,.28);color:#b7f2d1}
     .pill-button.primary,.mini-action.primary{
-      background:linear-gradient(180deg, rgba(95,240,200,.22), rgba(95,240,200,.10));
+      background:linear-gradient(180deg, rgba(95,240,200,.26), rgba(31,112,94,.22));
       border-color:rgba(95,240,200,.34);
       color:#ecfff8;
     }
     .studio-layout{display:grid;grid-template-columns:minmax(280px,.92fr) minmax(420px,1.35fr);gap:16px}
     .studio-stack{display:grid;gap:16px}
-    .studio-panel{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:16px}
+    .studio-panel{background:linear-gradient(180deg, rgba(20,32,66,.88), rgba(11,19,40,.90));border:1px solid rgba(124,196,255,.10);border-radius:16px;padding:16px}
     .studio-summary{margin-bottom:12px;color:var(--muted);font-size:13px;line-height:1.5}
     .studio-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--accent);margin-bottom:10px}
     .studio-alert{margin-top:12px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:13px;line-height:1.5;display:grid;gap:8px}
@@ -226,23 +254,37 @@
     .studio-alert-code{display:inline-flex;align-items:center;gap:8px;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(7,12,24,.30);color:#fff;overflow-wrap:anywhere;word-break:break-word}
     .studio-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     .studio-picks-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
-    .studio-field,.studio-pick-card{display:grid;gap:6px}
+    .studio-field,.studio-pick-card{
+      display:grid;
+      gap:6px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(124,196,255,.10);
+      background:rgba(9,16,35,.72)
+    }
     .studio-field.full,.studio-pick-card.full{grid-column:1 / -1}
-    .studio-field label,.studio-pick-card label{font-size:12px;color:var(--muted);font-weight:800}
+    .studio-field label,.studio-pick-card label{font-size:11px;color:#d9e8ff;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
     .studio-input{
       width:100%;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
+      background:var(--field-bg);
+      border:1px solid var(--field-line);
       color:var(--text);
       padding:10px 12px;
       border-radius:12px;
       font:inherit;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
     }
     .studio-input::placeholder{color:#8ea4ca}
+    .studio-input:focus{
+      outline:none;
+      border-color:var(--field-focus);
+      box-shadow:0 0 0 3px rgba(95,240,200,.10), inset 0 1px 0 rgba(255,255,255,.04);
+      background:rgba(8,17,38,.96)
+    }
     .studio-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .studio-button{
-      border:1px solid rgba(124,196,255,.22);
-      background:linear-gradient(180deg, rgba(124,196,255,.18), rgba(124,196,255,.08));
+      border:1px solid rgba(124,196,255,.24);
+      background:linear-gradient(180deg, rgba(68,98,166,.92), rgba(31,49,95,.92));
       color:#eef6ff;
       border-radius:12px;
       padding:10px 14px;
@@ -253,30 +295,38 @@
       transition:.18s ease;
     }
     .studio-button:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.36)}
-    .studio-button.secondary{background:rgba(68,215,146,.12);border-color:rgba(68,215,146,.24);color:#bff2d5}
-    .studio-button.ghost{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.10);color:#d9e6ff}
+    .studio-button.secondary{background:linear-gradient(180deg, rgba(68,215,146,.24), rgba(28,108,78,.22));border-color:rgba(68,215,146,.32);color:#d8ffea}
+    .studio-button.ghost{background:rgba(10,18,37,.82);border-color:rgba(255,255,255,.12);color:#d9e6ff}
     .studio-button[disabled]{opacity:.55;cursor:not-allowed;transform:none}
-    .studio-note{font-size:12px;color:var(--muted);line-height:1.55}
+    .studio-note{
+      font-size:12px;
+      color:#c6d8fb;
+      line-height:1.55;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(124,196,255,.10);
+      background:rgba(10,18,37,.68)
+    }
     .studio-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
     .studio-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;font-weight:800;color:#dbe7ff}
     .studio-divider{height:1px;background:var(--line);margin:14px 0}
-    .studio-empty{padding:14px;border-radius:14px;border:1px dashed rgba(255,255,255,.12);color:var(--muted);line-height:1.55}
+    .studio-empty{padding:14px;border-radius:14px;border:1px dashed rgba(124,196,255,.18);background:rgba(9,17,34,.62);color:#c6d7f8;line-height:1.55}
     .studio-owner{font-size:18px;font-weight:900;color:#fff}
     .studio-status{font-size:13px;color:var(--muted);line-height:1.5}
     .studio-pick-card .small{line-height:1.45}
     .studio-inline{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .studio-link{color:#dbeaff}
     .studio-status-stack{display:grid;gap:12px}
-    .studio-lifecycle-card{display:grid;gap:10px;padding:14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+    .studio-lifecycle-card{display:grid;gap:10px;padding:14px;border-radius:14px;border:1px solid rgba(255,200,87,.16);background:linear-gradient(180deg, rgba(255,200,87,.10), rgba(18,25,50,.82))}
     .studio-lifecycle-title{font-size:18px;font-weight:900;color:#fff}
     .studio-lifecycle-note{font-size:13px;color:var(--muted);line-height:1.55}
     .studio-locked-note{font-size:12px;color:#cfe2ff}
     .studio-pick-sheet{display:grid;gap:12px;margin-top:16px}
-    .studio-pick-row{display:grid;gap:10px;padding:14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .studio-pick-row{display:grid;gap:10px;padding:14px;border-radius:16px;border:1px solid rgba(124,196,255,.10);background:linear-gradient(180deg, rgba(18,29,58,.94), rgba(8,15,31,.92))}
     .studio-pick-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
     .studio-pick-label{font-size:15px;font-weight:900;color:#fff}
     .studio-pick-picker{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .studio-picked-value{min-height:44px;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:14px;font-weight:700;color:#fff}
+    .studio-picked-value{min-height:44px;padding:11px 12px;border-radius:12px;border:1px solid rgba(124,196,255,.14);background:rgba(6,14,32,.88);font-size:14px;font-weight:700;color:#fff}
     .studio-picked-value.empty{color:#8ea4ca;font-weight:600}
     .studio-row-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .studio-status-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid var(--line);font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
@@ -289,12 +339,12 @@
     .studio-clash-list{display:flex;gap:8px;flex-wrap:wrap}
     .studio-clash-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,127,150,.12);border:1px solid rgba(255,127,150,.22);font-size:11px;font-weight:800;color:#ffd4dc}
     .studio-stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .studio-stat-card{display:grid;gap:4px;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .studio-stat-card{display:grid;gap:4px;padding:12px;border-radius:14px;border:1px solid rgba(124,196,255,.10);background:linear-gradient(180deg, rgba(18,29,58,.86), rgba(8,15,31,.82))}
     .studio-stat-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:800}
     .studio-stat-value{font-size:22px;font-weight:900;color:#fff;line-height:1}
     .studio-stat-note{font-size:12px;color:var(--muted);line-height:1.45}
     .studio-list{display:grid;gap:10px}
-    .studio-list-card{display:grid;gap:8px;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .studio-list-card{display:grid;gap:8px;padding:12px;border-radius:14px;border:1px solid rgba(124,196,255,.10);background:linear-gradient(180deg, rgba(17,28,56,.90), rgba(8,15,31,.82))}
     .studio-list-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
     .studio-list-title{font-size:15px;font-weight:900;color:#fff;line-height:1.25}
     .studio-list-note{font-size:12px;color:var(--muted);line-height:1.45}
@@ -305,7 +355,7 @@
     .studio-progress{height:10px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;border:1px solid rgba(255,255,255,.06)}
     .studio-progress-fill{height:100%;background:linear-gradient(90deg, rgba(124,196,255,.85), rgba(95,240,200,.85))}
     .studio-checklist{display:grid;gap:8px}
-    .studio-check-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .studio-check-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid rgba(124,196,255,.10);background:rgba(9,17,34,.74)}
     .studio-check-copy{display:grid;gap:4px}
     .studio-check-title{font-size:13px;font-weight:800;color:#fff}
     .studio-check-note{font-size:12px;color:var(--muted);line-height:1.45}
@@ -325,7 +375,7 @@
     .studio-invite-copy{font-size:13px;color:#d7e7ff;line-height:1.55}
     .studio-invite-code{display:inline-flex;align-items:center;gap:8px;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(7,12,24,.38);font-size:16px;font-weight:900;color:#fff;overflow-wrap:anywhere;word-break:break-word}
     .studio-invite-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .studio-callout{padding:12px 14px;border-radius:14px;border:1px solid rgba(124,196,255,.16);background:rgba(124,196,255,.08);font-size:13px;line-height:1.55;color:#dceaff}
+    .studio-callout{padding:12px 14px;border-radius:14px;border:1px solid var(--info-line);background:linear-gradient(180deg, rgba(124,196,255,.14), rgba(18,31,66,.82));font-size:13px;line-height:1.55;color:#eff7ff}
     .surface-backdrop{
       position:fixed;
       inset:0;
@@ -363,8 +413,8 @@
       cursor:pointer;
     }
     .surface-drawer-stack{display:grid;gap:14px}
-    .surface-drawer-section{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:16px}
-    .surface-drawer-advanced{margin-top:14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03)}
+    .surface-drawer-section{background:linear-gradient(180deg, rgba(19,31,62,.92), rgba(9,17,34,.88));border:1px solid rgba(124,196,255,.10);border-radius:16px;padding:16px}
+    .surface-drawer-advanced{margin-top:14px;border:1px solid rgba(255,200,87,.14);border-radius:14px;background:linear-gradient(180deg, rgba(255,200,87,.08), rgba(10,18,36,.82))}
     .surface-drawer-advanced summary{cursor:pointer;list-style:none;padding:14px 16px;font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
     .surface-drawer-advanced summary::-webkit-details-marker{display:none}
     .surface-drawer-advanced-body{padding:0 16px 16px}
@@ -562,25 +612,26 @@
     .fantasy-sub{font-size:13px;color:var(--muted);line-height:1.55;max-width:860px}
     .fantasy-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
     .fantasy-fixture-list{display:grid;gap:12px}
-    .fantasy-window-note{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.55}
+    .fantasy-window-note{margin-top:12px;font-size:12px;color:#d7e7ff;line-height:1.55;padding:10px 12px;border-radius:12px;border:1px solid rgba(124,196,255,.14);background:rgba(124,196,255,.08)}
     .fantasy-availability-list{display:grid;gap:8px;margin-top:12px}
-    .fantasy-availability-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .fantasy-availability-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,200,87,.14);background:linear-gradient(180deg, rgba(255,200,87,.08), rgba(10,18,36,.80))}
     .fantasy-availability-copy{display:grid;gap:4px}
     .fantasy-availability-title{font-size:13px;font-weight:900;color:#fff}
     .fantasy-availability-note{font-size:12px;color:var(--muted);line-height:1.45}
     .fantasy-fixture-card{
       width:100%;
       text-align:left;
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(23,36,72,.96), rgba(9,18,38,.94));
+      border:1px solid rgba(124,196,255,.14);
       border-radius:16px;
       padding:14px;
       color:var(--text);
       cursor:pointer;
       transition:.18s ease;
+      box-shadow:var(--glow), inset 0 1px 0 rgba(255,255,255,.04);
     }
     .fantasy-fixture-card:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.3)}
-    .fantasy-fixture-card.active{border-color:rgba(95,240,200,.35);box-shadow:0 0 0 1px rgba(95,240,200,.15) inset}
+    .fantasy-fixture-card.active{border-color:rgba(95,240,200,.38);box-shadow:0 0 0 1px rgba(95,240,200,.18) inset, 0 14px 30px rgba(0,0,0,.28)}
     .fantasy-fixture-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
     .fantasy-fixture-match{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:800}
     .fantasy-fixture-teams{font-size:20px;font-weight:900;line-height:1.1;color:#fff;margin-top:6px}
@@ -591,9 +642,9 @@
     .fantasy-slot-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
     @media (max-width:760px){.fantasy-slot-grid{grid-template-columns:1fr}}
     .fantasy-slot-card{
-      border:1px solid var(--line);
+      border:1px solid rgba(124,196,255,.12);
       border-radius:16px;
-      background:rgba(255,255,255,.03);
+      background:linear-gradient(180deg, rgba(18,31,62,.92), rgba(8,16,34,.88));
       padding:14px;
       display:grid;
       gap:10px;
@@ -606,20 +657,20 @@
     .fantasy-slot-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
     .fantasy-rules{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .fantasy-empty{
-      border:1px dashed rgba(255,255,255,.14);
+      border:1px dashed rgba(124,196,255,.16);
       border-radius:16px;
       padding:18px;
-      color:var(--muted);
-      background:rgba(255,255,255,.025);
+      color:#c7d9fb;
+      background:rgba(9,17,34,.68);
       line-height:1.6;
     }
     .fantasy-picker-list{display:grid;gap:10px}
     .fantasy-picker-card{
       width:100%;
       text-align:left;
-      border:1px solid var(--line);
+      border:1px solid rgba(124,196,255,.14);
       border-radius:14px;
-      background:rgba(255,255,255,.03);
+      background:linear-gradient(180deg, rgba(20,32,64,.94), rgba(8,16,34,.90));
       padding:12px 14px;
       color:var(--text);
       cursor:pointer;
@@ -641,7 +692,7 @@
       margin-top:14px;
     }
     .fantasy-saved-list{display:grid;gap:8px;margin-top:14px}
-    .fantasy-saved-item{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .fantasy-saved-item{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid rgba(95,240,200,.14);background:linear-gradient(180deg, rgba(95,240,200,.08), rgba(11,20,40,.86))}
     .fantasy-leaderboard-list{display:grid;gap:10px;margin-top:14px}
     .fantasy-leaderboard-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
     .fantasy-leaderboard-row.top-1{border-color:rgba(255,200,87,.34);background:rgba(255,200,87,.10)}
@@ -793,6 +844,12 @@
               <div id="miniFantasyFixtures" class="fantasy-fixture-list"></div>
             </div>
             <div class="card">
+              <div class="section-title">How Mini Fantasy works</div>
+              <div class="studio-note">Pick one 4-player team for each open match. Save it before lock, and keep one captain for the 1.5x boost.</div>
+              <div class="studio-note">You must stay inside 31 credits, take at least 1 batter, at least 1 bowler, and at least 1 player from each real team.</div>
+              <div class="studio-note">Matches open the day before and lock 1 minute before the official start time, so tomorrow's fixtures can be entered today.</div>
+            </div>
+            <div class="card">
               <div class="section-title">Rules</div>
               <div class="fantasy-rules">
                 <div class="pill">Exactly 4 players</div>
@@ -836,7 +893,7 @@
       <div class="surface-drawer-head">
         <div>
           <div class="surface-drawer-title">Profile</div>
-          <div class="surface-drawer-sub">Create an account once, then use the same login for Duels and Mini Fantasy.</div>
+          <div class="surface-drawer-sub">Create your account once with four fields, then come back with email + password for both Duels and Mini Fantasy.</div>
         </div>
         <button class="surface-drawer-close" type="button" data-close-drawer="profile">Close</button>
       </div>
@@ -860,7 +917,7 @@
       <div class="surface-drawer-head">
         <div>
           <div class="surface-drawer-title">Create duel</div>
-          <div class="surface-drawer-sub">Start a new public duel, get the code instantly, and keep building your picks while your challenger joins.</div>
+          <div class="surface-drawer-sub">Start a new public duel, get the code instantly, and keep building your sealed picks while your challenger joins.</div>
         </div>
         <button class="surface-drawer-close" type="button" data-close-drawer="create">Close</button>
       </div>
@@ -993,6 +1050,7 @@
     let CURRENT_USER = null;
     let HOSTED_AUTH_MODE = 'signin';
     let AUTH_FORM_PREFILL = { displayName: '', ownerId: '', email: '' };
+    let AUTH_PANEL_NOTICE = null;
     let CUSTOM_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_MINI_FANTASY_ENTRIES = [];
@@ -1010,7 +1068,10 @@
       matchNo: null,
       slotIndex: null,
       teamFilter: 'ALL',
-      search: ''
+      search: '',
+      restoreSearchFocus: false,
+      searchSelectionStart: null,
+      searchSelectionEnd: null
     };
     let ACTIVE_PICKER_STATE = {
       open: false,
@@ -1018,7 +1079,10 @@
       teamFilter: 'ALL',
       search: '',
       formId: null,
-      duelId: null
+      duelId: null,
+      restoreSearchFocus: false,
+      searchSelectionStart: null,
+      searchSelectionEnd: null
     };
 
     // ========= CATEGORY MAP =========
@@ -3386,6 +3450,28 @@ function titleBandScore(pick, live){
       }).format(new Date(dt));
     }
 
+    function friendlyHostedAuthError(action, error){
+      const raw = String(error?.message || '').trim();
+      const normalized = raw.toLowerCase();
+      if (normalized.includes('invalid login credentials')) {
+        return 'That email + password did not match. Try again, or switch to Create account first.';
+      }
+      if (normalized.includes('already registered') || normalized.includes('already been registered')) {
+        return 'That email already has an account. Switch to Sign in and use email + password there.';
+      }
+      if (normalized.includes('no active session yet') || normalized.includes('confirm the account first')) {
+        return 'Your account exists, but email confirmation is still blocking sign-in. Confirm the account first, or turn email confirmation off in Supabase.';
+      }
+      if (normalized.includes('password')) {
+        return action === 'signup'
+          ? 'That password was not accepted. Use the four fields again and try a stronger password.'
+          : 'That email + password did not go through. Check them and try again.';
+      }
+      return action === 'signup'
+        ? 'That account could not be created right now. Check the four fields and try again.'
+        : 'That sign-in did not go through. Check your email + password and try again.';
+    }
+
     function formatUtcStamp(iso){
       const dt = new Date(iso);
       const date = dt.toISOString().slice(0, 10);
@@ -3651,6 +3737,7 @@ function titleBandScore(pick, live){
           id: entry?.id || null,
           userId: entry?.userId || null,
           ownerHandle: normalizeOwnerId(entry?.ownerHandle || entry?.ownerId || ''),
+          displayName: normalizeTextValue(entry?.displayName || entry?.display_name || ''),
           season: normalizeTextValue(entry?.season || MINI_FANTASY_SEASON),
           matchNo: Number(entry?.matchNo || 0) || null,
           homeTeamCode: normalizeTextValue(entry?.homeTeamCode || ''),
@@ -3695,6 +3782,7 @@ function titleBandScore(pick, live){
         id: entry?.id || `local-mini-${normalizedOwner}-${matchNo}`,
         userId: entry?.userId || CURRENT_USER?.userId || null,
         ownerHandle: normalizedOwner,
+        displayName: normalizeTextValue(entry?.displayName || CURRENT_USER?.displayName || normalizedOwner),
         season: normalizeTextValue(entry?.season || MINI_FANTASY_SEASON),
         matchNo,
         homeTeamCode: normalizeTextValue(entry?.homeTeamCode || ''),
@@ -3794,8 +3882,8 @@ function titleBandScore(pick, live){
         console.error('Hosted mini fantasy load failed:', error);
         MINI_FANTASY_NOTICE = {
           type: 'bad',
-          title: 'Mini Fantasy entries could not load',
-          text: error.message || `Could not load your saved Mini Fantasy entries from ${currentAuthLabel()}.`
+          title: 'Mini Fantasy could not refresh just now',
+          text: 'Your saved teams could not be refreshed right now. Please try again in a moment.'
         };
         setRemoteMiniFantasyEntries([]);
         setRemoteMiniFantasyLeaderboardEntries([]);
@@ -3873,6 +3961,16 @@ function titleBandScore(pick, live){
       DUEL_STUDIO_NOTICE = typeof text === 'string'
         ? { type, text }
         : { type, ...text };
+    }
+
+    function setAuthPanelNotice(type, payload){
+      if (!payload) {
+        AUTH_PANEL_NOTICE = null;
+        return;
+      }
+      AUTH_PANEL_NOTICE = typeof payload === 'string'
+        ? { type, text: payload }
+        : { type, ...payload };
     }
 
     function createEmptyPicks(){
@@ -4375,6 +4473,9 @@ function titleBandScore(pick, live){
         refreshMergedRoom(sharedBundle?.duelRecord?.id || requestedDuelId);
         requestedDuelMissing = Boolean(requestedDuelId) && !MATCHUPS.some((m) => m.id === requestedDuelId);
         activeId = MATCHUPS.find((m) => m.id === (sharedBundle?.duelRecord?.id || requestedDuelId))?.id || MATCHUPS.find((m) => m.id === activeId)?.id || MATCHUPS[0]?.id || null;
+        if (sharedBundle?.duelRecord?.id || requestedDuelId) {
+          activeView = 'warroom';
+        }
         if (ACTIVE_ROOM) {
           const duelCount = Array.isArray(ACTIVE_ROOM.duels) ? ACTIVE_ROOM.duels.length : 0;
           const liveCount = Array.isArray(ACTIVE_ROOM.duels) ? ACTIVE_ROOM.duels.filter((duel) => duel.state === 'locked').length : 0;
@@ -4625,9 +4726,39 @@ function titleBandScore(pick, live){
         teamFilter: 'ALL',
         search: '',
         formId: null,
-        duelId: null
+        duelId: null,
+        restoreSearchFocus: false,
+        searchSelectionStart: null,
+        searchSelectionEnd: null
       };
       renderPickPicker();
+    }
+
+    function captureSearchInputState(input, state){
+      if (!input || !state) return;
+      state.search = input.value || state.search || '';
+      const isFocused = document.activeElement === input;
+      state.restoreSearchFocus = Boolean(isFocused || state.restoreSearchFocus);
+      if (typeof input.selectionStart === 'number') state.searchSelectionStart = input.selectionStart;
+      if (typeof input.selectionEnd === 'number') state.searchSelectionEnd = input.selectionEnd;
+    }
+
+    function restoreSearchInputState(input, state){
+      if (!input || !state || !state.restoreSearchFocus) return;
+      const valueLength = input.value.length;
+      const start = typeof state.searchSelectionStart === 'number'
+        ? Math.max(0, Math.min(state.searchSelectionStart, valueLength))
+        : valueLength;
+      const end = typeof state.searchSelectionEnd === 'number'
+        ? Math.max(start, Math.min(state.searchSelectionEnd, valueLength))
+        : start;
+      try {
+        input.focus({ preventScroll: true });
+        if (typeof input.setSelectionRange === 'function') input.setSelectionRange(start, end);
+      } catch (_error) {
+        input.focus();
+      }
+      state.restoreSearchFocus = false;
     }
 
     function updateStudioPickRow(categoryKey){
@@ -4673,7 +4804,10 @@ function titleBandScore(pick, live){
         teamFilter: 'ALL',
         search: '',
         formId: 'activeEntryForm',
-        duelId: activeId
+        duelId: activeId,
+        restoreSearchFocus: true,
+        searchSelectionStart: null,
+        searchSelectionEnd: null
       };
       renderPickPicker();
     }
@@ -4703,6 +4837,7 @@ function titleBandScore(pick, live){
       const mode = pickerCategoryMode(category.key);
       const filtered = filteredPickerOptions(category.key, ACTIVE_PICKER_STATE.search, ACTIVE_PICKER_STATE.teamFilter);
       const currentValue = activeFormPickValue(category.key);
+      captureSearchInputState(document.getElementById('pickPickerSearch'), ACTIVE_PICKER_STATE);
 
       modal.classList.remove('section-hidden');
       modal.setAttribute('aria-hidden', 'false');
@@ -4762,8 +4897,7 @@ function titleBandScore(pick, live){
           ACTIVE_PICKER_STATE.search = event.target.value || '';
           renderPickPicker();
         };
-        searchInput.focus();
-        searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+        restoreSearchInputState(searchInput, ACTIVE_PICKER_STATE);
       }
 
       toolbar.querySelectorAll('[data-picker-team]').forEach((button) => {
@@ -5045,7 +5179,7 @@ function titleBandScore(pick, live){
             <span class="studio-chip">${escapeHtml(currentAuthLabel())}</span>
           </div>
           <div class="studio-note">${usesHostedDuelsBackend()
-            ? `Real Duels account live. Your session and public duel records are coming from ${escapeHtml(currentAuthLabel())}.`
+            ? `You are signed in. The same hosted account now works for both Duels and Mini Fantasy.`
             : 'This lightweight beta keeps your duel identity in this browser. Use the same handle whenever you open or share invite links.'}</div>
           <div class="studio-actions">
             <button class="studio-button ghost" type="button" id="signOutButton">Sign out</button>
@@ -5064,12 +5198,13 @@ function titleBandScore(pick, live){
               try {
                 await DUELS_BACKEND.signOut();
               } catch (error) {
-                setStudioNotice('bad', error.message || 'Could not sign out of the hosted Duels account.');
+                setStudioNotice('bad', 'That sign-out did not finish cleanly. Please try again.');
                 render();
                 return;
               }
             }
             clearStoredUserProfile();
+            setAuthPanelNotice(null);
             await syncMiniFantasyEntries();
             setStudioNotice('info', usesHostedDuelsBackend()
               ? 'Signed out of the hosted Duels account.'
@@ -5084,13 +5219,20 @@ function titleBandScore(pick, live){
       const isHosted = usesHostedDuelsBackend();
       const isHostedSignUp = isHosted && HOSTED_AUTH_MODE === 'signup';
       const authTitle = isHosted
-        ? (isHostedSignUp ? 'Create your account once, then use the same login everywhere in the app.' : 'Sign in with your email address and password only.')
+        ? (isHostedSignUp ? 'Create your account once for both Duels and Mini Fantasy.' : 'Sign in with the same email + password you used at account creation.')
         : 'Use your display name and handle in this browser to create, join, and manage duels.';
       const authHint = isHosted
         ? (isHostedSignUp
-          ? 'Create account needs all four fields: display name, handle, email, and password.'
-          : 'Already created an account? Sign in uses only email + password. Display name and handle are not needed here.')
+          ? 'Create account uses all four fields below: display name, handle, email, and password.'
+          : 'Only email + password are needed here. Display name and handle are only for account creation.')
         : 'No password yet. Your handle is the minimal beta identity for creating, joining, and updating public duels.';
+      const authNotice = !CURRENT_USER && AUTH_PANEL_NOTICE
+        ? `<div class="studio-alert ${studioAlertClass(AUTH_PANEL_NOTICE.type)}">
+             ${AUTH_PANEL_NOTICE.title ? `<div class="studio-alert-title">${escapeHtml(AUTH_PANEL_NOTICE.title)}</div>` : ''}
+             ${AUTH_PANEL_NOTICE.text ? `<div class="studio-alert-detail">${escapeHtml(AUTH_PANEL_NOTICE.text)}</div>` : ''}
+             ${AUTH_PANEL_NOTICE.nextStep ? `<div class="studio-alert-next">${escapeHtml(AUTH_PANEL_NOTICE.nextStep)}</div>` : ''}
+           </div>`
+        : '';
 
       panel.innerHTML = `
         ${isHosted ? `
@@ -5100,6 +5242,7 @@ function titleBandScore(pick, live){
           </div>
         ` : ''}
         <form id="authForm" data-auth-mode="${isHosted ? (isHostedSignUp ? 'signup' : 'signin') : 'local'}">
+          ${authNotice}
           <div class="studio-note">${escapeHtml(authTitle)}</div>
           <div class="studio-form-grid">
             ${!isHosted || isHostedSignUp ? `
@@ -5138,6 +5281,7 @@ function titleBandScore(pick, live){
             const form = document.getElementById('authForm');
             storeAuthFormPrefill(form);
             HOSTED_AUTH_MODE = button.dataset.authMode === 'signup' ? 'signup' : 'signin';
+            if (AUTH_PANEL_NOTICE?.type !== 'good') setAuthPanelNotice(null);
             renderAuthPanel();
           };
         });
@@ -5147,6 +5291,7 @@ function titleBandScore(pick, live){
             const form = document.getElementById('authForm');
             storeAuthFormPrefill(form);
             HOSTED_AUTH_MODE = isHostedSignUp ? 'signin' : 'signup';
+            if (AUTH_PANEL_NOTICE?.type !== 'good') setAuthPanelNotice(null);
             renderAuthPanel();
           };
         }
@@ -5175,23 +5320,49 @@ function titleBandScore(pick, live){
                     email: formData.get('email'),
                     password: formData.get('password')
                   });
+              if (action === 'signup') {
+                const createdUser = normalizeUserProfile(remoteUser || {}) || null;
+                storeAuthFormPrefill({
+                  displayName: createdUser?.displayName || formData.get('displayName') || AUTH_FORM_PREFILL.displayName || '',
+                  ownerId: createdUser?.ownerId || formData.get('ownerId') || AUTH_FORM_PREFILL.ownerId || '',
+                  email: createdUser?.email || formData.get('email') || AUTH_FORM_PREFILL.email || ''
+                });
+                try {
+                  await DUELS_BACKEND.signOut();
+                } catch (signOutError) {
+                  console.warn('Hosted signup sign-out handoff failed', signOutError);
+                }
+                clearStoredUserProfile();
+                HOSTED_AUTH_MODE = 'signin';
+                setAuthPanelNotice('good', {
+                  title: 'Account created successfully',
+                  text: 'Your account is ready. Sign in now with the same email + password.',
+                  nextStep: 'Use only email + password in Sign in. Display name and handle are already saved.'
+                });
+                setStudioNotice('info', 'Account created. Sign in now with the same email + password.');
+                await syncMiniFantasyEntries();
+                render();
+                return;
+              }
               CURRENT_USER = normalizeUserProfile(remoteUser || {}) || null;
               if (!CURRENT_USER) {
+                setAuthPanelNotice('bad', 'Your account exists, but the profile could not load yet. Please try signing in again.');
                 setStudioNotice('bad', 'The hosted account signed in, but the Duels profile is incomplete.');
                 render();
                 return;
               }
+              setAuthPanelNotice(null);
               storeAuthFormPrefill({
                 displayName: CURRENT_USER.displayName,
                 ownerId: CURRENT_USER.ownerId,
                 email: CURRENT_USER.email || formData.get('email') || AUTH_FORM_PREFILL.email || ''
               });
-              setStudioNotice('good', action === 'signup'
-                ? `Account created for ${CURRENT_USER.displayName}. You are signed in now and can jump straight into Duels or Mini Fantasy.`
-                : `Signed in as ${CURRENT_USER.displayName}. Your Duels and Mini Fantasy account is ready in this browser.`);
+              setStudioNotice('good', `Signed in as ${CURRENT_USER.displayName}. Your Duels and Mini Fantasy account is ready in this browser.`);
               await syncMiniFantasyEntries();
             } catch (error) {
-              setStudioNotice('bad', error.message || `Could not ${action === 'signup' ? 'create the account' : 'sign in'} right now.`);
+              const friendlyError = friendlyHostedAuthError(action, error);
+              setAuthPanelNotice('bad', friendlyError);
+              setStudioNotice('bad', friendlyError);
             }
             render();
             return;
@@ -5206,6 +5377,7 @@ function titleBandScore(pick, live){
             render();
             return;
           }
+          setAuthPanelNotice(null);
           setStudioNotice('good', `Signed in as ${saved.displayName}. You can now create, join, and submit public duels from this browser.`);
           await syncMiniFantasyEntries();
           render();
@@ -5219,6 +5391,15 @@ function titleBandScore(pick, live){
       if (!panel) return;
       const disabledAttr = CURRENT_USER ? '' : 'disabled';
       panel.innerHTML = `
+        <div class="studio-list" style="margin-bottom:16px">
+          <div class="studio-list-card">
+            <div class="studio-list-title">How Duel works</div>
+            <div class="studio-list-note">1. Create the duel and copy the code or invite link.</div>
+            <div class="studio-list-note">2. Your challenger joins the open slot and fills their sealed 15 picks.</div>
+            <div class="studio-list-note">3. Both sides submit. Shared picks become clashes and must be changed.</div>
+            <div class="studio-list-note">4. Once both sheets are full and clash-free, the duel arms and goes live from the next eligible match.</div>
+          </div>
+        </div>
         <form id="createDuelForm">
           <div class="studio-callout">Create the duel first. You will get a duel code instantly, and your challenger can create an account later from the invite link or duel code.</div>
           <div class="studio-note">${usesHostedDuelsBackend()
@@ -5254,7 +5435,7 @@ function titleBandScore(pick, live){
           try {
             await createCustomDuel();
           } catch (error) {
-            setStudioNotice('bad', error.message || 'Could not create duel.');
+            setStudioNotice('bad', 'That duel was not created. Please try again.');
           }
           render();
         };
@@ -5272,7 +5453,7 @@ function titleBandScore(pick, live){
           try {
             await joinDuelByCode(formData.get('duelCode'));
           } catch (error) {
-            setStudioNotice('bad', error.message || 'Could not join duel by code.');
+            setStudioNotice('bad', 'That duel code did not go through. Check the code and try again.');
           }
           render();
         };
@@ -5283,7 +5464,7 @@ function titleBandScore(pick, live){
       const panel = document.getElementById('profilePanel');
       if (!panel) return;
       if (!CURRENT_USER) {
-        panel.innerHTML = '<div class="studio-empty">Create an account once, then come back with the same email + password. If you are using the local beta mode, sign in here with your display name and handle only.</div>';
+        panel.innerHTML = '<div class="studio-empty">New here? Create your account with display name, handle, email, and password. Returning later? Just use email + password to sign back in.</div>';
         return;
       }
       const profile = profileSnapshot();
@@ -5322,12 +5503,12 @@ function titleBandScore(pick, live){
       const panel = document.getElementById('myDuelsPanel');
       if (!panel) return;
       if (!CURRENT_USER) {
-        panel.innerHTML = '<div class="studio-empty">Sign in to see the duels you created, the duels you joined, and which ones are draft, clash, armed, or live right now.</div>';
+        panel.innerHTML = '<div class="studio-empty">Sign in to see your live duels, any draft or clash states, and the invites you are already part of.</div>';
         return;
       }
       const items = myDirectorySummaries();
       if (!items.length) {
-        panel.innerHTML = '<div class="studio-empty">No duels yet. Create your first duel above, or paste a duel code from a friend to claim their open challenger slot.</div>';
+        panel.innerHTML = '<div class="studio-empty">No duels yet. Open Duel, tap Create duel, or paste a friend\'s duel code to claim the open challenger slot.</div>';
         return;
       }
       panel.innerHTML = `
@@ -5448,12 +5629,12 @@ function titleBandScore(pick, live){
       const matchup = activeMatchup();
       const bundle = activeCustomBundle();
       if (!matchup) {
-        panel.innerHTML = '<div class="studio-empty">Open a duel from the public feed, or create one above, to manage invites, joining, and sealed picks.</div>';
+        panel.innerHTML = '<div class="studio-empty">Open a duel, then use Manage duel for invites, sealed picks, clash fixes, and readiness.</div>';
         return;
       }
 
       if (!bundle) {
-        panel.innerHTML = '<div class="studio-empty">This is a featured public duel from the shipped fixture, so it is read-only. Create your own public duel above if you want the full invite, join, and sealed-picks flow.</div>';
+        panel.innerHTML = '<div class="studio-empty">This is a featured public duel from the shipped fixture, so it is read-only. Create your own duel if you want invites, joining, and sealed picks.</div>';
         return;
       }
 
@@ -5472,7 +5653,7 @@ function titleBandScore(pick, live){
             <span class="studio-chip">${escapeHtml(bundle.duelRecord.label || `${entryA?.displayName || 'Entry A'} vs ${entryB?.displayName || 'Entry B'}`)}</span>
             <span class="studio-chip">${escapeHtml(lifecycleHeadline(lifecycle))}</span>
           </div>
-          <div class="studio-empty">Create or sign in to a Duels account to claim the open challenger slot on this duel invite and submit your sealed picks.</div>
+          <div class="studio-empty">Create an account or sign in to claim the open challenger slot on this duel invite, then submit your sealed picks.</div>
           <div class="studio-invite-card">
             <div class="studio-invite-title">Invite your challenger</div>
             <div class="studio-invite-copy">Send the link or duel code below. Your challenger creates an account, joins the duel, then fills all 15 picks. Opponent picks stay hidden until the duel is clash-free and live.</div>
@@ -5820,7 +6001,7 @@ function titleBandScore(pick, live){
     }
 
     let activeId = null;
-    let activeView = 'warroom';
+    let activeView = 'fantasy';
     let activeStatsKey = 'orangeCap';
     let directoryFilter = 'all';
     let activeDrawer = null;
@@ -7300,7 +7481,10 @@ function titleBandScore(pick, live){
         matchNo: Number(matchNo),
         slotIndex: Number(slotIndex),
         teamFilter: 'ALL',
-        search: ''
+        search: '',
+        restoreSearchFocus: true,
+        searchSelectionStart: null,
+        searchSelectionEnd: null
       };
       renderMiniFantasyPicker();
     }
@@ -7311,7 +7495,10 @@ function titleBandScore(pick, live){
         matchNo: null,
         slotIndex: null,
         teamFilter: 'ALL',
-        search: ''
+        search: '',
+        restoreSearchFocus: false,
+        searchSelectionStart: null,
+        searchSelectionEnd: null
       };
       renderMiniFantasyPicker();
     }
@@ -7371,9 +7558,9 @@ function titleBandScore(pick, live){
         ? `Submit now: ${openMatchList}`
         : 'No Mini Fantasy entry is open right now';
       summary.textContent = fixtures.length
-        ? `${openMatchList} ${fixtures.length === 1 ? 'is' : 'are'} open right now. Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO} is already live for entries, later matches open from the day before, and every fixture locks 1 minute before the start time.`
+        ? `${openMatchList} ${fixtures.length === 1 ? 'is' : 'are'} open right now. Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO} is already live for entries, later matches open the day before, and every fixture locks 1 minute before the official start time.`
         : nextOpening
-          ? `No entry is open at this moment. Match ${nextOpening.match_no} opens on ${formatDate(nextOpening.opens_at_utc)} and then locks 1 minute before the start time.`
+          ? `No entry is open at this moment. Match ${nextOpening.match_no} opens on ${formatDate(nextOpening.opens_at_utc)} and then locks 1 minute before the official start time.`
           : `Mini Fantasy entries are only accepted for upcoming Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO}+ fixtures before lock.`;
       meta.innerHTML = `
         <span class="pill">Eligible fixtures: ${fixtures.length}</span>
@@ -7386,7 +7573,7 @@ function titleBandScore(pick, live){
       if (!fixtures.length) {
         slot.innerHTML = `
           <div class="fantasy-empty">
-            No Mini Fantasy match is open right now. ${nextOpening ? `Next up: Match ${nextOpening.match_no} - ${escapeHtml(formatFixtureLabel(nextOpening.fixture || `${nextOpening.away_team} vs ${nextOpening.home_team}`))} opens on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : 'The next eligible entry window will appear here automatically.'}
+            No Mini Fantasy match is open right now. ${nextOpening ? `Next up: Match ${nextOpening.match_no} - ${escapeHtml(formatFixtureLabel(nextOpening.fixture || `${nextOpening.away_team} vs ${nextOpening.home_team}`))} opens on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}. It will lock 1 minute before the start time.` : 'The next eligible entry window will appear here automatically.'}
           </div>
         `;
         return;
@@ -7395,13 +7582,16 @@ function titleBandScore(pick, live){
       const activeFixture = activeMiniFantasyFixture();
       const upcoming = availability.filter((fixture) => fixture.availability_status === 'upcoming').slice(0, 3);
       slot.innerHTML = `
-        <div class="fantasy-window-note">You can currently submit ${escapeHtml(openMatchList)}. ${nextOpening ? `Next opening: Match ${escapeHtml(String(nextOpening.match_no))} on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : 'No later opening is queued yet.'}</div>
+        <div class="fantasy-window-note">You can currently submit ${escapeHtml(openMatchList)}. Later matches open the day before. ${nextOpening ? `Next opening: Match ${escapeHtml(String(nextOpening.match_no))} on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : 'No later opening is queued yet.'}</div>
         ${fixtures.map((fixture) => {
         const savedEntry = findMiniFantasyEntryForMatch(fixture.match_no);
         const fixtureLabel = formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`);
         const whenLabel = Number(fixture.match_no) === MINI_FANTASY_FIRST_OPEN_MATCH_NO && currentNowDate().getTime() < Date.parse(fixture.opens_at_utc || '')
           ? 'Opening soon'
           : 'Open now';
+        const openingRuleLabel = Number(fixture.match_no) === MINI_FANTASY_FIRST_OPEN_MATCH_NO
+          ? `Opened from Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO} launch`
+          : 'Opens the day before';
         return `
           <button type="button" class="fantasy-fixture-card ${Number(activeFixture?.match_no) === Number(fixture.match_no) ? 'active' : ''}" data-mini-fixture="${fixture.match_no}">
             <div class="fantasy-fixture-top">
@@ -7413,8 +7603,9 @@ function titleBandScore(pick, live){
             </div>
             <div class="fantasy-fixture-note">${escapeHtml(fixtureLabel)}</div>
             <div class="fantasy-fixture-status">
-              <span class="pill">Starts: ${escapeHtml(formatDate(fixture.datetime_utc))}</span>
-              <span class="pill">Locks: ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
+              <span class="pill">Open now</span>
+              <span class="pill">Locks at ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
+              <span class="pill">${escapeHtml(openingRuleLabel)}</span>
             </div>
           </button>
         `;
@@ -7428,8 +7619,9 @@ function titleBandScore(pick, live){
                   <div class="fantasy-availability-note">${escapeHtml(formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`))}</div>
                 </div>
                 <div class="studio-inline">
-                  <span class="pill">Opens: ${escapeHtml(formatDate(fixture.opens_at_utc))}</span>
-                  <span class="pill">Locks: ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
+                  <span class="pill">Opens the day before</span>
+                  <span class="pill">Opens at ${escapeHtml(formatDate(fixture.opens_at_utc))}</span>
+                  <span class="pill">Locks at ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
                 </div>
               </div>
             `).join('')}
@@ -7449,14 +7641,14 @@ function titleBandScore(pick, live){
       const panel = document.getElementById('miniFantasyMyEntries');
       if (!panel) return;
       if (!CURRENT_USER) {
-        panel.innerHTML = '<div class="fantasy-empty">Sign in to save Mini Fantasy entries match by match.</div>';
+        panel.innerHTML = '<div class="fantasy-empty">Sign in to save one Mini Fantasy team per match and come back to edit it until lock.</div>';
         return;
       }
       const entries = currentMiniFantasyEntries()
         .slice()
         .sort((a, b) => Number(a.matchNo || 0) - Number(b.matchNo || 0));
       if (!entries.length) {
-        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy entries saved yet. Pick a fixture, build your 4-player team, and lock one captain.</div>';
+        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams saved yet. Start with any open fixture, pick 4 players, and lock one captain before the fixture closes.</div>';
         return;
       }
       panel.innerHTML = `
@@ -7490,7 +7682,7 @@ function titleBandScore(pick, live){
       const leaderboard = miniFantasyLeaderboardData();
       const rows = Array.isArray(leaderboard.rows) ? leaderboard.rows : [];
       if (!rows.length) {
-        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams have been saved yet. Once players start locking lineups, everyone will be ranked here by total points.</div>';
+        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams have been saved yet. Once lineups start locking, everyone will be ranked here by total points and the top three will show medal tags.</div>';
         return;
       }
       panel.innerHTML = `
@@ -7501,10 +7693,10 @@ function titleBandScore(pick, live){
               <div class="fantasy-leaderboard-copy">
                 <div class="fantasy-leaderboard-name">
                   <span class="fantasy-leaderboard-rank">#${escapeHtml(String(row.rank))}</span>
-                  <span>${escapeHtml(row.owner_handle)}</span>
+                  <span>${escapeHtml(row.display_name || row.owner_handle)}</span>
                   ${row.medal ? `<span class="fantasy-medal ${escapeHtml(row.medal)}">${escapeHtml(miniFantasyMedalLabel(row.medal))}</span>` : ''}
                 </div>
-                <div class="small">${escapeHtml(String(row.scored_entries))} scored match${row.scored_entries === 1 ? '' : 'es'} - ${escapeHtml(String(row.pending_entries))} pending - ${escapeHtml(String(row.saved_entries))} saved entry${row.saved_entries === 1 ? '' : 'ies'}</div>
+                <div class="small">@${escapeHtml(row.owner_handle)} - ${escapeHtml(String(row.scored_entries))} scored match${row.scored_entries === 1 ? '' : 'es'} - ${escapeHtml(String(row.pending_entries))} pending - ${escapeHtml(String(row.saved_entries))} saved entry${row.saved_entries === 1 ? '' : 'ies'}</div>
               </div>
               <div class="fantasy-leaderboard-score">
                 <div class="fantasy-leaderboard-points">${escapeHtml(String(row.total_points))}</div>
@@ -7545,7 +7737,7 @@ function titleBandScore(pick, live){
       });
       if (!validation.valid) {
         setMiniFantasyNotice('bad', {
-          title: 'Mini Fantasy lineup not ready',
+          title: 'Your team is not ready yet',
           text: validation.errors.join(' ')
         });
         render();
@@ -7558,6 +7750,7 @@ function titleBandScore(pick, live){
         : buildEntryPriceSnapshot(playerPool);
       const payload = {
         ownerHandle: CURRENT_USER.ownerId,
+        displayName: CURRENT_USER.displayName,
         userId: CURRENT_USER.userId || null,
         season: MINI_FANTASY_SEASON,
         matchNo: Number(fixture.match_no),
@@ -7587,12 +7780,12 @@ function titleBandScore(pick, live){
         }
         setMiniFantasyNotice('good', {
           title: `Match ${fixture.match_no} team saved`,
-          text: `Your ${payload.homeTeamCode} vs ${payload.awayTeamCode} Mini Fantasy team is saved with ${validation.total_cost} credits spent.`
+          text: `Your ${payload.homeTeamCode} vs ${payload.awayTeamCode} Mini Fantasy team is saved with ${validation.total_cost} credits spent. You can still edit it until lock.`
         });
       } catch (error) {
         setMiniFantasyNotice('bad', {
-          title: 'Mini Fantasy save failed',
-          text: error.message || 'Could not save the Mini Fantasy entry right now.'
+          title: 'That team was not saved',
+          text: 'Please try again. If the match has locked, the lineup can no longer change.'
         });
       }
       render();
@@ -7604,12 +7797,12 @@ function titleBandScore(pick, live){
       const fixture = activeMiniFantasyFixture();
       if (!fixture) {
         const nextOpening = nextMiniFantasyOpeningFixture();
-        panel.innerHTML = `<div class="fantasy-empty">No Mini Fantasy fixture is open right now.${nextOpening ? ` Match ${escapeHtml(String(nextOpening.match_no))} opens on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : ''}</div>`;
+        panel.innerHTML = `<div class="fantasy-empty">No Mini Fantasy fixture is open right now.${nextOpening ? ` Match ${escapeHtml(String(nextOpening.match_no))} opens on ${escapeHtml(formatDate(nextOpening.opens_at_utc))} and locks 1 minute before the start time.` : ''}</div>`;
         return;
       }
 
       if (!CURRENT_USER) {
-        panel.innerHTML = '<div class="fantasy-empty">Sign in to build and save one Mini Fantasy entry per match.</div>';
+        panel.innerHTML = '<div class="fantasy-empty">Sign in to build one 4-player team for this match, choose one captain, and save it before lock.</div>';
         return;
       }
 
@@ -7656,7 +7849,7 @@ function titleBandScore(pick, live){
                   <span class="pill">${escapeHtml(String(player.final_price))} cr</span>
                 </div>
               ` : `
-                <div class="fantasy-slot-empty">Choose a player from ${escapeHtml(teamShort(fixture.home_team))} or ${escapeHtml(teamShort(fixture.away_team))}. Every team needs 4 players total.</div>
+                <div class="fantasy-slot-empty">Choose a player from ${escapeHtml(teamShort(fixture.home_team))} or ${escapeHtml(teamShort(fixture.away_team))}. Every lineup needs 4 players total, at least 1 batter, at least 1 bowler, and at least 1 player from each team.</div>
               `}
               <div class="fantasy-slot-actions">
                 <button class="studio-button ${player ? 'ghost' : ''}" type="button" data-mini-pick="${slotIndex}" ${locked ? 'disabled' : ''}>${player ? 'Change player' : 'Choose player'}</button>
@@ -7677,7 +7870,7 @@ function titleBandScore(pick, live){
               ? `Lineup ready. You have ${budgetRemaining} credits left and the captain boost is set for ${draft.captainPlayerId ? escapeHtml((poolById.get(draft.captainPlayerId) || {}).name || 'your captain') : 'nobody yet'}.`
               : validation.errors.length
                 ? escapeHtml(validation.errors.join(' '))
-                : 'Build your lineup, keep one player from each team, and remember the captain 1.5x boost.'}
+                : 'Build your lineup, keep one player from each team, take at least 1 batter and 1 bowler, then lock the 1.5x captain.'}
         </div>
         <div class="studio-actions">
           <button class="studio-button" type="button" id="saveMiniFantasyButton" ${locked ? 'disabled' : ''}>${entry ? 'Update team' : 'Save team'}</button>
@@ -7737,6 +7930,7 @@ function titleBandScore(pick, live){
       }
 
       const filtered = filteredMiniFantasyPickerPool();
+      captureSearchInputState(document.getElementById('miniFantasyPickerSearch'), MINI_FANTASY_PICKER_STATE);
       modal.classList.remove('section-hidden');
       modal.setAttribute('aria-hidden', 'false');
       title.textContent = `Choose player for Match ${fixture.match_no}`;
@@ -7772,6 +7966,7 @@ function titleBandScore(pick, live){
           MINI_FANTASY_PICKER_STATE.search = event.target.value || '';
           renderMiniFantasyPicker();
         };
+        restoreSearchInputState(searchInput, MINI_FANTASY_PICKER_STATE);
       }
       toolbar.querySelectorAll('[data-mini-picker-team]').forEach((button) => {
         button.onclick = () => {

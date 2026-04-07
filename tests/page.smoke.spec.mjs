@@ -81,6 +81,7 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await page.locator('#profileDrawer [data-close-drawer="profile"]').click();
   await page.locator('#createDuelButton').click();
   await expect(page.locator('#createDrawer')).toBeVisible();
+  await expect(page.locator('#createDuelPanel')).toContainText('How Duel works');
   await expect(page.locator('#createDuelPanel')).toContainText('Join duel by code');
 
   await page.getByRole('button', { name: 'Create public duel' }).click();
@@ -233,7 +234,10 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
   await expect(page.locator('#manageDuelButton')).toHaveCount(0);
   await expect(page.locator('#profileChipButton')).toContainText('Mini Bala');
   await expectLocatorCountAtLeast(page.locator('#miniFantasyFixtures [data-mini-fixture]'), 1);
+  await expect(page.locator('#miniFantasySection')).toContainText('How Mini Fantasy works');
   await expect(page.locator('#miniFantasyFixtures')).toContainText('Match 14');
+  await expect(page.locator('#miniFantasyFixtures')).toContainText('Locks at');
+  await expect(page.locator('#miniFantasyFixtures')).toContainText('Opens the day before');
   await expect(page.locator('#miniFantasyFixtures')).toContainText('opens next');
   await expect(page.locator('#miniFantasyBuilder')).toContainText('Match 14');
 
@@ -263,7 +267,8 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
   await expect(page.locator('#miniFantasyBuilder')).toContainText('team saved');
   await expect(page.locator('#miniFantasyMyEntries')).toContainText('Match 14');
   await expect(page.locator('#miniFantasyMyEntries')).toContainText('Captain locked');
-  await expect(page.locator('#miniFantasyLeaderboard')).toContainText('mini-bala');
+  await expect(page.locator('#miniFantasyLeaderboard')).toContainText('Mini Bala');
+  await expect(page.locator('#miniFantasyLeaderboard')).toContainText('@mini-bala');
   await expect(page.locator('#miniFantasyLeaderboard')).toContainText(/medal/i);
 
   expect(pageErrors).toEqual([]);

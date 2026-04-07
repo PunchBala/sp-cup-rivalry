@@ -287,6 +287,7 @@ test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy point
     entries: [
       {
         ownerHandle: 'senthil',
+        displayName: 'Senthil',
         matchNo: 14,
         selectedPlayerIds: [
           buildMiniFantasyPlayerId('DC', 'DC Batter'),
@@ -298,6 +299,7 @@ test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy point
       },
       {
         ownerHandle: 'sai',
+        displayName: 'Sai',
         matchNo: 14,
         selectedPlayerIds: [
           buildMiniFantasyPlayerId('DC', 'DC Batter'),
@@ -315,6 +317,7 @@ test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy point
 
   assert.equal(leaderboard.completed_match_count, 14);
   assert.equal(leaderboard.rows[0].owner_handle, 'senthil');
+  assert.equal(leaderboard.rows[0].display_name, 'Senthil');
   assert.equal(leaderboard.rows[0].medal, 'gold');
   assert.equal(leaderboard.rows[1].medal, 'silver');
   assert.equal(leaderboard.rows[0].total_points, 102);
