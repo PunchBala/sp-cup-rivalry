@@ -291,6 +291,20 @@
       return firstArrayItem(rows);
     }
 
+    async function fetchProfilesByIds(userIds = [], accessToken) {
+      const ids = [...new Set((Array.isArray(userIds) ? userIds : []).map((value) => normalizeWhitespace(value)).filter(Boolean))];
+      if (!ids.length) return [];
+      const rows = await restRequest(config.tables.profiles, {
+        method: 'GET',
+        query: {
+          select: 'id,handle,display_name,email',
+          id: `in.(${ids.join(',')})`
+        },
+        accessToken
+      });
+      return Array.isArray(rows) ? rows : [];
+    }
+
     async function upsertProfile(profile, accessToken) {
       const payload = {
         id: profile.id,
@@ -324,6 +338,26 @@
         ownerId,
         authSource: 'supabase'
       };
+    }
+
+    async function enrichMiniFantasyEntriesWithProfiles(rows = [], accessToken) {
+      const safeRows = Array.isArray(rows) ? rows : [];
+      const profiles = await fetchProfilesByIds(safeRows.map((row) => row?.user_id), accessToken).catch(() => []);
+      if (!profiles.length) return safeRows;
+      const profileById = new Map(
+        profiles
+          .filter((profile) => normalizeWhitespace(profile?.id))
+          .map((profile) => [normalizeWhitespace(profile.id), profile])
+      );
+      return safeRows.map((row) => {
+        const profile = profileById.get(normalizeWhitespace(row?.user_id || ''));
+        if (!profile) return row;
+        return {
+          ...row,
+          display_name: normalizeWhitespace(profile.display_name || row?.display_name || row?.owner_handle || ''),
+          owner_handle: normalizeSlug(profile.handle || row?.owner_handle || '')
+        };
+      });
     }
 
     async function currentUserProfile() {
@@ -680,7 +714,8 @@ function normalizeMiniFantasyEntryRow(row) {
           },
           accessToken: activeSession.access_token
         });
-        return (Array.isArray(rows) ? rows : []).map(normalizeMiniFantasyEntryRow).filter(Boolean);
+        const enrichedRows = await enrichMiniFantasyEntriesWithProfiles(rows, activeSession.access_token);
+        return enrichedRows.map(normalizeMiniFantasyEntryRow).filter(Boolean);
       },
 
       async listPublicMiniFantasyEntries({ season, currentUser } = {}) {
@@ -695,7 +730,8 @@ function normalizeMiniFantasyEntryRow(row) {
           },
           accessToken: activeSession?.access_token || currentUser?.accessToken || null
         });
-        return (Array.isArray(rows) ? rows : []).map(normalizeMiniFantasyEntryRow).filter(Boolean);
+        const enrichedRows = await enrichMiniFantasyEntriesWithProfiles(rows, activeSession?.access_token || currentUser?.accessToken || null);
+        return enrichedRows.map(normalizeMiniFantasyEntryRow).filter(Boolean);
       },
 
       async upsertMiniFantasyEntry({ currentUser, entry }) {
