@@ -110,6 +110,32 @@ const ROLE_OVERRIDES = Object.freeze({
   })
 });
 
+// Keep Mini Fantasy uncapped pricing aligned with the same curated player pool used by Uncapped MVP.
+const UNCAPPED_MVP_PLAYERS = Object.freeze([
+  'Ayush Mhatre', 'Kartik Sharma', 'Urvil Patel', 'Ramakrishna Ghosh', 'Prashant Veer', 'Aman Khan',
+  'Anshul Kamboj', 'Mukesh Choudhary', 'Shreyas Gopal', 'Gurjapneet Singh', 'Mahendra Singh Dhoni',
+  'Sahil Parakh', 'Abishek Porel', 'Sameer Rizvi', 'Ashutosh Sharma', 'Vipraj Nigam', 'Ajay Mandal',
+  'Tripurana Vijay', 'Madhav Tiwari', 'Auqib Nabi',
+  'Kumar Kushagra', 'Anuj Rawat', 'Nishant Sindhu', 'Mohd. Arshad Khan', 'Rahul Tewatia', 'Shahrukh Khan',
+  'Manav Suthar', 'Gurnoor Singh Brar', 'Ashok Sharma', 'Kulwant Khejroliya',
+  'Angkrish Raghuvanshi', 'Tejasvi Singh', 'Anukul Roy', 'Sarthak Ranjan', 'Daksh Kamra', 'Vaibhav Arora',
+  'Kartik Tyagi', 'Prashant Solanki', 'Saurabh Dubey',
+  'Himmat Singh', 'Mukul Choudhary', 'Akshat Raghuwanshi', 'Abdul Samad', 'Arshin Kulkarni', 'Ayush Badoni',
+  'M. Siddharth', 'Digvesh Singh', 'Akash Singh', 'Prince Yadav', 'Arjun Tendulkar', 'Naman Tiwari',
+  'Mohsin Khan',
+  'Robin Minz', 'Danish Malewar', 'Naman Dhir', 'Raj Angad Bawa', 'Atharva Ankolekar', 'Mayank Rawat',
+  'Ashwani Kumar', 'Raghu Sharma', 'Mohammad Izhar',
+  'Nehal Wadhera', 'Vishnu Vinod', 'Harnoor Pannu', 'Pyla Avinash', 'Prabhsimran Singh', 'Shashank Singh',
+  'Harpreet Brar', 'Priyansh Arya', 'Musheer Khan', 'Suryansh Shedge', 'Vyshak Vijaykumar', 'Yash Thakur',
+  'Pravin Dubey', 'Vishal Nishad',
+  'Shubham Dubey', 'Vaibhav Suryavanshi', 'Ravi Singh', 'Aman Rao Perala', 'Yudhvir Singh Charak',
+  'Sushant Mishra', 'Yash Raj Punja', 'Vignesh Puthur', 'Brijesh Sharma',
+  'Swapnil Singh', 'Satvik Deswal', 'Mangesh Yadav', 'Vicky Ostwal', 'Vihaan Malhotra', 'Kanishk Chouhan',
+  'Rasikh Dar', 'Suyash Sharma', 'Abhinandan Singh', 'Yash Dayal',
+  'Aniket Verma', 'Smaran Ravichandran', 'Salil Arora', 'Harsh Dubey', 'Shivang Kumar', 'Krains Fuletra',
+  'Zeeshan Ansari', 'Sakib Hussain', 'Onkar Tarmale', 'Amit Kumar', 'Praful Hinge'
+]);
+
 function toNumber(value, fallback = 0) {
   return Number.isFinite(Number(value)) ? Number(value) : fallback;
 }
@@ -127,6 +153,8 @@ export function normalizeName(value) {
     .toLowerCase()
     .trim();
 }
+
+const UNCAPPED_MVP_PLAYER_KEYS = new Set(UNCAPPED_MVP_PLAYERS.map((name) => normalizeName(name)));
 
 export function slugify(value) {
   return normalizeWhitespace(value)
@@ -426,6 +454,7 @@ export function buildPricingJobFromLiveData({
         name: playerName,
         team: teamCode,
         role: role || 'batter',
+        is_uncapped: UNCAPPED_MVP_PLAYER_KEYS.has(canonicalName),
         pricing_eligible: Boolean(role),
         old_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
         initial_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
@@ -498,6 +527,7 @@ export function buildFixturePlayerPool({
         team: teamCode,
         team_name: TEAM_CODE_TO_NAME[teamCode] || teamCode,
         role: role || 'batter',
+        is_uncapped: price?.is_uncapped ?? UNCAPPED_MVP_PLAYER_KEYS.has(normalizeName(playerName)),
         pricing_eligible: price?.pricing_eligible ?? Boolean(role),
         final_price: Number.isFinite(price?.final_price) ? price.final_price : DEFAULT_PRICE_JOB_META.default_initial_price,
         old_price: price?.old_price ?? null,
@@ -521,6 +551,7 @@ export function buildEntryPriceSnapshot(playerPool = []) {
         team: player.team,
         role: player.role,
         final_price: player.final_price,
+        is_uncapped: Boolean(player.is_uncapped),
         pricing_eligible: player.pricing_eligible
       }
     ])
@@ -537,6 +568,7 @@ export function applyPriceSnapshotToPool(playerPool = [], priceSnapshot = {}) {
     return {
       ...player,
       final_price: Number.isFinite(snap.final_price) ? snap.final_price : player.final_price,
+      is_uncapped: snap.is_uncapped ?? player.is_uncapped,
       pricing_eligible: snap.pricing_eligible ?? player.pricing_eligible
     };
   });

@@ -235,6 +235,46 @@ test('generatePrices keeps equal adjusted scores on the same target price band',
   assert.equal(tieC.target_price, 4);
 });
 
+test('generatePrices caps uncapped players at 9 credits even if their rank maps to 10', () => {
+  const output = generatePrices(
+    createJob([
+      {
+        player_id: 'sameer_rizvi',
+        name: 'Sameer Rizvi',
+        team: 'DC',
+        role: 'batter',
+        is_uncapped: true,
+        pricing_eligible: true,
+        old_price: 10,
+        initial_price: 10,
+        match_points: [96, 111],
+        matches_played: 2,
+        last_match_played_at_utc: '2026-04-06T18:30:00Z'
+      },
+      {
+        player_id: 'steady_veteran',
+        name: 'Steady Veteran',
+        team: 'MI',
+        role: 'bowler',
+        pricing_eligible: true,
+        old_price: 8,
+        initial_price: 8,
+        match_points: [40, 40, 40, 40],
+        matches_played: 4,
+        last_match_played_at_utc: '2026-04-06T18:30:00Z'
+      }
+    ])
+  );
+
+  const sameer = output.players.find((player) => player.player_id === 'sameer_rizvi');
+  assert.equal(sameer.is_uncapped, true);
+  assert.equal(sameer.target_price, 9);
+  assert.equal(sameer.smoothed_price, 9);
+  assert.equal(sameer.final_price, 9);
+  assert.equal(sameer.price_change, -1);
+  assert.match(sameer.calculation_notes.join(' '), /uncapped player price ceiling applied at 9 credits/i);
+});
+
 test('pricing example fixture returns stable JSON-shaped output', async () => {
   const fixturePath = path.resolve(process.cwd(), 'fixtures', 'mini_fantasy_pricing_job_example.json');
   const raw = await fs.readFile(fixturePath, 'utf8');

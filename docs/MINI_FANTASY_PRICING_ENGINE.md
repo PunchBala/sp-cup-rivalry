@@ -81,6 +81,7 @@ Then:
 - smooth against base price using `0.7 old/base + 0.3 target`
 - cap movement to `+/- 1` daily step by default
 - clamp into `[4, 10]`
+- uncapped players are additionally capped at `9` credits, even if their percentile band would otherwise map to `10`
 
 ## Important V1 behaviors
 
@@ -88,6 +89,7 @@ Then:
 - one great fringe match is dampened by the reliability factor
 - inactive or not-eligible players retain base price
 - players with zero matches retain base price
+- uncapped players can still rise quickly, but their displayed final price never exceeds `9`
 - if `matches_played` disagrees with `match_points.length`, the engine uses `match_points.length` and records a note
 - tied `adjusted_score` values get the same percentile and same target price band
 

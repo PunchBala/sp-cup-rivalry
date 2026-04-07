@@ -48,6 +48,7 @@ Earlier season data is still used to seed player prices, but user-facing entry w
 - The browser reads the committed price book from `data/mini_fantasy_prices.json`.
 - If a user saves an entry, that entry keeps its own fixture-specific `price_snapshot`.
 - Later edits to that same entry reuse the snapshot so overnight repricing does not break the saved build.
+- Uncapped players can be picked normally, but their price ceiling is `9` credits.
 
 ## Entry storage
 

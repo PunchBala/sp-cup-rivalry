@@ -190,6 +190,61 @@ test('generateMiniFantasyPriceBook and buildFixturePlayerPool work from live his
   assert.equal(pool[0].team <= pool[pool.length - 1].team, true);
 });
 
+test('generateMiniFantasyPriceBook marks uncapped players and caps them at 9 credits', () => {
+  const liveData = {
+    fetchedAt: '2026-04-08T00:10:00Z',
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 1,
+          snapshot: {
+            meta: { aggregates: { playerMatches: { 'Sameer Rizvi': 1, 'Veteran Bowler': 1 } } },
+            mvp: { values: { 'Sameer Rizvi': { score: 105 }, 'Veteran Bowler': { score: 30 } } }
+          }
+        },
+        {
+          processedMatchCount: 2,
+          snapshot: {
+            meta: { aggregates: { playerMatches: { 'Sameer Rizvi': 2, 'Veteran Bowler': 2 } } },
+            mvp: { values: { 'Sameer Rizvi': { score: 207 }, 'Veteran Bowler': { score: 62 } } }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    {
+      match_no: 14,
+      datetime_utc: '2026-04-08T14:00:00Z',
+      home_team: 'Delhi Capitals',
+      away_team: 'Mumbai Indians'
+    }
+  ];
+  const squads = {
+    DC: ['Sameer Rizvi'],
+    MI: ['Veteran Bowler']
+  };
+  const teamRoles = {
+    teams: {
+      DC: { players: { 'Sameer Rizvi': 'batter' } },
+      MI: { players: { 'Veteran Bowler': 'bowler' } }
+    }
+  };
+
+  const priceBook = generateMiniFantasyPriceBook({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    asOfUtc: '2026-04-08T00:10:00Z'
+  });
+
+  const sameer = priceBook.players.find((player) => player.player_id === buildMiniFantasyPlayerId('DC', 'Sameer Rizvi'));
+  assert.equal(sameer.is_uncapped, true);
+  assert.equal(sameer.final_price, 9);
+  assert.match(sameer.calculation_notes.join(' '), /uncapped player price ceiling applied at 9 credits/i);
+});
+
 test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy points', () => {
   const liveData = {
     meta: {

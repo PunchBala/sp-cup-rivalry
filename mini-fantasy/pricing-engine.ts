@@ -4,6 +4,7 @@ const BASE_PRICE_WEIGHT = 0.7;
 const TARGET_PRICE_WEIGHT = 0.3;
 const FULL_CONFIDENCE_MATCHES = 4;
 const TIE_EPSILON = 1e-9;
+export const UNCAPPED_PLAYER_PRICE_MAX = 9;
 
 export type PlayerRole = 'batter' | 'bowler' | 'all_rounder' | 'wicket_keeper';
 
@@ -30,6 +31,7 @@ export interface PricingPlayerInput {
   name: string;
   team: string;
   role: PlayerRole;
+  is_uncapped?: boolean;
   pricing_eligible: boolean;
   old_price: number | null;
   initial_price: number | null;
@@ -60,6 +62,7 @@ export interface PricingPlayerOutput {
   name: string;
   team: string;
   role: PlayerRole;
+  is_uncapped: boolean;
   pricing_eligible: boolean;
   old_price: number | null;
   initial_price: number | null;
@@ -91,6 +94,7 @@ export interface PricingEngineConfig {
   rules: {
     price_min: number;
     price_max: number;
+    uncapped_price_max: number;
     recent_matches_window: number;
     max_daily_price_step: number;
     default_initial_price: number;
@@ -159,6 +163,7 @@ export const PRICING_ENGINE_CONFIG_V1: PricingEngineConfig = Object.freeze({
   rules: {
     price_min: 4,
     price_max: 10,
+    uncapped_price_max: UNCAPPED_PLAYER_PRICE_MAX,
     recent_matches_window: 3,
     max_daily_price_step: 1,
     default_initial_price: 6,
@@ -304,6 +309,13 @@ export function capPriceMovement(
   return clamp(boundedStep, priceMin, priceMax);
 }
 
+export function resolvePlayerPriceMax(
+  player: Pick<PricingPlayerInput, 'is_uncapped'>,
+  priceMax: number
+): number {
+  return player.is_uncapped ? Math.min(priceMax, UNCAPPED_PLAYER_PRICE_MAX) : priceMax;
+}
+
 export function calculateEligiblePercentiles(players: EligibleRankingRecord[]): Map<string, number> {
   const percentileMap = new Map<string, number>();
   if (!Array.isArray(players) || players.length === 0) {
@@ -384,7 +396,8 @@ function createCalculationNotes(
   derived: DerivedPlayerInputs & { percentile: number },
   targetPrice: number,
   smoothedPrice: number,
-  finalPrice: number
+  finalPrice: number,
+  uncappedCapApplied: boolean
 ): string[] {
   const notes = [...derived.notes];
 
@@ -413,6 +426,10 @@ function createCalculationNotes(
 
   if (player.old_price == null) {
     notes.push('Missing historical old_price; reported price_change as 0 for initialization');
+  }
+
+  if (uncappedCapApplied) {
+    notes.push(`Uncapped player price ceiling applied at ${UNCAPPED_PLAYER_PRICE_MAX} credits`);
   }
 
   return notes;
@@ -458,16 +475,19 @@ export function generatePrices(input: PricingJobInput): PricingJobOutput {
 
   const players = derivedPlayers
     .map((entry): PricingPlayerOutput => {
+      const playerPriceMax = resolvePlayerPriceMax(entry.player, input.job_meta.price_max);
       const percentile = entry.player.pricing_eligible ? percentiles.get(entry.player.player_id) ?? 0 : 0;
-      const targetPrice = entry.player.pricing_eligible
-        ? clamp(mapPercentileToPrice(percentile), input.job_meta.price_min, input.job_meta.price_max)
-        : clamp(entry.basePrice, input.job_meta.price_min, input.job_meta.price_max);
+      const rawTargetPrice = entry.player.pricing_eligible
+        ? mapPercentileToPrice(percentile)
+        : entry.basePrice;
+      const targetPrice = clamp(rawTargetPrice, input.job_meta.price_min, playerPriceMax);
 
       // Keep brand-new or inactive players stable until they have usable ranked history.
-      const smoothedPrice =
+      const rawSmoothedPrice =
         entry.player.pricing_eligible && entry.effectiveMatchesPlayed > 0
-          ? clamp(smoothPrice(entry.basePrice, targetPrice), input.job_meta.price_min, input.job_meta.price_max)
-          : clamp(entry.basePrice, input.job_meta.price_min, input.job_meta.price_max);
+          ? smoothPrice(entry.basePrice, targetPrice)
+          : entry.basePrice;
+      const smoothedPrice = clamp(rawSmoothedPrice, input.job_meta.price_min, playerPriceMax);
 
       const finalPrice =
         entry.player.pricing_eligible && entry.effectiveMatchesPlayed > 0
@@ -476,17 +496,23 @@ export function generatePrices(input: PricingJobInput): PricingJobOutput {
               entry.basePrice,
               input.job_meta.max_daily_price_step,
               input.job_meta.price_min,
-              input.job_meta.price_max
+              playerPriceMax
             )
-          : clamp(entry.basePrice, input.job_meta.price_min, input.job_meta.price_max);
+          : clamp(entry.basePrice, input.job_meta.price_min, playerPriceMax);
 
       const priceChange = entry.player.old_price == null ? 0 : finalPrice - Math.round(entry.player.old_price);
+      const uncappedCapApplied = Boolean(entry.player.is_uncapped) && (
+        rawTargetPrice > playerPriceMax ||
+        rawSmoothedPrice > playerPriceMax ||
+        entry.basePrice > playerPriceMax
+      );
       const calculationNotes = createCalculationNotes(
         entry.player,
         { ...entry, percentile },
         targetPrice,
         smoothedPrice,
-        finalPrice
+        finalPrice,
+        uncappedCapApplied
       );
 
       return {
@@ -494,6 +520,7 @@ export function generatePrices(input: PricingJobInput): PricingJobOutput {
         name: entry.player.name,
         team: entry.player.team,
         role: entry.player.role,
+        is_uncapped: Boolean(entry.player.is_uncapped),
         pricing_eligible: entry.player.pricing_eligible,
         old_price: entry.player.old_price,
         initial_price: entry.player.initial_price,
