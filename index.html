@@ -604,14 +604,49 @@
     .worm-swatch{width:10px;height:10px;border-radius:999px;display:inline-block}
     .worm-swatch-a{background:#7cc4ff}
     .worm-swatch-b{background:#ff8ba2}
-    .fantasy-layout{display:grid;grid-template-columns:minmax(280px,.86fr) minmax(440px,1.14fr);gap:16px}
+    .fantasy-layout{display:grid;grid-template-columns:minmax(310px,.72fr) minmax(560px,1.28fr);gap:18px;align-items:start}
     @media (max-width:1100px){.fantasy-layout{grid-template-columns:1fr}}
     .fantasy-stack{display:grid;gap:16px}
+    .fantasy-builder-card{
+      background:
+        radial-gradient(circle at top left, rgba(95,240,200,.18), transparent 42%),
+        linear-gradient(180deg, rgba(10,33,38,.98), rgba(4,15,20,.96));
+      border:1px solid rgba(95,240,200,.24);
+      box-shadow:0 18px 40px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .fantasy-builder-card .section-title{color:#d7fff1}
+    .fantasy-recap-card{
+      background:
+        radial-gradient(circle at top left, rgba(124,196,255,.16), transparent 44%),
+        linear-gradient(180deg, rgba(17,27,54,.96), rgba(8,15,32,.94));
+      border:1px solid rgba(124,196,255,.18);
+    }
+    .fantasy-stage{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(250px,.72fr);gap:16px;align-items:start}
+    @media (max-width:1100px){.fantasy-stage{grid-template-columns:1fr}}
+    .fantasy-viewer-card{
+      background:
+        radial-gradient(circle at top right, rgba(255,200,87,.14), transparent 34%),
+        radial-gradient(circle at bottom left, rgba(255,139,162,.10), transparent 38%),
+        linear-gradient(180deg, rgba(27,19,14,.98), rgba(11,13,28,.96));
+      border:1px solid rgba(255,200,87,.22);
+      box-shadow:0 18px 40px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .fantasy-viewer-card .section-title{color:#ffe3a5}
+    .fantasy-leaderboard-card{
+      background:
+        radial-gradient(circle at top left, rgba(124,196,255,.10), transparent 34%),
+        linear-gradient(180deg, rgba(12,20,42,.96), rgba(7,13,28,.94));
+      border:1px solid rgba(124,196,255,.14);
+    }
+    .fantasy-leaderboard-card .section-title{color:#dce9ff}
+    .fantasy-leaderboard-scroll{max-height:min(68vh,820px);overflow:auto;padding-right:4px}
+    @media (max-width:1100px){.fantasy-leaderboard-scroll{max-height:none;overflow:visible;padding-right:0}}
+    .fantasy-leaderboard-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:#9fc4ff}
     .fantasy-lead{display:grid;gap:8px}
     .fantasy-headline{font-size:clamp(22px,3.2vw,32px);font-weight:900;line-height:1.06;color:#fff}
     .fantasy-sub{font-size:13px;color:var(--muted);line-height:1.55;max-width:860px}
     .fantasy-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .fantasy-fixture-list{display:grid;gap:12px}
+    .fantasy-fixture-list{display:grid;gap:14px}
     .fantasy-switcher-shell{display:grid;gap:12px}
     .fantasy-switcher-row{display:flex;gap:10px;flex-wrap:wrap}
     .fantasy-switcher-button{
@@ -631,6 +666,8 @@
     .fantasy-switcher-title{font-size:15px;font-weight:900;color:#fff;margin-top:4px}
     .fantasy-switcher-note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.45}
     .fantasy-window-note{margin-top:12px;font-size:12px;color:#d7e7ff;line-height:1.55;padding:10px 12px;border-radius:12px;border:1px solid rgba(124,196,255,.14);background:rgba(124,196,255,.08)}
+    .fantasy-builder-card .fantasy-window-note{border-color:rgba(95,240,200,.18);background:rgba(95,240,200,.08);color:#d9fff4}
+    .fantasy-viewer-card .fantasy-window-note{border-color:rgba(255,200,87,.18);background:rgba(255,200,87,.08);color:#ffe7bf}
     .fantasy-availability-list{display:grid;gap:8px;margin-top:12px}
     .fantasy-availability-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,200,87,.14);background:linear-gradient(180deg, rgba(255,200,87,.08), rgba(10,18,36,.80))}
     .fantasy-availability-copy{display:grid;gap:4px}
@@ -661,9 +698,9 @@
     .fantasy-slot-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
     @media (max-width:760px){.fantasy-slot-grid{grid-template-columns:1fr}}
     .fantasy-slot-card{
-      border:1px solid rgba(124,196,255,.12);
+      border:1px solid rgba(95,240,200,.14);
       border-radius:16px;
-      background:linear-gradient(180deg, rgba(18,31,62,.92), rgba(8,16,34,.88));
+      background:linear-gradient(180deg, rgba(14,44,50,.92), rgba(8,20,25,.88));
       padding:14px;
       display:grid;
       gap:10px;
@@ -704,16 +741,16 @@
     .fantasy-highlight{
       padding:12px 14px;
       border-radius:14px;
-      border:1px solid rgba(95,240,200,.22);
-      background:rgba(95,240,200,.10);
+      border:1px solid rgba(95,240,200,.24);
+      background:rgba(95,240,200,.12);
       color:#d9fff3;
       line-height:1.5;
       margin-top:14px;
     }
     .fantasy-saved-list{display:grid;gap:8px;margin-top:14px}
     .fantasy-saved-item{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid rgba(95,240,200,.14);background:linear-gradient(180deg, rgba(95,240,200,.08), rgba(11,20,40,.86))}
-    .fantasy-leaderboard-list{display:grid;gap:10px;margin-top:14px}
-    .fantasy-leaderboard-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .fantasy-leaderboard-list{display:grid;gap:8px;margin-top:14px}
+    .fantasy-leaderboard-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
     .fantasy-leaderboard-row.selectable{width:100%;appearance:none;text-align:left;color:inherit;font:inherit;cursor:pointer;transition:.18s ease}
     .fantasy-leaderboard-row.selectable:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.28)}
     .fantasy-leaderboard-row.active{border-color:rgba(95,240,200,.34);box-shadow:0 0 0 1px rgba(95,240,200,.18) inset}
@@ -723,15 +760,16 @@
     .fantasy-leaderboard-row.top-2{border-color:rgba(209,220,237,.24);background:rgba(209,220,237,.08)}
     .fantasy-leaderboard-row.top-3{border-color:rgba(217,154,100,.26);background:rgba(217,154,100,.09)}
     .fantasy-leaderboard-copy{display:grid;gap:5px}
-    .fantasy-leaderboard-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:16px;font-weight:900;color:#fff}
+    .fantasy-leaderboard-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px;font-weight:900;color:#fff}
     .fantasy-leaderboard-rank{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:12px;font-weight:900;color:#fff}
     .fantasy-medal{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
     .fantasy-medal.gold{background:rgba(255,200,87,.18);border:1px solid rgba(255,200,87,.34);color:#ffe3a5}
     .fantasy-medal.silver{background:rgba(209,220,237,.12);border:1px solid rgba(209,220,237,.22);color:#eef5ff}
     .fantasy-medal.bronze{background:rgba(217,154,100,.12);border:1px solid rgba(217,154,100,.24);color:#ffd8b9}
     .fantasy-leaderboard-score{display:grid;justify-items:end;gap:4px}
-    .fantasy-leaderboard-points{font-size:28px;font-weight:900;color:#fff;line-height:1}
+    .fantasy-leaderboard-points{font-size:22px;font-weight:900;color:#fff;line-height:1}
     .fantasy-entry-team{display:grid;gap:10px}
+    .fantasy-entry-team-main{display:grid;gap:14px}
     .fantasy-entry-player-list{display:grid;gap:10px;margin-top:14px}
     .fantasy-entry-player{
       display:flex;
@@ -740,8 +778,8 @@
       flex-wrap:wrap;
       padding:11px 12px;
       border-radius:14px;
-      border:1px solid rgba(124,196,255,.12);
-      background:linear-gradient(180deg, rgba(18,31,62,.92), rgba(8,16,34,.88));
+      border:1px solid rgba(255,200,87,.14);
+      background:linear-gradient(180deg, rgba(42,28,18,.92), rgba(13,14,28,.9));
     }
     .fantasy-entry-player.top{border-color:rgba(95,240,200,.28);background:linear-gradient(180deg, rgba(95,240,200,.10), rgba(8,16,34,.9))}
     .fantasy-entry-copy{display:grid;gap:4px}
@@ -755,6 +793,18 @@
     .fantasy-recap-title{font-size:17px;font-weight:900;color:#fff}
     .fantasy-recap-grid{display:grid;gap:10px}
     .fantasy-recap-note{font-size:13px;color:var(--muted);line-height:1.5}
+    .fantasy-field-summary{display:grid;gap:10px}
+    .fantasy-picks-focus{
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid rgba(255,200,87,.22);
+      background:linear-gradient(180deg, rgba(255,200,87,.10), rgba(255,139,162,.04));
+      display:grid;
+      gap:10px;
+    }
+    .fantasy-picks-focus-title{font-size:14px;font-weight:900;letter-spacing:.02em;color:#fff}
+    .fantasy-picks-focus-note{font-size:13px;color:#ffedc5;line-height:1.5}
+    .fantasy-picks-focus-meta{display:flex;gap:8px;flex-wrap:wrap}
 
   </style>
 
@@ -887,12 +937,12 @@
         </div>
         <div class="span-12 fantasy-layout">
           <div class="fantasy-stack">
-            <div class="card">
+            <div class="card fantasy-builder-card">
               <div id="miniFantasyFixtures" class="fantasy-fixture-list"></div>
               <div class="section-title">Team builder</div>
               <div id="miniFantasyBuilder"></div>
             </div>
-            <div class="card">
+            <div class="card fantasy-recap-card">
               <div class="section-title">Last game recap</div>
               <div id="miniFantasyLastGame"></div>
             </div>
@@ -911,14 +961,14 @@
               </div>
             </div>
           </div>
-          <div class="fantasy-stack">
-            <div class="card">
-              <div class="section-title">Global leaderboard</div>
-              <div id="miniFantasyLeaderboard"></div>
-            </div>
-            <div class="card">
+          <div class="fantasy-stage">
+            <div class="card fantasy-viewer-card">
               <div class="section-title">Recently locked teams</div>
               <div id="miniFantasyLockedViewer"></div>
+            </div>
+            <div class="card fantasy-leaderboard-card">
+              <div class="section-title">Global leaderboard</div>
+              <div id="miniFantasyLeaderboard"></div>
             </div>
           </div>
         </div>
@@ -8005,7 +8055,7 @@ function titleBandScore(pick, live){
       `;
     }
 
-    function renderMiniFantasyLeaderboard(){
+    function renderMiniFantasyLeaderboardLegacy(){
       const panel = document.getElementById('miniFantasyLeaderboard');
       if (!panel) return;
       const leaderboard = miniFantasyLeaderboardData();
@@ -8062,7 +8112,7 @@ function titleBandScore(pick, live){
       });
     }
 
-    function renderMiniFantasyLockedViewer(){
+    function renderMiniFantasyLockedViewerLegacy(){
       const panel = document.getElementById('miniFantasyLockedViewer');
       if (!panel) return;
       const board = miniFantasyRecentFixtureBoardData();
@@ -8127,6 +8177,137 @@ function titleBandScore(pick, live){
                 `).join('')}
               </div>
             `}
+        </div>
+      `;
+    }
+
+    function renderMiniFantasyLeaderboard(){
+      const panel = document.getElementById('miniFantasyLeaderboard');
+      if (!panel) return;
+      const leaderboard = miniFantasyLeaderboardData();
+      const rows = Array.isArray(leaderboard.rows) ? leaderboard.rows : [];
+      const recentBoard = miniFantasyRecentFixtureBoardData();
+      const leaderboardRows = recentBoard.fixture
+        ? recentBoard.rows
+        : rows.map((row) => ({
+            ...row,
+            fixtureStatus: 'none',
+            fixturePoints: 0
+          }));
+      const selectedRow = recentBoard.fixture ? selectedMiniFantasyRecentRow(recentBoard) : null;
+      if (!rows.length) {
+        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams have been saved yet. Once lineups start locking, everyone will be ranked here by total points and the top three will show medal tags.</div>';
+        return;
+      }
+      panel.innerHTML = `
+        <div class="fantasy-leaderboard-kicker">${escapeHtml(recentBoard.fixture ? `Pick rail for Match ${recentBoard.fixture.match_no}` : 'Leaderboard rail')}</div>
+        <div class="fantasy-window-note">${recentBoard.fixture ? `Click a user and keep your eyes on the locked-team stage. The rail only changes who is in focus for Match ${escapeHtml(String(recentBoard.fixture.match_no))}.` : 'Once the first fixture locks, this rail will become the fast way to inspect each user team without opening a new screen.'}</div>
+        <div class="fantasy-leaderboard-scroll">
+          <div class="fantasy-leaderboard-list">
+            ${leaderboardRows.map((row) => `
+              <button type="button" class="fantasy-leaderboard-row selectable ${row.rank <= 3 ? `top-${row.rank}` : ''} ${normalizeOwnerId(selectedRow?.owner_handle || '') === normalizeOwnerId(row.owner_handle || '') ? 'active' : ''}" data-mini-leaderboard-owner="${escapeHtml(row.owner_handle)}" ${recentBoard.fixture ? '' : 'disabled'}>
+                <div class="fantasy-leaderboard-copy">
+                  <div class="fantasy-leaderboard-name">
+                    <span class="fantasy-leaderboard-rank">#${escapeHtml(String(row.rank))}</span>
+                    <span>${escapeHtml(row.display_name || row.owner_handle)}</span>
+                    ${row.medal ? `<span class="fantasy-medal ${escapeHtml(row.medal)}">${escapeHtml(miniFantasyMedalLabel(row.medal))}</span>` : ''}
+                  </div>
+                  <div class="small">@${escapeHtml(row.owner_handle)}</div>
+                  ${recentBoard.fixture ? `
+                    <div class="fantasy-detail-meta">
+                      ${row.fixtureStatus === 'did_not_lock'
+                        ? '<span class="pill fantasy-did-not-lock">Did not lock</span>'
+                        : `<span class="pill">${escapeHtml(recentBoard.stage === 'final' ? 'Final' : recentBoard.stage === 'live' ? 'Live' : 'Locked')}</span><span class="pill">${escapeHtml(formatMiniFantasyPoints(row.fixturePoints))} fixture pts</span>`}
+                    </div>
+                  ` : ''}
+                </div>
+                <div class="fantasy-leaderboard-score">
+                  <div class="fantasy-leaderboard-points">${escapeHtml(String(row.total_points))}</div>
+                  <div class="small">overall</div>
+                </div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      if (!recentBoard.fixture) return;
+      panel.querySelectorAll('[data-mini-leaderboard-owner]').forEach((button) => {
+        button.onclick = () => {
+          MINI_FANTASY_RECENT_OWNER_HANDLE = normalizeOwnerId(button.dataset.miniLeaderboardOwner || '');
+          renderMiniFantasyLeaderboard();
+          renderMiniFantasyLockedViewer();
+        };
+      });
+    }
+
+    function renderMiniFantasyLockedViewer(){
+      const panel = document.getElementById('miniFantasyLockedViewer');
+      if (!panel) return;
+      const board = miniFantasyRecentFixtureBoardData();
+      if (!board.fixture) {
+        panel.innerHTML = '<div class="fantasy-empty">Once the first Mini Fantasy fixture locks, this area will show the field summary and let you inspect any user team from the leaderboard.</div>';
+        return;
+      }
+      const selectedRow = selectedMiniFantasyRecentRow(board);
+      if (!selectedRow) {
+        panel.innerHTML = '<div class="fantasy-empty">No locked teams are available for the most recently locked fixture yet.</div>';
+        return;
+      }
+      const fixtureLabel = formatFixtureLabel(board.fixture.fixture || `${board.fixture.away_team} vs ${board.fixture.home_team}`);
+      const statusLabel = board.stage === 'final' ? 'Final' : board.stage === 'live' ? 'Live' : 'Locked';
+      const detailPlayers = Array.isArray(selectedRow.fixturePlayers) ? selectedRow.fixturePlayers : [];
+      const bestPick = selectedRow.fixtureBestPick;
+      const captain = selectedRow.fixtureCaptain;
+      const viewedName = selectedRow.display_name || selectedRow.owner_handle;
+      const detailNote = selectedRow.fixtureStatus === 'did_not_lock'
+        ? `${viewedName} did not save a team before this fixture locked.`
+        : board.stage === 'final'
+          ? `${viewedName} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.points)}.` : ''}`
+          : board.stage === 'live'
+            ? `${viewedName} is live on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} is currently worth ${formatMiniFantasyPoints(captain.points)}.` : ''}`
+            : `${viewedName} locked this team. Points will start updating once Match ${board.fixture.match_no} begins.`;
+      panel.innerHTML = `
+        <div class="fantasy-entry-team">
+          <div class="fantasy-picks-focus">
+            <div class="fantasy-detail-header">
+              <div>
+                <div class="fantasy-picks-focus-title">Now viewing ${escapeHtml(viewedName)}'s Match ${escapeHtml(String(board.fixture.match_no))} team</div>
+                <div class="fantasy-picks-focus-note">This is the center stage for the most recently locked fixture. Click another user in the leaderboard rail to swap teams without losing this view.</div>
+              </div>
+              <div>
+                <div class="fantasy-detail-points">${escapeHtml(selectedRow.fixtureStatus === 'did_not_lock' ? '—' : formatMiniFantasyPoints(selectedRow.fixturePoints))}</div>
+                <div class="small">${escapeHtml(selectedRow.fixtureStatus === 'did_not_lock' ? 'did not lock' : `${statusLabel.toLowerCase()} pts`)}</div>
+              </div>
+            </div>
+            <div class="fantasy-picks-focus-meta">
+              <span class="fantasy-summary-chip">Fixture: Match ${escapeHtml(String(board.fixture.match_no))} - ${escapeHtml(fixtureLabel)}</span>
+              <span class="fantasy-summary-chip">${escapeHtml(board.fixture.home_team_code || teamShort(board.fixture.home_team || ''))} vs ${escapeHtml(board.fixture.away_team_code || teamShort(board.fixture.away_team || ''))}</span>
+              <span class="fantasy-summary-chip">${escapeHtml(statusLabel)}</span>
+              ${selectedRow.fixtureStatus === 'did_not_lock' ? '<span class="fantasy-summary-chip fantasy-did-not-lock">Did not lock</span>' : captain ? `<span class="fantasy-summary-chip">Captain: ${escapeHtml(captain.name)}</span>` : ''}
+            </div>
+          </div>
+          ${selectedRow.fixtureStatus === 'did_not_lock'
+            ? '<div class="fantasy-empty">No locked team exists for this user on the most recently locked fixture.</div>'
+            : `
+              <div class="fantasy-entry-player-list">
+                ${detailPlayers.map((player) => `
+                  <div class="fantasy-entry-player ${player.isCaptain ? 'top' : ''}">
+                    <div class="fantasy-entry-copy">
+                      <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
+                      <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}</div>
+                    </div>
+                    <div class="fantasy-entry-copy" style="justify-items:end">
+                      <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.points))}</div>
+                      <div class="fantasy-picker-role">${escapeHtml(String(player.price || 0))} cr</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `}
+          <div class="fantasy-field-summary">
+            ${board.summary.map((line) => `<div class="fantasy-window-note">${escapeHtml(line)}</div>`).join('')}
+          </div>
+          <div class="fantasy-window-note">${escapeHtml(detailNote)}</div>
         </div>
       `;
     }
