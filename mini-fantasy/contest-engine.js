@@ -827,6 +827,90 @@ export function buildMiniFantasyPlayerPointsIndex({
   return index;
 }
 
+function latestCompletedScoreHistoryEntry(liveData = {}) {
+  const ordered = [...(Array.isArray(liveData?.meta?.scoreHistory) ? liveData.meta.scoreHistory : [])]
+    .sort((a, b) => toNumber(a?.processedMatchCount, 0) - toNumber(b?.processedMatchCount, 0));
+  return ordered.length ? ordered[ordered.length - 1] : null;
+}
+
+function snapshotPlayerMatches(snapshot = {}) {
+  return snapshot?.meta?.aggregates?.playerMatches || {};
+}
+
+function snapshotMvpScoreLookup(snapshot = {}) {
+  const currentScoreValues = snapshot?.mvp?.values || {};
+  return Object.fromEntries(
+    Object.entries(currentScoreValues).map(([playerName, payload]) => [playerName, toNumber(payload?.score, 0)])
+  );
+}
+
+export function buildMiniFantasyFixturePointsIndex({
+  liveData = {},
+  schedule = [],
+  squads = {},
+  matchNo = null
+} = {}) {
+  const targetMatchNo = Number(matchNo || 0) || null;
+  const pointsIndex = new Map();
+  if (!targetMatchNo) return pointsIndex;
+
+  const baseIndex = buildMiniFantasyPlayerPointsIndex({ liveData, schedule, squads });
+  const completedMatchCount = getCompletedMiniFantasyMatchCount(liveData);
+
+  if (targetMatchNo <= completedMatchCount) {
+    baseIndex.forEach((payload, playerId) => {
+      pointsIndex.set(playerId, toNumber(payload?.points_by_match_no?.[targetMatchNo], 0));
+    });
+    return pointsIndex;
+  }
+
+  if (targetMatchNo !== completedMatchCount + 1) {
+    return pointsIndex;
+  }
+
+  const lastCompletedEntry = latestCompletedScoreHistoryEntry(liveData);
+  const previousSnapshot = lastCompletedEntry?.snapshot || {};
+  const currentSnapshot = liveData || {};
+  const previousMatches = snapshotPlayerMatches(previousSnapshot);
+  const currentMatches = snapshotPlayerMatches(currentSnapshot);
+  const previousScores = snapshotMvpScoreLookup(previousSnapshot);
+  const currentScores = snapshotMvpScoreLookup(currentSnapshot);
+  const liveDeltaHistories = new Map();
+  const playedAt = ((Array.isArray(schedule) ? schedule : []).find((fixture) => Number(fixture?.match_no || 0) === targetMatchNo) || {}).datetime_utc || liveData?.fetchedAt || null;
+
+  const allNames = new Set([
+    ...Object.keys(previousMatches),
+    ...Object.keys(currentMatches),
+    ...Object.keys(previousScores),
+    ...Object.keys(currentScores)
+  ]);
+
+  allNames.forEach((playerName) => {
+    const currentPlayerMatches = toNumber(currentMatches[playerName], 0);
+    const previousPlayerMatches = toNumber(previousMatches[playerName], 0);
+    const matchDelta = currentPlayerMatches - previousPlayerMatches;
+    if (matchDelta <= 0) return;
+    const livePoints = roundTo(toNumber(currentScores[playerName], 0) - toNumber(previousScores[playerName], 0), 2);
+    liveDeltaHistories.set(normalizeName(playerName), {
+      player_name: playerName,
+      match_points: [livePoints],
+      points_by_match_no: { [targetMatchNo]: livePoints },
+      matches_played: matchDelta,
+      last_match_played_at_utc: playedAt
+    });
+  });
+
+  Object.entries(squads || {}).forEach(([teamCode, squadPlayers]) => {
+    (Array.isArray(squadPlayers) ? squadPlayers : []).forEach((playerName) => {
+      const playerId = buildMiniFantasyPlayerId(teamCode, playerName);
+      const history = resolvePlayerHistory(playerName, liveDeltaHistories);
+      pointsIndex.set(playerId, toNumber(history?.points_by_match_no?.[targetMatchNo], 0));
+    });
+  });
+
+  return pointsIndex;
+}
+
 export function scoreMiniFantasyEntry({
   entry = {},
   liveData = {},
