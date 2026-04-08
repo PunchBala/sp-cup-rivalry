@@ -20,6 +20,8 @@ import {
 function makeFinalScorecard({
   teams,
   winner,
+  status = null,
+  omitScore = false,
   batter,
   bowler,
   catcher,
@@ -35,27 +37,60 @@ function makeFinalScorecard({
   return {
     teams,
     matchWinner: winner,
-    scorecard: [{
-      batting: [{
-        batsman: { name: batter },
-        r: runs,
-        b: balls,
-        '6s': sixes
-      }],
-      bowling: [{
-        bowler: { name: bowler },
-        o: overs,
-        w: wickets,
-        r: concededRuns
-      }],
-      catching: [{
-        catcher: { name: catcher },
-        catch: 1
-      }]
-    }],
-    score: [
-      { inning: `${teams[0]} Innings`, r: scoreA, w: 6, o: '20' },
-      { inning: `${teams[1]} Innings`, r: scoreB, w: 8, o: '20' }
+    status: status || (winner === 'No Winner' ? 'No result' : `${winner} won`),
+    scorecard: [
+      {
+        batting: [{
+          batsman: { name: batter },
+          r: runs,
+          b: balls,
+          '6s': sixes
+        }],
+        bowling: [
+          {
+            bowler: { name: bowler },
+            o: overs,
+            w: wickets,
+            r: concededRuns
+          },
+          {
+            bowler: { name: `${teams[1]} Support Bowler` },
+            o: '16',
+            w: Math.max(0, 6 - wickets),
+            r: Math.max(0, scoreA - concededRuns)
+          }
+        ],
+        catching: [{
+          catcher: { name: catcher },
+          catch: 1
+        }],
+        extras: {},
+        inning: `${teams[0]} Inning 1`
+      },
+      {
+        batting: [{
+          batsman: { name: `${teams[1]} Batter` },
+          r: scoreB,
+          b: Math.max(1, scoreB),
+          '6s': Math.max(0, Math.floor(scoreB / 30))
+        }],
+        bowling: [{
+          bowler: { name: `${teams[0]} Bowler` },
+          o: '20',
+          w: 8,
+          r: scoreB
+        }],
+        catching: [{
+          catcher: { name: `${teams[0]} Catcher` },
+          catch: 1
+        }],
+        extras: {},
+        inning: `${teams[1]} Inning 1`
+      }
+    ],
+    score: omitScore ? [] : [
+      { inning: `${teams[0]} Inning 1`, r: scoreA, w: 6, o: '20' },
+      { inning: `${teams[1]} Inning 1`, r: scoreB, w: 8, o: '20' }
     ]
   };
 }
@@ -298,4 +333,92 @@ test('repairs missing score-history checkpoints from the nearest earlier snapsho
   assert.equal(repaired.cacheHits, 0);
   assert.deepEqual(repairedCounts, [0, 1, 2]);
   assert.equal(repairedSnapshot.snapshot.meta.aggregates.battingRuns['Virat Kohli'], 88);
+});
+
+test('standings award one point each for no-result matches', async () => {
+  const rebuilt = await rebuildHistoricalState(
+    ['match-12'],
+    {
+      meta: {
+        scoreHistory: [{ processedMatchCount: 0, fetchedAt: '2026-04-01T00:00:00.000Z' }]
+      }
+    },
+    {
+      includeHistory: true,
+      loadScorecard: async () => ({
+        data: makeFinalScorecard({
+          teams: ['Kolkata Knight Riders', 'Punjab Kings'],
+          winner: 'No Winner',
+          status: 'No result (due to rain)',
+          batter: 'Venkatesh Iyer',
+          bowler: 'Arshdeep Singh',
+          catcher: 'Andre Russell',
+          runs: 25,
+          balls: 14,
+          sixes: 2,
+          wickets: 1,
+          concededRuns: 18,
+          overs: '3',
+          scoreA: 25,
+          scoreB: 0
+        }),
+        source: 'cache'
+      })
+    }
+  );
+
+  const kkr = rebuilt.aggregates.standings['Kolkata Knight Riders'];
+  const pbks = rebuilt.aggregates.standings['Punjab Kings'];
+
+  assert.equal(kkr.played, 1);
+  assert.equal(pbks.played, 1);
+  assert.equal(kkr.noResult, 1);
+  assert.equal(pbks.noResult, 1);
+  assert.equal(kkr.points, 1);
+  assert.equal(pbks.points, 1);
+});
+
+test('standings still update when scorecard omits the top-level score summary', async () => {
+  const rebuilt = await rebuildHistoricalState(
+    ['match-13'],
+    {
+      meta: {
+        scoreHistory: [{ processedMatchCount: 0, fetchedAt: '2026-04-01T00:00:00.000Z' }]
+      }
+    },
+    {
+      includeHistory: true,
+      loadScorecard: async () => ({
+        data: makeFinalScorecard({
+          teams: ['Rajasthan Royals', 'Mumbai Indians'],
+          winner: 'Rajasthan Royals',
+          status: 'Rajasthan Royals won by 3 wickets (match reduced to 18 overs due to rain)',
+          omitScore: true,
+          batter: 'Yashasvi Jaiswal',
+          bowler: 'Jasprit Bumrah',
+          catcher: 'Sanju Samson',
+          runs: 123,
+          balls: 90,
+          sixes: 7,
+          wickets: 2,
+          concededRuns: 24,
+          overs: '4',
+          scoreA: 123,
+          scoreB: 96
+        }),
+        source: 'cache'
+      })
+    }
+  );
+
+  const rr = rebuilt.aggregates.standings['Rajasthan Royals'];
+  const mi = rebuilt.aggregates.standings['Mumbai Indians'];
+
+  assert.equal(rr.played, 1);
+  assert.equal(rr.wins, 1);
+  assert.equal(rr.points, 2);
+  assert.equal(mi.played, 1);
+  assert.equal(mi.losses, 1);
+  assert.equal(rr.runsFor, 123);
+  assert.equal(mi.runsFor, 96);
 });

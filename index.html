@@ -6926,7 +6926,8 @@ function titleBandScore(pick, live){
         const ordered = ranking.length ? ranking : Object.keys(standings);
         ordered.forEach((team, idx) => {
           const s = standings[team] || {};
-          rows.push({ rank: displayRank(team, idx + 1), name: team, value: `${s.points ?? 0} pts`, context: `Played ${s.played ?? 0} • W ${s.wins ?? 0} • L ${s.losses ?? 0} • NRR ${standingNrrValue(s).toFixed(3)}` });
+          const noResult = s.noResult ?? 0;
+          rows.push({ rank: displayRank(team, idx + 1), name: team, value: `${s.points ?? 0} pts`, context: `Played ${s.played ?? 0} • W ${s.wins ?? 0} • L ${s.losses ?? 0} • NR ${noResult} • NRR ${standingNrrValue(s).toFixed(3)}` });
         });
         return { summary: categoryKey === 'titleWinner' ? 'Current title-race order from the live standings.' : 'Current table order. For Bottom of table, the lowest side is the live target.', rows };
       }

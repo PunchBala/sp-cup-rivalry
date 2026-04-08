@@ -225,8 +225,81 @@ function oversToBalls(value) {
   return (Number(whole || 0) * 6) + Number(frac || 0);
 }
 
+function ballsToOversNotation(balls) {
+  const safeBalls = Math.max(0, Number(balls || 0));
+  const whole = Math.floor(safeBalls / 6);
+  const remainder = safeBalls % 6;
+  return remainder ? `${whole}.${remainder}` : String(whole);
+}
+
 function allOutUsesFullQuota(wickets, balls, quota = 120) {
   return Number(wickets || 0) >= 10 ? quota : balls;
+}
+
+function isDismissedBattingEntry(entry) {
+  const text = normalizeName(entry?.['dismissal-text'] || entry?.dismissal || '').toLowerCase();
+  if (!text) return false;
+  if (text === 'batting') return false;
+  if (text === 'not out') return false;
+  if (text.includes('not out')) return false;
+  if (text.includes('retired hurt')) return false;
+  return true;
+}
+
+function deriveScoreLineFromInnings(innings) {
+  const inning = normalizeName(innings?.inning);
+  if (!inning) return null;
+
+  const totalsRuns = Number(
+    innings?.totals?.r
+    ?? innings?.totals?.runs
+    ?? innings?.total?.r
+    ?? innings?.total?.runs
+    ?? 0
+  );
+  const battingRuns = safeArray(innings?.batting).reduce((sum, batter) => sum + Number(batter?.r || 0), 0);
+  const extrasObject = innings?.extras && typeof innings.extras === 'object' ? innings.extras : {};
+  const extrasRuns = Object.values(extrasObject).reduce((sum, value) => sum + Number(value || 0), 0);
+  const bowlingRuns = safeArray(innings?.bowling).reduce((sum, bowler) => sum + Number(bowler?.r || 0), 0);
+  const bowlingExtras = safeArray(innings?.bowling).reduce((sum, bowler) => sum + Number(bowler?.nb || 0) + Number(bowler?.wd || 0), 0);
+  const runs = totalsRuns > 0 ? totalsRuns : Math.max(bowlingRuns, battingRuns + Math.max(extrasRuns, bowlingExtras));
+
+  const totalsWickets = Number(
+    innings?.totals?.w
+    ?? innings?.totals?.wkts
+    ?? innings?.total?.w
+    ?? innings?.total?.wkts
+    ?? innings?.wickets
+    ?? 0
+  );
+  const bowlingWickets = safeArray(innings?.bowling).reduce((sum, bowler) => sum + Number(bowler?.w || 0), 0);
+  const battingWickets = safeArray(innings?.batting).reduce((sum, batter) => sum + (isDismissedBattingEntry(batter) ? 1 : 0), 0);
+  const wickets = Math.max(totalsWickets, bowlingWickets, battingWickets);
+
+  const totalsOvers = innings?.totals?.o ?? innings?.totals?.overs ?? innings?.total?.o ?? innings?.total?.overs ?? innings?.o;
+  const bowlingBalls = safeArray(innings?.bowling).reduce((sum, bowler) => sum + oversToBalls(bowler?.o), 0);
+  const overs = totalsOvers != null && totalsOvers !== '' ? String(totalsOvers) : ballsToOversNotation(bowlingBalls);
+
+  return { inning, r: runs, w: wickets, o: overs };
+}
+
+function scoreLinesForScorecard(scorecardData, inningsBlocks) {
+  const topScores = safeArray(scorecardData?.score);
+  if (topScores.length >= 2) return topScores;
+  return safeArray(inningsBlocks).map((innings) => deriveScoreLineFromInnings(innings)).filter(Boolean);
+}
+
+function isNoResultStatus(scorecardData, winner, teamA, teamB) {
+  if (winner === teamA || winner === teamB) return false;
+  const status = normalizeName(scorecardData?.status).toLowerCase();
+  const winnerText = normalizeName(scorecardData?.matchWinner || '').toLowerCase();
+  return (
+    winnerText === 'no winner' ||
+    status.includes('no result') ||
+    status.includes('abandon') ||
+    status.includes('abandoned') ||
+    status.includes('washout')
+  );
 }
 
 function createEmptyAggregates() {
@@ -1015,6 +1088,7 @@ function ensureStandingTeam(map, team) {
       played: 0,
       wins: 0,
       losses: 0,
+      noResult: 0,
       points: 0,
       runsFor: 0,
       ballsFaced: 0,
@@ -1144,7 +1218,7 @@ function buildProcessedMatchRefs(matchList, processedKeys, processedIds = []) {
 
 function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true } = {}) {
   const inningsBlocks = safeArray(scorecardData.scorecard);
-  const topScores = safeArray(scorecardData.score);
+  const topScores = scoreLinesForScorecard(scorecardData, inningsBlocks);
   const participants = new Set();
 
   for (const innings of inningsBlocks) {
@@ -1196,30 +1270,32 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
   if (!isFinal) return;
 
   const teams = safeArray(scorecardData.teams).map(normalizeName);
-  if (teams.length === 2 && topScores.length >= 2) {
+  if (teams.length === 2) {
     const [teamA, teamB] = teams;
     const standingA = ensureStandingTeam(aggregates.standings, teamA);
     const standingB = ensureStandingTeam(aggregates.standings, teamB);
     standingA.played += 1;
     standingB.played += 1;
 
-    const inningMap = {};
-    for (const s of topScores) inningMap[parseTeamFromInningName(s?.inning)] = s;
+    if (topScores.length >= 2) {
+      const inningMap = {};
+      for (const s of topScores) inningMap[parseTeamFromInningName(s?.inning)] = s;
 
-    const sa = inningMap[teamA];
-    const sb = inningMap[teamB];
-    if (sa && sb) {
-      const ballsA = allOutUsesFullQuota(sa.w, oversToBalls(sa.o));
-      const ballsB = allOutUsesFullQuota(sb.w, oversToBalls(sb.o));
-      standingA.runsFor += Number(sa.r || 0);
-      standingA.ballsFaced += ballsA;
-      standingA.runsAgainst += Number(sb.r || 0);
-      standingA.ballsBowled += ballsB;
+      const sa = inningMap[teamA];
+      const sb = inningMap[teamB];
+      if (sa && sb) {
+        const ballsA = allOutUsesFullQuota(sa.w, oversToBalls(sa.o));
+        const ballsB = allOutUsesFullQuota(sb.w, oversToBalls(sb.o));
+        standingA.runsFor += Number(sa.r || 0);
+        standingA.ballsFaced += ballsA;
+        standingA.runsAgainst += Number(sb.r || 0);
+        standingA.ballsBowled += ballsB;
 
-      standingB.runsFor += Number(sb.r || 0);
-      standingB.ballsFaced += ballsB;
-      standingB.runsAgainst += Number(sa.r || 0);
-      standingB.ballsBowled += ballsA;
+        standingB.runsFor += Number(sb.r || 0);
+        standingB.ballsFaced += ballsB;
+        standingB.runsAgainst += Number(sa.r || 0);
+        standingB.ballsBowled += ballsA;
+      }
     }
 
     const winner = normalizeName(scorecardData.matchWinner);
@@ -1231,6 +1307,11 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
       standingB.wins += 1;
       standingB.points += 2;
       standingA.losses += 1;
+    } else if (isNoResultStatus(scorecardData, winner, teamA, teamB)) {
+      standingA.noResult += 1;
+      standingB.noResult += 1;
+      standingA.points += 1;
+      standingB.points += 1;
     }
   }
 }
