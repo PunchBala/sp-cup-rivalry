@@ -242,6 +242,7 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
   await expect(page.locator('#miniFantasyFixtures')).toContainText('Opens the day before');
   await expect(page.locator('#miniFantasyFixtures')).toContainText('opens next');
   await expect(page.locator('#miniFantasyBuilder')).toContainText('Match 14');
+  await expect(page.locator('#miniFantasyLockedViewer')).toContainText('Once the first Mini Fantasy fixture locks');
 
   await page.locator('[data-mini-pick="0"]').click();
   await expect(page.locator('#miniFantasyPickerModal')).toBeVisible();
@@ -267,8 +268,7 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
   await page.locator('#saveMiniFantasyButton').click();
 
   await expect(page.locator('#miniFantasyBuilder')).toContainText('team saved');
-  await expect(page.locator('#miniFantasyMyEntries')).toContainText('Match 14');
-  await expect(page.locator('#miniFantasyMyEntries')).toContainText('Captain locked');
+  await expect(page.locator('#miniFantasyLastGame')).toContainText('already have a saved team for it');
   await expect(page.locator('#miniFantasyLeaderboard')).toContainText('Mini Bala');
   await expect(page.locator('#miniFantasyLeaderboard')).toContainText('@mini-bala');
   await expect(page.locator('#miniFantasyLeaderboard')).toContainText(/medal/i);

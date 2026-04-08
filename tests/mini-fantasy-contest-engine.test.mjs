@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   MINI_FANTASY_BUDGET,
   buildMiniFantasyLeaderboard,
+  buildMiniFantasyFixturePointsIndex,
   buildMiniFantasyPlayerId,
   buildFixturePlayerPool,
   deriveCompletedMatchHistories,
@@ -161,6 +162,70 @@ test('getMiniFantasyOpenFixtures opens Match 14 now and later fixtures from the 
 
   const nearLock = getMiniFantasyOpenFixtures(schedule, new Date('2026-04-08T13:59:00Z'));
   assert.deepEqual(nearLock.fixtures.map((fixture) => fixture.match_no), [15]);
+});
+
+test('buildMiniFantasyFixturePointsIndex derives live match points from the current snapshot delta', () => {
+  const schedule = [
+    { match_no: 14, datetime_utc: '2026-04-08T14:00:00Z' },
+    { match_no: 15, datetime_utc: '2026-04-09T14:00:00Z' }
+  ];
+  const squads = {
+    GT: ['Mohammed Shami', 'Sai Sudharsan'],
+    DC: ['Kuldeep Yadav']
+  };
+  const liveData = {
+    fetchedAt: '2026-04-09T15:15:00Z',
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 14,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Mohammed Shami': 2,
+                  'Sai Sudharsan': 2,
+                  'Kuldeep Yadav': 2
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Mohammed Shami': { score: 45 },
+                'Sai Sudharsan': { score: 80 },
+                'Kuldeep Yadav': { score: 34 }
+              }
+            }
+          }
+        }
+      ],
+      aggregates: {
+        playerMatches: {
+          'Mohammed Shami': 3,
+          'Sai Sudharsan': 3,
+          'Kuldeep Yadav': 2
+        }
+      }
+    },
+    mvp: {
+      values: {
+        'Mohammed Shami': { score: 63 },
+        'Sai Sudharsan': { score: 95 },
+        'Kuldeep Yadav': { score: 34 }
+      }
+    }
+  };
+
+  const pointsIndex = buildMiniFantasyFixturePointsIndex({
+    liveData,
+    schedule,
+    squads,
+    matchNo: 15
+  });
+
+  assert.equal(pointsIndex.get(buildMiniFantasyPlayerId('GT', 'Mohammed Shami')), 18);
+  assert.equal(pointsIndex.get(buildMiniFantasyPlayerId('GT', 'Sai Sudharsan')), 15);
+  assert.equal(pointsIndex.get(buildMiniFantasyPlayerId('DC', 'Kuldeep Yadav')), 0);
 });
 
 test('validateMiniFantasyEntry enforces budget, team split, and role minimums', () => {

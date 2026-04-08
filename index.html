@@ -604,15 +604,70 @@
     .worm-swatch{width:10px;height:10px;border-radius:999px;display:inline-block}
     .worm-swatch-a{background:#7cc4ff}
     .worm-swatch-b{background:#ff8ba2}
-    .fantasy-layout{display:grid;grid-template-columns:minmax(280px,.86fr) minmax(440px,1.14fr);gap:16px}
+    .fantasy-layout{display:grid;grid-template-columns:minmax(310px,.72fr) minmax(560px,1.28fr);gap:18px;align-items:start}
     @media (max-width:1100px){.fantasy-layout{grid-template-columns:1fr}}
     .fantasy-stack{display:grid;gap:16px}
+    .fantasy-builder-card{
+      background:
+        radial-gradient(circle at top left, rgba(95,240,200,.18), transparent 42%),
+        linear-gradient(180deg, rgba(10,33,38,.98), rgba(4,15,20,.96));
+      border:1px solid rgba(95,240,200,.24);
+      box-shadow:0 18px 40px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .fantasy-builder-card .section-title{color:#d7fff1}
+    .fantasy-recap-card{
+      background:
+        radial-gradient(circle at top left, rgba(124,196,255,.16), transparent 44%),
+        linear-gradient(180deg, rgba(17,27,54,.96), rgba(8,15,32,.94));
+      border:1px solid rgba(124,196,255,.18);
+    }
+    .fantasy-stage{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(250px,.72fr);gap:16px;align-items:start}
+    @media (max-width:1100px){.fantasy-stage{grid-template-columns:1fr}}
+    .fantasy-viewer-card{
+      background:
+        radial-gradient(circle at top right, rgba(255,200,87,.14), transparent 34%),
+        radial-gradient(circle at bottom left, rgba(255,139,162,.10), transparent 38%),
+        linear-gradient(180deg, rgba(27,19,14,.98), rgba(11,13,28,.96));
+      border:1px solid rgba(255,200,87,.22);
+      box-shadow:0 18px 40px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .fantasy-viewer-card .section-title{color:#ffe3a5}
+    .fantasy-leaderboard-card{
+      background:
+        radial-gradient(circle at top left, rgba(124,196,255,.10), transparent 34%),
+        linear-gradient(180deg, rgba(12,20,42,.96), rgba(7,13,28,.94));
+      border:1px solid rgba(124,196,255,.14);
+    }
+    .fantasy-leaderboard-card .section-title{color:#dce9ff}
+    .fantasy-leaderboard-scroll{max-height:min(68vh,820px);overflow:auto;padding-right:4px}
+    @media (max-width:1100px){.fantasy-leaderboard-scroll{max-height:none;overflow:visible;padding-right:0}}
+    .fantasy-leaderboard-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:#9fc4ff}
     .fantasy-lead{display:grid;gap:8px}
     .fantasy-headline{font-size:clamp(22px,3.2vw,32px);font-weight:900;line-height:1.06;color:#fff}
     .fantasy-sub{font-size:13px;color:var(--muted);line-height:1.55;max-width:860px}
     .fantasy-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .fantasy-fixture-list{display:grid;gap:12px}
+    .fantasy-fixture-list{display:grid;gap:14px}
+    .fantasy-switcher-shell{display:grid;gap:12px}
+    .fantasy-switcher-row{display:flex;gap:10px;flex-wrap:wrap}
+    .fantasy-switcher-button{
+      border:1px solid rgba(124,196,255,.16);
+      border-radius:14px;
+      padding:12px 14px;
+      background:linear-gradient(180deg, rgba(18,31,62,.92), rgba(8,16,34,.88));
+      color:var(--text);
+      text-align:left;
+      min-width:180px;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    .fantasy-switcher-button:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.28)}
+    .fantasy-switcher-button.active{border-color:rgba(95,240,200,.38);box-shadow:0 0 0 1px rgba(95,240,200,.18) inset}
+    .fantasy-switcher-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:800}
+    .fantasy-switcher-title{font-size:15px;font-weight:900;color:#fff;margin-top:4px}
+    .fantasy-switcher-note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.45}
     .fantasy-window-note{margin-top:12px;font-size:12px;color:#d7e7ff;line-height:1.55;padding:10px 12px;border-radius:12px;border:1px solid rgba(124,196,255,.14);background:rgba(124,196,255,.08)}
+    .fantasy-builder-card .fantasy-window-note{border-color:rgba(95,240,200,.18);background:rgba(95,240,200,.08);color:#d9fff4}
+    .fantasy-viewer-card .fantasy-window-note{border-color:rgba(255,200,87,.18);background:rgba(255,200,87,.08);color:#ffe7bf}
     .fantasy-availability-list{display:grid;gap:8px;margin-top:12px}
     .fantasy-availability-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,200,87,.14);background:linear-gradient(180deg, rgba(255,200,87,.08), rgba(10,18,36,.80))}
     .fantasy-availability-copy{display:grid;gap:4px}
@@ -638,13 +693,14 @@
     .fantasy-fixture-note{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.45}
     .fantasy-fixture-status{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
     .fantasy-builder-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .fantasy-builder-status{display:grid;gap:8px;margin-top:14px}
     .fantasy-summary-grid{display:flex;gap:10px;flex-wrap:wrap}
     .fantasy-slot-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
     @media (max-width:760px){.fantasy-slot-grid{grid-template-columns:1fr}}
     .fantasy-slot-card{
-      border:1px solid rgba(124,196,255,.12);
+      border:1px solid rgba(95,240,200,.14);
       border-radius:16px;
-      background:linear-gradient(180deg, rgba(18,31,62,.92), rgba(8,16,34,.88));
+      background:linear-gradient(180deg, rgba(14,44,50,.92), rgba(8,20,25,.88));
       padding:14px;
       display:grid;
       gap:10px;
@@ -685,28 +741,70 @@
     .fantasy-highlight{
       padding:12px 14px;
       border-radius:14px;
-      border:1px solid rgba(95,240,200,.22);
-      background:rgba(95,240,200,.10);
+      border:1px solid rgba(95,240,200,.24);
+      background:rgba(95,240,200,.12);
       color:#d9fff3;
       line-height:1.5;
       margin-top:14px;
     }
     .fantasy-saved-list{display:grid;gap:8px;margin-top:14px}
     .fantasy-saved-item{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid rgba(95,240,200,.14);background:linear-gradient(180deg, rgba(95,240,200,.08), rgba(11,20,40,.86))}
-    .fantasy-leaderboard-list{display:grid;gap:10px;margin-top:14px}
-    .fantasy-leaderboard-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .fantasy-leaderboard-list{display:grid;gap:8px;margin-top:14px}
+    .fantasy-leaderboard-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .fantasy-leaderboard-row.selectable{width:100%;appearance:none;text-align:left;color:inherit;font:inherit;cursor:pointer;transition:.18s ease}
+    .fantasy-leaderboard-row.selectable:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.28)}
+    .fantasy-leaderboard-row.active{border-color:rgba(95,240,200,.34);box-shadow:0 0 0 1px rgba(95,240,200,.18) inset}
+    .fantasy-leaderboard-row:disabled{cursor:default;opacity:.84}
+    .fantasy-leaderboard-row:disabled:hover{transform:none;border-color:var(--line)}
     .fantasy-leaderboard-row.top-1{border-color:rgba(255,200,87,.34);background:rgba(255,200,87,.10)}
     .fantasy-leaderboard-row.top-2{border-color:rgba(209,220,237,.24);background:rgba(209,220,237,.08)}
     .fantasy-leaderboard-row.top-3{border-color:rgba(217,154,100,.26);background:rgba(217,154,100,.09)}
     .fantasy-leaderboard-copy{display:grid;gap:5px}
-    .fantasy-leaderboard-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:16px;font-weight:900;color:#fff}
+    .fantasy-leaderboard-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px;font-weight:900;color:#fff}
     .fantasy-leaderboard-rank{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:12px;font-weight:900;color:#fff}
     .fantasy-medal{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
     .fantasy-medal.gold{background:rgba(255,200,87,.18);border:1px solid rgba(255,200,87,.34);color:#ffe3a5}
     .fantasy-medal.silver{background:rgba(209,220,237,.12);border:1px solid rgba(209,220,237,.22);color:#eef5ff}
     .fantasy-medal.bronze{background:rgba(217,154,100,.12);border:1px solid rgba(217,154,100,.24);color:#ffd8b9}
     .fantasy-leaderboard-score{display:grid;justify-items:end;gap:4px}
-    .fantasy-leaderboard-points{font-size:28px;font-weight:900;color:#fff;line-height:1}
+    .fantasy-leaderboard-points{font-size:22px;font-weight:900;color:#fff;line-height:1}
+    .fantasy-entry-team{display:grid;gap:10px}
+    .fantasy-entry-team-main{display:grid;gap:14px}
+    .fantasy-entry-player-list{display:grid;gap:10px;margin-top:14px}
+    .fantasy-entry-player{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,200,87,.14);
+      background:linear-gradient(180deg, rgba(42,28,18,.92), rgba(13,14,28,.9));
+    }
+    .fantasy-entry-player.top{border-color:rgba(95,240,200,.28);background:linear-gradient(180deg, rgba(95,240,200,.10), rgba(8,16,34,.9))}
+    .fantasy-entry-copy{display:grid;gap:4px}
+    .fantasy-entry-summary{display:grid;gap:10px;margin-top:14px}
+    .fantasy-summary-strip{display:flex;gap:8px;flex-wrap:wrap}
+    .fantasy-detail-header{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+    .fantasy-detail-points{font-size:26px;font-weight:900;color:#fff;line-height:1}
+    .fantasy-detail-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .fantasy-summary-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid rgba(124,196,255,.14);background:rgba(255,255,255,.04);font-size:12px;color:#d7e7ff}
+    .fantasy-did-not-lock{border-color:rgba(255,139,162,.26);background:rgba(255,139,162,.10);color:#ffd5de}
+    .fantasy-recap-title{font-size:17px;font-weight:900;color:#fff}
+    .fantasy-recap-grid{display:grid;gap:10px}
+    .fantasy-recap-note{font-size:13px;color:var(--muted);line-height:1.5}
+    .fantasy-field-summary{display:grid;gap:10px}
+    .fantasy-picks-focus{
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid rgba(255,200,87,.22);
+      background:linear-gradient(180deg, rgba(255,200,87,.10), rgba(255,139,162,.04));
+      display:grid;
+      gap:10px;
+    }
+    .fantasy-picks-focus-title{font-size:14px;font-weight:900;letter-spacing:.02em;color:#fff}
+    .fantasy-picks-focus-note{font-size:13px;color:#ffedc5;line-height:1.5}
+    .fantasy-picks-focus-meta{display:flex;gap:8px;flex-wrap:wrap}
 
   </style>
 
@@ -839,18 +937,20 @@
         </div>
         <div class="span-12 fantasy-layout">
           <div class="fantasy-stack">
-            <div class="card">
-              <div class="section-title">Open fixtures</div>
+            <div class="card fantasy-builder-card">
               <div id="miniFantasyFixtures" class="fantasy-fixture-list"></div>
+              <div class="section-title">Team builder</div>
+              <div id="miniFantasyBuilder"></div>
+            </div>
+            <div class="card fantasy-recap-card">
+              <div class="section-title">Last game recap</div>
+              <div id="miniFantasyLastGame"></div>
             </div>
             <div class="card">
               <div class="section-title">How Mini Fantasy works</div>
-              <div class="studio-note">Pick one 4-player team for each open match. Save it before lock, and keep one captain for the 1.5x boost.</div>
-              <div class="studio-note">You must stay inside 31 credits, take at least 1 batter, at least 1 bowler, and at least 1 player from each real team.</div>
-              <div class="studio-note">Matches open the day before and lock 1 minute before the official start time, so tomorrow's fixtures can be entered today.</div>
-            </div>
-            <div class="card">
-              <div class="section-title">Rules</div>
+              <div class="studio-note">The compact builder is always for open fixtures only. Use the fixture switcher to move between today and tomorrow's open matches.</div>
+              <div class="studio-note">Once a match locks, the leaderboard becomes the way to inspect locked teams. Click any user to view their picks, captain, and live or final points for the most recently locked fixture.</div>
+              <div class="studio-note">Your last-game recap stays on the left so you can compare what just happened while still building the next team.</div>
               <div class="fantasy-rules">
                 <div class="pill">Exactly 4 players</div>
                 <div class="pill">Budget: 31 credits</div>
@@ -861,18 +961,14 @@
               </div>
             </div>
           </div>
-          <div class="fantasy-stack">
-            <div class="card">
-              <div class="section-title">Match builder</div>
-              <div id="miniFantasyBuilder"></div>
+          <div class="fantasy-stage">
+            <div class="card fantasy-viewer-card">
+              <div class="section-title">Recently locked teams</div>
+              <div id="miniFantasyLockedViewer"></div>
             </div>
-            <div class="card">
+            <div class="card fantasy-leaderboard-card">
               <div class="section-title">Global leaderboard</div>
               <div id="miniFantasyLeaderboard"></div>
-            </div>
-            <div class="card">
-              <div class="section-title">My entries</div>
-              <div id="miniFantasyMyEntries"></div>
             </div>
           </div>
         </div>
@@ -1015,13 +1111,17 @@
       MINI_FANTASY_LAUNCH_AT_UTC,
       MINI_FANTASY_SEASON,
       applyPriceSnapshotToPool,
+      buildMiniFantasyFixturePointsIndex,
       buildMiniFantasyLeaderboard,
       buildEntryPriceSnapshot,
       buildFixturePlayerPool,
       generateMiniFantasyPriceBook,
+      getCompletedMiniFantasyMatchCount,
       getMiniFantasyFixtureAvailability,
       getMiniFantasyOpenFixtures,
       isFixtureLocked,
+      scoreMiniFantasyLineup,
+      scoreMiniFantasyEntry,
       validateMiniFantasyEntry
     } from './mini-fantasy/contest-engine.js';
 
@@ -1063,6 +1163,7 @@
     let MINI_FANTASY_NOTICE = null;
     let MINI_FANTASY_DRAFTS = {};
     let MINI_FANTASY_ACTIVE_MATCH_NO = null;
+    let MINI_FANTASY_RECENT_OWNER_HANDLE = '';
     let MINI_FANTASY_PICKER_STATE = {
       open: false,
       matchNo: null,
@@ -7451,6 +7552,235 @@ function titleBandScore(pick, live){
       return miniFantasyAvailabilityRows().find((fixture) => fixture.availability_status === 'upcoming') || null;
     }
 
+    function miniFantasyFixtureByMatchNo(matchNo){
+      const target = Number(matchNo || 0) || null;
+      if (!target) return null;
+      const availabilityFixture = miniFantasyAvailabilityRows().find((fixture) => Number(fixture.match_no || 0) === target);
+      if (availabilityFixture) return availabilityFixture;
+      const scheduledFixture = (Array.isArray(LEAGUE_STAGE_SCHEDULE) ? LEAGUE_STAGE_SCHEDULE : []).find((fixture) => Number(fixture.match_no || 0) === target);
+      if (!scheduledFixture) return null;
+      return {
+        ...scheduledFixture,
+        home_team_code: scheduledFixture.home_team_code || teamShort(scheduledFixture.home_team || ''),
+        away_team_code: scheduledFixture.away_team_code || teamShort(scheduledFixture.away_team || ''),
+        starts_at_utc: scheduledFixture.datetime_utc || null,
+        opens_at_utc: null,
+        locks_at_utc: null,
+        is_open: false,
+        is_locked: false,
+        availability_status: 'scheduled'
+      };
+    }
+
+    function mostRecentlyLockedMiniFantasyFixture(){
+      const locked = miniFantasyAvailabilityRows()
+        .filter((fixture) => fixture.is_locked)
+        .sort((a, b) => Date.parse(a.locks_at_utc || a.datetime_utc || '') - Date.parse(b.locks_at_utc || b.datetime_utc || ''));
+      return locked.length ? locked[locked.length - 1] : null;
+    }
+
+    function miniFantasyRecentFixtureStage(fixture){
+      if (!fixture) return 'none';
+      const matchNo = Number(fixture.match_no || 0) || null;
+      if (!matchNo) return 'none';
+      const completedMatchCount = getCompletedMiniFantasyMatchCount(LIVE_2026);
+      if (matchNo <= completedMatchCount) return 'final';
+      const startMs = Date.parse(fixture.datetime_utc || fixture.starts_at_utc || '');
+      if (Number.isFinite(startMs) && currentNowDate().getTime() >= startMs) return 'live';
+      return 'locked';
+    }
+
+    function miniFantasyEntryPlayerPool(entry){
+      if (!entry) return [];
+      const fixture = miniFantasyFixtureByMatchNo(entry.matchNo);
+      if (!fixture) return [];
+      const basePool = buildFixturePlayerPool({
+        fixture,
+        priceBook: MINI_FANTASY_PRICE_BOOK || { players: [] },
+        squads: IPL_SQUADS,
+        teamRoles: IPL_TEAM_ROLES
+      });
+      return entry.priceSnapshot && Object.keys(entry.priceSnapshot).length
+        ? applyPriceSnapshotToPool(basePool, entry.priceSnapshot)
+        : basePool;
+    }
+
+    function fallbackMiniFantasyPlayerName(playerId){
+      const raw = normalizeTextValue(playerId || '').split('_').slice(1).join(' ') || normalizeTextValue(playerId || '');
+      if (!raw) return 'Unknown player';
+      return raw.split('-').map((part) => part ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : '').join(' ').trim() || raw;
+    }
+
+    function formatMiniFantasyPoints(value){
+      const amount = Number(value || 0) || 0;
+      return Number.isInteger(amount) ? String(amount) : amount.toFixed(1);
+    }
+
+    function describeMiniFantasyEntry(entry, fixturePointsIndex = new Map()){
+      if (!entry) {
+        return {
+          totalPoints: 0,
+          pointsByPlayerId: {},
+          players: [],
+          captain: null,
+          bestPick: null,
+          summary: 'No team was locked for this fixture.'
+        };
+      }
+      const playerPool = miniFantasyEntryPlayerPool(entry);
+      const poolById = new Map(playerPool.map((player) => [player.player_id, player]));
+      const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds) ? entry.selectedPlayerIds.filter(Boolean) : [];
+      const pointsByPlayerId = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Number(fixturePointsIndex.get(playerId) || 0)]));
+      const totalPoints = scoreMiniFantasyLineup({
+        selectedPlayerIds,
+        captainPlayerId: entry.captainPlayerId || '',
+        pointsByPlayerId
+      });
+      const players = selectedPlayerIds.map((playerId) => {
+        const player = poolById.get(playerId) || null;
+        return {
+          playerId,
+          name: player?.name || fallbackMiniFantasyPlayerName(playerId),
+          team: player?.team || '',
+          role: player?.role || '',
+          price: Number(player?.final_price || 0) || 0,
+          points: Number(pointsByPlayerId[playerId] || 0),
+          isCaptain: normalizeTextValue(entry.captainPlayerId || '') === playerId
+        };
+      });
+      const captain = players.find((player) => player.isCaptain) || null;
+      const bestPick = [...players].sort((a, b) => b.points - a.points || a.name.localeCompare(b.name))[0] || null;
+      return {
+        totalPoints,
+        pointsByPlayerId,
+        players,
+        captain,
+        bestPick,
+        summary: captain
+          ? `${captain.name} carries the captain armband.`
+          : 'Captain is not set on this saved team.'
+      };
+    }
+
+    function currentUserLatestMiniFantasyEntry(){
+      return currentMiniFantasyEntries()
+        .slice()
+        .sort((a, b) => Number(b.matchNo || 0) - Number(a.matchNo || 0) || String(b.savedAt || b.updatedAt || '').localeCompare(String(a.savedAt || a.updatedAt || '')))[0] || null;
+    }
+
+    function currentUserLatestLockedMiniFantasyEntry(){
+      return currentMiniFantasyEntries()
+        .filter((entry) => {
+          const fixture = miniFantasyFixtureByMatchNo(entry.matchNo);
+          return fixture ? isFixtureLocked(fixture, currentNowDate()) : false;
+        })
+        .slice()
+        .sort((a, b) => Number(b.matchNo || 0) - Number(a.matchNo || 0))[0] || null;
+    }
+
+    function currentUserLatestScoredMiniFantasyEntry(){
+      return currentMiniFantasyEntries()
+        .map((entry) => ({
+          entry,
+          score: scoreMiniFantasyEntry({
+            entry,
+            liveData: LIVE_2026,
+            schedule: LEAGUE_STAGE_SCHEDULE,
+            squads: IPL_SQUADS
+          })
+        }))
+        .filter((item) => item.score?.is_scored)
+        .sort((a, b) => Number(b.entry?.matchNo || 0) - Number(a.entry?.matchNo || 0))[0] || null;
+    }
+
+    function miniFantasyRecentFixtureBoardData(){
+      const fixture = mostRecentlyLockedMiniFantasyFixture();
+      const leaderboard = miniFantasyLeaderboardData();
+      const leaderboardRows = Array.isArray(leaderboard.rows) ? leaderboard.rows : [];
+      if (!fixture) {
+        return { fixture: null, stage: 'none', rows: [], summary: [] };
+      }
+      const matchNo = Number(fixture.match_no || 0) || null;
+      const stage = miniFantasyRecentFixtureStage(fixture);
+      const entryRows = currentMiniFantasyLeaderboardEntries();
+      const entryByOwner = new Map(
+        entryRows
+          .filter((entry) => Number(entry.matchNo || entry.match_no || 0) === matchNo)
+          .map((entry) => [normalizeOwnerId(entry.ownerHandle || entry.owner_handle || ''), entry])
+      );
+      const pointsIndex = buildMiniFantasyFixturePointsIndex({
+        liveData: LIVE_2026,
+        schedule: LEAGUE_STAGE_SCHEDULE,
+        squads: IPL_SQUADS,
+        matchNo
+      });
+      const rows = leaderboardRows.map((row) => {
+        const ownerHandle = normalizeOwnerId(row.owner_handle || '');
+        const fixtureEntry = entryByOwner.get(ownerHandle) || null;
+        const detail = describeMiniFantasyEntry(fixtureEntry, pointsIndex);
+        return {
+          ...row,
+          owner_handle: ownerHandle,
+          fixtureEntry,
+          fixtureStatus: fixtureEntry ? stage : 'did_not_lock',
+          fixturePoints: detail.totalPoints,
+          fixturePlayers: detail.players,
+          fixtureCaptain: detail.captain,
+          fixtureSummary: detail.summary,
+          fixtureBestPick: detail.bestPick
+        };
+      });
+
+      const playerCounts = new Map();
+      const captainCounts = new Map();
+      rows.forEach((row) => {
+        (row.fixturePlayers || []).forEach((player) => {
+          if (!player?.name) return;
+          playerCounts.set(player.name, (playerCounts.get(player.name) || 0) + 1);
+        });
+        if (row.fixtureCaptain?.name) {
+          captainCounts.set(row.fixtureCaptain.name, (captainCounts.get(row.fixtureCaptain.name) || 0) + 1);
+        }
+      });
+      const mostPicked = [...playerCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0] || null;
+      const mostPickedCaptain = [...captainCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0] || null;
+      const differential = [...playerCounts.entries()].filter((item) => item[1] === 1).sort((a, b) => a[0].localeCompare(b[0]))[0] || null;
+      const noLockUsers = rows.filter((row) => row.fixtureStatus === 'did_not_lock');
+      const captainSplit = [...captainCounts.entries()]
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, 3)
+        .map(([name, count]) => `${name} ${count}`);
+
+      return {
+        fixture,
+        stage,
+        rows,
+        summary: [
+          mostPicked ? `Most picked: ${mostPicked[0]} (${mostPicked[1]})` : 'Most picked: waiting for locks',
+          mostPickedCaptain ? `Most picked captain: ${mostPickedCaptain[0]} (${mostPickedCaptain[1]})` : 'Most picked captain: waiting for locks',
+          differential ? `Biggest differential: ${differential[0]} on 1 team` : 'Biggest differential: no solo picks yet',
+          noLockUsers.length ? `Did not lock: ${noLockUsers.map((row) => row.display_name || row.owner_handle).join(', ')}` : 'Did not lock: everyone submitted',
+          captainSplit.length ? `Captain split: ${captainSplit.join(' • ')}` : 'Captain split: waiting for captain choices'
+        ]
+      };
+    }
+
+    function selectedMiniFantasyRecentRow(board = miniFantasyRecentFixtureBoardData()){
+      const rows = Array.isArray(board.rows) ? board.rows : [];
+      if (!rows.length) return null;
+      const handles = new Set(rows.map((row) => normalizeOwnerId(row.owner_handle || '')));
+      const currentHandle = normalizeOwnerId(CURRENT_USER?.ownerId || '');
+      if (normalizeOwnerId(MINI_FANTASY_RECENT_OWNER_HANDLE || '') && handles.has(normalizeOwnerId(MINI_FANTASY_RECENT_OWNER_HANDLE || ''))) {
+        return rows.find((row) => normalizeOwnerId(row.owner_handle || '') === normalizeOwnerId(MINI_FANTASY_RECENT_OWNER_HANDLE || '')) || null;
+      }
+      if (currentHandle && handles.has(currentHandle)) {
+        MINI_FANTASY_RECENT_OWNER_HANDLE = currentHandle;
+        return rows.find((row) => normalizeOwnerId(row.owner_handle || '') === currentHandle) || null;
+      }
+      MINI_FANTASY_RECENT_OWNER_HANDLE = normalizeOwnerId(rows[0].owner_handle || '');
+      return rows[0];
+    }
+
     function miniFantasyLeaderboardData(){
       return buildMiniFantasyLeaderboard({
         entries: currentMiniFantasyLeaderboardEntries(),
@@ -7567,7 +7897,7 @@ function titleBandScore(pick, live){
       const meta = document.getElementById('miniFantasyMeta');
       const headline = document.getElementById('miniFantasyHeadline');
       const summary = document.getElementById('miniFantasySummary');
-      if (!slot || !meta || !headline || !summary) return;
+      if (!meta || !headline || !summary) return;
 
       const launchData = buildMiniFantasyLaunchData();
       const availability = miniFantasyAvailabilityRows();
@@ -7591,6 +7921,7 @@ function titleBandScore(pick, live){
         ${nextOpening ? `<span class="pill">Next opening: Match ${escapeHtml(String(nextOpening.match_no))} on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}</span>` : ''}
         <span class="pill">Lock: 1 minute before start</span>
       `;
+      if (!slot) return;
 
       if (!fixtures.length) {
         slot.innerHTML = `
@@ -7604,34 +7935,27 @@ function titleBandScore(pick, live){
       const activeFixture = activeMiniFantasyFixture();
       const upcoming = availability.filter((fixture) => fixture.availability_status === 'upcoming').slice(0, 3);
       slot.innerHTML = `
-        <div class="fantasy-window-note">You can currently submit ${escapeHtml(openMatchList)}. Later matches open the day before. ${nextOpening ? `Next opening: Match ${escapeHtml(String(nextOpening.match_no))} on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : 'No later opening is queued yet.'}</div>
-        ${fixtures.map((fixture) => {
-        const savedEntry = findMiniFantasyEntryForMatch(fixture.match_no);
-        const fixtureLabel = formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`);
-        const whenLabel = Number(fixture.match_no) === MINI_FANTASY_FIRST_OPEN_MATCH_NO && currentNowDate().getTime() < Date.parse(fixture.opens_at_utc || '')
-          ? 'Opening soon'
-          : 'Open now';
-        const openingRuleLabel = Number(fixture.match_no) === MINI_FANTASY_FIRST_OPEN_MATCH_NO
-          ? `Opened from Match ${MINI_FANTASY_FIRST_OPEN_MATCH_NO} launch`
-          : 'Opens the day before';
-        return `
-          <button type="button" class="fantasy-fixture-card ${Number(activeFixture?.match_no) === Number(fixture.match_no) ? 'active' : ''}" data-mini-fixture="${fixture.match_no}">
-            <div class="fantasy-fixture-top">
-              <div>
-                <div class="fantasy-fixture-match">Match ${escapeHtml(String(fixture.match_no))} - ${escapeHtml(whenLabel)}</div>
-                <div class="fantasy-fixture-teams">${escapeHtml(teamShort(fixture.home_team))} vs ${escapeHtml(teamShort(fixture.away_team))}</div>
-              </div>
-              ${miniFantasyStatusChip(savedEntry, fixture)}
-            </div>
-            <div class="fantasy-fixture-note">${escapeHtml(fixtureLabel)}</div>
-            <div class="fantasy-fixture-status">
-              <span class="pill">Open now</span>
-              <span class="pill">Locks at ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
-              <span class="pill">${escapeHtml(openingRuleLabel)}</span>
-            </div>
-          </button>
-        `;
-      }).join('')}
+        <div class="fantasy-switcher-shell">
+          <div class="fantasy-window-note">Pick the open fixture you want to build for. The builder below always follows this switcher, and later matches continue to open the day before. ${nextOpening ? `Next opening: Match ${escapeHtml(String(nextOpening.match_no))} on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}.` : 'No later opening is queued yet.'}</div>
+          <div class="fantasy-switcher-row">
+            ${fixtures.map((fixture) => {
+              const savedEntry = findMiniFantasyEntryForMatch(fixture.match_no);
+              const fixtureLabel = formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`);
+              return `
+                <button type="button" class="fantasy-switcher-button ${Number(activeFixture?.match_no) === Number(fixture.match_no) ? 'active' : ''}" data-mini-fixture="${fixture.match_no}">
+                  <div class="fantasy-switcher-kicker">Match ${escapeHtml(String(fixture.match_no))}</div>
+                  <div class="fantasy-switcher-title">${escapeHtml(teamShort(fixture.home_team))} vs ${escapeHtml(teamShort(fixture.away_team))}</div>
+                  <div class="fantasy-switcher-note">${escapeHtml(fixtureLabel)}</div>
+                  <div class="fantasy-fixture-status">
+                    <span class="pill">Open now</span>
+                    <span class="pill">Locks at ${escapeHtml(formatDate(fixture.locks_at_utc))}</span>
+                    ${savedEntry ? '<span class="pill">Saved</span>' : '<span class="pill">Not picked</span>'}
+                  </div>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
         ${upcoming.length ? `
           <div class="fantasy-availability-list">
             ${upcoming.map((fixture) => `
@@ -7659,59 +7983,101 @@ function titleBandScore(pick, live){
       });
     }
 
-    function renderMiniFantasyMyEntries(){
-      const panel = document.getElementById('miniFantasyMyEntries');
+    function renderMiniFantasyLastGame(){
+      const panel = document.getElementById('miniFantasyLastGame');
       if (!panel) return;
       if (!CURRENT_USER) {
-        panel.innerHTML = '<div class="fantasy-empty">Sign in to save one Mini Fantasy team per match and come back to edit it until lock.</div>';
+        panel.innerHTML = '<div class="fantasy-empty">Sign in to see your last Mini Fantasy team, captain, and score recap next to the open builder.</div>';
         return;
       }
-      const entries = currentMiniFantasyEntries()
-        .slice()
-        .sort((a, b) => Number(a.matchNo || 0) - Number(b.matchNo || 0));
-      if (!entries.length) {
-        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams saved yet. Start with any open fixture, pick 4 players, and lock one captain before the fixture closes.</div>';
+      const latestScored = currentUserLatestScoredMiniFantasyEntry();
+      const latestLockedEntry = currentUserLatestLockedMiniFantasyEntry();
+      const activeFixture = activeMiniFantasyFixture();
+      const openEntry = activeFixture ? findMiniFantasyEntryForMatch(activeFixture.match_no) : null;
+      if (!latestScored?.entry && !latestLockedEntry) {
+        panel.innerHTML = `<div class="fantasy-empty">No Mini Fantasy team has been locked yet. ${activeFixture ? `Match ${escapeHtml(String(activeFixture.match_no))} is open now, and you ${openEntry ? 'already have a saved team for it.' : "haven't picked it yet."}` : 'The next open builder will appear here automatically.'}</div>`;
         return;
       }
+      const recapEntry = latestScored?.entry || latestLockedEntry;
+      const recapFixture = miniFantasyFixtureByMatchNo(recapEntry.matchNo) || {
+        match_no: recapEntry.matchNo,
+        home_team: recapEntry.homeTeamCode,
+        away_team: recapEntry.awayTeamCode,
+        fixture: recapEntry.fixtureLabel,
+        datetime_utc: recapEntry.fixtureDatetimeUtc
+      };
+      const pointsIndex = buildMiniFantasyFixturePointsIndex({
+        liveData: LIVE_2026,
+        schedule: LEAGUE_STAGE_SCHEDULE,
+        squads: IPL_SQUADS,
+        matchNo: recapEntry.matchNo
+      });
+      const detail = describeMiniFantasyEntry(recapEntry, pointsIndex);
+      const stage = miniFantasyRecentFixtureStage(recapFixture);
+      const bestPick = detail.bestPick;
       panel.innerHTML = `
-        <div class="fantasy-saved-list">
-          ${entries.map((entry) => `
-            <div class="fantasy-saved-item">
-              <div>
-                <strong>Match ${escapeHtml(String(entry.matchNo || '?'))} - ${escapeHtml(entry.fixtureLabel || 'Fixture pending')}</strong>
-                <div class="small">Saved ${escapeHtml(formatTimestamp(entry.savedAt || entry.updatedAt))} - spent ${escapeHtml(String(entry.spentCredits || 0))} / ${MINI_FANTASY_BUDGET}</div>
-              </div>
-              <div class="studio-inline">
-                <span class="pill">${escapeHtml(entry.captainPlayerId ? 'Captain locked' : 'Captain pending')}</span>
-                <button class="pill-button" type="button" data-open-mini-entry="${entry.matchNo}">Open</button>
-              </div>
+        <div class="fantasy-recap-grid">
+          <div class="fantasy-detail-header">
+            <div>
+              <div class="fantasy-recap-title">Match ${escapeHtml(String(recapEntry.matchNo || '?'))} - ${escapeHtml(recapEntry.fixtureLabel || formatFixtureLabel(recapFixture.fixture || `${recapFixture.away_team} vs ${recapFixture.home_team}`))}</div>
+              <div class="fantasy-recap-note">Saved ${escapeHtml(formatTimestamp(recapEntry.savedAt || recapEntry.updatedAt))}. ${openEntry ? `Your next team for Match ${escapeHtml(String(activeFixture?.match_no || ''))} is already saved.` : activeFixture ? `You have not locked Match ${escapeHtml(String(activeFixture.match_no))} yet.` : 'No open fixture needs a pick right now.'}</div>
             </div>
-          `).join('')}
+            <div>
+              <div class="fantasy-detail-points">${escapeHtml(formatMiniFantasyPoints(detail.totalPoints))}</div>
+              <div class="small">${escapeHtml(stage === 'final' ? 'final pts' : stage === 'live' ? 'live pts' : 'locked')}</div>
+            </div>
+          </div>
+          <div class="fantasy-summary-strip">
+            <span class="pill">${detail.captain ? `Captain: ${detail.captain.name}` : 'Captain pending'}</span>
+            <span class="pill">Spent: ${escapeHtml(String(recapEntry.spentCredits || 0))} / ${MINI_FANTASY_BUDGET}</span>
+            ${bestPick ? `<span class="pill">Best pick: ${escapeHtml(bestPick.name)} ${escapeHtml(formatMiniFantasyPoints(bestPick.points))} pts</span>` : ''}
+          </div>
+          <div class="fantasy-window-note">${escapeHtml(stage === 'final'
+            ? `Final recap: ${detail.captain ? `${detail.captain.name} delivered ${formatMiniFantasyPoints(detail.captain.points)} captain points.` : 'Captain was not set.'} ${bestPick ? `${bestPick.name} was your best pick on ${formatMiniFantasyPoints(bestPick.points)} points.` : ''}`
+            : stage === 'live'
+              ? `This team is still live. ${detail.captain ? `${detail.captain.name} is currently returning ${formatMiniFantasyPoints(detail.captain.points)} captain points.` : 'Captain is not set yet.'}`
+              : 'This team is locked and waiting for scoring to start.')}</div>
+          <div class="fantasy-entry-player-list">
+            ${detail.players.map((player) => `
+              <div class="fantasy-entry-player ${player.isCaptain ? 'top' : ''}">
+                <div class="fantasy-entry-copy">
+                  <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
+                  <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}</div>
+                </div>
+                <div class="fantasy-entry-copy" style="justify-items:end">
+                  <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.points))}</div>
+                  <div class="fantasy-picker-role">${escapeHtml(String(player.price || 0))} cr</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
         </div>
       `;
-      panel.querySelectorAll('[data-open-mini-entry]').forEach((button) => {
-        button.onclick = () => {
-          activeView = 'fantasy';
-          MINI_FANTASY_ACTIVE_MATCH_NO = Number(button.dataset.openMiniEntry || 0) || null;
-          render();
-        };
-      });
     }
 
-    function renderMiniFantasyLeaderboard(){
+    function renderMiniFantasyLeaderboardLegacy(){
       const panel = document.getElementById('miniFantasyLeaderboard');
       if (!panel) return;
       const leaderboard = miniFantasyLeaderboardData();
       const rows = Array.isArray(leaderboard.rows) ? leaderboard.rows : [];
+      const recentBoard = miniFantasyRecentFixtureBoardData();
+      const leaderboardRows = recentBoard.fixture
+        ? recentBoard.rows
+        : rows.map((row) => ({
+            ...row,
+            fixtureStatus: 'none',
+            fixturePoints: 0
+          }));
+      const selectedRow = recentBoard.fixture ? selectedMiniFantasyRecentRow(recentBoard) : null;
       if (!rows.length) {
         panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams have been saved yet. Once lineups start locking, everyone will be ranked here by total points and the top three will show medal tags.</div>';
         return;
       }
       panel.innerHTML = `
-        <div class="fantasy-window-note">Everyone is ranked by total Mini Fantasy points across saved matches. Top three get medal tags, and points start moving as completed matches land in the live data feed.</div>
+        <div class="fantasy-window-note">Everyone is ranked by total Mini Fantasy points across saved matches. ${recentBoard.fixture ? `Click any row to inspect that user's team for Match ${escapeHtml(String(recentBoard.fixture.match_no))}.` : 'Once the first fixture locks, this same leaderboard will open each user’s locked team for the most recently locked fixture.'}</div>
         <div class="fantasy-leaderboard-list">
-          ${rows.map((row) => `
-            <div class="fantasy-leaderboard-row ${row.rank <= 3 ? `top-${row.rank}` : ''}">
+          ${leaderboardRows.map((row) => `
+            <button type="button" class="fantasy-leaderboard-row selectable ${row.rank <= 3 ? `top-${row.rank}` : ''} ${normalizeOwnerId(selectedRow?.owner_handle || '') === normalizeOwnerId(row.owner_handle || '') ? 'active' : ''}" data-mini-leaderboard-owner="${escapeHtml(row.owner_handle)}" ${recentBoard.fixture ? '' : 'disabled'}>
               <div class="fantasy-leaderboard-copy">
                 <div class="fantasy-leaderboard-name">
                   <span class="fantasy-leaderboard-rank">#${escapeHtml(String(row.rank))}</span>
@@ -7719,13 +8085,229 @@ function titleBandScore(pick, live){
                   ${row.medal ? `<span class="fantasy-medal ${escapeHtml(row.medal)}">${escapeHtml(miniFantasyMedalLabel(row.medal))}</span>` : ''}
                 </div>
                 <div class="small">@${escapeHtml(row.owner_handle)} - ${escapeHtml(String(row.scored_entries))} scored match${row.scored_entries === 1 ? '' : 'es'} - ${escapeHtml(String(row.pending_entries))} pending - ${escapeHtml(String(row.saved_entries))} saved entry${row.saved_entries === 1 ? '' : 'ies'}</div>
+                ${recentBoard.fixture ? `
+                  <div class="fantasy-detail-meta">
+                    <span class="pill">Match ${escapeHtml(String(recentBoard.fixture.match_no))}</span>
+                    ${row.fixtureStatus === 'did_not_lock'
+                      ? '<span class="pill fantasy-did-not-lock">Did not lock</span>'
+                      : `<span class="pill">${escapeHtml(recentBoard.stage === 'final' ? 'Final' : recentBoard.stage === 'live' ? 'Live' : 'Locked')}</span><span class="pill">${escapeHtml(formatMiniFantasyPoints(row.fixturePoints))} pts</span>`}
+                  </div>
+                ` : ''}
               </div>
               <div class="fantasy-leaderboard-score">
                 <div class="fantasy-leaderboard-points">${escapeHtml(String(row.total_points))}</div>
                 <div class="small">points</div>
               </div>
-            </div>
+            </button>
           `).join('')}
+        </div>
+      `;
+      if (!recentBoard.fixture) return;
+      panel.querySelectorAll('[data-mini-leaderboard-owner]').forEach((button) => {
+        button.onclick = () => {
+          MINI_FANTASY_RECENT_OWNER_HANDLE = normalizeOwnerId(button.dataset.miniLeaderboardOwner || '');
+          renderMiniFantasyLeaderboard();
+          renderMiniFantasyLockedViewer();
+        };
+      });
+    }
+
+    function renderMiniFantasyLockedViewerLegacy(){
+      const panel = document.getElementById('miniFantasyLockedViewer');
+      if (!panel) return;
+      const board = miniFantasyRecentFixtureBoardData();
+      if (!board.fixture) {
+        panel.innerHTML = '<div class="fantasy-empty">Once the first Mini Fantasy fixture locks, this area will show the field summary and let you inspect any user team from the leaderboard.</div>';
+        return;
+      }
+      const selectedRow = selectedMiniFantasyRecentRow(board);
+      if (!selectedRow) {
+        panel.innerHTML = '<div class="fantasy-empty">No locked teams are available for the most recently locked fixture yet.</div>';
+        return;
+      }
+      const fixtureLabel = formatFixtureLabel(board.fixture.fixture || `${board.fixture.away_team} vs ${board.fixture.home_team}`);
+      const statusLabel = board.stage === 'final' ? 'Final' : board.stage === 'live' ? 'Live' : 'Locked';
+      const detailPlayers = Array.isArray(selectedRow.fixturePlayers) ? selectedRow.fixturePlayers : [];
+      const bestPick = selectedRow.fixtureBestPick;
+      const captain = selectedRow.fixtureCaptain;
+      const detailNote = selectedRow.fixtureStatus === 'did_not_lock'
+        ? `${selectedRow.display_name || selectedRow.owner_handle} did not save a team before this fixture locked.`
+        : board.stage === 'final'
+          ? `${selectedRow.display_name || selectedRow.owner_handle} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.points)}.` : ''}`
+          : board.stage === 'live'
+            ? `${selectedRow.display_name || selectedRow.owner_handle} is live on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} is currently worth ${formatMiniFantasyPoints(captain.points)}.` : ''}`
+            : `${selectedRow.display_name || selectedRow.owner_handle} locked this team. Points will start updating once Match ${board.fixture.match_no} begins.`;
+      panel.innerHTML = `
+        <div class="fantasy-entry-team">
+          <div class="fantasy-detail-header">
+            <div>
+              <div class="fantasy-recap-title">Match ${escapeHtml(String(board.fixture.match_no))} - ${escapeHtml(fixtureLabel)}</div>
+              <div class="fantasy-recap-note">Most recently locked fixture. Click another user from the leaderboard to compare teams without leaving this screen.</div>
+            </div>
+            <div>
+              <div class="fantasy-detail-points">${escapeHtml(selectedRow.fixtureStatus === 'did_not_lock' ? '—' : formatMiniFantasyPoints(selectedRow.fixturePoints))}</div>
+              <div class="small">${escapeHtml(selectedRow.fixtureStatus === 'did_not_lock' ? 'did not lock' : `${statusLabel.toLowerCase()} pts`)}</div>
+            </div>
+          </div>
+          <div class="fantasy-summary-strip">
+            <span class="fantasy-summary-chip">Viewing: ${escapeHtml(selectedRow.display_name || selectedRow.owner_handle)}</span>
+            <span class="fantasy-summary-chip">Fixture: ${escapeHtml(statusLabel)}</span>
+            <span class="fantasy-summary-chip">${escapeHtml(board.fixture.home_team_code || teamShort(board.fixture.home_team || ''))} vs ${escapeHtml(board.fixture.away_team_code || teamShort(board.fixture.away_team || ''))}</span>
+            ${selectedRow.fixtureStatus === 'did_not_lock' ? '<span class="fantasy-summary-chip fantasy-did-not-lock">Did not lock</span>' : captain ? `<span class="fantasy-summary-chip">Captain: ${escapeHtml(captain.name)}</span>` : ''}
+          </div>
+          <div class="fantasy-entry-summary">
+            ${board.summary.map((line) => `<div class="fantasy-window-note">${escapeHtml(line)}</div>`).join('')}
+          </div>
+          <div class="fantasy-window-note">${escapeHtml(detailNote)}</div>
+          ${selectedRow.fixtureStatus === 'did_not_lock'
+            ? '<div class="fantasy-empty">No locked team exists for this user on the most recently locked fixture.</div>'
+            : `
+              <div class="fantasy-entry-player-list">
+                ${detailPlayers.map((player) => `
+                  <div class="fantasy-entry-player ${player.isCaptain ? 'top' : ''}">
+                    <div class="fantasy-entry-copy">
+                      <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
+                      <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}</div>
+                    </div>
+                    <div class="fantasy-entry-copy" style="justify-items:end">
+                      <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.points))}</div>
+                      <div class="fantasy-picker-role">${escapeHtml(String(player.price || 0))} cr</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `}
+        </div>
+      `;
+    }
+
+    function renderMiniFantasyLeaderboard(){
+      const panel = document.getElementById('miniFantasyLeaderboard');
+      if (!panel) return;
+      const leaderboard = miniFantasyLeaderboardData();
+      const rows = Array.isArray(leaderboard.rows) ? leaderboard.rows : [];
+      const recentBoard = miniFantasyRecentFixtureBoardData();
+      const leaderboardRows = recentBoard.fixture
+        ? recentBoard.rows
+        : rows.map((row) => ({
+            ...row,
+            fixtureStatus: 'none',
+            fixturePoints: 0
+          }));
+      const selectedRow = recentBoard.fixture ? selectedMiniFantasyRecentRow(recentBoard) : null;
+      if (!rows.length) {
+        panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams have been saved yet. Once lineups start locking, everyone will be ranked here by total points and the top three will show medal tags.</div>';
+        return;
+      }
+      panel.innerHTML = `
+        <div class="fantasy-leaderboard-kicker">${escapeHtml(recentBoard.fixture ? `Pick rail for Match ${recentBoard.fixture.match_no}` : 'Leaderboard rail')}</div>
+        <div class="fantasy-window-note">${recentBoard.fixture ? `Click a user and keep your eyes on the locked-team stage. The rail only changes who is in focus for Match ${escapeHtml(String(recentBoard.fixture.match_no))}.` : 'Once the first fixture locks, this rail will become the fast way to inspect each user team without opening a new screen.'}</div>
+        <div class="fantasy-leaderboard-scroll">
+          <div class="fantasy-leaderboard-list">
+            ${leaderboardRows.map((row) => `
+              <button type="button" class="fantasy-leaderboard-row selectable ${row.rank <= 3 ? `top-${row.rank}` : ''} ${normalizeOwnerId(selectedRow?.owner_handle || '') === normalizeOwnerId(row.owner_handle || '') ? 'active' : ''}" data-mini-leaderboard-owner="${escapeHtml(row.owner_handle)}" ${recentBoard.fixture ? '' : 'disabled'}>
+                <div class="fantasy-leaderboard-copy">
+                  <div class="fantasy-leaderboard-name">
+                    <span class="fantasy-leaderboard-rank">#${escapeHtml(String(row.rank))}</span>
+                    <span>${escapeHtml(row.display_name || row.owner_handle)}</span>
+                    ${row.medal ? `<span class="fantasy-medal ${escapeHtml(row.medal)}">${escapeHtml(miniFantasyMedalLabel(row.medal))}</span>` : ''}
+                  </div>
+                  <div class="small">@${escapeHtml(row.owner_handle)}</div>
+                  ${recentBoard.fixture ? `
+                    <div class="fantasy-detail-meta">
+                      ${row.fixtureStatus === 'did_not_lock'
+                        ? '<span class="pill fantasy-did-not-lock">Did not lock</span>'
+                        : `<span class="pill">${escapeHtml(recentBoard.stage === 'final' ? 'Final' : recentBoard.stage === 'live' ? 'Live' : 'Locked')}</span><span class="pill">${escapeHtml(formatMiniFantasyPoints(row.fixturePoints))} fixture pts</span>`}
+                    </div>
+                  ` : ''}
+                </div>
+                <div class="fantasy-leaderboard-score">
+                  <div class="fantasy-leaderboard-points">${escapeHtml(String(row.total_points))}</div>
+                  <div class="small">overall</div>
+                </div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      if (!recentBoard.fixture) return;
+      panel.querySelectorAll('[data-mini-leaderboard-owner]').forEach((button) => {
+        button.onclick = () => {
+          MINI_FANTASY_RECENT_OWNER_HANDLE = normalizeOwnerId(button.dataset.miniLeaderboardOwner || '');
+          renderMiniFantasyLeaderboard();
+          renderMiniFantasyLockedViewer();
+        };
+      });
+    }
+
+    function renderMiniFantasyLockedViewer(){
+      const panel = document.getElementById('miniFantasyLockedViewer');
+      if (!panel) return;
+      const board = miniFantasyRecentFixtureBoardData();
+      if (!board.fixture) {
+        panel.innerHTML = '<div class="fantasy-empty">Once the first Mini Fantasy fixture locks, this area will show the field summary and let you inspect any user team from the leaderboard.</div>';
+        return;
+      }
+      const selectedRow = selectedMiniFantasyRecentRow(board);
+      if (!selectedRow) {
+        panel.innerHTML = '<div class="fantasy-empty">No locked teams are available for the most recently locked fixture yet.</div>';
+        return;
+      }
+      const fixtureLabel = formatFixtureLabel(board.fixture.fixture || `${board.fixture.away_team} vs ${board.fixture.home_team}`);
+      const statusLabel = board.stage === 'final' ? 'Final' : board.stage === 'live' ? 'Live' : 'Locked';
+      const detailPlayers = Array.isArray(selectedRow.fixturePlayers) ? selectedRow.fixturePlayers : [];
+      const bestPick = selectedRow.fixtureBestPick;
+      const captain = selectedRow.fixtureCaptain;
+      const viewedName = selectedRow.display_name || selectedRow.owner_handle;
+      const detailNote = selectedRow.fixtureStatus === 'did_not_lock'
+        ? `${viewedName} did not save a team before this fixture locked.`
+        : board.stage === 'final'
+          ? `${viewedName} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.points)}.` : ''}`
+          : board.stage === 'live'
+            ? `${viewedName} is live on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} is currently worth ${formatMiniFantasyPoints(captain.points)}.` : ''}`
+            : `${viewedName} locked this team. Points will start updating once Match ${board.fixture.match_no} begins.`;
+      panel.innerHTML = `
+        <div class="fantasy-entry-team">
+          <div class="fantasy-picks-focus">
+            <div class="fantasy-detail-header">
+              <div>
+                <div class="fantasy-picks-focus-title">Now viewing ${escapeHtml(viewedName)}'s Match ${escapeHtml(String(board.fixture.match_no))} team</div>
+                <div class="fantasy-picks-focus-note">This is the center stage for the most recently locked fixture. Click another user in the leaderboard rail to swap teams without losing this view.</div>
+              </div>
+              <div>
+                <div class="fantasy-detail-points">${escapeHtml(selectedRow.fixtureStatus === 'did_not_lock' ? '—' : formatMiniFantasyPoints(selectedRow.fixturePoints))}</div>
+                <div class="small">${escapeHtml(selectedRow.fixtureStatus === 'did_not_lock' ? 'did not lock' : `${statusLabel.toLowerCase()} pts`)}</div>
+              </div>
+            </div>
+            <div class="fantasy-picks-focus-meta">
+              <span class="fantasy-summary-chip">Fixture: Match ${escapeHtml(String(board.fixture.match_no))} - ${escapeHtml(fixtureLabel)}</span>
+              <span class="fantasy-summary-chip">${escapeHtml(board.fixture.home_team_code || teamShort(board.fixture.home_team || ''))} vs ${escapeHtml(board.fixture.away_team_code || teamShort(board.fixture.away_team || ''))}</span>
+              <span class="fantasy-summary-chip">${escapeHtml(statusLabel)}</span>
+              ${selectedRow.fixtureStatus === 'did_not_lock' ? '<span class="fantasy-summary-chip fantasy-did-not-lock">Did not lock</span>' : captain ? `<span class="fantasy-summary-chip">Captain: ${escapeHtml(captain.name)}</span>` : ''}
+            </div>
+          </div>
+          ${selectedRow.fixtureStatus === 'did_not_lock'
+            ? '<div class="fantasy-empty">No locked team exists for this user on the most recently locked fixture.</div>'
+            : `
+              <div class="fantasy-entry-player-list">
+                ${detailPlayers.map((player) => `
+                  <div class="fantasy-entry-player ${player.isCaptain ? 'top' : ''}">
+                    <div class="fantasy-entry-copy">
+                      <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
+                      <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}</div>
+                    </div>
+                    <div class="fantasy-entry-copy" style="justify-items:end">
+                      <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.points))}</div>
+                      <div class="fantasy-picker-role">${escapeHtml(String(player.price || 0))} cr</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `}
+          <div class="fantasy-field-summary">
+            ${board.summary.map((line) => `<div class="fantasy-window-note">${escapeHtml(line)}</div>`).join('')}
+          </div>
+          <div class="fantasy-window-note">${escapeHtml(detailNote)}</div>
         </div>
       `;
     }
@@ -7844,6 +8426,12 @@ function titleBandScore(pick, live){
       const spentCredits = validation.total_cost;
       const budgetRemaining = validation.budget_remaining;
       const notice = MINI_FANTASY_NOTICE;
+      const missingOpenTeam = !entry && !selectedPlayerIds.length;
+      const statusLine = locked
+        ? 'This match is locked. The locked-team viewer on the right now owns the public story for it.'
+        : entry
+          ? `Your team is saved for Match ${fixture.match_no}. You can still edit it until ${formatDate(fixture.locks_at_utc)}.`
+          : `You have not locked Match ${fixture.match_no} yet. Build the 4-player team here before ${formatDate(fixture.locks_at_utc)}.`;
 
       panel.innerHTML = `
         <div class="fantasy-builder-top">
@@ -7856,8 +8444,12 @@ function titleBandScore(pick, live){
             <span class="pill">Spent: ${escapeHtml(String(spentCredits))} / ${MINI_FANTASY_BUDGET}</span>
             <span class="pill">Left: ${escapeHtml(String(budgetRemaining))}</span>
             <span class="pill">Captain: ${draft.captainPlayerId ? 'Set' : 'Pick 1'}</span>
-            ${entry ? '<span class="pill">Saved entry</span>' : '<span class="pill">Draft only</span>'}
+            ${entry ? '<span class="pill">Saved entry</span>' : '<span class="pill">Not picked yet</span>'}
           </div>
+        </div>
+        <div class="fantasy-builder-status">
+          <div class="fantasy-window-note">${escapeHtml(statusLine)}</div>
+          ${missingOpenTeam ? '<div class="studio-alert info"><div class="studio-alert-title">No team saved yet</div><div class="studio-alert-detail">Choose 4 players, lock a captain, and save this open fixture before it locks.</div></div>' : ''}
         </div>
         <div class="fantasy-slot-grid">
           ${selectedPlayers.map((player, slotIndex) => `
@@ -7871,7 +8463,7 @@ function titleBandScore(pick, live){
                   <span class="pill">${escapeHtml(String(player.final_price))} cr</span>
                 </div>
               ` : `
-                <div class="fantasy-slot-empty">Choose a player from ${escapeHtml(teamShort(fixture.home_team))} or ${escapeHtml(teamShort(fixture.away_team))}. Every lineup needs 4 players total, at least 1 batter, at least 1 bowler, and at least 1 player from each team.</div>
+                <div class="fantasy-slot-empty">Pick from ${escapeHtml(teamShort(fixture.home_team))} or ${escapeHtml(teamShort(fixture.away_team))}. Keep 4 total players, at least 1 batter, at least 1 bowler, and at least 1 player from each team.</div>
               `}
               <div class="fantasy-slot-actions">
                 <button class="studio-button ${player ? 'ghost' : ''}" type="button" data-mini-pick="${slotIndex}" ${locked ? 'disabled' : ''}>${player ? 'Change player' : 'Choose player'}</button>
@@ -8012,7 +8604,8 @@ function titleBandScore(pick, live){
       renderMiniFantasyFixtures();
       renderMiniFantasyBuilder();
       renderMiniFantasyLeaderboard();
-      renderMiniFantasyMyEntries();
+      renderMiniFantasyLockedViewer();
+      renderMiniFantasyLastGame();
       renderMiniFantasyPicker();
     }
 
