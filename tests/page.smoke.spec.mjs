@@ -268,7 +268,6 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
   await page.locator('#saveMiniFantasyButton').click();
 
   await expect(page.locator('#miniFantasyBuilder')).toContainText('team saved');
-  await expect(page.locator('#miniFantasyLastGame')).toContainText('already have a saved team for it');
   await expect(page.locator('#miniFantasyLeaderboard')).toContainText('Mini Bala');
   await expect(page.locator('#miniFantasyLeaderboard')).toContainText('@mini-bala');
   await expect(page.locator('#miniFantasyLeaderboard')).toContainText(/medal/i);

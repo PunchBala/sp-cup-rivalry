@@ -11,6 +11,7 @@ import {
   generateMiniFantasyPriceBook,
   getMiniFantasyOpenFixtures,
   resolvePlayerHistory,
+  scoreMiniFantasyEntry,
   validateMiniFantasyEntry
 } from '../mini-fantasy/contest-engine.js';
 
@@ -477,6 +478,15 @@ test('generateMiniFantasyPriceBook keeps alias-matched LSG bowlers from falling 
 test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy points', () => {
   const liveData = {
     meta: {
+      cache: {
+        matchList: [
+          {
+            matchNo: 14,
+            status: 'Delhi Capitals won by 6 wkts',
+            teams: ['Delhi Capitals', 'Gujarat Titans']
+          }
+        ]
+      },
       scoreHistory: [
         {
           processedMatchCount: 14,
@@ -549,6 +559,97 @@ test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy point
   assert.equal(leaderboard.rows[0].display_name, 'Senthil');
   assert.equal(leaderboard.rows[0].medal, 'gold');
   assert.equal(leaderboard.rows[1].medal, 'silver');
-  assert.equal(leaderboard.rows[0].total_points, 102);
-  assert.equal(leaderboard.rows[1].total_points, 88);
+  assert.equal(leaderboard.rows[0].total_points, 112);
+  assert.equal(leaderboard.rows[1].total_points, 98);
+});
+
+test('scoreMiniFantasyEntry adds +5 for each selected player from the winning side and skips no-result bonus', () => {
+  const entry = {
+    matchNo: 14,
+    selectedPlayerIds: [
+      buildMiniFantasyPlayerId('DC', 'DC Batter'),
+      buildMiniFantasyPlayerId('DC', 'DC Bowler'),
+      buildMiniFantasyPlayerId('GT', 'GT Bowler'),
+      buildMiniFantasyPlayerId('GT', 'GT Keeper')
+    ],
+    captainPlayerId: buildMiniFantasyPlayerId('DC', 'DC Batter')
+  };
+  const schedule = [
+    { match_no: 14, datetime_utc: '2026-04-08T14:00:00Z', home_team: 'Delhi Capitals', away_team: 'Gujarat Titans' }
+  ];
+  const squads = {
+    DC: ['DC Batter', 'DC Bowler'],
+    GT: ['GT Bowler', 'GT Keeper']
+  };
+  const scoredLiveData = {
+    meta: {
+      cache: {
+        matchList: [
+          {
+            matchNo: 14,
+            status: 'Delhi Capitals won by 6 wkts',
+            teams: ['Delhi Capitals', 'Gujarat Titans']
+          }
+        ]
+      },
+      scoreHistory: [
+        {
+          processedMatchCount: 14,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'DC Batter': 1,
+                  'DC Bowler': 1,
+                  'GT Bowler': 1,
+                  'GT Keeper': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'DC Batter': { score: 40 },
+                'DC Bowler': { score: 20 },
+                'GT Bowler': { score: 10 },
+                'GT Keeper': { score: 12 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  const scored = scoreMiniFantasyEntry({
+    entry,
+    liveData: scoredLiveData,
+    schedule,
+    squads
+  });
+  assert.equal(scored.total_points, 112);
+  assert.equal(scored.winner_bonus_points, 10);
+  assert.equal(scored.winning_team_code, 'DC');
+
+  const noResult = scoreMiniFantasyEntry({
+    entry,
+    liveData: {
+      meta: {
+        cache: {
+          matchList: [
+            {
+              matchNo: 14,
+              status: 'No result (due to rain)',
+              teams: ['Delhi Capitals', 'Gujarat Titans']
+            }
+          ]
+        },
+        scoreHistory: scoredLiveData.meta.scoreHistory
+      }
+    },
+    schedule,
+    squads
+  });
+  assert.equal(noResult.total_points, 102);
+  assert.equal(noResult.winner_bonus_points, 0);
+  assert.equal(noResult.winning_team_code, null);
 });
