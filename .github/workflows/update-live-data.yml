@@ -22,6 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.LIVE_DATA_PUSH_TOKEN }}
           fetch-depth: 0
           ref: ${{ github.ref_name }}
 
@@ -49,8 +50,8 @@ jobs:
       - name: Commit live data
         shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "sp-cup-bot"
+          git config user.email "sp-cup-bot@users.noreply.github.com"
           git add data/live.json
           git add data/mini_fantasy_prices.json
           if [ -d data/scorecards ]; then
