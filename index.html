@@ -615,12 +615,6 @@
       box-shadow:0 18px 40px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04);
     }
     .fantasy-builder-card .section-title{color:#d7fff1}
-    .fantasy-recap-card{
-      background:
-        radial-gradient(circle at top left, rgba(124,196,255,.16), transparent 44%),
-        linear-gradient(180deg, rgba(17,27,54,.96), rgba(8,15,32,.94));
-      border:1px solid rgba(124,196,255,.18);
-    }
     .fantasy-stage{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(250px,.72fr);gap:16px;align-items:start}
     @media (max-width:1100px){.fantasy-stage{grid-template-columns:1fr}}
     .fantasy-viewer-card{
@@ -646,6 +640,33 @@
     .fantasy-headline{font-size:clamp(22px,3.2vw,32px);font-weight:900;line-height:1.06;color:#fff}
     .fantasy-sub{font-size:13px;color:var(--muted);line-height:1.55;max-width:860px}
     .fantasy-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .fantasy-guide-card{
+      margin-top:16px;
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid rgba(124,196,255,.16);
+      background:
+        radial-gradient(circle at top left, rgba(124,196,255,.14), transparent 36%),
+        linear-gradient(180deg, rgba(14,23,47,.96), rgba(8,15,32,.92));
+      display:grid;
+      gap:12px;
+    }
+    .fantasy-guide-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .fantasy-guide-copy{display:grid;gap:6px}
+    .fantasy-guide-title{font-size:14px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:#e7f0ff}
+    .fantasy-guide-sub{font-size:12px;color:#bfd3f7;line-height:1.5;max-width:760px}
+    .fantasy-guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    @media (max-width:760px){.fantasy-guide-grid{grid-template-columns:1fr}}
+    .fantasy-guide-note{
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid rgba(124,196,255,.14);
+      background:rgba(124,196,255,.08);
+      font-size:12px;
+      color:#d9e7ff;
+      line-height:1.55;
+    }
+    .fantasy-guide-rules{display:flex;gap:8px;flex-wrap:wrap}
     .fantasy-fixture-list{display:grid;gap:14px}
     .fantasy-switcher-shell{display:grid;gap:12px}
     .fantasy-switcher-row{display:flex;gap:10px;flex-wrap:wrap}
@@ -933,6 +954,26 @@
             <div class="fantasy-headline" id="miniFantasyHeadline">Mini Fantasy opens from Match 14</div>
             <div class="fantasy-sub" id="miniFantasySummary">Pick a 4-player team for each eligible match, stay under 31 credits, lock one captain for a 1.5x boost, and get your entries saved match by match.</div>
             <div class="fantasy-meta" id="miniFantasyMeta"></div>
+            <div class="fantasy-guide-card">
+              <div class="fantasy-guide-top">
+                <div class="fantasy-guide-copy">
+                  <div class="fantasy-guide-title">How Mini Fantasy works</div>
+                  <div class="fantasy-guide-sub">Build only for open fixtures here. Once a match locks, the leaderboard becomes your window into everyone’s locked teams and live points.</div>
+                </div>
+              </div>
+              <div class="fantasy-guide-grid">
+                <div class="fantasy-guide-note">Use the fixture switcher to move between today and tomorrow’s open games, then save one 4-player team with a captain before lock.</div>
+                <div class="fantasy-guide-note">Click any user in the leaderboard to inspect their most recently locked team, see who missed lock, and follow live or final points.</div>
+              </div>
+              <div class="fantasy-guide-rules">
+                <div class="pill">Exactly 4 players</div>
+                <div class="pill">Budget: 31 credits</div>
+                <div class="pill">At least 1 player from each team</div>
+                <div class="pill">At least 1 batter</div>
+                <div class="pill">At least 1 bowler</div>
+                <div class="pill">Captain scores 1.5x</div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="span-12 fantasy-layout">
@@ -941,24 +982,6 @@
               <div id="miniFantasyFixtures" class="fantasy-fixture-list"></div>
               <div class="section-title">Team builder</div>
               <div id="miniFantasyBuilder"></div>
-            </div>
-            <div class="card fantasy-recap-card">
-              <div class="section-title">Last game recap</div>
-              <div id="miniFantasyLastGame"></div>
-            </div>
-            <div class="card">
-              <div class="section-title">How Mini Fantasy works</div>
-              <div class="studio-note">The compact builder is always for open fixtures only. Use the fixture switcher to move between today and tomorrow's open matches.</div>
-              <div class="studio-note">Once a match locks, the leaderboard becomes the way to inspect locked teams. Click any user to view their picks, captain, and live or final points for the most recently locked fixture.</div>
-              <div class="studio-note">Your last-game recap stays on the left so you can compare what just happened while still building the next team.</div>
-              <div class="fantasy-rules">
-                <div class="pill">Exactly 4 players</div>
-                <div class="pill">Budget: 31 credits</div>
-                <div class="pill">At least 1 player from each team</div>
-                <div class="pill">At least 1 batter</div>
-                <div class="pill">At least 1 bowler</div>
-                <div class="pill">Captain scores 1.5x</div>
-              </div>
             </div>
           </div>
           <div class="fantasy-stage">
@@ -1119,7 +1142,9 @@
       getCompletedMiniFantasyMatchCount,
       getMiniFantasyFixtureAvailability,
       getMiniFantasyOpenFixtures,
+      getMiniFantasyWinningTeamCode,
       isFixtureLocked,
+      resolveMiniFantasyPlayerTeamCode,
       scoreMiniFantasyLineup,
       scoreMiniFantasyEntry,
       validateMiniFantasyEntry
@@ -7616,28 +7641,38 @@ function titleBandScore(pick, live){
       return Number.isInteger(amount) ? String(amount) : amount.toFixed(1);
     }
 
-    function describeMiniFantasyEntry(entry, fixturePointsIndex = new Map()){
-      if (!entry) {
-        return {
-          totalPoints: 0,
-          pointsByPlayerId: {},
+      function describeMiniFantasyEntry(entry, fixturePointsIndex = new Map()){
+        if (!entry) {
+          return {
+            totalPoints: 0,
+            pointsByPlayerId: {},
           players: [],
           captain: null,
           bestPick: null,
           summary: 'No team was locked for this fixture.'
         };
       }
-      const playerPool = miniFantasyEntryPlayerPool(entry);
-      const poolById = new Map(playerPool.map((player) => [player.player_id, player]));
-      const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds) ? entry.selectedPlayerIds.filter(Boolean) : [];
-      const pointsByPlayerId = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Number(fixturePointsIndex.get(playerId) || 0)]));
-      const totalPoints = scoreMiniFantasyLineup({
-        selectedPlayerIds,
-        captainPlayerId: entry.captainPlayerId || '',
-        pointsByPlayerId
-      });
-      const players = selectedPlayerIds.map((playerId) => {
-        const player = poolById.get(playerId) || null;
+        const playerPool = miniFantasyEntryPlayerPool(entry);
+        const poolById = new Map(playerPool.map((player) => [player.player_id, player]));
+        const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds) ? entry.selectedPlayerIds.filter(Boolean) : [];
+        const pointsByPlayerId = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Number(fixturePointsIndex.get(playerId) || 0)]));
+        const playerTeamById = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, (poolById.get(playerId)?.team || resolveMiniFantasyPlayerTeamCode(playerId))]));
+        const winningTeamCode = getMiniFantasyWinningTeamCode({
+          liveData: LIVE_2026,
+          schedule: LEAGUE_STAGE_SCHEDULE,
+          matchNo: entry.matchNo
+        });
+        const fixture = miniFantasyFixtureByMatchNo(entry.matchNo);
+        const isCompletedFixture = fixture ? Number(entry.matchNo || 0) <= getCompletedMiniFantasyMatchCount(LIVE_2026) : false;
+        const totalPoints = scoreMiniFantasyLineup({
+          selectedPlayerIds,
+          captainPlayerId: entry.captainPlayerId || '',
+          pointsByPlayerId,
+          playerTeamById,
+          winningTeamCode: isCompletedFixture ? winningTeamCode : ''
+        });
+        const players = selectedPlayerIds.map((playerId) => {
+          const player = poolById.get(playerId) || null;
         return {
           playerId,
           name: player?.name || fallbackMiniFantasyPlayerName(playerId),
