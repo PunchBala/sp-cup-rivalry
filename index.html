@@ -4010,12 +4010,25 @@ function titleBandScore(pick, live){
       const bothComplete = completeEntries.length === 2;
       const bothSubmitted = submittedEntries.length === 2;
       const ready = bothSubmitted && bothComplete && clashKeys.length === 0;
-      const readyAt = ready ? (duelRecord.readyAt || currentNowDate().toISOString()) : null;
-      const startMatch = ready ? futureScheduleMatchAfter(readyAt) : null;
-      const startMatchNo = Number(startMatch?.match_no || startMatch?.matchNo || 0) || null;
-      const startsScoringAt = startMatch?.datetime_utc || null;
-      const scoreStartCount = startMatchNo ? Math.max(0, startMatchNo - 1) : 0;
-      const live = Boolean(startsScoringAt && currentNowMs() >= Date.parse(startsScoringAt));
+      const fallbackReadyAt = submittedEntries
+        .map((entry) => entry?.submittedAt || null)
+        .filter(Boolean)
+        .sort()
+        .slice(-1)[0] || null;
+      const readyAt = ready ? (duelRecord.readyAt || fallbackReadyAt || currentNowDate().toISOString()) : null;
+      const persistedStartMatchNo = Number(duelRecord.startsScoringFromMatchNo || 0) || null;
+      const persistedStartMatch = persistedStartMatchNo ? matchByNumber(persistedStartMatchNo) : null;
+      const startMatch = ready ? (persistedStartMatch || futureScheduleMatchAfter(readyAt)) : null;
+      const startMatchNo = persistedStartMatchNo || Number(startMatch?.match_no || startMatch?.matchNo || 0) || null;
+      const startsScoringAt = duelRecord.startsScoringAt || startMatch?.datetime_utc || null;
+      const persistedScoreStartCount = duelRecord.scoreStartCount != null ? Number(duelRecord.scoreStartCount) : null;
+      const scoreStartCount = Number.isFinite(persistedScoreStartCount)
+        ? Math.max(0, persistedScoreStartCount)
+        : (startMatchNo ? Math.max(0, startMatchNo - 1) : 0);
+      const live = Boolean(
+        duelRecord.liveAt
+        || (startsScoringAt && currentNowMs() >= Date.parse(startsScoringAt))
+      );
       const status = ready ? (live ? 'live' : 'armed') : (clashKeys.length ? 'clash' : 'draft');
       return {
         status,
