@@ -5051,10 +5051,10 @@ function titleBandScore(pick, live){
 
     function visibleDuelLabel(matchup){
       if (!matchup) return '';
-      const nameA = normalizeWhitespace(matchup?.a?.name || '');
-      const nameB = normalizeWhitespace(matchup?.b?.name || '');
+      const nameA = normalizeTextValue(matchup?.a?.name || '');
+      const nameB = normalizeTextValue(matchup?.b?.name || '');
       if (nameA && nameB) return `${nameA} vs ${nameB}`;
-      return normalizeWhitespace(matchup?.label || [nameA, nameB].filter(Boolean).join(' vs '));
+      return normalizeTextValue(matchup?.label || [nameA, nameB].filter(Boolean).join(' vs '));
     }
 
     function buildInviteMessage(duelId){
