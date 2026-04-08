@@ -2,8 +2,8 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-04-08T04:29:05.098Z",
-  "scrapeStatus": "ok (13 processed matches, 1 scorecard call this run, 13 cached scorecards reused)",
+  "fetchedAt": "2026-04-08T06:55:33.576Z",
+  "scrapeStatus": "ok (13 processed matches, 0 scorecard calls this run, 13 cached scorecards reused)",
   "scrapeReport": {
     "orangeCap": {
       "ok": true,
@@ -76,7 +76,7 @@
       "source": "IPLT20 official fairplay feed",
       "method": "parsed JSONP fairplayTotal table from Sports Mechanic stats feed",
       "rows": 10,
-      "updatedAt": "08-04-2026 : 08:02:45"
+      "updatedAt": "08-04-2026 : 11:05:22"
     },
     "leastMvp": {
       "ok": true,
@@ -92,13 +92,13 @@
       "maxBacklogScorecardsPerRun": 12,
       "maxFreshScorecardCallsPerRun": 12,
       "historicalReplayApiFallbackAllowed": true,
-      "scorecardCallsThisRun": 1,
+      "scorecardCallsThisRun": 0,
       "scorecardCacheHitsThisRun": 13,
       "historicalReplaySkipped": false,
       "historicalReplayMissingCaches": 0,
       "freshScorecardBudgetExhausted": false,
       "freshScorecardBudgetSkips": 0,
-      "freshScorecardBudgetRemaining": 11,
+      "freshScorecardBudgetRemaining": 12,
       "backlogRemaining": 0
     }
   },
@@ -107,10 +107,10 @@
       "dayKey": "2026-04-08",
       "quietRefreshesUsed": 0,
       "lastQuietRefreshAt": null,
-      "lastLiveRefreshAt": "2026-04-08T04:29:03.126Z",
-      "lastSeriesInfoAt": "2026-04-08T04:29:03.126Z",
+      "lastLiveRefreshAt": "2026-04-08T06:55:31.840Z",
+      "lastSeriesInfoAt": "2026-04-08T06:55:31.840Z",
       "lastDecision": {
-        "at": "2026-04-08T04:29:01.745Z",
+        "at": "2026-04-08T06:55:30.875Z",
         "shouldRefresh": true,
         "mode": "forced_refresh",
         "reason": "forced refresh requested",
@@ -119,7 +119,7 @@
       "nextPlannedRefreshAt": "2026-04-08T13:00:00.000Z",
       "nextPlannedMode": "scheduled_window",
       "nextPlannedReason": "league-stage refresh plan",
-      "nextPlannedCalculatedAt": "2026-04-08T04:29:03.127Z"
+      "nextPlannedCalculatedAt": "2026-04-08T06:55:31.841Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -66049,7 +66049,7 @@
       },
       {
         "processedMatchCount": 13,
-        "fetchedAt": "2026-04-08T04:29:05.098Z",
+        "fetchedAt": "2026-04-08T06:55:33.576Z",
         "snapshot": {
           "season": 2026,
           "provider": "CricketData.org",
@@ -66696,20 +66696,18 @@
                 "Kolkata Knight Riders": 220,
                 "Mumbai Indians": 224,
                 "Chennai Super Kings": 209,
-                "Rajasthan Royals": 128,
-                "Gujarat Titans": 162,
+                "Rajasthan Royals": 210,
+                "Gujarat Titans": 204,
                 "Punjab Kings": 210,
                 "Lucknow Super Giants": 160,
-                "Delhi Capitals": 164,
-                "rajasthan royals": 210,
-                "Gujarat Titans,Rajasthan Royals": 204,
-                "kolkata knight riders": 25
+                "Delhi Capitals": 164
               },
               "standings": {
                 "Royal Challengers Bengaluru": {
                   "played": 2,
                   "wins": 2,
                   "losses": 0,
+                  "noResult": 0,
                   "points": 4,
                   "runsFor": 453,
                   "ballsFaced": 214,
@@ -66720,6 +66718,7 @@
                   "played": 3,
                   "wins": 1,
                   "losses": 2,
+                  "noResult": 0,
                   "points": 2,
                   "runsFor": 583,
                   "ballsFaced": 360,
@@ -66727,39 +66726,43 @@
                   "ballsBowled": 333
                 },
                 "Mumbai Indians": {
-                  "played": 2,
+                  "played": 3,
                   "wins": 1,
-                  "losses": 1,
+                  "losses": 2,
+                  "noResult": 0,
                   "points": 2,
-                  "runsFor": 386,
-                  "ballsFaced": 235,
-                  "runsAgainst": 384,
-                  "ballsBowled": 229
+                  "runsFor": 492,
+                  "ballsFaced": 292,
+                  "runsAgainst": 534,
+                  "ballsBowled": 295
                 },
                 "Kolkata Knight Riders": {
-                  "played": 2,
+                  "played": 3,
                   "wins": 0,
                   "losses": 2,
-                  "points": 0,
+                  "noResult": 1,
+                  "points": 1,
                   "runsFor": 381,
                   "ballsFaced": 240,
                   "runsAgainst": 450,
                   "ballsBowled": 235
                 },
                 "Rajasthan Royals": {
-                  "played": 2,
-                  "wins": 2,
+                  "played": 3,
+                  "wins": 3,
                   "losses": 0,
-                  "points": 4,
-                  "runsFor": 128,
-                  "ballsFaced": 73,
-                  "runsAgainst": 127,
-                  "ballsBowled": 120
+                  "noResult": 0,
+                  "points": 6,
+                  "runsFor": 488,
+                  "ballsFaced": 259,
+                  "runsAgainst": 437,
+                  "ballsBowled": 297
                 },
                 "Chennai Super Kings": {
                   "played": 3,
                   "wins": 0,
                   "losses": 3,
+                  "noResult": 0,
                   "points": 0,
                   "runsFor": 543,
                   "ballsFaced": 360,
@@ -66767,10 +66770,11 @@
                   "ballsBowled": 305
                 },
                 "Punjab Kings": {
-                  "played": 2,
+                  "played": 3,
                   "wins": 2,
                   "losses": 0,
-                  "points": 4,
+                  "noResult": 1,
+                  "points": 5,
                   "runsFor": 375,
                   "ballsFaced": 227,
                   "runsAgainst": 371,
@@ -66780,16 +66784,18 @@
                   "played": 2,
                   "wins": 0,
                   "losses": 2,
+                  "noResult": 0,
                   "points": 0,
-                  "runsFor": 162,
-                  "ballsFaced": 120,
-                  "runsAgainst": 165,
-                  "ballsBowled": 115
+                  "runsFor": 366,
+                  "ballsFaced": 240,
+                  "runsAgainst": 375,
+                  "ballsBowled": 235
                 },
                 "Lucknow Super Giants": {
                   "played": 2,
                   "wins": 1,
                   "losses": 1,
+                  "noResult": 0,
                   "points": 2,
                   "runsFor": 301,
                   "ballsFaced": 239,
@@ -66800,6 +66806,7 @@
                   "played": 2,
                   "wins": 2,
                   "losses": 0,
+                  "noResult": 0,
                   "points": 4,
                   "runsFor": 309,
                   "ballsFaced": 212,
@@ -67409,7 +67416,7 @@
               "deferredScorecardMatchIds": [],
               "deferredScorecardReason": null
             },
-            "aggregateSchemaVersion": 2,
+            "aggregateSchemaVersion": 3,
             "providerStatus": {
               "state": "ok",
               "lastAttemptAt": null,
@@ -67423,36 +67430,36 @@
             "winner": "Rajasthan Royals",
             "finalists": [
               "Rajasthan Royals",
-              "Royal Challengers Bengaluru"
+              "Punjab Kings"
             ],
             "playoffs": [
               "Rajasthan Royals",
+              "Punjab Kings",
               "Royal Challengers Bengaluru",
-              "Delhi Capitals",
-              "Punjab Kings"
+              "Delhi Capitals"
             ],
             "ranking": [
               "Rajasthan Royals",
+              "Punjab Kings",
               "Royal Challengers Bengaluru",
               "Delhi Capitals",
-              "Punjab Kings",
               "Sunrisers Hyderabad",
-              "Mumbai Indians",
               "Lucknow Super Giants",
-              "Gujarat Titans",
+              "Mumbai Indians",
               "Kolkata Knight Riders",
+              "Gujarat Titans",
               "Chennai Super Kings"
             ],
             "extendedRanking": [
               "Rajasthan Royals",
+              "Punjab Kings",
               "Royal Challengers Bengaluru",
               "Delhi Capitals",
-              "Punjab Kings",
               "Sunrisers Hyderabad",
-              "Mumbai Indians",
               "Lucknow Super Giants",
-              "Gujarat Titans",
+              "Mumbai Indians",
               "Kolkata Knight Riders",
+              "Gujarat Titans",
               "Chennai Super Kings"
             ]
           },
@@ -71808,11 +71815,11 @@
             "source": "custom MVP ranking filtered to user-provided uncapped player pool"
           },
           "fairPlay": {
-            "winner": "Chennai Super Kings",
+            "winner": "Mumbai Indians",
             "ranking": [
+              "Mumbai Indians",
               "Chennai Super Kings",
               "Kolkata Knight Riders",
-              "Mumbai Indians",
               "Punjab Kings",
               "Rajasthan Royals",
               "Delhi Capitals",
@@ -71822,9 +71829,9 @@
               "Lucknow Super Giants"
             ],
             "extendedRanking": [
+              "Mumbai Indians",
               "Chennai Super Kings",
               "Kolkata Knight Riders",
-              "Mumbai Indians",
               "Punjab Kings",
               "Rajasthan Royals",
               "Delhi Capitals",
@@ -71834,6 +71841,23 @@
               "Lucknow Super Giants"
             ],
             "values": {
+              "Mumbai Indians": {
+                "matches": 3,
+                "average": null,
+                "points": 31,
+                "raw": {
+                  "TeamID": "1",
+                  "TeamName": "MI",
+                  "TeamFullName": "Mumbai Indians",
+                  "No": "3",
+                  "HM": "1",
+                  "HP": "10",
+                  "AM": "2",
+                  "AP": "21",
+                  "Points": "31",
+                  "AvePoints": "10.33"
+                }
+              },
               "Chennai Super Kings": {
                 "matches": 3,
                 "average": null,
@@ -71864,23 +71888,6 @@
                   "HP": "20",
                   "AM": "1",
                   "AP": "10",
-                  "Points": "30",
-                  "AvePoints": "10.00"
-                }
-              },
-              "Mumbai Indians": {
-                "matches": 3,
-                "average": null,
-                "points": 30,
-                "raw": {
-                  "TeamID": "1",
-                  "TeamName": "MI",
-                  "TeamFullName": "Mumbai Indians",
-                  "No": "3",
-                  "HM": "1",
-                  "HP": "10",
-                  "AM": "2",
-                  "AP": "20",
                   "Points": "30",
                   "AvePoints": "10.00"
                 }
@@ -72005,7 +72012,7 @@
                 }
               }
             },
-            "updatedAt": "08-04-2026 : 08:02:45",
+            "updatedAt": "08-04-2026 : 11:05:22",
             "source": "IPLT20 official fairplay feed"
           },
           "highestScoreTeam": {
@@ -72015,14 +72022,11 @@
               "Mumbai Indians",
               "Kolkata Knight Riders",
               "Punjab Kings",
-              "rajasthan royals",
-              "Chennai Super Kings",
-              "Gujarat Titans,Rajasthan Royals",
-              "Delhi Capitals",
-              "Gujarat Titans",
-              "Lucknow Super Giants",
               "Rajasthan Royals",
-              "kolkata knight riders"
+              "Chennai Super Kings",
+              "Gujarat Titans",
+              "Delhi Capitals",
+              "Lucknow Super Giants"
             ],
             "extendedRanking": [
               "Royal Challengers Bengaluru",
@@ -72030,14 +72034,11 @@
               "Mumbai Indians",
               "Kolkata Knight Riders",
               "Punjab Kings",
-              "rajasthan royals",
-              "Chennai Super Kings",
-              "Gujarat Titans,Rajasthan Royals",
-              "Delhi Capitals",
-              "Gujarat Titans",
-              "Lucknow Super Giants",
               "Rajasthan Royals",
-              "kolkata knight riders"
+              "Chennai Super Kings",
+              "Gujarat Titans",
+              "Delhi Capitals",
+              "Lucknow Super Giants"
             ],
             "values": {
               "Sunrisers Hyderabad": 226,
@@ -72045,14 +72046,11 @@
               "Kolkata Knight Riders": 220,
               "Mumbai Indians": 224,
               "Chennai Super Kings": 209,
-              "Rajasthan Royals": 128,
-              "Gujarat Titans": 162,
+              "Rajasthan Royals": 210,
+              "Gujarat Titans": 204,
               "Punjab Kings": 210,
               "Lucknow Super Giants": 160,
-              "Delhi Capitals": 164,
-              "rajasthan royals": 210,
-              "Gujarat Titans,Rajasthan Royals": 204,
-              "kolkata knight riders": 25
+              "Delhi Capitals": 164
             }
           },
           "striker": {
@@ -72431,26 +72429,26 @@
           "tableBottom": {
             "ranking": [
               "Rajasthan Royals",
+              "Punjab Kings",
               "Royal Challengers Bengaluru",
               "Delhi Capitals",
-              "Punjab Kings",
               "Sunrisers Hyderabad",
-              "Mumbai Indians",
               "Lucknow Super Giants",
-              "Gujarat Titans",
+              "Mumbai Indians",
               "Kolkata Knight Riders",
+              "Gujarat Titans",
               "Chennai Super Kings"
             ],
             "extendedRanking": [
               "Rajasthan Royals",
+              "Punjab Kings",
               "Royal Challengers Bengaluru",
               "Delhi Capitals",
-              "Punjab Kings",
               "Sunrisers Hyderabad",
-              "Mumbai Indians",
               "Lucknow Super Giants",
-              "Gujarat Titans",
+              "Mumbai Indians",
               "Kolkata Knight Riders",
+              "Gujarat Titans",
               "Chennai Super Kings"
             ]
           },
@@ -73083,20 +73081,18 @@
         "Kolkata Knight Riders": 220,
         "Mumbai Indians": 224,
         "Chennai Super Kings": 209,
-        "Rajasthan Royals": 128,
-        "Gujarat Titans": 162,
+        "Rajasthan Royals": 210,
+        "Gujarat Titans": 204,
         "Punjab Kings": 210,
         "Lucknow Super Giants": 160,
-        "Delhi Capitals": 164,
-        "rajasthan royals": 210,
-        "Gujarat Titans,Rajasthan Royals": 204,
-        "kolkata knight riders": 25
+        "Delhi Capitals": 164
       },
       "standings": {
         "Royal Challengers Bengaluru": {
           "played": 2,
           "wins": 2,
           "losses": 0,
+          "noResult": 0,
           "points": 4,
           "runsFor": 453,
           "ballsFaced": 214,
@@ -73107,6 +73103,7 @@
           "played": 3,
           "wins": 1,
           "losses": 2,
+          "noResult": 0,
           "points": 2,
           "runsFor": 583,
           "ballsFaced": 360,
@@ -73114,39 +73111,43 @@
           "ballsBowled": 333
         },
         "Mumbai Indians": {
-          "played": 2,
+          "played": 3,
           "wins": 1,
-          "losses": 1,
+          "losses": 2,
+          "noResult": 0,
           "points": 2,
-          "runsFor": 386,
-          "ballsFaced": 235,
-          "runsAgainst": 384,
-          "ballsBowled": 229
+          "runsFor": 492,
+          "ballsFaced": 292,
+          "runsAgainst": 534,
+          "ballsBowled": 295
         },
         "Kolkata Knight Riders": {
-          "played": 2,
+          "played": 3,
           "wins": 0,
           "losses": 2,
-          "points": 0,
+          "noResult": 1,
+          "points": 1,
           "runsFor": 381,
           "ballsFaced": 240,
           "runsAgainst": 450,
           "ballsBowled": 235
         },
         "Rajasthan Royals": {
-          "played": 2,
-          "wins": 2,
+          "played": 3,
+          "wins": 3,
           "losses": 0,
-          "points": 4,
-          "runsFor": 128,
-          "ballsFaced": 73,
-          "runsAgainst": 127,
-          "ballsBowled": 120
+          "noResult": 0,
+          "points": 6,
+          "runsFor": 488,
+          "ballsFaced": 259,
+          "runsAgainst": 437,
+          "ballsBowled": 297
         },
         "Chennai Super Kings": {
           "played": 3,
           "wins": 0,
           "losses": 3,
+          "noResult": 0,
           "points": 0,
           "runsFor": 543,
           "ballsFaced": 360,
@@ -73154,10 +73155,11 @@
           "ballsBowled": 305
         },
         "Punjab Kings": {
-          "played": 2,
+          "played": 3,
           "wins": 2,
           "losses": 0,
-          "points": 4,
+          "noResult": 1,
+          "points": 5,
           "runsFor": 375,
           "ballsFaced": 227,
           "runsAgainst": 371,
@@ -73167,16 +73169,18 @@
           "played": 2,
           "wins": 0,
           "losses": 2,
+          "noResult": 0,
           "points": 0,
-          "runsFor": 162,
-          "ballsFaced": 120,
-          "runsAgainst": 165,
-          "ballsBowled": 115
+          "runsFor": 366,
+          "ballsFaced": 240,
+          "runsAgainst": 375,
+          "ballsBowled": 235
         },
         "Lucknow Super Giants": {
           "played": 2,
           "wins": 1,
           "losses": 1,
+          "noResult": 0,
           "points": 2,
           "runsFor": 301,
           "ballsFaced": 239,
@@ -73187,6 +73191,7 @@
           "played": 2,
           "wins": 2,
           "losses": 0,
+          "noResult": 0,
           "points": 4,
           "runsFor": 309,
           "ballsFaced": 212,
@@ -73749,7 +73754,7 @@
     },
     "liveOverlay": {
       "matchId": null,
-      "generatedAt": "2026-04-08T04:29:03.307Z",
+      "generatedAt": "2026-04-08T06:55:31.855Z",
       "aggregates": null,
       "status": null,
       "source": null
@@ -73771,17 +73776,17 @@
     "officialMostDots": {
       "enabled": true,
       "minRefreshMinutes": 120,
-      "lastFetchedAt": "2026-04-08T04:29:04.374Z",
-      "lastAttemptAt": "2026-04-08T04:29:03.307Z",
+      "lastFetchedAt": "2026-04-08T06:55:32.816Z",
+      "lastAttemptAt": "2026-04-08T06:55:31.855Z",
       "lastSource": "IPLT20 official most dots feed",
       "lastStatus": "ok",
       "lastError": null
     },
     "lastRun": {
       "seriesInfoCalls": 1,
-      "scorecardCalls": 1,
+      "scorecardCalls": 0,
       "scorecardCacheHits": 13,
-      "backlogProcessed": 1,
+      "backlogProcessed": 0,
       "backlogRemaining": 0,
       "liveOverlayFetched": false,
       "liveOverlayReused": false,
@@ -73797,10 +73802,10 @@
       "deferredScorecardMatchIds": [],
       "deferredScorecardReason": null
     },
-    "aggregateSchemaVersion": 2,
+    "aggregateSchemaVersion": 3,
     "providerStatus": {
       "state": "ok",
-      "lastAttemptAt": "2026-04-08T04:29:01.742Z",
+      "lastAttemptAt": "2026-04-08T06:55:30.874Z",
       "lastErrorAt": null,
       "reason": null,
       "hitsToday": null,
@@ -73824,36 +73829,36 @@
     "winner": "Rajasthan Royals",
     "finalists": [
       "Rajasthan Royals",
-      "Royal Challengers Bengaluru"
+      "Punjab Kings"
     ],
     "playoffs": [
       "Rajasthan Royals",
+      "Punjab Kings",
       "Royal Challengers Bengaluru",
-      "Delhi Capitals",
-      "Punjab Kings"
+      "Delhi Capitals"
     ],
     "ranking": [
       "Rajasthan Royals",
+      "Punjab Kings",
       "Royal Challengers Bengaluru",
       "Delhi Capitals",
-      "Punjab Kings",
       "Sunrisers Hyderabad",
-      "Mumbai Indians",
       "Lucknow Super Giants",
-      "Gujarat Titans",
+      "Mumbai Indians",
       "Kolkata Knight Riders",
+      "Gujarat Titans",
       "Chennai Super Kings"
     ],
     "extendedRanking": [
       "Rajasthan Royals",
+      "Punjab Kings",
       "Royal Challengers Bengaluru",
       "Delhi Capitals",
-      "Punjab Kings",
       "Sunrisers Hyderabad",
-      "Mumbai Indians",
       "Lucknow Super Giants",
-      "Gujarat Titans",
+      "Mumbai Indians",
       "Kolkata Knight Riders",
+      "Gujarat Titans",
       "Chennai Super Kings"
     ]
   },
@@ -78209,11 +78214,11 @@
     "source": "custom MVP ranking filtered to user-provided uncapped player pool"
   },
   "fairPlay": {
-    "winner": "Chennai Super Kings",
+    "winner": "Mumbai Indians",
     "ranking": [
+      "Mumbai Indians",
       "Chennai Super Kings",
       "Kolkata Knight Riders",
-      "Mumbai Indians",
       "Punjab Kings",
       "Rajasthan Royals",
       "Delhi Capitals",
@@ -78223,9 +78228,9 @@
       "Lucknow Super Giants"
     ],
     "extendedRanking": [
+      "Mumbai Indians",
       "Chennai Super Kings",
       "Kolkata Knight Riders",
-      "Mumbai Indians",
       "Punjab Kings",
       "Rajasthan Royals",
       "Delhi Capitals",
@@ -78235,6 +78240,23 @@
       "Lucknow Super Giants"
     ],
     "values": {
+      "Mumbai Indians": {
+        "matches": 3,
+        "average": null,
+        "points": 31,
+        "raw": {
+          "TeamID": "1",
+          "TeamName": "MI",
+          "TeamFullName": "Mumbai Indians",
+          "No": "3",
+          "HM": "1",
+          "HP": "10",
+          "AM": "2",
+          "AP": "21",
+          "Points": "31",
+          "AvePoints": "10.33"
+        }
+      },
       "Chennai Super Kings": {
         "matches": 3,
         "average": null,
@@ -78265,23 +78287,6 @@
           "HP": "20",
           "AM": "1",
           "AP": "10",
-          "Points": "30",
-          "AvePoints": "10.00"
-        }
-      },
-      "Mumbai Indians": {
-        "matches": 3,
-        "average": null,
-        "points": 30,
-        "raw": {
-          "TeamID": "1",
-          "TeamName": "MI",
-          "TeamFullName": "Mumbai Indians",
-          "No": "3",
-          "HM": "1",
-          "HP": "10",
-          "AM": "2",
-          "AP": "20",
           "Points": "30",
           "AvePoints": "10.00"
         }
@@ -78406,7 +78411,7 @@
         }
       }
     },
-    "updatedAt": "08-04-2026 : 08:02:45",
+    "updatedAt": "08-04-2026 : 11:05:22",
     "source": "IPLT20 official fairplay feed"
   },
   "highestScoreTeam": {
@@ -78416,14 +78421,11 @@
       "Mumbai Indians",
       "Kolkata Knight Riders",
       "Punjab Kings",
-      "rajasthan royals",
-      "Chennai Super Kings",
-      "Gujarat Titans,Rajasthan Royals",
-      "Delhi Capitals",
-      "Gujarat Titans",
-      "Lucknow Super Giants",
       "Rajasthan Royals",
-      "kolkata knight riders"
+      "Chennai Super Kings",
+      "Gujarat Titans",
+      "Delhi Capitals",
+      "Lucknow Super Giants"
     ],
     "extendedRanking": [
       "Royal Challengers Bengaluru",
@@ -78431,14 +78433,11 @@
       "Mumbai Indians",
       "Kolkata Knight Riders",
       "Punjab Kings",
-      "rajasthan royals",
-      "Chennai Super Kings",
-      "Gujarat Titans,Rajasthan Royals",
-      "Delhi Capitals",
-      "Gujarat Titans",
-      "Lucknow Super Giants",
       "Rajasthan Royals",
-      "kolkata knight riders"
+      "Chennai Super Kings",
+      "Gujarat Titans",
+      "Delhi Capitals",
+      "Lucknow Super Giants"
     ],
     "values": {
       "Sunrisers Hyderabad": 226,
@@ -78446,14 +78445,11 @@
       "Kolkata Knight Riders": 220,
       "Mumbai Indians": 224,
       "Chennai Super Kings": 209,
-      "Rajasthan Royals": 128,
-      "Gujarat Titans": 162,
+      "Rajasthan Royals": 210,
+      "Gujarat Titans": 204,
       "Punjab Kings": 210,
       "Lucknow Super Giants": 160,
-      "Delhi Capitals": 164,
-      "rajasthan royals": 210,
-      "Gujarat Titans,Rajasthan Royals": 204,
-      "kolkata knight riders": 25
+      "Delhi Capitals": 164
     }
   },
   "striker": {
@@ -78832,26 +78828,26 @@
   "tableBottom": {
     "ranking": [
       "Rajasthan Royals",
+      "Punjab Kings",
       "Royal Challengers Bengaluru",
       "Delhi Capitals",
-      "Punjab Kings",
       "Sunrisers Hyderabad",
-      "Mumbai Indians",
       "Lucknow Super Giants",
-      "Gujarat Titans",
+      "Mumbai Indians",
       "Kolkata Knight Riders",
+      "Gujarat Titans",
       "Chennai Super Kings"
     ],
     "extendedRanking": [
       "Rajasthan Royals",
+      "Punjab Kings",
       "Royal Challengers Bengaluru",
       "Delhi Capitals",
-      "Punjab Kings",
       "Sunrisers Hyderabad",
-      "Mumbai Indians",
       "Lucknow Super Giants",
-      "Gujarat Titans",
+      "Mumbai Indians",
       "Kolkata Knight Riders",
+      "Gujarat Titans",
       "Chennai Super Kings"
     ]
   },
