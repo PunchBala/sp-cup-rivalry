@@ -5049,9 +5049,17 @@ function titleBandScore(pick, live){
       };
     }
 
+    function visibleDuelLabel(matchup){
+      if (!matchup) return '';
+      const nameA = normalizeWhitespace(matchup?.a?.name || '');
+      const nameB = normalizeWhitespace(matchup?.b?.name || '');
+      if (nameA && nameB) return `${nameA} vs ${nameB}`;
+      return normalizeWhitespace(matchup?.label || [nameA, nameB].filter(Boolean).join(' vs '));
+    }
+
     function buildInviteMessage(duelId){
       const bundle = findCustomBundleByDuelId(ACTIVE_ROOM?.slug || DEFAULT_ROOM_SLUG, duelId);
-      const label = bundle?.duelRecord?.label || activeMatchup()?.label || 'SP Cup Duel';
+      const label = visibleDuelLabel(activeMatchup()) || bundle?.duelRecord?.label || 'SP Cup Duel';
       const duelCode = duelCodeLabel(duelId);
       const link = buildDuelShareUrl(duelId);
       return [
@@ -5091,7 +5099,7 @@ function titleBandScore(pick, live){
       const lifecycle = matchup.lifecycle || deriveMatchupLifecycle(matchup, ACTIVE_ROOM);
       return {
         duelId: matchup.id,
-        label: matchup.label,
+        label: visibleDuelLabel(matchup),
         source: activeCustomBundle()?.source || 'fixture',
         currentUser: CURRENT_USER ? {
           displayName: CURRENT_USER.displayName,
@@ -6165,10 +6173,10 @@ function titleBandScore(pick, live){
         <div class="duel-picker">
           <label for="duelPicker">Browse duel</label>
           <select id="duelPicker" aria-label="Browse public duel">
-            ${pickerMatchups.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === matchup.id ? 'selected' : ''}>${escapeHtml(item.label || `${item.a.name} vs ${item.b.name}`)}${item.state !== 'locked' ? ' (Waiting)' : ''}</option>`).join('')}
+            ${pickerMatchups.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === matchup.id ? 'selected' : ''}>${escapeHtml(visibleDuelLabel(item))}${item.state !== 'locked' ? ' (Waiting)' : ''}</option>`).join('')}
           </select>
         </div>
-        <div class="pill">Active duel: ${escapeHtml(matchup.label || `${matchup.a.name} vs ${matchup.b.name}`)}${escapeHtml(waitingTag)}</div>
+        <div class="pill">Active duel: ${escapeHtml(visibleDuelLabel(matchup))}${escapeHtml(waitingTag)}</div>
         <div class="pill">Visibility: public duel page${pickerMatchups.length ? ` | ${pickerMatchups.length} shown` : ''}</div>
         <div class="pill">Series: ${escapeHtml(ACTIVE_ROOM.name || ACTIVE_ROOM.slug || 'Duels')}</div>
         ${fallbackTag ? `<div class="pill">${escapeHtml(fallbackTag)}</div>` : ''}
@@ -6207,10 +6215,10 @@ function titleBandScore(pick, live){
         <div class="duel-picker">
           <label for="duelPicker">Jump to duel</label>
           <select id="duelPicker" aria-label="Browse public duel">
-            ${MATCHUPS.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === matchup.id ? 'selected' : ''}>${escapeHtml(item.label || `${item.a.name} vs ${item.b.name}`)}${item.state !== 'locked' ? ' (Waiting)' : ''}</option>`).join('')}
+            ${MATCHUPS.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === matchup.id ? 'selected' : ''}>${escapeHtml(visibleDuelLabel(item))}${item.state !== 'locked' ? ' (Waiting)' : ''}</option>`).join('')}
           </select>
         </div>
-        <div class="pill">Active duel: ${escapeHtml(matchup.label || `${matchup.a.name} vs ${matchup.b.name}`)}${escapeHtml(waitingTag)}</div>
+        <div class="pill">Active duel: ${escapeHtml(visibleDuelLabel(matchup))}${escapeHtml(waitingTag)}</div>
         <div class="pill">Visibility: public duel page | ${MATCHUPS.length} listed</div>
         <div class="pill">Series: ${escapeHtml(ACTIVE_ROOM.name || ACTIVE_ROOM.slug || 'Duels')}</div>
         ${fallbackTag ? `<div class="pill">${escapeHtml(fallbackTag)}</div>` : ''}
@@ -6249,7 +6257,7 @@ function titleBandScore(pick, live){
         }
 
         const updatedLabel = formatTimestamp(boardUpdatedAt || item.updatedAt || ACTIVE_ROOM.updatedAt || null);
-        const duelLabel = item.label || `${item.a.name} vs ${item.b.name}`;
+        const duelLabel = visibleDuelLabel(item);
         const activeClass = item.id === activeId ? 'active' : '';
         const ctaLabel = item.id === activeId ? 'Viewing duel page' : 'Open duel page';
 
@@ -6345,7 +6353,7 @@ function titleBandScore(pick, live){
       matchup = withFreshLifecycle(matchup);
       const updatedAt = latestBoardUpdatedAt() || matchup.updatedAt || ACTIVE_ROOM?.updatedAt || null;
       const createdAt = matchup.createdAt || ACTIVE_ROOM?.createdAt || null;
-      const duelLabel = matchup.label || `${matchup.a.name} vs ${matchup.b.name}`;
+      const duelLabel = visibleDuelLabel(matchup);
       const lifecycle = matchup.lifecycle || deriveMatchupLifecycle(matchup, ACTIVE_ROOM);
       const status = lifecycle.status || 'draft';
       const isLive = status === 'live';
@@ -6439,7 +6447,7 @@ function titleBandScore(pick, live){
       const orderedDuels = sortedDirectoryDuels();
       if (directoryFilter === 'mine' && !CURRENT_USER) directoryFilter = 'all';
       const visibleDuels = filteredDirectoryDuels(orderedDuels);
-      const activeLabel = matchup.label || `${matchup.a.name} vs ${matchup.b.name}`;
+      const activeLabel = visibleDuelLabel(matchup);
       const statusLabel = matchup.lifecycle?.status === 'live' ? 'Live duel' : lifecycleHeadline(matchup.lifecycle);
       const fallbackTag = requestedDuelMissing ? 'Requested duel was not found, so this page fell back to the first available duel.' : '';
       if (activeView !== 'fantasy') {

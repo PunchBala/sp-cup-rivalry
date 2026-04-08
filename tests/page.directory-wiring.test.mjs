@@ -32,11 +32,12 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /duels-backend\.js/);
   assert.match(html, /mini-fantasy\/contest-engine\.js/);
   assert.match(html, /function sortedDirectoryDuels\(/);
-  assert.match(html, /function buildDuelShareUrl\(/);
-  assert.match(html, /function joinDuelByCode\(/);
-  assert.match(html, /function copyDuelCode\(/);
-  assert.match(html, /function copyInviteMessage\(/);
-  assert.match(html, /function renderHeroActions\(/);
+    assert.match(html, /function buildDuelShareUrl\(/);
+    assert.match(html, /function joinDuelByCode\(/);
+    assert.match(html, /function copyDuelCode\(/);
+    assert.match(html, /function copyInviteMessage\(/);
+    assert.match(html, /function visibleDuelLabel\(/);
+    assert.match(html, /function renderHeroActions\(/);
   assert.match(html, /function renderParticipantBanner\(/);
   assert.match(html, /function syncSurfaceDrawers\(/);
   assert.match(html, /function renderProfilePanel\(/);

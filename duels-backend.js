@@ -114,6 +114,14 @@
       || fallback;
   }
 
+  function buildBundleLabel(duelRow, orderedEntries) {
+    const names = (orderedEntries || [])
+      .map((entry) => normalizeWhitespace(entry?.displayName || entry?.display_name || ''))
+      .filter(Boolean);
+    if (names.length >= 2) return `${names[0]} vs ${names[1]}`;
+    return normalizeWhitespace(duelRow?.label || names.join(' vs '));
+  }
+
   function makeBundleFromRows(duelRow, entryRows) {
     if (!duelRow) return null;
     const duelSlug = normalizeSlug(duelRow.slug || duelRow.id || '');
@@ -143,7 +151,7 @@
       duelRecord: {
         id: duelSlug,
         backendId: duelRow.id || null,
-        label: normalizeWhitespace(duelRow.label || orderedEntries.map((entry) => entry.displayName).join(' vs ')),
+        label: buildBundleLabel(duelRow, orderedEntries),
         visibility: duelRow.visibility || 'public',
         state: duelRow.state || 'draft',
         createdByUserId: duelRow.created_by_user_id || null,
@@ -637,6 +645,7 @@ function normalizeMiniFantasyEntryRow(row) {
         if (reservedHandle && reservedHandle !== normalizeSlug(currentUser.ownerId || '')) {
           throw new Error(`This duel slot is reserved for @${reservedHandle}.`);
         }
+        const updatedAt = new Date().toISOString();
         await restRequest(config.tables.duelEntries, {
           method: 'PATCH',
           query: {
@@ -647,7 +656,31 @@ function normalizeMiniFantasyEntryRow(row) {
             owner_user_id: currentUser.userId,
             owner_handle: currentUser.ownerId,
             display_name: currentUser.displayName,
-            updated_at: new Date().toISOString()
+            updated_at: updatedAt
+          },
+          accessToken: activeSession.access_token,
+          prefer: 'return=representation'
+        });
+        const nextEntryRows = loaded.entryRows.map((entry) => (
+          entry.id === openEntry.id
+            ? {
+                ...entry,
+                owner_user_id: currentUser.userId,
+                owner_handle: currentUser.ownerId,
+                display_name: currentUser.displayName,
+                updated_at: updatedAt
+              }
+            : entry
+        ));
+        await restRequest(config.tables.duels, {
+          method: 'PATCH',
+          query: {
+            id: `eq.${loaded.duelRow.id}`,
+            select: 'id'
+          },
+          body: {
+            label: buildBundleLabel(loaded.duelRow, nextEntryRows),
+            updated_at: updatedAt
           },
           accessToken: activeSession.access_token,
           prefer: 'return=representation'
