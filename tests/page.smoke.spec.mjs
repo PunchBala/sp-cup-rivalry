@@ -52,6 +52,7 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await expect(page.locator('#leaguePill')).toContainText('Duels: SP Cup 2026');
   await expect(page.getByRole('button', { name: 'Duel', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Mini Fantasy', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Duel', exact: true }).click();
   await expect(page.locator('#browseDuelsButton')).toBeVisible();
   await expect(page.locator('#createDuelButton')).toBeVisible();
   await expect(page.locator('#profileChipButton')).toContainText('Sign in');
@@ -220,13 +221,14 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
 
   await page.goto('http://127.0.0.1:4173/index.html?room=sp-cup-2026');
 
+  await expect(page.locator('#profileChipButton')).toBeVisible();
   await page.locator('#profileChipButton').click();
+  await expect(page.locator('#profileDrawer')).toBeVisible();
   await page.locator('#authDisplayName').fill('Mini Bala');
   await page.locator('#authOwnerId').fill('mini-bala');
   await page.locator('#authForm button[type="submit"]').click();
   await page.locator('#profileDrawer [data-close-drawer="profile"]').click();
 
-  await page.getByRole('button', { name: 'Mini Fantasy', exact: true }).click();
   await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Mini Fantasy');
   await expect(page.getByRole('button', { name: 'Duel', exact: true })).toBeVisible();
   await expect(page.locator('#browseDuelsButton')).toHaveCount(0);

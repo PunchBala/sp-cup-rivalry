@@ -9,6 +9,7 @@ import {
   deriveCompletedMatchHistories,
   generateMiniFantasyPriceBook,
   getMiniFantasyOpenFixtures,
+  resolvePlayerHistory,
   validateMiniFantasyEntry
 } from '../mini-fantasy/contest-engine.js';
 
@@ -70,6 +71,76 @@ test('deriveCompletedMatchHistories keeps zero-point appearances when playerMatc
   assert.equal(histories.get('player a')?.matches_played, 2);
   assert.deepEqual(histories.get('player b')?.match_points, [5]);
   assert.deepEqual(histories.get('player c')?.match_points, [60]);
+});
+
+test('resolvePlayerHistory matches safe alias variations used by squad lists', () => {
+  const liveData = {
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 1,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Mohammed Shami': 1,
+                  'Manimaran Siddharth': 1,
+                  'Digvesh Singh Rathi': 1,
+                  'Vijaykumar Vyshak': 1,
+                  'Tilak Varma': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Mohammed Shami': { score: 20 },
+                'Manimaran Siddharth': { score: 30 },
+                'Digvesh Singh Rathi': { score: 10 },
+                'Vijaykumar Vyshak': { score: 25 },
+                'Tilak Varma': { score: 15 }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 2,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Mohammed Shami': 2,
+                  'Manimaran Siddharth': 1,
+                  'Digvesh Singh Rathi': 1,
+                  'Vijaykumar Vyshak': 2,
+                  'Tilak Varma': 2
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Mohammed Shami': { score: 50 },
+                'Manimaran Siddharth': { score: 30 },
+                'Digvesh Singh Rathi': { score: 10 },
+                'Vijaykumar Vyshak': { score: 60 },
+                'Tilak Varma': { score: 25 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  const histories = deriveCompletedMatchHistories(liveData, [
+    { match_no: 1, datetime_utc: '2026-04-01T14:00:00Z' },
+    { match_no: 2, datetime_utc: '2026-04-02T14:00:00Z' }
+  ]);
+
+  assert.deepEqual(resolvePlayerHistory('Mohammad Shami', histories)?.match_points, [20, 30]);
+  assert.deepEqual(resolvePlayerHistory('M. Siddharth', histories)?.match_points, [30]);
+  assert.deepEqual(resolvePlayerHistory('Digvesh Singh', histories)?.match_points, [10]);
+  assert.deepEqual(resolvePlayerHistory('Vyshak Vijaykumar', histories)?.match_points, [25, 35]);
+  assert.deepEqual(resolvePlayerHistory('N. Tilak Varma', histories)?.match_points, [15, 10]);
 });
 
 test('getMiniFantasyOpenFixtures opens Match 14 now and later fixtures from the day-before window', () => {
@@ -243,6 +314,99 @@ test('generateMiniFantasyPriceBook marks uncapped players and caps them at 9 cre
   assert.equal(sameer.is_uncapped, true);
   assert.equal(sameer.final_price, 9);
   assert.match(sameer.calculation_notes.join(' '), /uncapped player price ceiling applied at 9 credits/i);
+});
+
+test('generateMiniFantasyPriceBook keeps alias-matched LSG bowlers from falling back to blank stats', () => {
+  const liveData = {
+    fetchedAt: '2026-04-08T00:10:00Z',
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 5,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Mohammed Shami': 1,
+                  'Manimaran Siddharth': 1,
+                  'Veteran Bowler': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Mohammed Shami': { score: 23 },
+                'Manimaran Siddharth': { score: 30 },
+                'Veteran Bowler': { score: 10 }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 10,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Mohammed Shami': 2,
+                  'Manimaran Siddharth': 1,
+                  'Veteran Bowler': 2
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Mohammed Shami': { score: 69 },
+                'Manimaran Siddharth': { score: 30 },
+                'Veteran Bowler': { score: 20 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 5, datetime_utc: '2026-04-01T14:00:00Z', home_team: 'Lucknow Super Giants', away_team: 'Mumbai Indians' },
+    { match_no: 10, datetime_utc: '2026-04-05T14:00:00Z', home_team: 'Lucknow Super Giants', away_team: 'Rajasthan Royals' },
+    { match_no: 14, datetime_utc: '2026-04-08T14:00:00Z', home_team: 'Lucknow Super Giants', away_team: 'Delhi Capitals' }
+  ];
+  const squads = {
+    LSG: ['Mohammad Shami', 'M. Siddharth'],
+    DC: ['Veteran Bowler']
+  };
+  const teamRoles = {
+    teams: {
+      LSG: {
+        players: {
+          'Mohammad Shami': 'bowler',
+          'M. Siddharth': 'bowler'
+        }
+      },
+      DC: {
+        players: {
+          'Veteran Bowler': 'bowler'
+        }
+      }
+    }
+  };
+
+  const priceBook = generateMiniFantasyPriceBook({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    asOfUtc: '2026-04-08T00:10:00Z'
+  });
+
+  const shami = priceBook.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'Mohammad Shami'));
+  const siddharth = priceBook.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'M. Siddharth'));
+
+  assert.equal(shami.matches_played, 2);
+  assert.equal(shami.last_match_played_at_utc, '2026-04-05T14:00:00Z');
+  assert.ok(shami.final_price > 6);
+  assert.equal(siddharth.matches_played, 1);
+  assert.equal(siddharth.last_match_played_at_utc, '2026-04-01T14:00:00Z');
 });
 
 test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy points', () => {

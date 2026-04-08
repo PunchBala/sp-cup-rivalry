@@ -156,6 +156,19 @@ export function normalizeName(value) {
 
 const UNCAPPED_MVP_PLAYER_KEYS = new Set(UNCAPPED_MVP_PLAYERS.map((name) => normalizeName(name)));
 
+// Keep a conservative alias map for common score-feed spelling drift.
+const NAME_TOKEN_ALIASES = Object.freeze({
+  mohd: 'mohammad',
+  mohd0: 'mohammad',
+  mohds: 'mohammad',
+  mohamad: 'mohammad',
+  mohamed: 'mohammad',
+  mohammed: 'mohammad',
+  mohammedh: 'mohammad',
+  mohamad0: 'mohammad',
+  md: 'mohammad'
+});
+
 export function slugify(value) {
   return normalizeWhitespace(value)
     .normalize('NFKD')
@@ -177,6 +190,130 @@ export function currentRoleOverride(teamCode, playerName) {
 
 function tokenizeName(value) {
   return normalizeName(value).split(' ').filter(Boolean);
+}
+
+function normalizeAliasToken(token) {
+  return NAME_TOKEN_ALIASES[token] || token;
+}
+
+function tokenizeAliasName(value, { dropInitials = false } = {}) {
+  return tokenizeName(value)
+    .map(normalizeAliasToken)
+    .filter((token) => !dropInitials || token.length > 1);
+}
+
+function addAliasKey(keys, tokens) {
+  const normalizedTokens = (Array.isArray(tokens) ? tokens : []).filter(Boolean);
+  if (!normalizedTokens.length) return;
+  keys.add(normalizedTokens.join(' '));
+  if (normalizedTokens.length > 1) {
+    keys.add([...normalizedTokens].sort().join(' '));
+  }
+}
+
+function buildNameAliasKeys(value) {
+  const rawTokens = tokenizeAliasName(value);
+  const significantTokens = tokenizeAliasName(value, { dropInitials: true });
+  const keys = new Set();
+
+  addAliasKey(keys, rawTokens);
+  if (significantTokens.length && significantTokens.length !== rawTokens.length) {
+    addAliasKey(keys, significantTokens);
+  }
+
+  if (rawTokens.length >= 3) {
+    addAliasKey(keys, [rawTokens[0], rawTokens[rawTokens.length - 1]]);
+    addAliasKey(keys, rawTokens.slice(0, 2));
+  }
+
+  if (significantTokens.length >= 2) {
+    addAliasKey(keys, [significantTokens[0], significantTokens[significantTokens.length - 1]]);
+    addAliasKey(keys, [significantTokens[0].charAt(0), significantTokens[significantTokens.length - 1]]);
+    if (significantTokens.length >= 3) {
+      addAliasKey(keys, significantTokens.slice(0, 2));
+      addAliasKey(keys, [significantTokens[0].charAt(0), significantTokens[1]]);
+    }
+  }
+
+  return [...keys].filter(Boolean);
+}
+
+function countSharedAliasTokens(a, b) {
+  const tokensA = new Set(tokenizeAliasName(a, { dropInitials: true }));
+  const tokensB = new Set(tokenizeAliasName(b, { dropInitials: true }));
+  let shared = 0;
+  tokensA.forEach((token) => {
+    if (tokensB.has(token)) shared += 1;
+  });
+  return shared;
+}
+
+function areAliasTokensSubset(a, b) {
+  return a.length > 0 && a.every((token) => b.includes(token));
+}
+
+function mergeHistoryMatches(playerName, histories = []) {
+  const mergedPoints = {};
+  let resolvedName = normalizeWhitespace(playerName);
+  let lastMatchPlayedAtUtc = null;
+
+  histories.forEach((history) => {
+    const pointsByMatchNo = history?.points_by_match_no || {};
+    Object.entries(pointsByMatchNo).forEach(([matchNo, points]) => {
+      const numericMatchNo = Number(matchNo);
+      if (!Number.isFinite(numericMatchNo) || numericMatchNo <= 0) return;
+      mergedPoints[numericMatchNo] = mergedPoints[numericMatchNo] == null
+        ? roundTo(toNumber(points, 0), 2)
+        : Math.max(mergedPoints[numericMatchNo], roundTo(toNumber(points, 0), 2));
+    });
+    if (!resolvedName || String(history?.player_name || '').length > resolvedName.length) {
+      resolvedName = normalizeWhitespace(history?.player_name || resolvedName);
+    }
+    const playedAt = history?.last_match_played_at_utc || null;
+    if (playedAt && (!lastMatchPlayedAtUtc || Date.parse(playedAt) > Date.parse(lastMatchPlayedAtUtc))) {
+      lastMatchPlayedAtUtc = playedAt;
+    }
+  });
+
+  const orderedMatchNos = Object.keys(mergedPoints).map(Number).sort((a, b) => a - b);
+  return {
+    player_name: resolvedName || normalizeWhitespace(playerName),
+    match_points: orderedMatchNos.map((matchNo) => mergedPoints[matchNo]),
+    points_by_match_no: Object.fromEntries(orderedMatchNos.map((matchNo) => [matchNo, mergedPoints[matchNo]])),
+    matches_played: orderedMatchNos.length,
+    last_match_played_at_utc: lastMatchPlayedAtUtc
+  };
+}
+
+export function resolvePlayerHistory(playerName, historyMap = new Map()) {
+  if (!(historyMap instanceof Map) || !normalizeWhitespace(playerName)) {
+    return null;
+  }
+
+  const targetAliasKeys = new Set(buildNameAliasKeys(playerName));
+  const targetSignificantTokens = tokenizeAliasName(playerName, { dropInitials: true });
+  const matches = [];
+
+  historyMap.forEach((history, fallbackKey) => {
+    const candidateName = history?.player_name || fallbackKey;
+    const directAliasMatch = buildNameAliasKeys(candidateName).some((aliasKey) => targetAliasKeys.has(aliasKey));
+    if (!directAliasMatch) {
+      const candidateTokens = tokenizeAliasName(candidateName, { dropInitials: true });
+      const sharedTokens = countSharedAliasTokens(playerName, candidateName);
+      const subsetMatch =
+        areAliasTokensSubset(targetSignificantTokens, candidateTokens) ||
+        areAliasTokensSubset(candidateTokens, targetSignificantTokens);
+      const overlap =
+        sharedTokens / Math.max(new Set(targetSignificantTokens).size || 1, new Set(candidateTokens).size || 1);
+      if (sharedTokens < 2 || (!subsetMatch && overlap < 0.67)) {
+        return;
+      }
+    }
+    matches.push(history);
+  });
+
+  if (!matches.length) return null;
+  return mergeHistoryMatches(playerName, matches);
 }
 
 function tokenOverlapScore(a, b) {
@@ -441,8 +578,9 @@ export function buildPricingJobFromLiveData({
   Object.entries(squads || {}).forEach(([teamCode, squadPlayers]) => {
     (Array.isArray(squadPlayers) ? squadPlayers : []).forEach((playerName) => {
       const canonicalName = normalizeName(playerName);
-      const history = historyMap.get(canonicalName) || {
+      const history = resolvePlayerHistory(playerName, historyMap) || {
         match_points: [],
+        points_by_match_no: {},
         matches_played: 0,
         last_match_played_at_utc: null
       };
@@ -674,7 +812,7 @@ export function buildMiniFantasyPlayerPointsIndex({
   const index = new Map();
   Object.entries(squads || {}).forEach(([teamCode, squadPlayers]) => {
     (Array.isArray(squadPlayers) ? squadPlayers : []).forEach((playerName) => {
-      const history = historyMap.get(normalizeName(playerName));
+      const history = resolvePlayerHistory(playerName, historyMap);
       index.set(buildMiniFantasyPlayerId(teamCode, playerName), {
         player_id: buildMiniFantasyPlayerId(teamCode, playerName),
         name: playerName,

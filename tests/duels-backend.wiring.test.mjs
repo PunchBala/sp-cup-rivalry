@@ -22,6 +22,9 @@ test('backend config, adapter, and setup docs are present for real auth + duel a
   assert.match(backendJs, /listPublicBundles/);
   assert.match(backendJs, /createPublicDuel/);
   assert.match(backendJs, /claimOpenEntry/);
+  assert.match(backendJs, /function buildBundleLabel\(/);
+  assert.match(backendJs, /label:\s*buildBundleLabel\(duelRow,\s*orderedEntries\)/);
+  assert.match(backendJs, /label:\s*buildBundleLabel\(loaded\.duelRow,\s*nextEntryRows\)/);
   assert.match(backendJs, /saveOwnedEntry/);
   assert.match(backendJs, /listMiniFantasyEntries/);
   assert.match(backendJs, /listPublicMiniFantasyEntries/);
