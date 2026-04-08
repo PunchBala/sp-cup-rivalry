@@ -422,3 +422,45 @@ test('standings still update when scorecard omits the top-level score summary', 
   assert.equal(rr.runsFor, 123);
   assert.equal(mi.runsFor, 96);
 });
+
+test('highest team score canonicalizes malformed inning labels and keeps one max per team', async () => {
+  const scorecard = makeFinalScorecard({
+    teams: ['Gujarat Titans', 'Rajasthan Royals'],
+    winner: 'Rajasthan Royals',
+    batter: 'Sai Sudharsan',
+    bowler: 'Jofra Archer',
+    catcher: 'Sanju Samson',
+    runs: 84,
+    balls: 51,
+    sixes: 4,
+    wickets: 2,
+    concededRuns: 33,
+    overs: '4',
+    scoreA: 204,
+    scoreB: 210
+  });
+  scorecard.score = [
+    { inning: 'Gujarat Titans,Rajasthan Royals Inning 1', r: 204, w: 4, o: '20' },
+    { inning: 'rajasthan royals Inning 1', r: 210, w: 5, o: '20' }
+  ];
+  scorecard.scorecard[0].inning = 'Gujarat Titans,Rajasthan Royals Inning 1';
+  scorecard.scorecard[1].inning = 'rajasthan royals Inning 1';
+
+  const rebuilt = await rebuildHistoricalState(
+    ['match-9'],
+    {
+      meta: {
+        scoreHistory: [{ processedMatchCount: 0, fetchedAt: '2026-04-01T00:00:00.000Z' }]
+      }
+    },
+    {
+      includeHistory: true,
+      loadScorecard: async () => ({ data: scorecard, source: 'cache' })
+    }
+  );
+
+  assert.deepEqual(rebuilt.aggregates.teamHighestScore, {
+    'Gujarat Titans': 204,
+    'Rajasthan Royals': 210
+  });
+});

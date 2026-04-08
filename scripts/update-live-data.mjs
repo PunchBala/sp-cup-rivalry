@@ -37,7 +37,7 @@ const IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES = parseEnvInt(process.env.IPLT20_MOST
 const IPLT20_MOST_DOTS_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/284-mostdotballsbowledtournament.js?callback=onmostdotballsbowledtournament';
 const IPLT20_FAIRPLAY_ENABLED = parseEnvBool(process.env.IPLT20_FAIRPLAY_ENABLED, true);
 const IPLT20_FAIRPLAY_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/2026-fairplayList.js?callback=onFairplayAward';
-const AGGREGATE_SCHEMA_VERSION = 2;
+const AGGREGATE_SCHEMA_VERSION = 3;
 const LEAST_MVP_MIN_MATCHES = 5;
 const UNCAPPED_MVP_PLAYERS = [
   'Ayush Mhatre', 'Kartik Sharma', 'Urvil Patel', 'Ramakrishna Ghosh', 'Prashant Veer', 'Aman Khan',
@@ -205,6 +205,9 @@ function isoNow() { return new Date().toISOString(); }
 function nowMs() { return Date.now(); }
 function safeArray(v) { return Array.isArray(v) ? v : []; }
 function normalizeName(name) { return String(name || '').replace(/\s+/g, ' ').trim(); }
+function normalizeTeamKey(name) {
+  return normalizeName(name).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
 function normalizePlayerKey(name) { return normalizeName(name).toLowerCase().replace(/\./g, '').trim(); }
 export function canonicalPlayerPoolKey(name) {
   const normalized = normalizePlayerKey(name);
@@ -1127,10 +1130,55 @@ function updateBestBowlingFigure(bestMap, bowler, wickets, runs, balls) {
   }
 }
 
-function parseTeamFromInningName(inningName) {
+function sharedTokenCount(a, b) {
+  const setA = new Set(normalizeTeamKey(a).split(' ').filter(Boolean));
+  const setB = new Set(normalizeTeamKey(b).split(' ').filter(Boolean));
+  let shared = 0;
+  setA.forEach((token) => {
+    if (setB.has(token)) shared += 1;
+  });
+  return shared;
+}
+
+function resolveCanonicalTeamName(rawName, knownTeams = []) {
+  const normalizedRaw = normalizeName(rawName);
+  if (!normalizedRaw) return '';
+  const primarySegment = normalizeName(String(normalizedRaw).split(',')[0]);
+  const rawKey = normalizeTeamKey(normalizedRaw);
+  const primaryKey = normalizeTeamKey(primarySegment);
+  const teams = safeArray(knownTeams).map(normalizeName).filter(Boolean);
+
+  if (!teams.length) return primarySegment;
+
+  for (const team of teams) {
+    if (normalizeTeamKey(team) === primaryKey || normalizeTeamKey(team) === rawKey) {
+      return team;
+    }
+  }
+
+  let best = null;
+  teams.forEach((team) => {
+    const teamKey = normalizeTeamKey(team);
+    const exactContainment =
+      primaryKey.includes(teamKey) ||
+      teamKey.includes(primaryKey) ||
+      rawKey.includes(teamKey) ||
+      teamKey.includes(rawKey);
+    const shared = Math.max(sharedTokenCount(primarySegment, team), sharedTokenCount(normalizedRaw, team));
+    if (!exactContainment && shared < 2) return;
+    const score = exactContainment ? 10 + teamKey.length : shared;
+    if (!best || score > best.score) {
+      best = { team, score };
+    }
+  });
+
+  return best?.team || primarySegment;
+}
+
+function parseTeamFromInningName(inningName, knownTeams = []) {
   const raw = String(inningName || '');
   const idx = raw.toLowerCase().indexOf(' inning');
-  return normalizeName(idx >= 0 ? raw.slice(0, idx) : raw);
+  return resolveCanonicalTeamName(idx >= 0 ? raw.slice(0, idx) : raw, knownTeams);
 }
 
 function parseMatchNoFromText(value) {
@@ -1260,8 +1308,10 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
 
   for (const player of participants) incrementCountMap(aggregates.playerMatches, player);
 
+  const teams = safeArray(scorecardData.teams).map(normalizeName).filter(Boolean);
+
   for (const scoreLine of topScores) {
-    const team = parseTeamFromInningName(scoreLine?.inning);
+    const team = parseTeamFromInningName(scoreLine?.inning, teams);
     if (team) {
       aggregates.teamHighestScore[team] = Math.max(Number(aggregates.teamHighestScore[team] || 0), Number(scoreLine?.r || 0));
     }
@@ -1269,7 +1319,6 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
 
   if (!isFinal) return;
 
-  const teams = safeArray(scorecardData.teams).map(normalizeName);
   if (teams.length === 2) {
     const [teamA, teamB] = teams;
     const standingA = ensureStandingTeam(aggregates.standings, teamA);
@@ -1279,7 +1328,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
 
     if (topScores.length >= 2) {
       const inningMap = {};
-      for (const s of topScores) inningMap[parseTeamFromInningName(s?.inning)] = s;
+      for (const s of topScores) inningMap[parseTeamFromInningName(s?.inning, teams)] = s;
 
       const sa = inningMap[teamA];
       const sb = inningMap[teamB];
