@@ -17,9 +17,9 @@
   "summary": {
     "total_players_received": 250,
     "eligible_players_ranked": 250,
-    "price_rises": 12,
-    "price_drops": 1,
-    "price_unchanged": 237
+    "price_rises": 2,
+    "price_drops": 0,
+    "price_unchanged": 248
   },
   "players": [
     {
@@ -42,7 +42,7 @@
       "score_basis": 41,
       "reliability_factor": 0.75,
       "adjusted_score": 30.75,
-      "percentile": 91.97,
+      "percentile": 91.57,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -68,7 +68,7 @@
       "score_basis": 33,
       "reliability_factor": 0.75,
       "adjusted_score": 24.75,
-      "percentile": 84.74,
+      "percentile": 84.34,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -94,10 +94,10 @@
       "score_basis": 38.04,
       "reliability_factor": 1,
       "adjusted_score": 38.04,
-      "percentile": 96.99,
+      "percentile": 96.59,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 96.99",
+        "Target price mapped from percentile 96.59",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T14:00:00Z"
@@ -122,7 +122,7 @@
       "score_basis": 34.33,
       "reliability_factor": 0.75,
       "adjusted_score": 25.75,
-      "percentile": 85.94,
+      "percentile": 85.54,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -148,10 +148,10 @@
       "score_basis": 54,
       "reliability_factor": 0.5,
       "adjusted_score": 27,
-      "percentile": 87.55,
+      "percentile": 87.15,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 87.55",
+        "Target price mapped from percentile 87.15",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T14:00:00Z"
@@ -176,37 +176,9 @@
       "score_basis": 16.67,
       "reliability_factor": 0.75,
       "adjusted_score": 12.5,
-      "percentile": 67.67,
+      "percentile": 67.27,
       "calculation_notes": [
         "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-05T14:00:00Z"
-    },
-    {
-      "player_id": "csk_ruturaj-gaikwad",
-      "name": "Ruturaj Gaikwad",
-      "team": "CSK",
-      "role": "batter",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 8,
-      "initial_price": 8,
-      "target_price": 7,
-      "smoothed_price": 8,
-      "final_price": 8,
-      "price_change": 0,
-      "matches_played": 3,
-      "season_avg_points": 14.33,
-      "recent_avg_points": 14.33,
-      "last_match_points": 9,
-      "score_basis": 14.33,
-      "reliability_factor": 0.75,
-      "adjusted_score": 10.75,
-      "percentile": 64.26,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 64.26",
-        "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T14:00:00Z"
     },
@@ -230,7 +202,7 @@
       "score_basis": 9.67,
       "reliability_factor": 0.75,
       "adjusted_score": 7.25,
-      "percentile": 58.23,
+      "percentile": 57.83,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -256,7 +228,7 @@
       "score_basis": 7.33,
       "reliability_factor": 0.75,
       "adjusted_score": 5.5,
-      "percentile": 53.82,
+      "percentile": 53.41,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -282,10 +254,10 @@
       "score_basis": 26.5,
       "reliability_factor": 0.5,
       "adjusted_score": 13.25,
-      "percentile": 68.27,
+      "percentile": 67.87,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 68.27",
+        "Target price mapped from percentile 67.87",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T14:00:00Z"
@@ -310,11 +282,39 @@
       "score_basis": 3,
       "reliability_factor": 0.25,
       "adjusted_score": 0.75,
-      "percentile": 45.98,
+      "percentile": 45.58,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
+    },
+    {
+      "player_id": "csk_ruturaj-gaikwad",
+      "name": "Ruturaj Gaikwad",
+      "team": "CSK",
+      "role": "batter",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 6,
+      "initial_price": 6,
+      "target_price": 7,
+      "smoothed_price": 7,
+      "final_price": 7,
+      "price_change": 1,
+      "matches_played": 3,
+      "season_avg_points": 14.33,
+      "recent_avg_points": 14.33,
+      "last_match_points": 9,
+      "score_basis": 14.33,
+      "reliability_factor": 0.75,
+      "adjusted_score": 10.75,
+      "percentile": 63.86,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Recovered real match history from a previously blank price; used the corrected target price immediately",
+        "Target price mapped from percentile 63.86"
+      ],
+      "last_match_played_at_utc": "2026-04-05T14:00:00Z"
     },
     {
       "player_id": "csk_sanju-samson",
@@ -336,7 +336,7 @@
       "score_basis": 8,
       "reliability_factor": 0.75,
       "adjusted_score": 6,
-      "percentile": 54.62,
+      "percentile": 54.22,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -362,7 +362,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -389,10 +389,10 @@
       "score_basis": 40,
       "reliability_factor": 0.25,
       "adjusted_score": 10,
-      "percentile": 62.85,
+      "percentile": 62.45,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 62.85",
+        "Target price mapped from percentile 62.45",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -417,7 +417,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -444,7 +444,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -458,12 +458,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
+      "old_price": 6,
+      "initial_price": 6,
       "target_price": 5,
       "smoothed_price": 6,
       "final_price": 6,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 3,
       "season_avg_points": 0,
       "recent_avg_points": 0,
@@ -471,10 +471,10 @@
       "score_basis": 0,
       "reliability_factor": 0.75,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 22.49",
+        "Target price mapped from percentile 22.29",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T14:00:00Z"
@@ -488,7 +488,7 @@
       "pricing_eligible": true,
       "old_price": 6,
       "initial_price": 6,
-      "target_price": 7,
+      "target_price": 6,
       "smoothed_price": 6,
       "final_price": 6,
       "price_change": 0,
@@ -499,11 +499,9 @@
       "score_basis": 2,
       "reliability_factor": 0.25,
       "adjusted_score": 0.5,
-      "percentile": 45.38,
+      "percentile": 44.98,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 45.38",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-03-30T14:00:00Z"
     },
@@ -527,7 +525,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -554,10 +552,10 @@
       "score_basis": 8,
       "reliability_factor": 0.5,
       "adjusted_score": 4,
-      "percentile": 51.41,
+      "percentile": 51,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 51.41",
+        "Target price mapped from percentile 51",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -582,7 +580,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -609,7 +607,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -636,7 +634,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -663,7 +661,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -690,7 +688,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -717,10 +715,10 @@
       "score_basis": 29,
       "reliability_factor": 0.5,
       "adjusted_score": 14.5,
-      "percentile": 71.08,
+      "percentile": 70.68,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 71.08",
+        "Target price mapped from percentile 70.68",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
@@ -772,7 +770,7 @@
       "score_basis": 47,
       "reliability_factor": 0.5,
       "adjusted_score": 23.5,
-      "percentile": 81.73,
+      "percentile": 81.33,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -798,13 +796,41 @@
       "score_basis": 34,
       "reliability_factor": 0.5,
       "adjusted_score": 17,
-      "percentile": 72.69,
+      "percentile": 72.29,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 72.69",
+        "Target price mapped from percentile 72.29",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
+    },
+    {
+      "player_id": "dc_ashutosh-sharma",
+      "name": "Ashutosh Sharma",
+      "team": "DC",
+      "role": "all_rounder",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 9,
+      "smoothed_price": 8,
+      "final_price": 8,
+      "price_change": 0,
+      "matches_played": 5,
+      "season_avg_points": 24.5,
+      "recent_avg_points": 29.67,
+      "last_match_points": 0,
+      "score_basis": 27.6,
+      "reliability_factor": 1,
+      "adjusted_score": 27.6,
+      "percentile": 88.76,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 88.76",
+        "Applied smoothing against the target price"
+      ],
+      "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
     {
       "player_id": "dc_axar-patel",
@@ -826,7 +852,7 @@
       "score_basis": 28,
       "reliability_factor": 0.5,
       "adjusted_score": 14,
-      "percentile": 70.08,
+      "percentile": 69.68,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -852,10 +878,10 @@
       "score_basis": 14.5,
       "reliability_factor": 0.5,
       "adjusted_score": 7.25,
-      "percentile": 57.63,
+      "percentile": 57.23,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 57.63",
+        "Target price mapped from percentile 57.23",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
@@ -880,9 +906,37 @@
       "score_basis": 24,
       "reliability_factor": 0.5,
       "adjusted_score": 12,
-      "percentile": 66.27,
+      "percentile": 65.86,
       "calculation_notes": [
         "Used old_price for smoothing"
+      ],
+      "last_match_played_at_utc": "2026-04-04T10:00:00Z"
+    },
+    {
+      "player_id": "dc_lungisani-ngidi",
+      "name": "Lungisani Ngidi",
+      "team": "DC",
+      "role": "bowler",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 9,
+      "smoothed_price": 8,
+      "final_price": 8,
+      "price_change": 0,
+      "matches_played": 2,
+      "season_avg_points": 47,
+      "recent_avg_points": 47,
+      "last_match_points": 20,
+      "score_basis": 47,
+      "reliability_factor": 0.5,
+      "adjusted_score": 23.5,
+      "percentile": 81.33,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 81.33",
+        "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -906,39 +960,11 @@
       "score_basis": 23.5,
       "reliability_factor": 0.5,
       "adjusted_score": 11.75,
-      "percentile": 65.46,
+      "percentile": 65.06,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
-    },
-    {
-      "player_id": "dc_ashutosh-sharma",
-      "name": "Ashutosh Sharma",
-      "team": "DC",
-      "role": "all_rounder",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
-      "target_price": 9,
-      "smoothed_price": 7,
-      "final_price": 7,
-      "price_change": 1,
-      "matches_played": 5,
-      "season_avg_points": 24.5,
-      "recent_avg_points": 29.67,
-      "last_match_points": 0,
-      "score_basis": 27.6,
-      "reliability_factor": 1,
-      "adjusted_score": 27.6,
-      "percentile": 89.16,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 89.16",
-        "Applied smoothing against the target price"
-      ],
-      "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
     {
       "player_id": "dc_kl-rahul",
@@ -960,37 +986,9 @@
       "score_basis": 4.5,
       "reliability_factor": 0.5,
       "adjusted_score": 2.25,
-      "percentile": 48.59,
+      "percentile": 48.19,
       "calculation_notes": [
         "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-04T10:00:00Z"
-    },
-    {
-      "player_id": "dc_lungisani-ngidi",
-      "name": "Lungisani Ngidi",
-      "team": "DC",
-      "role": "bowler",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
-      "target_price": 9,
-      "smoothed_price": 7,
-      "final_price": 7,
-      "price_change": 1,
-      "matches_played": 2,
-      "season_avg_points": 47,
-      "recent_avg_points": 47,
-      "last_match_points": 20,
-      "score_basis": 47,
-      "reliability_factor": 0.5,
-      "adjusted_score": 23.5,
-      "percentile": 81.73,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 81.73",
-        "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
@@ -1014,7 +1012,7 @@
       "score_basis": 12.5,
       "reliability_factor": 0.5,
       "adjusted_score": 6.25,
-      "percentile": 55.22,
+      "percentile": 54.82,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -1040,7 +1038,7 @@
       "score_basis": 10,
       "reliability_factor": 0.5,
       "adjusted_score": 5,
-      "percentile": 53.41,
+      "percentile": 53.01,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -1066,7 +1064,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1093,7 +1091,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1120,7 +1118,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1147,7 +1145,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1174,7 +1172,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1201,7 +1199,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1228,7 +1226,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1255,7 +1253,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1282,7 +1280,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1309,7 +1307,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1336,7 +1334,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1363,7 +1361,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1390,10 +1388,10 @@
       "score_basis": 53.5,
       "reliability_factor": 0.5,
       "adjusted_score": 26.75,
-      "percentile": 86.95,
+      "percentile": 86.55,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 86.95",
+        "Target price mapped from percentile 86.55",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T14:00:00Z"
@@ -1418,10 +1416,10 @@
       "score_basis": 43,
       "reliability_factor": 0.5,
       "adjusted_score": 21.5,
-      "percentile": 79.52,
+      "percentile": 79.12,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 79.52",
+        "Target price mapped from percentile 79.12",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T14:00:00Z"
@@ -1446,10 +1444,10 @@
       "score_basis": 41,
       "reliability_factor": 0.5,
       "adjusted_score": 20.5,
-      "percentile": 79.12,
+      "percentile": 78.71,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 79.12",
+        "Target price mapped from percentile 78.71",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T14:00:00Z"
@@ -1474,7 +1472,7 @@
       "score_basis": 50,
       "reliability_factor": 0.5,
       "adjusted_score": 25,
-      "percentile": 85.14,
+      "percentile": 84.74,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -1500,10 +1498,10 @@
       "score_basis": 36,
       "reliability_factor": 0.5,
       "adjusted_score": 18,
-      "percentile": 74.5,
+      "percentile": 74.1,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 74.5",
+        "Target price mapped from percentile 74.1",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T14:00:00Z"
@@ -1528,10 +1526,10 @@
       "score_basis": 57,
       "reliability_factor": 0.25,
       "adjusted_score": 14.25,
-      "percentile": 70.68,
+      "percentile": 70.28,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 70.68",
+        "Target price mapped from percentile 70.28",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-03-31T14:00:00Z"
@@ -1556,10 +1554,10 @@
       "score_basis": 27.6,
       "reliability_factor": 1,
       "adjusted_score": 27.6,
-      "percentile": 89.16,
+      "percentile": 88.76,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 89.16",
+        "Target price mapped from percentile 88.76",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -1573,7 +1571,7 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
@@ -1584,9 +1582,11 @@
       "score_basis": 23,
       "reliability_factor": 0.5,
       "adjusted_score": 11.5,
-      "percentile": 65.06,
+      "percentile": 64.66,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 64.66",
+        "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T14:00:00Z"
     },
@@ -1610,10 +1610,10 @@
       "score_basis": 26,
       "reliability_factor": 0.25,
       "adjusted_score": 6.5,
-      "percentile": 56.02,
+      "percentile": 55.62,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 56.02",
+        "Target price mapped from percentile 55.62",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T14:00:00Z"
@@ -1625,12 +1625,12 @@
       "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 9,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": 1,
+      "price_change": 0,
       "matches_played": 5,
       "season_avg_points": 31.6,
       "recent_avg_points": 42.33,
@@ -1638,10 +1638,10 @@
       "score_basis": 38.04,
       "reliability_factor": 1,
       "adjusted_score": 38.04,
-      "percentile": 96.99,
+      "percentile": 96.59,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 96.99",
+        "Target price mapped from percentile 96.59",
         "Applied smoothing against the target price",
         "Uncapped player price ceiling applied at 9 credits"
       ],
@@ -1667,7 +1667,7 @@
       "score_basis": 25,
       "reliability_factor": 0.5,
       "adjusted_score": 12.5,
-      "percentile": 67.07,
+      "percentile": 66.67,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -1693,7 +1693,7 @@
       "score_basis": 11.5,
       "reliability_factor": 0.5,
       "adjusted_score": 5.75,
-      "percentile": 54.22,
+      "percentile": 53.82,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -1719,7 +1719,7 @@
       "score_basis": 12.5,
       "reliability_factor": 0.5,
       "adjusted_score": 6.25,
-      "percentile": 55.22,
+      "percentile": 54.82,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -1745,7 +1745,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1772,7 +1772,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1799,7 +1799,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1826,7 +1826,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1853,7 +1853,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1880,7 +1880,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1907,7 +1907,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1934,7 +1934,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1961,10 +1961,10 @@
       "score_basis": 36,
       "reliability_factor": 0.25,
       "adjusted_score": 9,
-      "percentile": 60.84,
+      "percentile": 60.44,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 60.84",
+        "Target price mapped from percentile 60.44",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-01T14:00:00Z"
@@ -1989,7 +1989,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2016,7 +2016,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2043,7 +2043,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2070,10 +2070,10 @@
       "score_basis": 37.67,
       "reliability_factor": 0.75,
       "adjusted_score": 28.25,
-      "percentile": 90.76,
+      "percentile": 90.36,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 90.76",
+        "Target price mapped from percentile 90.36",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-06T14:00:00Z"
@@ -2098,10 +2098,10 @@
       "score_basis": 53.5,
       "reliability_factor": 0.5,
       "adjusted_score": 26.75,
-      "percentile": 86.95,
+      "percentile": 86.55,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 86.95",
+        "Target price mapped from percentile 86.55",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
@@ -2126,7 +2126,7 @@
       "score_basis": 47.67,
       "reliability_factor": 0.75,
       "adjusted_score": 35.75,
-      "percentile": 95.58,
+      "percentile": 95.18,
       "calculation_notes": [
         "Used old_price for smoothing",
         "Uncapped player price ceiling applied at 9 credits"
@@ -2153,10 +2153,10 @@
       "score_basis": 29,
       "reliability_factor": 0.75,
       "adjusted_score": 21.75,
-      "percentile": 79.92,
+      "percentile": 79.52,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 79.92",
+        "Target price mapped from percentile 79.52",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-06T14:00:00Z"
@@ -2181,7 +2181,7 @@
       "score_basis": 48,
       "reliability_factor": 0.5,
       "adjusted_score": 24,
-      "percentile": 83.53,
+      "percentile": 83.13,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -2207,10 +2207,10 @@
       "score_basis": 14,
       "reliability_factor": 0.5,
       "adjusted_score": 7,
-      "percentile": 56.83,
+      "percentile": 56.43,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 56.83",
+        "Target price mapped from percentile 56.43",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
@@ -2235,10 +2235,10 @@
       "score_basis": 11.33,
       "reliability_factor": 0.75,
       "adjusted_score": 8.5,
-      "percentile": 59.84,
+      "percentile": 59.44,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 59.84",
+        "Target price mapped from percentile 59.44",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-06T14:00:00Z"
@@ -2263,10 +2263,10 @@
       "score_basis": 20,
       "reliability_factor": 0.5,
       "adjusted_score": 10,
-      "percentile": 62.85,
+      "percentile": 62.45,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 62.85",
+        "Target price mapped from percentile 62.45",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
@@ -2278,12 +2278,12 @@
       "role": "all_rounder",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 9,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": 1,
+      "price_change": 0,
       "matches_played": 2,
       "season_avg_points": 48,
       "recent_avg_points": 48,
@@ -2291,10 +2291,10 @@
       "score_basis": 48,
       "reliability_factor": 0.5,
       "adjusted_score": 24,
-      "percentile": 83.53,
+      "percentile": 83.13,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 83.53",
+        "Target price mapped from percentile 83.13",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
@@ -2319,10 +2319,10 @@
       "score_basis": 18,
       "reliability_factor": 0.5,
       "adjusted_score": 9,
-      "percentile": 60.84,
+      "percentile": 60.44,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 60.84",
+        "Target price mapped from percentile 60.44",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-02T14:00:00Z"
@@ -2347,7 +2347,7 @@
       "score_basis": 28,
       "reliability_factor": 0.5,
       "adjusted_score": 14,
-      "percentile": 70.08,
+      "percentile": 69.68,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -2373,7 +2373,7 @@
       "score_basis": 8,
       "reliability_factor": 0.25,
       "adjusted_score": 2,
-      "percentile": 47.19,
+      "percentile": 46.79,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -2399,7 +2399,7 @@
       "score_basis": 5.5,
       "reliability_factor": 0.5,
       "adjusted_score": 2.75,
-      "percentile": 49.6,
+      "percentile": 49.2,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -2425,7 +2425,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2452,7 +2452,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2479,7 +2479,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2506,7 +2506,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2533,7 +2533,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2560,7 +2560,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2587,7 +2587,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2614,7 +2614,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2641,7 +2641,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2668,7 +2668,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2695,7 +2695,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2722,7 +2722,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2749,10 +2749,10 @@
       "score_basis": 54.5,
       "reliability_factor": 0.5,
       "adjusted_score": 27.25,
-      "percentile": 88.35,
+      "percentile": 87.95,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 88.35",
+        "Target price mapped from percentile 87.95",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -2777,10 +2777,10 @@
       "score_basis": 32,
       "reliability_factor": 0.5,
       "adjusted_score": 16,
-      "percentile": 71.89,
+      "percentile": 71.49,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 71.89",
+        "Target price mapped from percentile 71.49",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -2805,10 +2805,10 @@
       "score_basis": 37.5,
       "reliability_factor": 0.5,
       "adjusted_score": 18.75,
-      "percentile": 77.11,
+      "percentile": 76.71,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 77.11",
+        "Target price mapped from percentile 76.71",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -2822,7 +2822,7 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 9,
+      "target_price": 8,
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
@@ -2833,9 +2833,11 @@
       "score_basis": 45,
       "reliability_factor": 0.5,
       "adjusted_score": 22.5,
-      "percentile": 80.32,
+      "percentile": 79.92,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 79.92",
+        "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
     },
@@ -2859,10 +2861,10 @@
       "score_basis": 40,
       "reliability_factor": 0.25,
       "adjusted_score": 10,
-      "percentile": 62.85,
+      "percentile": 62.45,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 62.85",
+        "Target price mapped from percentile 62.45",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -2887,7 +2889,7 @@
       "score_basis": 27.5,
       "reliability_factor": 0.5,
       "adjusted_score": 13.75,
-      "percentile": 69.28,
+      "percentile": 68.88,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -2913,10 +2915,10 @@
       "score_basis": 36,
       "reliability_factor": 0.25,
       "adjusted_score": 9,
-      "percentile": 60.84,
+      "percentile": 60.44,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 60.84",
+        "Target price mapped from percentile 60.44",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-01T14:00:00Z"
@@ -2928,12 +2930,12 @@
       "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
+      "old_price": 7,
+      "initial_price": 7,
       "target_price": 8,
       "smoothed_price": 7,
       "final_price": 7,
-      "price_change": 1,
+      "price_change": 0,
       "matches_played": 5,
       "season_avg_points": 19.5,
       "recent_avg_points": 17.67,
@@ -2941,10 +2943,10 @@
       "score_basis": 18.4,
       "reliability_factor": 1,
       "adjusted_score": 18.4,
-      "percentile": 75.5,
+      "percentile": 75.1,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 75.5",
+        "Target price mapped from percentile 75.1",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-06T14:00:00Z"
@@ -2969,7 +2971,7 @@
       "score_basis": 6,
       "reliability_factor": 0.5,
       "adjusted_score": 3,
-      "percentile": 50.2,
+      "percentile": 49.8,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -2982,12 +2984,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
+      "old_price": 7,
+      "initial_price": 7,
       "target_price": 8,
       "smoothed_price": 7,
       "final_price": 7,
-      "price_change": 1,
+      "price_change": 0,
       "matches_played": 2,
       "season_avg_points": 34.5,
       "recent_avg_points": 34.5,
@@ -2995,10 +2997,10 @@
       "score_basis": 34.5,
       "reliability_factor": 0.5,
       "adjusted_score": 17.25,
-      "percentile": 73.09,
+      "percentile": 72.69,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 73.09",
+        "Target price mapped from percentile 72.69",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -3023,7 +3025,7 @@
       "score_basis": 8,
       "reliability_factor": 0.5,
       "adjusted_score": 4,
-      "percentile": 51.41,
+      "percentile": 51,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -3049,7 +3051,7 @@
       "score_basis": 4.5,
       "reliability_factor": 0.5,
       "adjusted_score": 2.25,
-      "percentile": 48.59,
+      "percentile": 48.19,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -3075,7 +3077,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3102,10 +3104,10 @@
       "score_basis": 0,
       "reliability_factor": 0.25,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 22.49",
+        "Target price mapped from percentile 22.29",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-01T14:00:00Z"
@@ -3130,7 +3132,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3157,7 +3159,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3184,10 +3186,10 @@
       "score_basis": 15,
       "reliability_factor": 0.25,
       "adjusted_score": 3.75,
-      "percentile": 50.6,
+      "percentile": 50.2,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 50.6",
+        "Target price mapped from percentile 50.2",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -3212,7 +3214,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3239,7 +3241,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3266,10 +3268,10 @@
       "score_basis": 30,
       "reliability_factor": 0.25,
       "adjusted_score": 7.5,
-      "percentile": 58.63,
+      "percentile": 58.23,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 58.63",
+        "Target price mapped from percentile 58.23",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -3294,7 +3296,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3321,7 +3323,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3348,7 +3350,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3375,7 +3377,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3402,7 +3404,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3429,7 +3431,7 @@
       "score_basis": 49,
       "reliability_factor": 0.75,
       "adjusted_score": 36.75,
-      "percentile": 96.18,
+      "percentile": 95.78,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -3455,7 +3457,7 @@
       "score_basis": 46.33,
       "reliability_factor": 0.75,
       "adjusted_score": 34.75,
-      "percentile": 94.18,
+      "percentile": 93.78,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -3481,7 +3483,7 @@
       "score_basis": 32.67,
       "reliability_factor": 0.75,
       "adjusted_score": 24.5,
-      "percentile": 84.34,
+      "percentile": 83.94,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -3507,10 +3509,10 @@
       "score_basis": 26,
       "reliability_factor": 0.25,
       "adjusted_score": 6.5,
-      "percentile": 56.02,
+      "percentile": 55.62,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 56.02",
+        "Target price mapped from percentile 55.62",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
@@ -3535,7 +3537,7 @@
       "score_basis": 27.25,
       "reliability_factor": 0.5,
       "adjusted_score": 13.63,
-      "percentile": 68.67,
+      "percentile": 68.27,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -3561,10 +3563,10 @@
       "score_basis": 40,
       "reliability_factor": 0.25,
       "adjusted_score": 10,
-      "percentile": 62.85,
+      "percentile": 62.45,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 62.85",
+        "Target price mapped from percentile 62.45",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T10:00:00Z"
@@ -3589,9 +3591,66 @@
       "score_basis": 22.33,
       "reliability_factor": 0.75,
       "adjusted_score": 16.75,
-      "percentile": 72.29,
+      "percentile": 71.89,
       "calculation_notes": [
         "Used old_price for smoothing"
+      ],
+      "last_match_played_at_utc": "2026-04-07T14:00:00Z"
+    },
+    {
+      "player_id": "mi_raghu-sharma",
+      "name": "Raghu Sharma",
+      "team": "MI",
+      "role": "bowler",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 9,
+      "smoothed_price": 8,
+      "final_price": 8,
+      "price_change": 0,
+      "matches_played": 3,
+      "season_avg_points": 49,
+      "recent_avg_points": 49,
+      "last_match_points": 2,
+      "score_basis": 49,
+      "reliability_factor": 0.75,
+      "adjusted_score": 36.75,
+      "percentile": 95.78,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 95.78",
+        "Applied smoothing against the target price",
+        "Uncapped player price ceiling applied at 9 credits"
+      ],
+      "last_match_played_at_utc": "2026-04-07T14:00:00Z"
+    },
+    {
+      "player_id": "mi_surya-kumar-yadav",
+      "name": "Surya Kumar Yadav",
+      "team": "MI",
+      "role": "batter",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 9,
+      "smoothed_price": 8,
+      "final_price": 8,
+      "price_change": 0,
+      "matches_played": 5,
+      "season_avg_points": 24.6,
+      "recent_avg_points": 36,
+      "last_match_points": 8,
+      "score_basis": 31.44,
+      "reliability_factor": 1,
+      "adjusted_score": 31.44,
+      "percentile": 91.97,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 91.97",
+        "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-07T14:00:00Z"
     },
@@ -3615,7 +3674,7 @@
       "score_basis": 8.25,
       "reliability_factor": 0.5,
       "adjusted_score": 4.13,
-      "percentile": 52.21,
+      "percentile": 51.81,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -3641,7 +3700,7 @@
       "score_basis": 2.5,
       "reliability_factor": 0.75,
       "adjusted_score": 1.88,
-      "percentile": 46.59,
+      "percentile": 46.18,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -3667,7 +3726,7 @@
       "score_basis": 1.5,
       "reliability_factor": 0.5,
       "adjusted_score": 0.75,
-      "percentile": 45.98,
+      "percentile": 45.58,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -3680,12 +3739,12 @@
       "role": "batter",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
+      "old_price": 7,
+      "initial_price": 7,
       "target_price": 8,
       "smoothed_price": 7,
       "final_price": 7,
-      "price_change": 1,
+      "price_change": 0,
       "matches_played": 3,
       "season_avg_points": 25.33,
       "recent_avg_points": 25.33,
@@ -3693,40 +3752,11 @@
       "score_basis": 25.33,
       "reliability_factor": 0.75,
       "adjusted_score": 19,
-      "percentile": 77.91,
+      "percentile": 77.51,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 77.91",
+        "Target price mapped from percentile 77.51",
         "Applied smoothing against the target price"
-      ],
-      "last_match_played_at_utc": "2026-04-07T14:00:00Z"
-    },
-    {
-      "player_id": "mi_raghu-sharma",
-      "name": "Raghu Sharma",
-      "team": "MI",
-      "role": "bowler",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
-      "target_price": 9,
-      "smoothed_price": 7,
-      "final_price": 7,
-      "price_change": 1,
-      "matches_played": 3,
-      "season_avg_points": 49,
-      "recent_avg_points": 49,
-      "last_match_points": 2,
-      "score_basis": 49,
-      "reliability_factor": 0.75,
-      "adjusted_score": 36.75,
-      "percentile": 96.18,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 96.18",
-        "Applied smoothing against the target price",
-        "Uncapped player price ceiling applied at 9 credits"
       ],
       "last_match_played_at_utc": "2026-04-07T14:00:00Z"
     },
@@ -3750,38 +3780,10 @@
       "score_basis": 16.67,
       "reliability_factor": 0.75,
       "adjusted_score": 12.5,
-      "percentile": 67.67,
+      "percentile": 67.27,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 67.67",
-        "Applied smoothing against the target price"
-      ],
-      "last_match_played_at_utc": "2026-04-07T14:00:00Z"
-    },
-    {
-      "player_id": "mi_surya-kumar-yadav",
-      "name": "Surya Kumar Yadav",
-      "team": "MI",
-      "role": "batter",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
-      "target_price": 10,
-      "smoothed_price": 7,
-      "final_price": 7,
-      "price_change": 1,
-      "matches_played": 5,
-      "season_avg_points": 24.6,
-      "recent_avg_points": 36,
-      "last_match_points": 8,
-      "score_basis": 31.44,
-      "reliability_factor": 1,
-      "adjusted_score": 31.44,
-      "percentile": 92.37,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 92.37",
+        "Target price mapped from percentile 67.27",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-07T14:00:00Z"
@@ -3806,10 +3808,10 @@
       "score_basis": 20.5,
       "reliability_factor": 0.5,
       "adjusted_score": 10.25,
-      "percentile": 63.86,
+      "percentile": 63.45,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 63.86",
+        "Target price mapped from percentile 63.45",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-07T14:00:00Z"
@@ -3834,7 +3836,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3861,7 +3863,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3888,7 +3890,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3915,7 +3917,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3942,7 +3944,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3969,7 +3971,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3996,7 +3998,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4023,7 +4025,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4050,7 +4052,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4105,7 +4107,7 @@
       "score_basis": 70.5,
       "reliability_factor": 0.5,
       "adjusted_score": 35.25,
-      "percentile": 94.78,
+      "percentile": 94.38,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -4131,10 +4133,10 @@
       "score_basis": 30.5,
       "reliability_factor": 0.5,
       "adjusted_score": 15.25,
-      "percentile": 71.49,
+      "percentile": 71.08,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 71.49",
+        "Target price mapped from percentile 71.08",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
@@ -4159,7 +4161,7 @@
       "score_basis": 38.67,
       "reliability_factor": 0.75,
       "adjusted_score": 29,
-      "percentile": 91.16,
+      "percentile": 90.76,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -4185,10 +4187,10 @@
       "score_basis": 36,
       "reliability_factor": 0.5,
       "adjusted_score": 18,
-      "percentile": 74.5,
+      "percentile": 74.1,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 74.5",
+        "Target price mapped from percentile 74.1",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
@@ -4213,7 +4215,7 @@
       "score_basis": 50.5,
       "reliability_factor": 0.5,
       "adjusted_score": 25.25,
-      "percentile": 85.54,
+      "percentile": 85.14,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -4239,10 +4241,10 @@
       "score_basis": 35,
       "reliability_factor": 0.5,
       "adjusted_score": 17.5,
-      "percentile": 73.9,
+      "percentile": 73.49,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 73.9",
+        "Target price mapped from percentile 73.49",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
@@ -4267,10 +4269,38 @@
       "score_basis": 15.5,
       "reliability_factor": 0.5,
       "adjusted_score": 7.75,
-      "percentile": 59.04,
+      "percentile": 58.63,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 59.04",
+        "Target price mapped from percentile 58.63",
+        "Applied smoothing against the target price"
+      ],
+      "last_match_played_at_utc": "2026-04-03T14:00:00Z"
+    },
+    {
+      "player_id": "pbks_vyshak-vijaykumar",
+      "name": "Vyshak Vijaykumar",
+      "team": "PBKS",
+      "role": "bowler",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 9,
+      "smoothed_price": 8,
+      "final_price": 8,
+      "price_change": 0,
+      "matches_played": 2,
+      "season_avg_points": 56,
+      "recent_avg_points": 56,
+      "last_match_points": 40,
+      "score_basis": 56,
+      "reliability_factor": 0.5,
+      "adjusted_score": 28,
+      "percentile": 89.56,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 89.56",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
@@ -4295,7 +4325,7 @@
       "score_basis": 27,
       "reliability_factor": 0.75,
       "adjusted_score": 20.25,
-      "percentile": 78.31,
+      "percentile": 77.91,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -4321,10 +4351,10 @@
       "score_basis": 18.4,
       "reliability_factor": 1,
       "adjusted_score": 18.4,
-      "percentile": 75.5,
+      "percentile": 75.1,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 75.5",
+        "Target price mapped from percentile 75.1",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-06T14:00:00Z"
@@ -4349,7 +4379,7 @@
       "score_basis": 4.5,
       "reliability_factor": 0.5,
       "adjusted_score": 2.25,
-      "percentile": 48.59,
+      "percentile": 48.19,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -4375,37 +4405,9 @@
       "score_basis": 9,
       "reliability_factor": 0.5,
       "adjusted_score": 4.5,
-      "percentile": 52.81,
+      "percentile": 52.41,
       "calculation_notes": [
         "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-03T14:00:00Z"
-    },
-    {
-      "player_id": "pbks_vyshak-vijaykumar",
-      "name": "Vyshak Vijaykumar",
-      "team": "PBKS",
-      "role": "bowler",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
-      "target_price": 9,
-      "smoothed_price": 7,
-      "final_price": 7,
-      "price_change": 1,
-      "matches_played": 2,
-      "season_avg_points": 56,
-      "recent_avg_points": 56,
-      "last_match_points": 40,
-      "score_basis": 56,
-      "reliability_factor": 0.5,
-      "adjusted_score": 28,
-      "percentile": 89.96,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 89.96",
-        "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
@@ -4429,7 +4431,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4456,7 +4458,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4483,7 +4485,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4510,7 +4512,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4537,7 +4539,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4564,7 +4566,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4591,10 +4593,10 @@
       "score_basis": 36,
       "reliability_factor": 0.25,
       "adjusted_score": 9,
-      "percentile": 60.84,
+      "percentile": 60.44,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 60.84",
+        "Target price mapped from percentile 60.44",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-01T14:00:00Z"
@@ -4619,7 +4621,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4646,7 +4648,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4673,7 +4675,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4700,7 +4702,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4727,7 +4729,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4754,7 +4756,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4807,7 +4809,7 @@
       "score_basis": 71.5,
       "reliability_factor": 0.5,
       "adjusted_score": 35.75,
-      "percentile": 95.18,
+      "percentile": 94.78,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -4833,10 +4835,10 @@
       "score_basis": 65.75,
       "reliability_factor": 0.5,
       "adjusted_score": 32.88,
-      "percentile": 93.17,
+      "percentile": 92.77,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 93.17",
+        "Target price mapped from percentile 92.77",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T14:00:00Z"
@@ -4861,10 +4863,10 @@
       "score_basis": 64.5,
       "reliability_factor": 0.5,
       "adjusted_score": 32.25,
-      "percentile": 92.77,
+      "percentile": 92.37,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 92.77",
+        "Target price mapped from percentile 92.37",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T14:00:00Z"
@@ -4889,10 +4891,10 @@
       "score_basis": 37.25,
       "reliability_factor": 0.5,
       "adjusted_score": 18.63,
-      "percentile": 76.31,
+      "percentile": 75.9,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 76.31",
+        "Target price mapped from percentile 75.9",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T14:00:00Z"
@@ -4917,7 +4919,7 @@
       "score_basis": 61,
       "reliability_factor": 0.5,
       "adjusted_score": 30.5,
-      "percentile": 91.57,
+      "percentile": 91.16,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -4943,7 +4945,7 @@
       "score_basis": 18.4,
       "reliability_factor": 1,
       "adjusted_score": 18.4,
-      "percentile": 75.5,
+      "percentile": 75.1,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -4969,10 +4971,38 @@
       "score_basis": 52.75,
       "reliability_factor": 0.5,
       "adjusted_score": 26.38,
-      "percentile": 86.35,
+      "percentile": 85.94,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 86.35",
+        "Target price mapped from percentile 85.94",
+        "Applied smoothing against the target price"
+      ],
+      "last_match_played_at_utc": "2026-04-05T14:00:00Z"
+    },
+    {
+      "player_id": "rcb_phil-salt",
+      "name": "Phil Salt",
+      "team": "RCB",
+      "role": "wicket_keeper",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 9,
+      "smoothed_price": 8,
+      "final_price": 8,
+      "price_change": 0,
+      "matches_played": 2,
+      "season_avg_points": 46,
+      "recent_avg_points": 46,
+      "last_match_points": 60,
+      "score_basis": 46,
+      "reliability_factor": 0.5,
+      "adjusted_score": 23,
+      "percentile": 80.72,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 80.72",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T14:00:00Z"
@@ -4997,10 +5027,10 @@
       "score_basis": 23.94,
       "reliability_factor": 1,
       "adjusted_score": 23.94,
-      "percentile": 82.53,
+      "percentile": 82.13,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 82.53",
+        "Target price mapped from percentile 82.13",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-07T14:00:00Z"
@@ -5025,7 +5055,7 @@
       "score_basis": 8,
       "reliability_factor": 0.5,
       "adjusted_score": 4,
-      "percentile": 51.41,
+      "percentile": 51,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -5051,37 +5081,9 @@
       "score_basis": 18.25,
       "reliability_factor": 0.5,
       "adjusted_score": 9.13,
-      "percentile": 61.85,
+      "percentile": 61.45,
       "calculation_notes": [
         "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-05T14:00:00Z"
-    },
-    {
-      "player_id": "rcb_phil-salt",
-      "name": "Phil Salt",
-      "team": "RCB",
-      "role": "wicket_keeper",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
-      "target_price": 9,
-      "smoothed_price": 7,
-      "final_price": 7,
-      "price_change": 1,
-      "matches_played": 2,
-      "season_avg_points": 46,
-      "recent_avg_points": 46,
-      "last_match_points": 60,
-      "score_basis": 46,
-      "reliability_factor": 0.5,
-      "adjusted_score": 23,
-      "percentile": 81.12,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 81.12",
-        "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T14:00:00Z"
     },
@@ -5105,10 +5107,10 @@
       "score_basis": 8,
       "reliability_factor": 0.25,
       "adjusted_score": 2,
-      "percentile": 47.19,
+      "percentile": 46.79,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 47.19",
+        "Target price mapped from percentile 46.79",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T14:00:00Z"
@@ -5133,7 +5135,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5160,7 +5162,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5187,7 +5189,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5214,7 +5216,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5241,7 +5243,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5268,7 +5270,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5295,7 +5297,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5322,10 +5324,10 @@
       "score_basis": 9,
       "reliability_factor": 0.5,
       "adjusted_score": 4.5,
-      "percentile": 52.81,
+      "percentile": 52.41,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 52.81",
+        "Target price mapped from percentile 52.41",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-03T14:00:00Z"
@@ -5350,7 +5352,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5377,7 +5379,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5404,7 +5406,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5431,7 +5433,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5458,7 +5460,7 @@
       "score_basis": 51.67,
       "reliability_factor": 0.75,
       "adjusted_score": 38.75,
-      "percentile": 97.59,
+      "percentile": 97.19,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -5536,7 +5538,7 @@
       "score_basis": 30.5,
       "reliability_factor": 0.75,
       "adjusted_score": 22.88,
-      "percentile": 80.72,
+      "percentile": 80.32,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -5562,9 +5564,38 @@
       "score_basis": 36.33,
       "reliability_factor": 0.75,
       "adjusted_score": 27.25,
-      "percentile": 87.95,
+      "percentile": 87.55,
       "calculation_notes": [
         "Used old_price for smoothing"
+      ],
+      "last_match_played_at_utc": "2026-04-07T14:00:00Z"
+    },
+    {
+      "player_id": "rr_vaibhav-suryavanshi",
+      "name": "Vaibhav Suryavanshi",
+      "team": "RR",
+      "role": "batter",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 6,
+      "initial_price": 6,
+      "target_price": 9,
+      "smoothed_price": 9,
+      "final_price": 9,
+      "price_change": 3,
+      "matches_played": 3,
+      "season_avg_points": 56.67,
+      "recent_avg_points": 56.67,
+      "last_match_points": 57,
+      "score_basis": 56.67,
+      "reliability_factor": 0.75,
+      "adjusted_score": 42.5,
+      "percentile": 97.59,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Recovered real match history from a previously blank price; used the corrected target price immediately",
+        "Target price mapped from percentile 97.59",
+        "Uncapped player price ceiling applied at 9 credits"
       ],
       "last_match_played_at_utc": "2026-04-07T14:00:00Z"
     },
@@ -5588,13 +5619,41 @@
       "score_basis": 28,
       "reliability_factor": 0.25,
       "adjusted_score": 7,
-      "percentile": 56.83,
+      "percentile": 56.43,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 56.83",
+        "Target price mapped from percentile 56.43",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-03-30T14:00:00Z"
+    },
+    {
+      "player_id": "rr_ravi-singh",
+      "name": "Ravi Singh",
+      "team": "RR",
+      "role": "wicket_keeper",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 9,
+      "smoothed_price": 8,
+      "final_price": 8,
+      "price_change": 0,
+      "matches_played": 2,
+      "season_avg_points": 48,
+      "recent_avg_points": 48,
+      "last_match_points": 50,
+      "score_basis": 48,
+      "reliability_factor": 0.5,
+      "adjusted_score": 24,
+      "percentile": 83.13,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 83.13",
+        "Applied smoothing against the target price"
+      ],
+      "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
     {
       "player_id": "rr_ravindra-jadeja",
@@ -5616,7 +5675,7 @@
       "score_basis": 27.5,
       "reliability_factor": 0.5,
       "adjusted_score": 13.75,
-      "percentile": 69.28,
+      "percentile": 68.88,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -5642,7 +5701,7 @@
       "score_basis": 25,
       "reliability_factor": 0.75,
       "adjusted_score": 18.75,
-      "percentile": 77.11,
+      "percentile": 76.71,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -5668,10 +5727,10 @@
       "score_basis": 23.94,
       "reliability_factor": 1,
       "adjusted_score": 23.94,
-      "percentile": 82.53,
+      "percentile": 82.13,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 82.53",
+        "Target price mapped from percentile 82.13",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-07T14:00:00Z"
@@ -5696,10 +5755,10 @@
       "score_basis": 22,
       "reliability_factor": 0.5,
       "adjusted_score": 11,
-      "percentile": 64.66,
+      "percentile": 64.26,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 64.66",
+        "Target price mapped from percentile 64.26",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-07T14:00:00Z"
@@ -5724,7 +5783,7 @@
       "score_basis": 23.75,
       "reliability_factor": 0.5,
       "adjusted_score": 11.88,
-      "percentile": 65.86,
+      "percentile": 65.46,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -5750,41 +5809,13 @@
       "score_basis": 1,
       "reliability_factor": 0.25,
       "adjusted_score": 0.25,
-      "percentile": 44.98,
+      "percentile": 44.58,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 44.98",
+        "Target price mapped from percentile 44.58",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-04T14:00:00Z"
-    },
-    {
-      "player_id": "rr_ravi-singh",
-      "name": "Ravi Singh",
-      "team": "RR",
-      "role": "wicket_keeper",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
-      "target_price": 9,
-      "smoothed_price": 7,
-      "final_price": 7,
-      "price_change": 1,
-      "matches_played": 2,
-      "season_avg_points": 48,
-      "recent_avg_points": 48,
-      "last_match_points": 50,
-      "score_basis": 48,
-      "reliability_factor": 0.5,
-      "adjusted_score": 24,
-      "percentile": 83.53,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 83.53",
-        "Applied smoothing against the target price"
-      ],
-      "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
     {
       "player_id": "rr_adam-milne",
@@ -5806,7 +5837,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5833,7 +5864,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5860,7 +5891,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5887,7 +5918,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5914,7 +5945,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5941,7 +5972,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5968,7 +5999,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5995,34 +6026,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "No matches played; retained base price"
-      ],
-      "last_match_played_at_utc": null
-    },
-    {
-      "player_id": "rr_vaibhav-suryavanshi",
-      "name": "Vaibhav Suryavanshi",
-      "team": "RR",
-      "role": "batter",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
-      "target_price": 5,
-      "smoothed_price": 6,
-      "final_price": 6,
-      "price_change": 0,
-      "matches_played": 0,
-      "season_avg_points": 0,
-      "recent_avg_points": 0,
-      "last_match_points": 0,
-      "score_basis": 0,
-      "reliability_factor": 0,
-      "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6049,7 +6053,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6076,7 +6080,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6103,7 +6107,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6156,7 +6160,7 @@
       "score_basis": 46.33,
       "reliability_factor": 0.75,
       "adjusted_score": 34.75,
-      "percentile": 94.18,
+      "percentile": 93.78,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -6182,7 +6186,7 @@
       "score_basis": 44.83,
       "reliability_factor": 0.75,
       "adjusted_score": 33.62,
-      "percentile": 93.57,
+      "percentile": 93.17,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -6234,7 +6238,7 @@
       "score_basis": 27.6,
       "reliability_factor": 1,
       "adjusted_score": 27.6,
-      "percentile": 89.16,
+      "percentile": 88.76,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -6260,10 +6264,10 @@
       "score_basis": 23.33,
       "reliability_factor": 0.75,
       "adjusted_score": 17.5,
-      "percentile": 73.49,
+      "percentile": 73.09,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 73.49",
+        "Target price mapped from percentile 73.09",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -6288,10 +6292,10 @@
       "score_basis": 27.17,
       "reliability_factor": 0.75,
       "adjusted_score": 20.38,
-      "percentile": 78.71,
+      "percentile": 78.31,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 78.71",
+        "Target price mapped from percentile 78.31",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -6316,7 +6320,7 @@
       "score_basis": 37.5,
       "reliability_factor": 0.75,
       "adjusted_score": 28.13,
-      "percentile": 90.36,
+      "percentile": 89.96,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -6342,10 +6346,10 @@
       "score_basis": 25,
       "reliability_factor": 0.75,
       "adjusted_score": 18.75,
-      "percentile": 77.11,
+      "percentile": 76.71,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 77.11",
+        "Target price mapped from percentile 76.71",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -6370,7 +6374,7 @@
       "score_basis": 24.25,
       "reliability_factor": 0.5,
       "adjusted_score": 12.13,
-      "percentile": 66.67,
+      "percentile": 66.27,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -6396,10 +6400,10 @@
       "score_basis": 32,
       "reliability_factor": 0.25,
       "adjusted_score": 8,
-      "percentile": 59.44,
+      "percentile": 59.04,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 59.44",
+        "Target price mapped from percentile 59.04",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -6424,10 +6428,10 @@
       "score_basis": 14.5,
       "reliability_factor": 0.5,
       "adjusted_score": 7.25,
-      "percentile": 57.63,
+      "percentile": 57.23,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 57.63",
+        "Target price mapped from percentile 57.23",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-05T10:00:00Z"
@@ -6452,7 +6456,7 @@
       "score_basis": 4.25,
       "reliability_factor": 0.5,
       "adjusted_score": 2.13,
-      "percentile": 47.79,
+      "percentile": 47.39,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -6478,7 +6482,7 @@
       "score_basis": 5.5,
       "reliability_factor": 0.5,
       "adjusted_score": 2.75,
-      "percentile": 49.6,
+      "percentile": 49.2,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -6504,7 +6508,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6531,7 +6535,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6558,7 +6562,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6585,7 +6589,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6612,7 +6616,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6639,7 +6643,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6666,7 +6670,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6693,7 +6697,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6720,7 +6724,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6747,7 +6751,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6774,7 +6778,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 22.49,
+      "percentile": 22.29,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"

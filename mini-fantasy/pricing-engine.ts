@@ -35,6 +35,7 @@ export interface PricingPlayerInput {
   pricing_eligible: boolean;
   old_price: number | null;
   initial_price: number | null;
+  recovered_history?: boolean;
   match_points: number[];
   matches_played: number;
   last_match_played_at_utc: string | null;
@@ -135,6 +136,7 @@ interface DerivedPlayerInputs {
   player: PricingPlayerInput;
   basePrice: number;
   maxDailyPriceStep: number;
+  recoveredHistory: boolean;
   seasonAveragePoints: number;
   recentAveragePoints: number;
   lastMatchPoints: number;
@@ -411,6 +413,10 @@ function createCalculationNotes(
     return notes;
   }
 
+  if (derived.recoveredHistory) {
+    notes.push('Recovered real match history from a previously blank price; used the corrected target price immediately');
+  }
+
   if (targetPrice !== derived.basePrice) {
     notes.push(`Target price mapped from percentile ${roundTo(derived.percentile, 2)}`);
   }
@@ -450,6 +456,7 @@ function derivePlayerInputs(player: PricingPlayerInput, jobMeta: PricingJobMetaI
     player,
     basePrice,
     maxDailyPriceStep: jobMeta.max_daily_price_step,
+    recoveredHistory: Boolean(player.recovered_history) && effectiveMatchesPlayed > 0,
     seasonAveragePoints,
     recentAveragePoints,
     lastMatchPoints,
@@ -484,13 +491,17 @@ export function generatePrices(input: PricingJobInput): PricingJobOutput {
 
       // Keep brand-new or inactive players stable until they have usable ranked history.
       const rawSmoothedPrice =
-        entry.player.pricing_eligible && entry.effectiveMatchesPlayed > 0
+        entry.recoveredHistory
+          ? targetPrice
+          : entry.player.pricing_eligible && entry.effectiveMatchesPlayed > 0
           ? smoothPrice(entry.basePrice, targetPrice)
           : entry.basePrice;
       const smoothedPrice = clamp(rawSmoothedPrice, input.job_meta.price_min, playerPriceMax);
 
       const finalPrice =
-        entry.player.pricing_eligible && entry.effectiveMatchesPlayed > 0
+        entry.recoveredHistory
+          ? clamp(targetPrice, input.job_meta.price_min, playerPriceMax)
+          : entry.player.pricing_eligible && entry.effectiveMatchesPlayed > 0
           ? capPriceMovement(
               smoothedPrice,
               entry.basePrice,

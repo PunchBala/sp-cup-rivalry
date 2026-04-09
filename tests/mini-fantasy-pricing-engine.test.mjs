@@ -275,6 +275,57 @@ test('generatePrices caps uncapped players at 9 credits even if their rank maps 
   assert.match(sameer.calculation_notes.join(' '), /uncapped player price ceiling applied at 9 credits/i);
 });
 
+test('generatePrices snaps recovered histories to the corrected target price', () => {
+  const output = generatePrices(
+    createJob([
+      {
+        player_id: 'vaibhav_fix',
+        name: 'Vaibhav Suryavanshi',
+        team: 'RR',
+        role: 'batter',
+        is_uncapped: true,
+        pricing_eligible: true,
+        old_price: 6,
+        initial_price: 6,
+        recovered_history: true,
+        match_points: [61, 52, 57],
+        matches_played: 3,
+        last_match_played_at_utc: '2026-04-08T18:30:00Z'
+      },
+      {
+        player_id: 'steady_star',
+        name: 'Steady Star',
+        team: 'AAA',
+        role: 'batter',
+        pricing_eligible: true,
+        old_price: 8,
+        initial_price: 8,
+        match_points: [45, 44, 43, 42],
+        matches_played: 4,
+        last_match_played_at_utc: '2026-04-08T18:30:00Z'
+      },
+      {
+        player_id: 'depth_piece',
+        name: 'Depth Piece',
+        team: 'BBB',
+        role: 'bowler',
+        pricing_eligible: true,
+        old_price: 6,
+        initial_price: 6,
+        match_points: [10, 12],
+        matches_played: 2,
+        last_match_played_at_utc: '2026-04-08T18:30:00Z'
+      }
+    ])
+  );
+
+  const vaibhav = output.players.find((player) => player.player_id === 'vaibhav_fix');
+  assert.equal(vaibhav.smoothed_price, vaibhav.target_price);
+  assert.equal(vaibhav.final_price, vaibhav.target_price);
+  assert.ok(vaibhav.final_price > 6);
+  assert.match(vaibhav.calculation_notes.join(' '), /Recovered real match history/i);
+});
+
 test('pricing example fixture returns stable JSON-shaped output', async () => {
   const fixturePath = path.resolve(process.cwd(), 'fixtures', 'mini_fantasy_pricing_job_example.json');
   const raw = await fs.readFile(fixturePath, 'utf8');
