@@ -19,6 +19,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /id="miniFantasyLeaderboard"/);
   assert.match(html, /id="miniFantasyLockedViewer"/);
   assert.match(html, /id="miniFantasyPickerModal"/);
+  assert.match(html, /id="toastBanner"/);
   assert.match(html, /id="authPanel"/);
   assert.match(html, /id="profilePanel"/);
   assert.match(html, /id="createDuelPanel"/);
@@ -81,6 +82,9 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /data-directory-filter=/);
   assert.match(html, /data-mini-fixture=/);
   assert.match(html, /data-mini-pick=/);
+  assert.match(html, /data-mini-picker-role=/);
   assert.match(html, /data-mini-picker-value=/);
+  assert.match(html, /const savedScroll = scrollEl \? scrollEl\.scrollTop : 0/);
+  assert.match(html, /scrollElAfter\) scrollElAfter\.scrollTop = savedScroll/);
   assert.match(html, /window\.history\.replaceState/);
 });

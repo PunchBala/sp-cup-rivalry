@@ -246,6 +246,10 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
 
   await page.locator('[data-mini-pick="0"]').click();
   await expect(page.locator('#miniFantasyPickerModal')).toBeVisible();
+  await page.locator('[data-mini-picker-role="bowler"]').click();
+  await page.locator('#miniFantasyPickerSearch').fill('duckett');
+  await expect(page.locator('#miniFantasyPickerBody')).toContainText('No player matches the current search and team filter.');
+  await page.locator('[data-mini-picker-role="ALL"]').click();
   await page.locator('#miniFantasyPickerSearch').fill('duckett');
   await page.locator('[data-mini-picker-value="dc_ben-duckett"]').click();
 
