@@ -71,15 +71,15 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await page.locator('#authForm button[type="submit"]').click();
   await expect(page.locator('#myDuelsPanel')).toContainText('Senthil vs Sai');
   await expect(page.locator('#myDuelsPanel')).toContainText('Live from Match 1');
+  await page.locator('#profileChipButton').click();
+  await expect(page.locator('#profileDrawer')).toBeVisible();
   await page.locator('#authPanel').getByRole('button', { name: 'Sign out' }).click();
 
   await page.locator('#authDisplayName').fill('Anand');
   await page.locator('#authOwnerId').fill('anand');
   await page.locator('#authForm button[type="submit"]').click();
-  await expect(page.locator('#authPanel')).toContainText('Signed in as Anand');
-  await expect(page.locator('#profilePanel')).toContainText('Anand');
+  await expect(page.locator('#profileChipButton')).toContainText('Anand');
   await expect(page.locator('#myDuelsPanel')).toContainText('No duels yet');
-  await page.locator('#profileDrawer [data-close-drawer="profile"]').click();
   await page.locator('#createDuelButton').click();
   await expect(page.locator('#createDrawer')).toBeVisible();
   await expect(page.locator('#createDuelPanel')).toContainText('How Duel works');
@@ -134,7 +134,7 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await page.locator('#authDisplayName').fill('Bala');
   await page.locator('#authOwnerId').fill('bala');
   await page.locator('#authForm button[type="submit"]').click();
-  await page.locator('#profileDrawer [data-close-drawer="profile"]').click();
+  await expect(page.locator('#profileChipButton')).toContainText('Bala');
   await page.locator('#createDuelButton').click();
   await page.locator('#joinByCodeInput').fill(duelCode);
   await page.getByRole('button', { name: 'Join by code' }).click();
@@ -227,7 +227,7 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
   await page.locator('#authDisplayName').fill('Mini Bala');
   await page.locator('#authOwnerId').fill('mini-bala');
   await page.locator('#authForm button[type="submit"]').click();
-  await page.locator('#profileDrawer [data-close-drawer="profile"]').click();
+  await expect(page.locator('#profileChipButton')).toContainText('Mini Bala');
 
   await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Mini Fantasy');
   await expect(page.getByRole('button', { name: 'Duel', exact: true })).toBeVisible();
