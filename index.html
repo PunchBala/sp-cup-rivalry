@@ -376,6 +376,39 @@
     .studio-invite-code{display:inline-flex;align-items:center;gap:8px;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(7,12,24,.38);font-size:16px;font-weight:900;color:#fff;overflow-wrap:anywhere;word-break:break-word}
     .studio-invite-actions{display:flex;gap:10px;flex-wrap:wrap}
     .studio-callout{padding:12px 14px;border-radius:14px;border:1px solid var(--info-line);background:linear-gradient(180deg, rgba(124,196,255,.14), rgba(18,31,66,.82));font-size:13px;line-height:1.55;color:#eff7ff}
+    .toast-banner{
+      position:fixed;
+      top:20px;
+      left:50%;
+      transform:translateX(-50%) translateY(0);
+      z-index:300;
+      min-width:280px;
+      max-width:min(560px,90vw);
+      padding:14px 20px;
+      border-radius:14px;
+      font-size:13px;
+      font-weight:700;
+      line-height:1.5;
+      text-align:center;
+      box-shadow:0 8px 32px rgba(0,0,0,.45);
+      transition:opacity .22s ease, transform .22s ease;
+      pointer-events:auto;
+    }
+    .toast-banner.toast-good{
+      background:linear-gradient(180deg,rgba(68,215,146,.22),rgba(20,60,40,.96));
+      border:1px solid rgba(68,215,146,.34);
+      color:#b8f5d4;
+    }
+    .toast-banner.toast-bad{
+      background:linear-gradient(180deg,rgba(255,90,120,.22),rgba(50,16,22,.96));
+      border:1px solid rgba(255,90,120,.34);
+      color:#ffc4ce;
+    }
+    .toast-banner.toast-hidden{
+      opacity:0;
+      transform:translateX(-50%) translateY(-12px);
+      pointer-events:none;
+    }
     .surface-backdrop{
       position:fixed;
       inset:0;
@@ -423,7 +456,7 @@
       inset:0;
       z-index:120;
       display:flex;
-      align-items:flex-end;
+      align-items:center;
       justify-content:center;
       padding:18px;
       background:rgba(4,9,18,.70);
@@ -1006,6 +1039,8 @@
       </div>
     </div>
 
+    <div id="toastBanner" class="toast-banner toast-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+
     <div id="surfaceBackdrop" class="surface-backdrop section-hidden"></div>
 
     <aside id="profileDrawer" class="surface-drawer section-hidden" aria-hidden="true">
@@ -1109,7 +1144,7 @@
           <button class="picker-close" id="miniFantasyPickerClose" type="button">Close picker</button>
         </div>
         <div class="picker-toolbar" id="miniFantasyPickerToolbar"></div>
-        <div id="miniFantasyPickerBody"></div>
+        <div id="miniFantasyPickerBody"  style="margin-top:16px"></div>
         <div class="picker-footer">
           <div class="picker-count" id="miniFantasyPickerCount">0 options</div>
           <div class="studio-inline">
@@ -1176,6 +1211,19 @@
     let HOSTED_AUTH_MODE = 'signin';
     let AUTH_FORM_PREFILL = { displayName: '', ownerId: '', email: '' };
     let AUTH_PANEL_NOTICE = null;
+    let _toastTimer = null;
+
+    function showToast(type, text, durationMs = 5000){
+      const el = document.getElementById('toastBanner');
+      if (!el) return;
+      if (_toastTimer) { clearTimeout(_toastTimer); _toastTimer = null; }
+      el.className = `toast-banner toast-${type === 'good' ? 'good' : 'bad'}`;
+      el.textContent = text;
+      _toastTimer = setTimeout(() => {
+        el.classList.add('toast-hidden');
+        _toastTimer = null;
+      }, durationMs);
+    }
     let CUSTOM_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_MINI_FANTASY_ENTRIES = [];
@@ -1194,6 +1242,7 @@
       matchNo: null,
       slotIndex: null,
       teamFilter: 'ALL',
+      roleFilter: 'ALL',
       search: '',
       restoreSearchFocus: false,
       searchSelectionStart: null,
@@ -5486,7 +5535,7 @@ function titleBandScore(pick, live){
                   text: 'Your account is ready. Sign in now with the same email + password.',
                   nextStep: 'Use only email + password in Sign in. Display name and handle are already saved.'
                 });
-                setStudioNotice('info', 'Account created. Sign in now with the same email + password.');
+                showToast('good', 'Account created. Sign in now with the same email + password.');
                 await syncMiniFantasyEntries();
                 render();
                 return;
@@ -5494,7 +5543,7 @@ function titleBandScore(pick, live){
               CURRENT_USER = normalizeUserProfile(remoteUser || {}) || null;
               if (!CURRENT_USER) {
                 setAuthPanelNotice('bad', 'Your account exists, but the profile could not load yet. Please try signing in again.');
-                setStudioNotice('bad', 'The hosted account signed in, but the Duels profile is incomplete.');
+                showToast('bad', 'Profile could not load. Please try signing in again.');
                 render();
                 return;
               }
@@ -5504,12 +5553,13 @@ function titleBandScore(pick, live){
                 ownerId: CURRENT_USER.ownerId,
                 email: CURRENT_USER.email || formData.get('email') || AUTH_FORM_PREFILL.email || ''
               });
-              setStudioNotice('good', `Signed in as ${CURRENT_USER.displayName}. Your Duels and Mini Fantasy account is ready in this browser.`);
+              setActiveDrawer(null);
+              showToast('good', `Signed in as ${CURRENT_USER.displayName}. Your Duels and Mini Fantasy account is ready.`);
               await syncMiniFantasyEntries();
             } catch (error) {
               const friendlyError = friendlyHostedAuthError(action, error);
               setAuthPanelNotice('bad', friendlyError);
-              setStudioNotice('bad', friendlyError);
+              showToast('bad', typeof friendlyError === 'string' ? friendlyError : (friendlyError.text || 'Sign in failed. Please try again.'));
             }
             render();
             return;
@@ -5525,7 +5575,8 @@ function titleBandScore(pick, live){
             return;
           }
           setAuthPanelNotice(null);
-          setStudioNotice('good', `Signed in as ${saved.displayName}. You can now create, join, and submit public duels from this browser.`);
+          setActiveDrawer(null);
+          showToast('good', `Signed in as ${saved.displayName}. You can now create, join, and submit public duels from this browser.`);
           await syncMiniFantasyEntries();
           render();
         };
@@ -7868,6 +7919,7 @@ function titleBandScore(pick, live){
         matchNo: Number(matchNo),
         slotIndex: Number(slotIndex),
         teamFilter: 'ALL',
+        roleFilter: 'ALL',
         search: '',
         restoreSearchFocus: true,
         searchSelectionStart: null,
@@ -7882,6 +7934,7 @@ function titleBandScore(pick, live){
         matchNo: null,
         slotIndex: null,
         teamFilter: 'ALL',
+        roleFilter: 'ALL',
         search: '',
         restoreSearchFocus: false,
         searchSelectionStart: null,
@@ -7900,6 +7953,7 @@ function titleBandScore(pick, live){
       return currentMiniFantasyPlayerPool(fixture)
         .filter((player) => !otherSelected.has(player.player_id))
         .filter((player) => MINI_FANTASY_PICKER_STATE.teamFilter === 'ALL' || player.team === MINI_FANTASY_PICKER_STATE.teamFilter)
+        .filter((player) => MINI_FANTASY_PICKER_STATE.roleFilter === 'ALL' || player.role === MINI_FANTASY_PICKER_STATE.roleFilter)
         .filter((player) => {
           const needle = normalizeName(MINI_FANTASY_PICKER_STATE.search || '');
           if (!needle) return true;
@@ -8269,7 +8323,11 @@ function titleBandScore(pick, live){
       panel.querySelectorAll('[data-mini-leaderboard-owner]').forEach((button) => {
         button.onclick = () => {
           MINI_FANTASY_RECENT_OWNER_HANDLE = normalizeOwnerId(button.dataset.miniLeaderboardOwner || '');
+          const scrollEl = panel.querySelector('.fantasy-leaderboard-scroll');
+          const savedScroll = scrollEl ? scrollEl.scrollTop : 0;
           renderMiniFantasyLeaderboard();
+          const scrollElAfter = panel.querySelector('.fantasy-leaderboard-scroll');
+          if (scrollElAfter) scrollElAfter.scrollTop = savedScroll;
           renderMiniFantasyLockedViewer();
         };
       });
@@ -8591,6 +8649,13 @@ function titleBandScore(pick, live){
           <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.teamFilter === fixture.home_team_code ? 'active' : ''}" data-mini-picker-team="${fixture.home_team_code}">${fixture.home_team_code}</button>
           <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.teamFilter === fixture.away_team_code ? 'active' : ''}" data-mini-picker-team="${fixture.away_team_code}">${fixture.away_team_code}</button>
         </div>
+        <div class="picker-chip-row">
+          <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.roleFilter === 'ALL' ? 'active' : ''}" data-mini-picker-role="ALL">All roles</button>
+          <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.roleFilter === 'batter' ? 'active' : ''}" data-mini-picker-role="batter">Batter</button>
+          <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.roleFilter === 'bowler' ? 'active' : ''}" data-mini-picker-role="bowler">Bowler</button>
+          <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.roleFilter === 'all_rounder' ? 'active' : ''}" data-mini-picker-role="all_rounder">All rounder</button>
+          <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.roleFilter === 'wicket_keeper' ? 'active' : ''}" data-mini-picker-role="wicket_keeper">Wicket keeper</button>
+        </div>
       `;
       body.innerHTML = filtered.length
         ? `<div class="fantasy-picker-list">
@@ -8620,6 +8685,12 @@ function titleBandScore(pick, live){
       toolbar.querySelectorAll('[data-mini-picker-team]').forEach((button) => {
         button.onclick = () => {
           MINI_FANTASY_PICKER_STATE.teamFilter = button.dataset.miniPickerTeam || 'ALL';
+          renderMiniFantasyPicker();
+        };
+      });
+      toolbar.querySelectorAll('[data-mini-picker-role]').forEach((button) => {
+        button.onclick = () => {
+          MINI_FANTASY_PICKER_STATE.roleFilter = button.dataset.miniPickerRole || 'ALL';
           renderMiniFantasyPicker();
         };
       });
