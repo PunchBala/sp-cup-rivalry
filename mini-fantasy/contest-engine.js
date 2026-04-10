@@ -604,7 +604,7 @@ export function buildPricingJobFromLiveData({
         pricing_eligible: Boolean(role),
         old_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
         initial_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
-        recovered_history: Number(previous?.matches_played || 0) === 0 && Number(history.matches_played || 0) > 0,
+        recovered_history: Boolean(previous) && Number(previous?.matches_played || 0) === 0 && Number(history.matches_played || 0) > 0,
         match_points: [...(history.match_points || [])],
         matches_played: Number(history.matches_played || 0),
         last_match_played_at_utc: history.last_match_played_at_utc || null
