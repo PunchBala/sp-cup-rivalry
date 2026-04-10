@@ -2,124 +2,42 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-04-09T21:00:49.132Z",
-  "scrapeStatus": "ok (15 processed matches, 1 scorecard call this run, 14 cached scorecards reused)",
+  "fetchedAt": "2026-04-10T11:37:12.296Z",
+  "scrapeStatus": "skipped (outside_scheduled_window: outside planned refresh windows)",
   "scrapeReport": {
-    "orangeCap": {
-      "ok": true,
-      "source": "CricketData scorecards",
-      "method": "computed season total runs"
-    },
-    "mostSixes": {
-      "ok": true,
-      "source": "CricketData scorecards",
-      "method": "computed season total sixes"
-    },
-    "purpleCap": {
-      "ok": true,
-      "source": "CricketData scorecards",
-      "method": "computed season total wickets"
-    },
-    "highestScoreTeam": {
-      "ok": true,
-      "source": "CricketData scorecards",
-      "method": "computed team max innings score"
-    },
-    "striker": {
-      "ok": true,
-      "source": "CricketData scorecards",
-      "method": "computed strike rate with minimum 100 runs"
-    },
-    "bestBowlingFigures": {
-      "ok": true,
-      "source": "CricketData scorecards",
-      "method": "best single spell sorted by wickets then runs"
-    },
-    "bestBowlingStrikeRate": {
-      "ok": true,
-      "source": "CricketData scorecards",
-      "method": "computed balls per wicket with minimum 72 balls"
-    },
-    "mostCatches": {
-      "ok": true,
-      "source": "CricketData scorecards",
-      "method": "computed season total catches"
-    },
-    "titleWinner": {
-      "ok": true,
-      "source": "CricketData scorecards",
-      "method": "computed standings from completed matches"
-    },
-    "tableBottom": {
-      "ok": true,
-      "source": "CricketData scorecards",
-      "method": "computed standings from completed matches"
-    },
-    "mostDots": {
-      "ok": true,
-      "source": "IPLT20 official most dots feed",
-      "method": "parsed JSONP mostdotballsbowledtournament feed from Sports Mechanic stats feed",
-      "rows": 75
-    },
-    "mvp": {
-      "ok": true,
-      "source": "CricketData + IPLT20 official Most Dots",
-      "method": "custom formula using runs, sixes, wickets, dot balls, catches, strike-rate bonus, economy bonus and milestone bonuses"
-    },
-    "uncappedMvp": {
-      "ok": true,
-      "source": "custom MVP ranking",
-      "method": "filtered to the provided uncapped player pool, then compares picks by their positions in the custom MVP ranking"
-    },
-    "fairPlay": {
-      "ok": true,
-      "source": "IPLT20 official fairplay feed",
-      "method": "parsed JSONP fairplayTotal table from Sports Mechanic stats feed",
-      "rows": 10,
-      "updatedAt": "10-04-2026 : 01:00:01"
-    },
-    "leastMvp": {
-      "ok": true,
-      "source": "custom MVP ranking",
-      "method": "lower in custom MVP ranking wins, filtered to players with minimum 5 matches"
-    },
     "costControl": {
       "ok": true,
       "source": "worker",
-      "method": "scheduled league-stage windows, cached completed matches forever, cache-first historical replay, capped backlog catch-up, throttled live scorecards",
+      "method": "scheduled league-stage windows, cached completed matches forever, capped backlog catch-up, throttled live scorecards",
+      "skipped": true,
+      "mode": "outside_scheduled_window",
+      "reason": "outside planned refresh windows",
       "liveScorecardsEnabled": false,
       "liveScorecardIntervalMinutes": 30,
-      "maxBacklogScorecardsPerRun": 12,
-      "maxFreshScorecardCallsPerRun": 12,
-      "historicalReplayApiFallbackAllowed": true,
-      "scorecardCallsThisRun": 1,
-      "scorecardCacheHitsThisRun": 14,
-      "historicalReplaySkipped": false,
-      "historicalReplayMissingCaches": 0,
-      "freshScorecardBudgetExhausted": false,
-      "freshScorecardBudgetSkips": 0,
-      "freshScorecardBudgetRemaining": 11,
+      "maxBacklogScorecardsPerRun": 2,
+      "maxFreshScorecardCallsPerRun": 1,
+      "scorecardCallsThisRun": 0,
       "backlogRemaining": 0
     }
   },
   "meta": {
     "scheduler": {
-      "dayKey": "2026-04-09",
+      "dayKey": "2026-04-10",
       "quietRefreshesUsed": 0,
       "lastQuietRefreshAt": null,
-      "lastLiveRefreshAt": "2026-04-09T21:00:46.896Z",
+      "lastLiveRefreshAt": null,
       "lastSeriesInfoAt": "2026-04-09T21:00:46.896Z",
       "lastDecision": {
-        "at": "2026-04-09T21:00:45.478Z",
-        "shouldRefresh": true,
-        "mode": "forced_refresh",
-        "reason": "forced refresh requested",
+        "at": "2026-04-10T11:37:12.296Z",
+        "shouldRefresh": false,
+        "mode": "outside_scheduled_window",
+        "reason": "outside planned refresh windows",
         "nextPlannedAt": "2026-04-10T13:00:00.000Z"
       },
       "nextPlannedRefreshAt": "2026-04-10T13:00:00.000Z",
       "nextPlannedMode": "scheduled_window",
       "nextPlannedReason": "league-stage refresh plan",
-      "nextPlannedCalculatedAt": "2026-04-09T21:00:46.896Z"
+      "nextPlannedCalculatedAt": "2026-04-10T11:37:12.296Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -86812,8 +86730,8 @@
     "scorecardBudget": {
       "liveEnabled": false,
       "liveIntervalMinutes": 30,
-      "maxBacklogPerRun": 12,
-      "maxFreshPerRun": 12,
+      "maxBacklogPerRun": 2,
+      "maxFreshPerRun": 1,
       "lastLiveScorecardAt": null,
       "lastLiveScorecardMatchId": null,
       "lastBacklogProcessAt": "2026-04-09T21:00:47.425Z",
@@ -86833,10 +86751,10 @@
       "lastError": null
     },
     "lastRun": {
-      "seriesInfoCalls": 1,
-      "scorecardCalls": 1,
-      "scorecardCacheHits": 14,
-      "backlogProcessed": 1,
+      "seriesInfoCalls": 0,
+      "scorecardCalls": 0,
+      "scorecardCacheHits": 0,
+      "backlogProcessed": 0,
       "backlogRemaining": 0,
       "liveOverlayFetched": false,
       "liveOverlayReused": false,
@@ -86855,7 +86773,7 @@
     "aggregateSchemaVersion": 3,
     "providerStatus": {
       "state": "ok",
-      "lastAttemptAt": "2026-04-09T21:00:45.474Z",
+      "lastAttemptAt": "2026-04-10T11:37:12.292Z",
       "lastErrorAt": null,
       "reason": null,
       "hitsToday": null,
