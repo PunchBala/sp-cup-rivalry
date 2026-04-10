@@ -1002,7 +1002,7 @@
                 <div class="pill">Exactly 4 players</div>
                 <div class="pill">Budget: 31 credits</div>
                 <div class="pill">At least 1 player from each team</div>
-                <div class="pill">At least 1 batter</div>
+                <div class="pill">At least 1 batter or wicket keeper</div>
                 <div class="pill">At least 1 bowler</div>
                 <div class="pill">Captain scores 1.5x</div>
               </div>
@@ -8556,7 +8556,7 @@ function titleBandScore(pick, live){
                   <span class="pill">${escapeHtml(String(player.final_price))} cr</span>
                 </div>
               ` : `
-                <div class="fantasy-slot-empty">Pick from ${escapeHtml(teamShort(fixture.home_team))} or ${escapeHtml(teamShort(fixture.away_team))}. Keep 4 total players, at least 1 batter, at least 1 bowler, and at least 1 player from each team.</div>
+                <div class="fantasy-slot-empty">Pick from ${escapeHtml(teamShort(fixture.home_team))} or ${escapeHtml(teamShort(fixture.away_team))}. Keep 4 total players, at least 1 batter or wicket keeper, at least 1 bowler, and at least 1 player from each team.</div>
               `}
               <div class="fantasy-slot-actions">
                 <button class="studio-button ${player ? 'ghost' : ''}" type="button" data-mini-pick="${slotIndex}" ${locked ? 'disabled' : ''}>${player ? 'Change player' : 'Choose player'}</button>
@@ -8577,7 +8577,7 @@ function titleBandScore(pick, live){
               ? `Lineup ready. You have ${budgetRemaining} credits left and the captain boost is set for ${draft.captainPlayerId ? escapeHtml((poolById.get(draft.captainPlayerId) || {}).name || 'your captain') : 'nobody yet'}.`
               : validation.errors.length
                 ? escapeHtml(validation.errors.join(' '))
-                : 'Build your lineup, keep one player from each team, take at least 1 batter and 1 bowler, then lock the 1.5x captain.'}
+                : 'Build your lineup, keep one player from each team, take at least 1 batter or wicket keeper and 1 bowler, then lock the 1.5x captain.'}
         </div>
         <div class="studio-actions">
           <button class="studio-button" type="button" id="saveMiniFantasyButton" ${locked ? 'disabled' : ''}>${entry ? 'Update team' : 'Save team'}</button>

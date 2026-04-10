@@ -167,7 +167,9 @@ const NAME_TOKEN_ALIASES = Object.freeze({
   mohammed: 'mohammad',
   mohammedh: 'mohammad',
   mohamad0: 'mohammad',
-  md: 'mohammad'
+  md: 'mohammad',
+  sooryavanshi: 'suryavanshi',
+  sooryanvanshi: 'suryavanshi'
 });
 
 export function slugify(value) {
@@ -602,6 +604,7 @@ export function buildPricingJobFromLiveData({
         pricing_eligible: Boolean(role),
         old_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
         initial_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
+        recovered_history: Number(previous?.matches_played || 0) === 0 && Number(history.matches_played || 0) > 0,
         match_points: [...(history.match_points || [])],
         matches_played: Number(history.matches_played || 0),
         last_match_played_at_utc: history.last_match_played_at_utc || null
@@ -770,8 +773,9 @@ export function validateMiniFantasyEntry({
     errors.push('Pick at least one player from each fixture team.');
   }
 
-  if ((roleCounts.batter || 0) < 1) {
-    errors.push('Pick at least one batter.');
+  const batterLikeCount = (roleCounts.batter || 0) + (roleCounts.wicket_keeper || 0);
+  if (batterLikeCount < 1) {
+    errors.push('Pick at least one batter or wicket keeper.');
   }
 
   if ((roleCounts.bowler || 0) < 1) {
