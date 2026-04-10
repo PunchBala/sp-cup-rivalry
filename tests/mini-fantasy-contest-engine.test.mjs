@@ -552,6 +552,50 @@ test('buildPricingJobFromLiveData only marks recovered history when a previous b
   assert.equal(brandNew.recovered_history, false);
 });
 
+test('generateMiniFantasyPriceBook keeps curated dormant premium players expensive while blank newcomers seed cheap', () => {
+  const liveData = {
+    fetchedAt: '2026-04-10T00:10:00Z',
+    meta: {
+      scoreHistory: []
+    }
+  };
+  const schedule = [
+    { match_no: 16, datetime_utc: '2026-04-10T14:00:00Z', home_team: 'Lucknow Super Giants', away_team: 'Delhi Capitals' }
+  ];
+  const squads = {
+    LSG: ['MS Dhoni', 'Unknown Bench'],
+    DC: ['Active Bowler']
+  };
+  const teamRoles = {
+    teams: {
+      LSG: {
+        players: {
+          'MS Dhoni': 'wicket_keeper',
+          'Unknown Bench': 'bowler'
+        }
+      },
+      DC: {
+        players: {
+          'Active Bowler': 'bowler'
+        }
+      }
+    }
+  };
+  const priceBook = generateMiniFantasyPriceBook({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    asOfUtc: '2026-04-10T00:10:00Z'
+  });
+
+  const injuredPremium = priceBook.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'MS Dhoni'));
+  const unknownBench = priceBook.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'Unknown Bench'));
+
+  assert.equal(injuredPremium.final_price, 9);
+  assert.equal(unknownBench.final_price, 5);
+});
+
 test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy points', () => {
   const liveData = {
     meta: {

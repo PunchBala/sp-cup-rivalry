@@ -46,7 +46,7 @@ const DEFAULT_PRICE_JOB_META = Object.freeze({
   price_max: 10,
   recent_matches_window: 3,
   max_daily_price_step: 1,
-  default_initial_price: 6,
+  default_initial_price: 5,
   scoring_source: 'existing_mvp_points_formula_v1',
   notes: 'Daily pricing refresh after all completed matches for the day'
 });
@@ -137,6 +137,36 @@ const UNCAPPED_MVP_PLAYERS = Object.freeze([
   'Zeeshan Ansari', 'Sakib Hussain', 'Onkar Tarmale', 'Amit Kumar', 'Praful Hinge'
 ]);
 
+// Small curated fallback until upstream provides explicit prestige seeding for dormant stars.
+const DORMANT_PRESTIGE_PRICE_SEEDS = Object.freeze({
+  'akeal hosein': 9,
+  'adam milne': 9,
+  'azmatullah omarzai': 9,
+  'ben duckett': 9,
+  'brydon carse': 9,
+  'dasun shanaka': 9,
+  'dewald brevis': 9,
+  'dushmantha chameera': 9,
+  'ishant sharma': 9,
+  'jason holder': 9,
+  'josh hazlewood': 9,
+  'josh inglis': 9,
+  'kamindu mendis': 9,
+  'lockie ferguson': 9,
+  'matheesha pathirana': 9,
+  'mayank yadav': 9,
+  'mitchell starc': 9,
+  'ms dhoni': 9,
+  'nuwan thushara': 9,
+  'pat cummins': 9,
+  'quinton de kock': 9,
+  'rachin ravindra': 9,
+  'tim seifert': 9,
+  'tom banton': 9,
+  'wanindu hasaranga': 9,
+  'will jacks': 9
+});
+
 function toNumber(value, fallback = 0) {
   return Number.isFinite(Number(value)) ? Number(value) : fallback;
 }
@@ -194,6 +224,10 @@ export function resolveMiniFantasyPlayerTeamCode(playerId = '') {
 export function currentRoleOverride(teamCode, playerName) {
   const teamOverrides = ROLE_OVERRIDES[String(teamCode || '').toUpperCase()] || {};
   return teamOverrides[normalizeName(playerName)] || null;
+}
+
+function resolveDormantPrestigeSeed(playerName) {
+  return DORMANT_PRESTIGE_PRICE_SEEDS[normalizeName(playerName)] ?? null;
 }
 
 function tokenizeName(value) {
@@ -528,7 +562,7 @@ export function deriveCompletedMatchHistories(liveData = {}, schedule = []) {
 
 export function seedInitialPriceMap(players = [], jobMeta = DEFAULT_PRICE_JOB_META) {
   const eligiblePlayers = (Array.isArray(players) ? players : [])
-    .filter((player) => player.pricing_eligible)
+    .filter((player) => player.pricing_eligible && Number(player.matches_played || 0) > 0)
     .map((player) => {
       const seasonAveragePoints = computeSeasonAveragePoints(player.match_points || []);
       const recentAveragePoints = computeRecentAveragePoints(player.match_points || [], jobMeta.recent_matches_window);
@@ -601,6 +635,7 @@ export function buildPricingJobFromLiveData({
         team: teamCode,
         role: role || 'batter',
         is_uncapped: UNCAPPED_MVP_PLAYER_KEYS.has(canonicalName),
+        prestige_seed_price: resolveDormantPrestigeSeed(playerName),
         pricing_eligible: Boolean(role),
         old_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
         initial_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
