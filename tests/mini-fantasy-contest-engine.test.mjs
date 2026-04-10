@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   MINI_FANTASY_BUDGET,
+  buildPricingJobFromLiveData,
   buildMiniFantasyLeaderboard,
   buildMiniFantasyFixturePointsIndex,
   buildMiniFantasyPlayerId,
@@ -89,7 +90,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Manimaran Siddharth': 1,
                   'Digvesh Singh Rathi': 1,
                   'Vijaykumar Vyshak': 1,
-                  'Tilak Varma': 1
+                  'Tilak Varma': 1,
+                  'Vaibhav Sooryavanshi': 1
                 }
               }
             },
@@ -99,7 +101,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Manimaran Siddharth': { score: 30 },
                 'Digvesh Singh Rathi': { score: 10 },
                 'Vijaykumar Vyshak': { score: 25 },
-                'Tilak Varma': { score: 15 }
+                'Tilak Varma': { score: 15 },
+                'Vaibhav Sooryavanshi': { score: 52 }
               }
             }
           }
@@ -114,7 +117,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Manimaran Siddharth': 1,
                   'Digvesh Singh Rathi': 1,
                   'Vijaykumar Vyshak': 2,
-                  'Tilak Varma': 2
+                  'Tilak Varma': 2,
+                  'Vaibhav Sooryavanshi': 1
                 }
               }
             },
@@ -124,7 +128,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Manimaran Siddharth': { score: 30 },
                 'Digvesh Singh Rathi': { score: 10 },
                 'Vijaykumar Vyshak': { score: 60 },
-                'Tilak Varma': { score: 25 }
+                'Tilak Varma': { score: 25 },
+                'Vaibhav Sooryavanshi': { score: 52 }
               }
             }
           }
@@ -143,6 +148,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
   assert.deepEqual(resolvePlayerHistory('Digvesh Singh', histories)?.match_points, [10]);
   assert.deepEqual(resolvePlayerHistory('Vyshak Vijaykumar', histories)?.match_points, [25, 35]);
   assert.deepEqual(resolvePlayerHistory('N. Tilak Varma', histories)?.match_points, [15, 10]);
+  assert.deepEqual(resolvePlayerHistory('Vaibhav Suryavanshi', histories)?.match_points, [52]);
 });
 
 test('getMiniFantasyOpenFixtures opens Match 14 now and later fixtures from the day-before window', () => {
@@ -239,6 +245,7 @@ test('validateMiniFantasyEntry enforces budget, team split, and role minimums', 
   const pool = [
     { player_id: 'dc_a', name: 'DC Batter', team: 'DC', role: 'batter', final_price: 8, pricing_eligible: true },
     { player_id: 'dc_b', name: 'DC Bowler', team: 'DC', role: 'bowler', final_price: 7, pricing_eligible: true },
+    { player_id: 'dc_c', name: 'DC All-rounder', team: 'DC', role: 'all_rounder', final_price: 5, pricing_eligible: true },
     { player_id: 'gt_a', name: 'GT All-rounder', team: 'GT', role: 'all_rounder', final_price: 7, pricing_eligible: true },
     { player_id: 'gt_b', name: 'GT Keeper', team: 'GT', role: 'wicket_keeper', final_price: 6, pricing_eligible: true },
     { player_id: 'gt_c', name: 'GT Bowler', team: 'GT', role: 'bowler', final_price: 10, pricing_eligible: true }
@@ -246,23 +253,24 @@ test('validateMiniFantasyEntry enforces budget, team split, and role minimums', 
 
   const valid = validateMiniFantasyEntry({
     fixture,
-    selectedPlayerIds: ['dc_a', 'dc_b', 'gt_a', 'gt_b'],
-    captainPlayerId: 'dc_a',
+    selectedPlayerIds: ['dc_b', 'gt_a', 'gt_b', 'gt_c'],
+    captainPlayerId: 'gt_b',
     playerPool: pool
   });
   assert.equal(valid.valid, true);
-  assert.equal(valid.total_cost, 28);
-  assert.equal(valid.budget_remaining, MINI_FANTASY_BUDGET - 28);
+  assert.equal(valid.total_cost, 30);
+  assert.equal(valid.budget_remaining, MINI_FANTASY_BUDGET - 30);
 
   const invalid = validateMiniFantasyEntry({
     fixture,
-    selectedPlayerIds: ['dc_a', 'dc_b', 'gt_c', 'gt_b'],
+    selectedPlayerIds: ['dc_b', 'dc_c', 'gt_a', 'gt_c'],
     captainPlayerId: 'gt_c',
     playerPool: pool,
-    budget: MINI_FANTASY_BUDGET - 1
+    budget: MINI_FANTASY_BUDGET - 3
   });
   assert.equal(invalid.valid, false);
   assert.match(invalid.errors.join(' | '), /Squad budget exceeded/);
+  assert.match(invalid.errors.join(' | '), /batter or wicket keeper/);
 });
 
 test('generateMiniFantasyPriceBook and buildFixturePlayerPool work from live history plus squad roles', () => {
@@ -473,6 +481,75 @@ test('generateMiniFantasyPriceBook keeps alias-matched LSG bowlers from falling 
   assert.ok(shami.final_price > 6);
   assert.equal(siddharth.matches_played, 1);
   assert.equal(siddharth.last_match_played_at_utc, '2026-04-01T14:00:00Z');
+});
+
+test('buildPricingJobFromLiveData only marks recovered history when a previous blank record existed', () => {
+  const liveData = {
+    fetchedAt: '2026-04-09T00:10:00Z',
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 5,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Recovered Bowler': 1,
+                  'Brand New Star': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Recovered Bowler': { score: 18 },
+                'Brand New Star': { score: 65 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 5, datetime_utc: '2026-04-09T14:00:00Z', home_team: 'Lucknow Super Giants', away_team: 'Delhi Capitals' }
+  ];
+  const squads = {
+    LSG: ['Recovered Bowler', 'Brand New Star']
+  };
+  const teamRoles = {
+    teams: {
+      LSG: {
+        players: {
+          'Recovered Bowler': 'bowler',
+          'Brand New Star': 'batter'
+        }
+      }
+    }
+  };
+  const previousPriceBook = {
+    players: [
+      {
+        player_id: buildMiniFantasyPlayerId('LSG', 'Recovered Bowler'),
+        final_price: 6,
+        matches_played: 0
+      }
+    ]
+  };
+
+  const input = buildPricingJobFromLiveData({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    previousPriceBook,
+    asOfUtc: '2026-04-09T00:10:00Z'
+  });
+
+  const recovered = input.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'Recovered Bowler'));
+  const brandNew = input.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'Brand New Star'));
+
+  assert.equal(recovered.recovered_history, true);
+  assert.equal(brandNew.recovered_history, false);
 });
 
 test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy points', () => {
