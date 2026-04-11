@@ -304,18 +304,19 @@ export function resolvePlayerHistory(playerName, historyMap = new Map()) {
 
   historyMap.forEach((history, fallbackKey) => {
     const candidateName = history?.player_name || fallbackKey;
+    const candidateTokens = tokenizeAliasName(candidateName, { dropInitials: true });
+    const sharedTokens = countSharedAliasTokens(playerName, candidateName);
+    const subsetMatch =
+      areAliasTokensSubset(targetSignificantTokens, candidateTokens) ||
+      areAliasTokensSubset(candidateTokens, targetSignificantTokens);
+    const overlap =
+      sharedTokens / Math.max(new Set(targetSignificantTokens).size || 1, new Set(candidateTokens).size || 1);
     const directAliasMatch = buildNameAliasKeys(candidateName).some((aliasKey) => targetAliasKeys.has(aliasKey));
-    if (!directAliasMatch) {
-      const candidateTokens = tokenizeAliasName(candidateName, { dropInitials: true });
-      const sharedTokens = countSharedAliasTokens(playerName, candidateName);
-      const subsetMatch =
-        areAliasTokensSubset(targetSignificantTokens, candidateTokens) ||
-        areAliasTokensSubset(candidateTokens, targetSignificantTokens);
-      const overlap =
-        sharedTokens / Math.max(new Set(targetSignificantTokens).size || 1, new Set(candidateTokens).size || 1);
-      if (sharedTokens < 2 || (!subsetMatch && overlap < 0.67)) {
-        return;
-      }
+    if (!directAliasMatch && sharedTokens < 2) {
+      return;
+    }
+    if (!subsetMatch && overlap < 0.67) {
+      return;
     }
     matches.push(history);
   });

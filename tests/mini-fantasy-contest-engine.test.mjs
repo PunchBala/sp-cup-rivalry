@@ -151,6 +151,71 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
   assert.deepEqual(resolvePlayerHistory('Vaibhav Suryavanshi', histories)?.match_points, [52]);
 });
 
+test('buildMiniFantasyFixturePointsIndex does not collide same-initial same-surname players', () => {
+  const schedule = [
+    { match_no: 15, datetime_utc: '2026-04-09T14:00:00Z' },
+    { match_no: 16, datetime_utc: '2026-04-10T14:00:00Z' }
+  ];
+  const squads = {
+    RCB: ['Suyash Sharma'],
+    RR: ['Sandeep Sharma']
+  };
+  const liveData = {
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 15,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Suyash Sharma': 2,
+                  'Sandeep Sharma': 3
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Suyash Sharma': { score: 64.5 },
+                'Sandeep Sharma': { score: 69.5 }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 16,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Suyash Sharma': 2,
+                  'Sandeep Sharma': 4
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Suyash Sharma': { score: 64.5 },
+                'Sandeep Sharma': { score: 95 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  const pointsIndex = buildMiniFantasyFixturePointsIndex({
+    liveData,
+    schedule,
+    squads,
+    matchNo: 16
+  });
+
+  assert.equal(pointsIndex.get(buildMiniFantasyPlayerId('RCB', 'Suyash Sharma')), 0);
+  assert.equal(pointsIndex.get(buildMiniFantasyPlayerId('RR', 'Sandeep Sharma')), 25.5);
+});
+
 test('getMiniFantasyOpenFixtures opens Match 14 now and later fixtures from the day-before window', () => {
   const schedule = [
     { match_no: 13, datetime_utc: '2026-04-07T14:00:00Z', home_team: 'Mumbai Indians', away_team: 'Rajasthan Royals' },
