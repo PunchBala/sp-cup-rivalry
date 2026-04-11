@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   MINI_FANTASY_BUDGET,
+  buildPricingJobFromLiveData,
   buildMiniFantasyLeaderboard,
   buildMiniFantasyFixturePointsIndex,
   buildMiniFantasyPlayerId,
@@ -480,6 +481,119 @@ test('generateMiniFantasyPriceBook keeps alias-matched LSG bowlers from falling 
   assert.ok(shami.final_price > 6);
   assert.equal(siddharth.matches_played, 1);
   assert.equal(siddharth.last_match_played_at_utc, '2026-04-01T14:00:00Z');
+});
+
+test('buildPricingJobFromLiveData only marks recovered history when a previous blank record existed', () => {
+  const liveData = {
+    fetchedAt: '2026-04-09T00:10:00Z',
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 5,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Recovered Bowler': 1,
+                  'Brand New Star': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Recovered Bowler': { score: 18 },
+                'Brand New Star': { score: 65 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 5, datetime_utc: '2026-04-09T14:00:00Z', home_team: 'Lucknow Super Giants', away_team: 'Delhi Capitals' }
+  ];
+  const squads = {
+    LSG: ['Recovered Bowler', 'Brand New Star']
+  };
+  const teamRoles = {
+    teams: {
+      LSG: {
+        players: {
+          'Recovered Bowler': 'bowler',
+          'Brand New Star': 'batter'
+        }
+      }
+    }
+  };
+  const previousPriceBook = {
+    players: [
+      {
+        player_id: buildMiniFantasyPlayerId('LSG', 'Recovered Bowler'),
+        final_price: 6,
+        matches_played: 0
+      }
+    ]
+  };
+
+  const input = buildPricingJobFromLiveData({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    previousPriceBook,
+    asOfUtc: '2026-04-09T00:10:00Z'
+  });
+
+  const recovered = input.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'Recovered Bowler'));
+  const brandNew = input.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'Brand New Star'));
+
+  assert.equal(recovered.recovered_history, true);
+  assert.equal(brandNew.recovered_history, false);
+});
+
+test('generateMiniFantasyPriceBook keeps curated dormant premium players expensive while blank newcomers seed cheap', () => {
+  const liveData = {
+    fetchedAt: '2026-04-10T00:10:00Z',
+    meta: {
+      scoreHistory: []
+    }
+  };
+  const schedule = [
+    { match_no: 16, datetime_utc: '2026-04-10T14:00:00Z', home_team: 'Lucknow Super Giants', away_team: 'Delhi Capitals' }
+  ];
+  const squads = {
+    LSG: ['MS Dhoni', 'Unknown Bench'],
+    DC: ['Active Bowler']
+  };
+  const teamRoles = {
+    teams: {
+      LSG: {
+        players: {
+          'MS Dhoni': 'wicket_keeper',
+          'Unknown Bench': 'bowler'
+        }
+      },
+      DC: {
+        players: {
+          'Active Bowler': 'bowler'
+        }
+      }
+    }
+  };
+  const priceBook = generateMiniFantasyPriceBook({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    asOfUtc: '2026-04-10T00:10:00Z'
+  });
+
+  const injuredPremium = priceBook.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'MS Dhoni'));
+  const unknownBench = priceBook.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'Unknown Bench'));
+
+  assert.equal(injuredPremium.final_price, 9);
+  assert.equal(unknownBench.final_price, 5);
 });
 
 test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy points', () => {

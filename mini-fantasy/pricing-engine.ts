@@ -1,5 +1,5 @@
-const RECENT_AVERAGE_WEIGHT = 0.6;
-const SEASON_AVERAGE_WEIGHT = 0.4;
+const RECENT_AVERAGE_WEIGHT = 0.4;
+const SEASON_AVERAGE_WEIGHT = 0.6;
 const BASE_PRICE_WEIGHT = 0.7;
 const TARGET_PRICE_WEIGHT = 0.3;
 const FULL_CONFIDENCE_MATCHES = 4;
@@ -32,6 +32,7 @@ export interface PricingPlayerInput {
   team: string;
   role: PlayerRole;
   is_uncapped?: boolean;
+  prestige_seed_price?: number | null;
   pricing_eligible: boolean;
   old_price: number | null;
   initial_price: number | null;
@@ -148,16 +149,48 @@ interface DerivedPlayerInputs {
   notes: string[];
 }
 
+function shouldSoftenDormantPlaceholderPrice(entry: DerivedPlayerInputs, jobMeta: PricingJobMetaInput): boolean {
+  return (
+    entry.player.pricing_eligible &&
+    entry.effectiveMatchesPlayed === 0 &&
+    entry.basePrice <= jobMeta.default_initial_price + 1
+  );
+}
+
+function resolveDormantBasePrice(
+  entry: DerivedPlayerInputs,
+  jobMeta: PricingJobMetaInput,
+  playerPriceMax: number
+): number {
+  if (entry.effectiveMatchesPlayed > 0 || !entry.player.pricing_eligible) {
+    return entry.basePrice;
+  }
+
+  if (Number.isFinite(entry.player.prestige_seed_price)) {
+    return clamp(
+      Math.max(entry.basePrice, Math.round(Number(entry.player.prestige_seed_price))),
+      jobMeta.price_min,
+      playerPriceMax
+    );
+  }
+
+  if (shouldSoftenDormantPlaceholderPrice(entry, jobMeta)) {
+    return clamp(jobMeta.default_initial_price, jobMeta.price_min, playerPriceMax);
+  }
+
+  return clamp(entry.basePrice, jobMeta.price_min, playerPriceMax);
+}
+
 export const ENGINE_VERSION = 'pricing_v1';
 
 export const DEFAULT_PERCENTILE_PRICE_BANDS: readonly PricingPercentileBand[] = Object.freeze([
-  { gt: 0, lte: 10, price: 4 },
-  { gt: 10, lte: 25, price: 5 },
-  { gt: 25, lte: 45, price: 6 },
-  { gt: 45, lte: 65, price: 7 },
-  { gt: 65, lte: 80, price: 8 },
-  { gt: 80, lte: 92, price: 9 },
-  { gt: 92, lte: 100, price: 10 }
+  { gt: 0, lte: 15, price: 4 },
+  { gt: 15, lte: 35, price: 5 },
+  { gt: 35, lte: 57, price: 6 },
+  { gt: 57, lte: 77, price: 7 },
+  { gt: 77, lte: 90, price: 8 },
+  { gt: 90, lte: 97, price: 9 },
+  { gt: 97, lte: 100, price: 10 }
 ]);
 
 export const PRICING_ENGINE_CONFIG_V1: PricingEngineConfig = Object.freeze({
@@ -168,7 +201,7 @@ export const PRICING_ENGINE_CONFIG_V1: PricingEngineConfig = Object.freeze({
     uncapped_price_max: UNCAPPED_PLAYER_PRICE_MAX,
     recent_matches_window: 3,
     max_daily_price_step: 1,
-    default_initial_price: 6,
+    default_initial_price: 5,
     score_basis_weights: {
       recent_avg_points: RECENT_AVERAGE_WEIGHT,
       season_avg_points: SEASON_AVERAGE_WEIGHT
@@ -409,7 +442,13 @@ function createCalculationNotes(
   }
 
   if (derived.effectiveMatchesPlayed === 0) {
-    notes.push('No matches played; retained base price');
+    if (Number.isFinite(player.prestige_seed_price) && finalPrice > derived.basePrice) {
+      notes.push(`No matches played; applied curated dormant prestige seed at ${finalPrice} credits and excluded from active ranking`);
+    } else if (finalPrice < derived.basePrice) {
+      notes.push('No matches played; eased neutral placeholder price toward the default floor and excluded from active ranking');
+    } else {
+      notes.push('No matches played; retained base price and excluded from active ranking');
+    }
     return notes;
   }
 
@@ -472,7 +511,7 @@ function derivePlayerInputs(player: PricingPlayerInput, jobMeta: PricingJobMetaI
 export function generatePrices(input: PricingJobInput): PricingJobOutput {
   const derivedPlayers = input.players.map((player) => derivePlayerInputs(player, input.job_meta));
   const eligibleRankingPool: EligibleRankingRecord[] = derivedPlayers
-    .filter((entry) => entry.player.pricing_eligible)
+    .filter((entry) => entry.player.pricing_eligible && entry.effectiveMatchesPlayed > 0)
     .map((entry) => ({
       player_id: entry.player.player_id,
       adjusted_score: entry.adjustedScore,
@@ -483,11 +522,13 @@ export function generatePrices(input: PricingJobInput): PricingJobOutput {
   const players = derivedPlayers
     .map((entry): PricingPlayerOutput => {
       const playerPriceMax = resolvePlayerPriceMax(entry.player, input.job_meta.price_max);
-      const percentile = entry.player.pricing_eligible ? percentiles.get(entry.player.player_id) ?? 0 : 0;
-      const rawTargetPrice = entry.player.pricing_eligible
+      const isRankEligible = entry.player.pricing_eligible && entry.effectiveMatchesPlayed > 0;
+      const percentile = isRankEligible ? percentiles.get(entry.player.player_id) ?? 0 : 0;
+      const rawTargetPrice = isRankEligible
         ? mapPercentileToPrice(percentile)
         : entry.basePrice;
       const targetPrice = clamp(rawTargetPrice, input.job_meta.price_min, playerPriceMax);
+      const dormantBasePrice = resolveDormantBasePrice(entry, input.job_meta, playerPriceMax);
 
       // Keep brand-new or inactive players stable until they have usable ranked history.
       const rawSmoothedPrice =
@@ -495,7 +536,7 @@ export function generatePrices(input: PricingJobInput): PricingJobOutput {
           ? targetPrice
           : entry.player.pricing_eligible && entry.effectiveMatchesPlayed > 0
           ? smoothPrice(entry.basePrice, targetPrice)
-          : entry.basePrice;
+          : dormantBasePrice;
       const smoothedPrice = clamp(rawSmoothedPrice, input.job_meta.price_min, playerPriceMax);
 
       const finalPrice =
@@ -509,7 +550,7 @@ export function generatePrices(input: PricingJobInput): PricingJobOutput {
               input.job_meta.price_min,
               playerPriceMax
             )
-          : clamp(entry.basePrice, input.job_meta.price_min, playerPriceMax);
+          : clamp(dormantBasePrice, input.job_meta.price_min, playerPriceMax);
 
       const priceChange = entry.player.old_price == null ? 0 : finalPrice - Math.round(entry.player.old_price);
       const uncappedCapApplied = Boolean(entry.player.is_uncapped) && (
