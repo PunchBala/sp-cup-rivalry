@@ -869,7 +869,7 @@
       transition:.16s ease;
       pointer-events:none;
     }
-    .fantasy-picker-card.has-captain-action:hover .fantasy-picker-captain-btn{opacity:1;transform:translateY(0);pointer-events:auto}
+    .fantasy-picker-card.has-captain-action .fantasy-picker-captain-btn{opacity:1;transform:none;pointer-events:auto}
     .fantasy-picker-captain-btn.is-captain{opacity:1;transform:none;pointer-events:auto;border-color:rgba(255,200,87,.3);background:rgba(255,200,87,.16);color:#ffe8b5}
     .fantasy-crown-icon{display:inline-block;margin-right:5px;font-size:11px;line-height:1}
     .fantasy-pill-strong{color:#fff}
@@ -8396,7 +8396,7 @@ function titleBandScore(pick, live){
           <div class="fantasy-summary-strip">
             <span class="pill">${detail.captain ? `Captain: ${detail.captain.name}` : 'Captain pending'}</span>
             <span class="pill">Spent: ${escapeHtml(String(recapEntry.spentCredits || 0))} / ${MINI_FANTASY_BUDGET}</span>
-            ${bestPick ? `<span class="pill">Best pick: ${escapeHtml(bestPick.name)} ${escapeHtml(formatMiniFantasyPoints(bestPick.points))} pts</span>` : ''}
+            ${bestPick ? `<span class="pill">Best pick: ${escapeHtml(bestPick.name)} ${escapeHtml(formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points))} pts</span>` : ''}
           </div>
           <div class="fantasy-window-note">${escapeHtml(stage === 'final'
             ? `Final recap: ${detail.captain ? `${detail.captain.name} delivered ${formatMiniFantasyPoints(detail.captain.scoredPoints ?? detail.captain.points)} captain points.` : 'Captain was not set.'} ${bestPick ? `${bestPick.name} was your best pick on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)} points.` : ''}`

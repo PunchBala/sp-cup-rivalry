@@ -1,10 +1,13 @@
 import { spawn } from 'node:child_process';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const SERVER_URL = 'http://127.0.0.1:4173/index.html';
 const serverScript = path.resolve('scripts/serve-static.mjs');
-const playwrightCli = path.resolve('node_modules/playwright/cli.js');
+const require = createRequire(import.meta.url);
+const playwrightPkgJson = require.resolve('playwright/package.json');
+const playwrightCli = path.join(path.dirname(playwrightPkgJson), 'cli.js');
 
 function waitForServer(url, timeoutMs = 20000) {
   const startedAt = Date.now();
