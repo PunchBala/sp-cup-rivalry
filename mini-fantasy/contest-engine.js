@@ -172,6 +172,10 @@ const NAME_TOKEN_ALIASES = Object.freeze({
   sooryanvanshi: 'suryavanshi'
 });
 
+const NAME_TOKEN_EXPANSIONS = Object.freeze({
+  suryakumar: Object.freeze(['surya', 'kumar'])
+});
+
 export function slugify(value) {
   return normalizeWhitespace(value)
     .normalize('NFKD')
@@ -206,7 +210,11 @@ function normalizeAliasToken(token) {
 
 function tokenizeAliasName(value, { dropInitials = false } = {}) {
   return tokenizeName(value)
-    .map(normalizeAliasToken)
+    .flatMap((token) => {
+      const normalized = normalizeAliasToken(token);
+      const expanded = NAME_TOKEN_EXPANSIONS[normalized];
+      return expanded ? [...expanded] : [normalized];
+    })
     .filter((token) => !dropInitials || token.length > 1);
 }
 
