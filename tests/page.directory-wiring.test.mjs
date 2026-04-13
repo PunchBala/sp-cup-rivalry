@@ -77,6 +77,8 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /Only email \+ password are needed here\./);
   assert.match(html, /How Duel works/);
   assert.match(html, /How Mini Fantasy works/);
+  assert.match(html, /Fixture-only scoring:/);
+  assert.match(html, /Lineup total:/);
   assert.match(html, /Opens the day before/);
   assert.match(html, /Locks at/);
   assert.match(html, /data-directory-filter=/);

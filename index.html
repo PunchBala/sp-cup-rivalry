@@ -715,6 +715,28 @@
       line-height:1.55;
     }
     .fantasy-guide-rules{display:flex;gap:8px;flex-wrap:wrap}
+    .fantasy-guide-scoring{
+      display:grid;
+      gap:10px;
+      padding-top:4px;
+    }
+    .fantasy-guide-heading{
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      color:#ffe8b5;
+    }
+    .fantasy-guide-list{
+      display:grid;
+      gap:8px;
+      margin:0;
+      padding-left:18px;
+      color:#d9e7ff;
+      font-size:12px;
+      line-height:1.55;
+    }
+    .fantasy-guide-list strong{color:#fff}
     .fantasy-fixture-list{display:grid;gap:10px}
     .fantasy-switcher-shell{display:grid;gap:10px}
     .fantasy-switcher-caption{
@@ -1126,6 +1148,17 @@
                   <div class="pill">At least 1 batter or wicket keeper</div>
                   <div class="pill">At least 1 bowler</div>
                   <div class="pill">Captain scores 1.5x</div>
+                </div>
+                <div class="fantasy-guide-scoring">
+                  <div class="fantasy-guide-heading">Mini Fantasy scoring</div>
+                  <ul class="fantasy-guide-list">
+                    <li><strong>Fixture-only scoring:</strong> your 4-player team scores only from the fixture it locked against. There is no season carry-over into that match score.</li>
+                    <li><strong>Same MVP engine as Nerd Room / Duel:</strong> base player points are <code>runs + (sixes x 2) + (wickets x 20) + (dot balls x 1.5) + (catches x 8)</code>.</li>
+                    <li><strong>Batting strike-rate bonus:</strong> minimum 30 runs, then SR above 170 = +8, above 150 = +5, above 130 = +2, below 100 = -5.</li>
+                    <li><strong>Bowling economy bonus:</strong> minimum 2 overs, then economy below 6 = +8, below 7 = +5, below 8 = +2, above 10 = -5.</li>
+                    <li><strong>Milestone bonuses:</strong> fifty +10, hundred +25, quick 30 under 15 balls +8, 3 wickets +12, 4 wickets +20, 5 wickets +30.</li>
+                    <li><strong>Lineup total:</strong> add the 4 fixture player scores, apply <code>1.5x</code> to your captain, then add <code>+5</code> for each selected player from the winning team once the result is final. No-result matches get no winner bonus.</li>
+                  </ul>
                 </div>
               </div>
             </div>
