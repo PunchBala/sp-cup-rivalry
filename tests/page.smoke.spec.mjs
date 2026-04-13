@@ -253,19 +253,18 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
   await page.locator('#miniFantasyPickerSearch').fill('duckett');
   await page.locator('[data-mini-picker-value="dc_ben-duckett"]').click();
 
-  await page.locator('[data-mini-pick="1"]').click();
   await page.locator('#miniFantasyPickerSearch').fill('chameera');
   await page.locator('[data-mini-picker-value="dc_dushmantha-chameera"]').click();
 
-  await page.locator('[data-mini-pick="2"]').click();
   await page.locator('[data-mini-picker-team="GT"]').click();
   await page.locator('#miniFantasyPickerSearch').fill('shahrukh');
   await page.locator('[data-mini-picker-value="gt_shahrukh-khan"]').click();
 
-  await page.locator('[data-mini-pick="3"]').click();
   await page.locator('[data-mini-picker-team="GT"]').click();
   await page.locator('#miniFantasyPickerSearch').fill('kishore');
   await page.locator('[data-mini-picker-value="gt_sai-kishore"]').click();
+  await page.locator('#miniFantasyPickerDone').click();
+  await expect(page.locator('#miniFantasyPickerModal')).toBeHidden();
 
   await page.locator('[data-mini-captain="0"]').click();
   await expect(page.locator('#miniFantasyBuilder')).toContainText('Lineup ready');
