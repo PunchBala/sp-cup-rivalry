@@ -838,12 +838,40 @@
       color:var(--text);
       cursor:pointer;
       transition:.18s ease;
+      position:relative;
     }
     .fantasy-picker-card:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.3)}
     .fantasy-picker-card.disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .fantasy-picker-card.picked{border-color:rgba(255,200,87,.38);background:linear-gradient(180deg, rgba(64,50,18,.88), rgba(27,20,8,.86))}
+    .fantasy-picker-card.current{border-color:rgba(95,240,200,.38);box-shadow:0 0 0 1px rgba(95,240,200,.18) inset}
     .fantasy-picker-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
     .fantasy-picker-price{font-size:22px;font-weight:900;color:#fff;line-height:1}
     .fantasy-picker-role{margin-top:6px;font-size:12px;color:var(--muted)}
+    .fantasy-picker-meta-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .fantasy-picker-meta-badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .fantasy-picker-badge{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,200,87,.32);background:rgba(255,200,87,.14);color:#ffe2a8;font-size:11px;font-weight:800;letter-spacing:.01em}
+    .fantasy-picker-meta-row .fantasy-picker-badge{margin-top:0}
+    .fantasy-picker-badge.current{border-color:rgba(95,240,200,.28);background:rgba(95,240,200,.14);color:#c6ffe9}
+    .fantasy-picker-captain-btn{
+      display:inline-flex;
+      align-items:center;
+      border:1px solid rgba(95,240,200,.26);
+      background:rgba(95,240,200,.14);
+      color:#d9fff3;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.01em;
+      cursor:pointer;
+      opacity:0;
+      transform:translateY(3px);
+      transition:.16s ease;
+      pointer-events:none;
+    }
+    .fantasy-picker-card.has-captain-action:hover .fantasy-picker-captain-btn{opacity:1;transform:translateY(0);pointer-events:auto}
+    .fantasy-picker-captain-btn.is-captain{opacity:1;transform:none;pointer-events:auto;border-color:rgba(255,200,87,.3);background:rgba(255,200,87,.16);color:#ffe8b5}
+    .fantasy-crown-icon{display:inline-block;margin-right:5px;font-size:11px;line-height:1}
     .fantasy-pill-strong{color:#fff}
     .fantasy-highlight{
       padding:12px 14px;
@@ -7815,18 +7843,22 @@ function titleBandScore(pick, live){
         });
         const players = selectedPlayerIds.map((playerId) => {
           const player = poolById.get(playerId) || null;
+          const isCaptain = normalizeTextValue(entry.captainPlayerId || '') === playerId;
+          const rawPoints = Number(pointsByPlayerId[playerId] || 0);
+          const scoredPoints = isCaptain ? rawPoints * MINI_FANTASY_CAPTAIN_MULTIPLIER : rawPoints;
         return {
           playerId,
           name: player?.name || fallbackMiniFantasyPlayerName(playerId),
           team: player?.team || '',
           role: player?.role || '',
           price: Number(player?.final_price || 0) || 0,
-          points: Number(pointsByPlayerId[playerId] || 0),
-          isCaptain: normalizeTextValue(entry.captainPlayerId || '') === playerId
+          points: rawPoints,
+          scoredPoints,
+          isCaptain
         };
       });
       const captain = players.find((player) => player.isCaptain) || null;
-      const bestPick = [...players].sort((a, b) => b.points - a.points || a.name.localeCompare(b.name))[0] || null;
+      const bestPick = [...players].sort((a, b) => b.scoredPoints - a.scoredPoints || a.name.localeCompare(b.name))[0] || null;
       return {
         totalPoints,
         pointsByPlayerId,
@@ -8162,11 +8194,17 @@ function titleBandScore(pick, live){
       const fixture = availableMiniFantasyFixtures().find((item) => Number(item.match_no) === Number(MINI_FANTASY_PICKER_STATE.matchNo));
       if (!fixture) return [];
       const draft = ensureMiniFantasyDraft(fixture.match_no);
-      const otherSelected = new Set(
-        draft.selectedPlayerIds.filter((playerId, index) => index !== MINI_FANTASY_PICKER_STATE.slotIndex && playerId)
-      );
+      const currentSlotIndex = Number(MINI_FANTASY_PICKER_STATE.slotIndex || 0);
       return currentMiniFantasyPlayerPool(fixture)
-        .filter((player) => !otherSelected.has(player.player_id))
+        .map((player) => {
+          const selectedSlotIndex = draft.selectedPlayerIds.findIndex((id) => id === player.player_id);
+          return {
+            ...player,
+            selectedSlotIndex,
+            pickedInOtherSlot: selectedSlotIndex !== -1 && selectedSlotIndex !== currentSlotIndex,
+            selectedInCurrentSlot: selectedSlotIndex === currentSlotIndex
+          };
+        })
         .filter((player) => MINI_FANTASY_PICKER_STATE.teamFilter === 'ALL' || player.team === MINI_FANTASY_PICKER_STATE.teamFilter)
         .filter((player) => MINI_FANTASY_PICKER_STATE.roleFilter === 'ALL' || player.role === MINI_FANTASY_PICKER_STATE.roleFilter)
         .filter((player) => {
@@ -8181,8 +8219,22 @@ function titleBandScore(pick, live){
       const slotIndex = Number(MINI_FANTASY_PICKER_STATE.slotIndex || 0);
       if (!matchNo && matchNo !== 0) return;
       if (!Number.isFinite(slotIndex)) return;
+      const draft = ensureMiniFantasyDraft(matchNo);
+      const existingSlotIndex = draft.selectedPlayerIds.findIndex((id) => id === playerId);
+
+      if (existingSlotIndex !== -1) {
+        clearMiniFantasyDraftSlot(matchNo, existingSlotIndex);
+        MINI_FANTASY_PICKER_STATE.slotIndex = existingSlotIndex;
+        setMiniFantasyNotice(null);
+        render();
+        return;
+      }
+
       setMiniFantasyDraftSlot(matchNo, slotIndex, playerId || '');
-      closeMiniFantasyPicker();
+      const updatedDraft = ensureMiniFantasyDraft(matchNo);
+      const nextEmptySlot = updatedDraft.selectedPlayerIds.findIndex((id) => !id);
+      MINI_FANTASY_PICKER_STATE.slotIndex = nextEmptySlot !== -1 ? nextEmptySlot : slotIndex;
+      setMiniFantasyNotice(null);
       render();
     }
 
@@ -8347,9 +8399,9 @@ function titleBandScore(pick, live){
             ${bestPick ? `<span class="pill">Best pick: ${escapeHtml(bestPick.name)} ${escapeHtml(formatMiniFantasyPoints(bestPick.points))} pts</span>` : ''}
           </div>
           <div class="fantasy-window-note">${escapeHtml(stage === 'final'
-            ? `Final recap: ${detail.captain ? `${detail.captain.name} delivered ${formatMiniFantasyPoints(detail.captain.points)} captain points.` : 'Captain was not set.'} ${bestPick ? `${bestPick.name} was your best pick on ${formatMiniFantasyPoints(bestPick.points)} points.` : ''}`
+            ? `Final recap: ${detail.captain ? `${detail.captain.name} delivered ${formatMiniFantasyPoints(detail.captain.scoredPoints ?? detail.captain.points)} captain points.` : 'Captain was not set.'} ${bestPick ? `${bestPick.name} was your best pick on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)} points.` : ''}`
             : stage === 'live'
-              ? `This team is still live. ${detail.captain ? `${detail.captain.name} is currently returning ${formatMiniFantasyPoints(detail.captain.points)} captain points.` : 'Captain is not set yet.'}`
+              ? `This team is still live. ${detail.captain ? `${detail.captain.name} is currently returning ${formatMiniFantasyPoints(detail.captain.scoredPoints ?? detail.captain.points)} captain points.` : 'Captain is not set yet.'}`
               : 'This team is locked and waiting for scoring to start.')}</div>
           <div class="fantasy-entry-player-list">
             ${detail.players.map((player) => `
@@ -8359,7 +8411,7 @@ function titleBandScore(pick, live){
                   <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}</div>
                 </div>
                 <div class="fantasy-entry-copy" style="justify-items:end">
-                  <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.points))}</div>
+                  <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.scoredPoints ?? player.points))}</div>
                   <div class="fantasy-picker-role">${escapeHtml(String(player.price || 0))} cr</div>
                 </div>
               </div>
@@ -8447,9 +8499,9 @@ function titleBandScore(pick, live){
       const detailNote = selectedRow.fixtureStatus === 'did_not_lock'
         ? `${selectedRow.display_name || selectedRow.owner_handle} did not save a team before this fixture locked.`
         : board.stage === 'final'
-          ? `${selectedRow.display_name || selectedRow.owner_handle} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.points)}.` : ''}`
+          ? `${selectedRow.display_name || selectedRow.owner_handle} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)}.` : ''}`
           : board.stage === 'live'
-            ? `${selectedRow.display_name || selectedRow.owner_handle} is live on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} is currently worth ${formatMiniFantasyPoints(captain.points)}.` : ''}`
+            ? `${selectedRow.display_name || selectedRow.owner_handle} is live on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} is currently worth ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}`
             : `${selectedRow.display_name || selectedRow.owner_handle} locked this team. Points will start updating once Match ${board.fixture.match_no} begins.`;
       panel.innerHTML = `
         <div class="fantasy-entry-team">
@@ -8581,9 +8633,9 @@ function titleBandScore(pick, live){
       const detailNote = selectedRow.fixtureStatus === 'did_not_lock'
         ? `${viewedName} did not save a team before this fixture locked.`
         : board.stage === 'final'
-          ? `${viewedName} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.points)}.` : ''}`
+          ? `${viewedName} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)}.` : ''}`
           : board.stage === 'live'
-            ? `${viewedName} is live on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} is currently worth ${formatMiniFantasyPoints(captain.points)}.` : ''}`
+            ? `${viewedName} is live on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} is currently worth ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}`
             : `${viewedName} locked this team. Points will start updating once Match ${board.fixture.match_no} begins.`;
       panel.innerHTML = `
         <div class="fantasy-entry-team">
@@ -8616,7 +8668,7 @@ function titleBandScore(pick, live){
                       <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}</div>
                     </div>
                     <div class="fantasy-entry-copy" style="justify-items:end">
-                      <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.points))}</div>
+                      <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.scoredPoints ?? player.points))}</div>
                       <div class="fantasy-picker-role">${escapeHtml(String(player.price || 0))} cr</div>
                     </div>
                   </div>
@@ -8871,11 +8923,20 @@ function titleBandScore(pick, live){
       }
 
       const filtered = filteredMiniFantasyPickerPool();
+      const draft = ensureMiniFantasyDraft(fixture.match_no);
+      const playerPool = currentMiniFantasyPlayerPool(fixture);
+      const selectedPlayerIds = draft.selectedPlayerIds.filter(Boolean);
+      const pickerValidation = validateMiniFantasyEntry({
+        fixture,
+        selectedPlayerIds,
+        captainPlayerId: draft.captainPlayerId,
+        playerPool
+      });
       captureSearchInputState(document.getElementById('miniFantasyPickerSearch'), MINI_FANTASY_PICKER_STATE);
       modal.classList.remove('section-hidden');
       modal.setAttribute('aria-hidden', 'false');
       title.textContent = `Choose player for Match ${fixture.match_no}`;
-      subtitle.textContent = `Search the ${teamShort(fixture.home_team)} and ${teamShort(fixture.away_team)} pool, then lock one player into the slot.`;
+      subtitle.textContent = `Search the ${teamShort(fixture.home_team)} and ${teamShort(fixture.away_team)} pool, then fill slot ${Number(MINI_FANTASY_PICKER_STATE.slotIndex || 0) + 1} of 4. Tap a picked player to unselect.`;
       toolbar.innerHTML = `
         <input class="picker-search" id="miniFantasyPickerSearch" placeholder="Search player name" value="${escapeHtml(MINI_FANTASY_PICKER_STATE.search)}" autocomplete="off" />
         <div class="picker-chip-row">
@@ -8890,15 +8951,43 @@ function titleBandScore(pick, live){
           <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.roleFilter === 'all_rounder' ? 'active' : ''}" data-mini-picker-role="all_rounder">All rounder</button>
           <button type="button" class="picker-chip ${MINI_FANTASY_PICKER_STATE.roleFilter === 'wicket_keeper' ? 'active' : ''}" data-mini-picker-role="wicket_keeper">Wicket keeper</button>
         </div>
+        <div class="fantasy-summary-grid">
+          <span class="pill">Selected: ${escapeHtml(String(selectedPlayerIds.length))} / 4</span>
+          <span class="pill">Credits: ${escapeHtml(String(pickerValidation.total_cost))} / ${MINI_FANTASY_BUDGET}</span>
+          <span class="pill">Left: ${escapeHtml(String(pickerValidation.budget_remaining))}</span>
+        </div>
       `;
       body.innerHTML = filtered.length
         ? `<div class="fantasy-picker-list">
             ${filtered.map((player) => `
-              <button type="button" class="fantasy-picker-card" data-mini-picker-value="${escapeHtml(player.player_id)}">
+              <button
+                type="button"
+                class="fantasy-picker-card ${player.pickedInOtherSlot ? 'picked' : ''} ${player.selectedInCurrentSlot ? 'current' : ''} ${player.selectedSlotIndex !== -1 ? 'has-captain-action' : ''}"
+                data-mini-picker-value="${escapeHtml(player.player_id)}"
+              >
                 <div class="fantasy-picker-row">
                   <div>
                     <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
-                    <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml(player.role.replace('_', ' '))}${player.matches_played ? ` - ${escapeHtml(String(player.matches_played))} matches` : ''}</div>
+                    <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml(player.role.replace('_', ' '))}${player.matches_played ? ` - ${escapeHtml(String(player.matches_played))} matches` : ''}${draft.captainPlayerId === player.player_id ? ' - captain' : ''}</div>
+                    ${(player.pickedInOtherSlot || player.selectedInCurrentSlot || player.selectedSlotIndex !== -1) ? `
+                      <div class="fantasy-picker-meta-row">
+                        <div class="fantasy-picker-meta-badges">
+                          ${player.pickedInOtherSlot ? `<div class="fantasy-picker-badge">Picked in slot ${player.selectedSlotIndex + 1} - tap to unselect</div>` : ''}
+                          ${player.selectedInCurrentSlot ? '<div class="fantasy-picker-badge current">Selected in this slot - tap to unselect</div>' : ''}
+                        </div>
+                        ${player.selectedSlotIndex !== -1 ? `
+                          <span
+                            class="fantasy-picker-captain-btn ${draft.captainPlayerId === player.player_id ? 'is-captain' : ''}"
+                            data-mini-picker-captain="${escapeHtml(player.player_id)}"
+                            title="${draft.captainPlayerId === player.player_id ? 'Captain selected' : 'Make captain'}"
+                            role="button"
+                            tabindex="0"
+                          >
+                            <span class="fantasy-crown-icon" aria-hidden="true">&#9819;</span>${draft.captainPlayerId === player.player_id ? 'Captain' : 'Make captain'}
+                          </span>
+                        ` : ''}
+                      </div>
+                    ` : ''}
                   </div>
                   <div class="fantasy-picker-price">${escapeHtml(String(player.final_price))}</div>
                 </div>
@@ -8906,7 +8995,7 @@ function titleBandScore(pick, live){
             `).join('')}
           </div>`
         : '<div class="fantasy-empty">No player matches the current search and team filter.</div>';
-      count.textContent = `${filtered.length} option${filtered.length === 1 ? '' : 's'}`;
+      count.textContent = `${filtered.length} option${filtered.length === 1 ? '' : 's'} - ${selectedPlayerIds.length} selected - ${pickerValidation.total_cost}/${MINI_FANTASY_BUDGET} credits`;
 
       const searchInput = document.getElementById('miniFantasyPickerSearch');
       if (searchInput) {
@@ -8930,6 +9019,25 @@ function titleBandScore(pick, live){
       });
       body.querySelectorAll('[data-mini-picker-value]').forEach((button) => {
         button.onclick = () => applyMiniFantasyPickerSelection(button.dataset.miniPickerValue || '');
+      });
+      body.querySelectorAll('[data-mini-picker-captain]').forEach((button) => {
+        button.onclick = (event) => {
+          event.stopPropagation();
+          const playerId = button.dataset.miniPickerCaptain || '';
+          if (!playerId) return;
+          const pickerDraft = ensureMiniFantasyDraft(fixture.match_no);
+          if (!pickerDraft.selectedPlayerIds.includes(playerId)) return;
+          pickerDraft.captainPlayerId = playerId;
+          MINI_FANTASY_DRAFTS[fixture.match_no] = pickerDraft;
+          setMiniFantasyNotice(null);
+          render();
+        };
+        button.onkeydown = (event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          event.stopPropagation();
+          button.click();
+        };
       });
       closeButton.onclick = () => closeMiniFantasyPicker();
       clearButton.onclick = () => {
