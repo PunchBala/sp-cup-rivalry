@@ -8666,7 +8666,7 @@ function titleBandScore(pick, live){
           </div>
           <div class="fantasy-window-note">${escapeHtml(detailNote)}</div>
           ${selectedRow.fixtureStatus === 'did_not_lock'
-            ? '<div class="fantasy-empty">No locked team exists for this user on the most recently locked fixture.</div>'
+            ? '<div class="fantasy-empty">No locked team exists for this user on the selected fixture.</div>'
             : `
               <div class="fantasy-entry-player-list">
                 ${detailPlayers.map((player) => `
@@ -8826,7 +8826,7 @@ function titleBandScore(pick, live){
             </div>
           </div>
           ${selectedRow.fixtureStatus === 'did_not_lock'
-            ? '<div class="fantasy-empty">No locked team exists for this user on the most recently locked fixture.</div>'
+            ? '<div class="fantasy-empty">No locked team exists for this user on the selected fixture.</div>'
             : `
               <div class="fantasy-entry-player-list">
                 ${detailPlayers.map((player) => `
