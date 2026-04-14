@@ -66,6 +66,8 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /async function fetchJsonWithTimeout\(/);
   assert.match(html, /new AbortController\(\)/);
   assert.match(html, /Duels app initialization failed:/);
+  assert.match(html, /await Promise\.all\(\[/);
+  assert.match(html, /loadLiveData\(\)\.catch\(\(\) => \{\}\)/);
   assert.match(html, /LOCAL_AUTH_STORAGE_KEY/);
   assert.match(html, /LOCAL_MINI_FANTASY_ENTRIES_STORAGE_KEY/);
   assert.match(html, /data-copy-duel-link=/);

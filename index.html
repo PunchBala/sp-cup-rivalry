@@ -9373,12 +9373,14 @@ function titleBandScore(pick, live){
         }
         await syncMiniFantasyEntries();
         renderDuelStudio();
-        await loadWarRoomData().catch(() => {});
-        await loadScheduleData().catch(() => {});
-        await loadSquadsData().catch(() => {});
-        await loadTeamRolesData().catch(() => {});
-        await loadLiveData();
-        await loadMiniFantasyPriceBook();
+        await Promise.all([
+          loadWarRoomData().catch(() => {}),
+          loadScheduleData().catch(() => {}),
+          loadSquadsData().catch(() => {}),
+          loadTeamRolesData().catch(() => {}),
+          loadLiveData().catch(() => {})
+        ]);
+        await loadMiniFantasyPriceBook().catch(() => {});
       } catch (error) {
         console.error('Duels app initialization failed:', error);
       } finally {
