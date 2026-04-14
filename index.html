@@ -764,14 +764,12 @@
     .fantasy-history-copy{display:grid;gap:6px;max-width:760px}
     .fantasy-history-title{font-size:13px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#ffd67e}
     .fantasy-history-sub{font-size:12px;line-height:1.55;color:#ffe7bf}
-    .fantasy-history-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .fantasy-history-controls{display:grid;gap:10px;width:100%}
     .fantasy-history-select-wrap{
       display:flex;
       align-items:center;
       gap:10px;
-      min-width:320px;
-      flex:1 1 360px;
-      max-width:520px;
+      width:min(100%, 620px);
       padding:8px 10px;
       border-radius:999px;
       border:1px solid rgba(124,196,255,.14);
@@ -803,7 +801,7 @@
     .fantasy-history-select:focus{outline:none;border-color:rgba(255,200,87,.4);box-shadow:0 0 0 2px rgba(255,200,87,.12)}
     .fantasy-history-select option{background:#171326;color:#f4f7ff}
     @media (max-width:760px){
-      .fantasy-history-select-wrap{min-width:100%;border-radius:18px;align-items:stretch;flex-direction:column}
+      .fantasy-history-select-wrap{width:100%;border-radius:18px;align-items:stretch;flex-direction:column}
       .fantasy-history-select-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#ffdc96}
     }
     .fantasy-history-meta{display:flex;gap:8px;flex-wrap:wrap}
@@ -8795,8 +8793,7 @@ function titleBandScore(pick, live){
                   <select id="miniFantasyHistorySelect" class="fantasy-history-select">
                     ${fixtureOptions.map((option) => {
                       const optionFixture = option.fixture || {};
-                      const optionStatus = option.stage === 'final' ? 'Final' : option.stage === 'live' ? 'Live' : 'Locked';
-                      const optionLabel = `${option.matchNo === fixtureOptions[0]?.matchNo ? 'Latest lock - ' : ''}Match ${option.matchNo} - ${teamShort(optionFixture.home_team || optionFixture.home_team_code || '')} vs ${teamShort(optionFixture.away_team || optionFixture.away_team_code || '')} - ${optionStatus}`;
+                      const optionLabel = `${option.matchNo === fixtureOptions[0]?.matchNo ? 'Latest lock - ' : ''}Match ${option.matchNo} - ${teamShort(optionFixture.home_team || optionFixture.home_team_code || '')} vs ${teamShort(optionFixture.away_team || optionFixture.away_team_code || '')}`;
                       return `<option value="${escapeHtml(String(option.matchNo || ''))}" ${option.isActive ? 'selected' : ''}>${escapeHtml(optionLabel)}</option>`;
                     }).join('')}
                   </select>
