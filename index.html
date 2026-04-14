@@ -8060,7 +8060,8 @@ function titleBandScore(pick, live){
           fixturePlayers: detail.players,
           fixtureCaptain: detail.captain,
           fixtureSummary: detail.summary,
-          fixtureBestPick: detail.bestPick
+          fixtureBestPick: detail.bestPick,
+          fixtureIsNoResult: Boolean(detail.isNoResult)
         };
       });
 
@@ -8648,7 +8649,7 @@ function titleBandScore(pick, live){
       const captain = selectedRow.fixtureCaptain;
       const detailNote = selectedRow.fixtureStatus === 'did_not_lock'
         ? `${selectedRow.display_name || selectedRow.owner_handle} did not save a team before this fixture locked.`
-        : detail.isNoResult
+        : selectedRow.fixtureIsNoResult
           ? `Match ${board.fixture.match_no} ended with no result, so no Mini Fantasy points were awarded.`
         : board.stage === 'final'
           ? `${selectedRow.display_name || selectedRow.owner_handle} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)}.` : ''}`
@@ -8786,7 +8787,7 @@ function titleBandScore(pick, live){
       const activeOption = fixtureOptions.find((option) => option.isActive) || null;
       const detailNote = selectedRow.fixtureStatus === 'did_not_lock'
         ? `${viewedName} did not save a team before this fixture locked.`
-        : detail.isNoResult
+        : selectedRow.fixtureIsNoResult
           ? `Match ${board.fixture.match_no} ended with no result, so no Mini Fantasy points were awarded.`
         : board.stage === 'final'
           ? `${viewedName} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)}.` : ''}`
