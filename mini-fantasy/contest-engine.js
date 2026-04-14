@@ -22,6 +22,7 @@ export const MINI_FANTASY_TEAM_SIZE = 4;
 export const MINI_FANTASY_BUDGET = 31;
 export const MINI_FANTASY_CAPTAIN_MULTIPLIER = 1.5;
 export const MINI_FANTASY_WINNING_TEAM_PLAYER_BONUS = 5;
+export const MINI_FANTASY_APPEARANCE_PLAYER_BONUS = 2;
 export const MINI_FANTASY_LOCK_OFFSET_MINUTES = 1;
 
 export const TEAM_CODE_TO_NAME = Object.freeze({
@@ -806,22 +807,27 @@ export function scoreMiniFantasyLineup({
   selectedPlayerIds = [],
   captainPlayerId = '',
   pointsByPlayerId = {},
+  appearedByPlayerId = {},
   playerTeamById = {},
   winningTeamCode = '',
-  winningPlayerBonus = MINI_FANTASY_WINNING_TEAM_PLAYER_BONUS
+  winningPlayerBonus = MINI_FANTASY_WINNING_TEAM_PLAYER_BONUS,
+  appearancePlayerBonus = MINI_FANTASY_APPEARANCE_PLAYER_BONUS,
+  noResult = false
 } = {}) {
   const selected = [...new Set((Array.isArray(selectedPlayerIds) ? selectedPlayerIds : []).filter(Boolean))];
+  const resolvedWinningTeamCode = resolveFixtureTeamCode(winningTeamCode);
+  const winnerBonusPerPlayer = toNumber(winningPlayerBonus, 0);
+  const appearanceBonusPerPlayer = toNumber(appearancePlayerBonus, 0);
   let total = 0;
   selected.forEach((playerId) => {
-    const rawPoints = toNumber(pointsByPlayerId[playerId], 0);
+    const rawPoints = noResult ? 0 : toNumber(pointsByPlayerId[playerId], 0);
+    const appeared = noResult ? false : Boolean(appearedByPlayerId[playerId]);
+    const playerTeamCode = resolveFixtureTeamCode(playerTeamById[playerId] || resolveMiniFantasyPlayerTeamCode(playerId));
+    const appearanceBonus = appeared ? appearanceBonusPerPlayer : 0;
+    const winnerBonus = resolvedWinningTeamCode && playerTeamCode === resolvedWinningTeamCode ? winnerBonusPerPlayer : 0;
+    const eligiblePoints = rawPoints + appearanceBonus + winnerBonus;
     const multiplier = playerId === captainPlayerId ? MINI_FANTASY_CAPTAIN_MULTIPLIER : 1;
-    total += rawPoints * multiplier;
-  });
-  total += calculateMiniFantasyWinningTeamBonus({
-    selectedPlayerIds: selected,
-    playerTeamById,
-    winningTeamCode,
-    winningPlayerBonus
+    total += eligiblePoints * multiplier;
   });
   return roundTo(total, 2);
 }
@@ -872,28 +878,38 @@ function snapshotMvpScoreLookup(snapshot = {}) {
   );
 }
 
-export function buildMiniFantasyFixturePointsIndex({
+function hasFixturePoints(pointsByMatchNo = {}, matchNo = null) {
+  const targetMatchNo = Number(matchNo || 0) || null;
+  if (!targetMatchNo || !pointsByMatchNo || typeof pointsByMatchNo !== 'object') return false;
+  return Object.prototype.hasOwnProperty.call(pointsByMatchNo, targetMatchNo);
+}
+
+function buildMiniFantasyFixturePlayerRecordMap({
   liveData = {},
   schedule = [],
   squads = {},
   matchNo = null
 } = {}) {
   const targetMatchNo = Number(matchNo || 0) || null;
-  const pointsIndex = new Map();
-  if (!targetMatchNo) return pointsIndex;
+  const recordMap = new Map();
+  if (!targetMatchNo) return recordMap;
 
   const baseIndex = buildMiniFantasyPlayerPointsIndex({ liveData, schedule, squads });
   const completedMatchCount = getCompletedMiniFantasyMatchCount(liveData);
 
   if (targetMatchNo <= completedMatchCount) {
     baseIndex.forEach((payload, playerId) => {
-      pointsIndex.set(playerId, toNumber(payload?.points_by_match_no?.[targetMatchNo], 0));
+      const pointsByMatchNo = payload?.points_by_match_no || {};
+      recordMap.set(playerId, {
+        points: toNumber(pointsByMatchNo[targetMatchNo], 0),
+        appeared: hasFixturePoints(pointsByMatchNo, targetMatchNo)
+      });
     });
-    return pointsIndex;
+    return recordMap;
   }
 
   if (targetMatchNo !== completedMatchCount + 1) {
-    return pointsIndex;
+    return recordMap;
   }
 
   const lastCompletedEntry = latestCompletedScoreHistoryEntry(liveData);
@@ -932,15 +948,40 @@ export function buildMiniFantasyFixturePointsIndex({
     (Array.isArray(squadPlayers) ? squadPlayers : []).forEach((playerName) => {
       const playerId = buildMiniFantasyPlayerId(teamCode, playerName);
       const history = resolvePlayerHistory(playerName, liveDeltaHistories);
-      pointsIndex.set(playerId, toNumber(history?.points_by_match_no?.[targetMatchNo], 0));
+      const pointsByMatchNo = history?.points_by_match_no || {};
+      recordMap.set(playerId, {
+        points: toNumber(pointsByMatchNo[targetMatchNo], 0),
+        appeared: hasFixturePoints(pointsByMatchNo, targetMatchNo)
+      });
     });
   });
 
+  return recordMap;
+}
+
+export function buildMiniFantasyFixturePointsIndex({
+  liveData = {},
+  schedule = [],
+  squads = {},
+  matchNo = null
+} = {}) {
+  const targetMatchNo = Number(matchNo || 0) || null;
+  const pointsIndex = new Map();
+  if (!targetMatchNo) return pointsIndex;
+  buildMiniFantasyFixturePlayerRecordMap({ liveData, schedule, squads, matchNo }).forEach((record, playerId) => {
+    pointsIndex.set(playerId, toNumber(record?.points, 0));
+  });
   return pointsIndex;
 }
 
 function cachedMiniFantasyMatchList(liveData = {}) {
   return Array.isArray(liveData?.meta?.cache?.matchList) ? liveData.meta.cache.matchList : [];
+}
+
+function isMiniFantasyNoResultStatus(statusText = '') {
+  const status = normalizeWhitespace(statusText).toLowerCase();
+  if (!status) return false;
+  return status.includes('no result') || status.includes('abandon') || status.includes('abandoned') || status.includes('washout');
 }
 
 export function getMiniFantasyWinningTeamCode({
@@ -955,7 +996,7 @@ export function getMiniFantasyWinningTeamCode({
   const fixture = (Array.isArray(schedule) ? schedule : []).find((item) => Number(item?.match_no || 0) === targetMatchNo) || null;
   const status = normalizeWhitespace(cachedMatch?.status || '');
   if (!status || /^match starts\b/i.test(status) || /^live\b/i.test(status)) return '';
-  if (/no result|abandoned|tied|tie\b/i.test(status)) return '';
+  if (isMiniFantasyNoResultStatus(status) || /tied|tie\b/i.test(status)) return '';
 
   const candidateTeams = [
     ...(Array.isArray(cachedMatch?.teams) ? cachedMatch.teams : []),
@@ -971,6 +1012,16 @@ export function getMiniFantasyWinningTeamCode({
     .find((team) => lowerStatus.includes(team.toLowerCase()));
 
   return resolveFixtureTeamCode(matchedTeam || '');
+}
+
+export function isMiniFantasyNoResultFixture({
+  liveData = {},
+  matchNo = null
+} = {}) {
+  const targetMatchNo = Number(matchNo || 0) || null;
+  if (!targetMatchNo) return false;
+  const cachedMatch = cachedMiniFantasyMatchList(liveData).find((match) => Number(match?.matchNo || 0) === targetMatchNo) || null;
+  return isMiniFantasyNoResultStatus(cachedMatch?.status || '');
 }
 
 function calculateMiniFantasyWinningTeamBonus({
@@ -993,6 +1044,20 @@ function calculateMiniFantasyWinningTeamBonus({
   );
 }
 
+function calculateMiniFantasyAppearanceBonus({
+  selectedPlayerIds = [],
+  appearedByPlayerId = {},
+  appearancePlayerBonus = MINI_FANTASY_APPEARANCE_PLAYER_BONUS
+} = {}) {
+  const bonusPerPlayer = toNumber(appearancePlayerBonus, 0);
+  if (bonusPerPlayer <= 0) return 0;
+  return roundTo(
+    [...new Set((Array.isArray(selectedPlayerIds) ? selectedPlayerIds : []).filter(Boolean))]
+      .reduce((total, playerId) => total + (appearedByPlayerId[playerId] ? bonusPerPlayer : 0), 0),
+    2
+  );
+}
+
 export function scoreMiniFantasyEntry({
   entry = {},
   liveData = {},
@@ -1001,37 +1066,67 @@ export function scoreMiniFantasyEntry({
 } = {}) {
   const matchNo = Number(entry?.matchNo || entry?.match_no || 0) || null;
   const completedMatchCount = getCompletedMiniFantasyMatchCount(liveData);
-  const pointsIndex = buildMiniFantasyPlayerPointsIndex({ liveData, schedule, squads });
-  const selectedPlayerIds = Array.isArray(entry?.selectedPlayerIds) ? entry.selectedPlayerIds : [];
-  const pointsByPlayerId = Object.fromEntries(
-    selectedPlayerIds.map((playerId) => [
-      playerId,
-      pointsIndex.get(playerId)?.points_by_match_no?.[matchNo] || 0
-    ])
-  );
+  const selectedPlayerIds = Array.isArray(entry?.selectedPlayerIds) ? entry.selectedPlayerIds : (Array.isArray(entry?.selected_player_ids) ? entry.selected_player_ids : []);
+  const captainPlayerId = entry?.captainPlayerId || entry?.captain_player_id || '';
+  const fixtureRecordMap = buildMiniFantasyFixturePlayerRecordMap({ liveData, schedule, squads, matchNo });
+  const pointsByPlayerId = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, toNumber(fixtureRecordMap.get(playerId)?.points, 0)]));
+  const appearedByPlayerId = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Boolean(fixtureRecordMap.get(playerId)?.appeared)]));
   const playerTeamById = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, resolveMiniFantasyPlayerTeamCode(playerId)]));
+  const noResult = matchNo && matchNo <= completedMatchCount
+    ? isMiniFantasyNoResultFixture({ liveData, matchNo })
+    : false;
   const winningTeamCode = matchNo && matchNo <= completedMatchCount
-    ? getMiniFantasyWinningTeamCode({ liveData, schedule, matchNo })
+    ? (noResult ? '' : getMiniFantasyWinningTeamCode({ liveData, schedule, matchNo }))
     : '';
+  const scoredPointsByPlayerId = {};
+  const appearanceBonusByPlayerId = {};
+  const winnerBonusByPlayerId = {};
+  const eligiblePointsByPlayerId = {};
+  selectedPlayerIds.forEach((playerId) => {
+    const basePoints = noResult ? 0 : toNumber(pointsByPlayerId[playerId], 0);
+    const appeared = noResult ? false : Boolean(appearedByPlayerId[playerId]);
+    const appearanceBonus = appeared ? MINI_FANTASY_APPEARANCE_PLAYER_BONUS : 0;
+    const winnerBonus = !noResult && resolveFixtureTeamCode(playerTeamById[playerId]) === resolveFixtureTeamCode(winningTeamCode)
+      ? MINI_FANTASY_WINNING_TEAM_PLAYER_BONUS
+      : 0;
+    const eligiblePoints = basePoints + appearanceBonus + winnerBonus;
+    const multiplier = playerId === captainPlayerId ? MINI_FANTASY_CAPTAIN_MULTIPLIER : 1;
+    appearanceBonusByPlayerId[playerId] = appearanceBonus;
+    winnerBonusByPlayerId[playerId] = winnerBonus;
+    eligiblePointsByPlayerId[playerId] = eligiblePoints;
+    scoredPointsByPlayerId[playerId] = roundTo(eligiblePoints * multiplier, 2);
+  });
   const totalPoints = matchNo && matchNo <= completedMatchCount
-    ? scoreMiniFantasyLineup({
+      ? scoreMiniFantasyLineup({
         selectedPlayerIds,
-        captainPlayerId: entry?.captainPlayerId || '',
+        captainPlayerId,
         pointsByPlayerId,
+        appearedByPlayerId,
         playerTeamById,
-        winningTeamCode
+        winningTeamCode,
+        noResult
       })
     : 0;
   return {
     match_no: matchNo,
     is_scored: Boolean(matchNo && matchNo <= completedMatchCount),
+    is_no_result: Boolean(noResult),
     total_points: totalPoints,
     points_by_player_id: pointsByPlayerId,
+    appeared_by_player_id: appearedByPlayerId,
+    appearance_bonus_by_player_id: appearanceBonusByPlayerId,
+    winner_bonus_by_player_id: winnerBonusByPlayerId,
+    eligible_points_by_player_id: eligiblePointsByPlayerId,
+    scored_points_by_player_id: scoredPointsByPlayerId,
     winning_team_code: winningTeamCode || null,
     winner_bonus_points: calculateMiniFantasyWinningTeamBonus({
       selectedPlayerIds,
       playerTeamById,
       winningTeamCode
+    }),
+    appearance_bonus_points: noResult ? 0 : calculateMiniFantasyAppearanceBonus({
+      selectedPlayerIds,
+      appearedByPlayerId
     })
   };
 }
@@ -1042,7 +1137,6 @@ export function buildMiniFantasyLeaderboard({
   schedule = [],
   squads = {}
 } = {}) {
-  const pointsIndex = buildMiniFantasyPlayerPointsIndex({ liveData, schedule, squads });
   const completedMatchCount = getCompletedMiniFantasyMatchCount(liveData);
   const grouped = new Map();
 
@@ -1051,27 +1145,9 @@ export function buildMiniFantasyLeaderboard({
     const displayName = normalizeWhitespace(entry?.displayName || entry?.display_name || ownerHandle || '');
     if (!ownerHandle) return;
     const matchNo = Number(entry?.matchNo || entry?.match_no || 0) || null;
-    const selectedPlayerIds = entry?.selectedPlayerIds || entry?.selected_player_ids || [];
-    const pointsByPlayerId = Object.fromEntries(
-      (Array.isArray(selectedPlayerIds) ? selectedPlayerIds : []).map((playerId) => [
-        playerId,
-        pointsIndex.get(playerId)?.points_by_match_no?.[matchNo] || 0
-      ])
-    );
-    const scored = Boolean(matchNo && matchNo <= completedMatchCount);
-    const playerTeamById = Object.fromEntries(
-      (Array.isArray(selectedPlayerIds) ? selectedPlayerIds : []).map((playerId) => [playerId, resolveMiniFantasyPlayerTeamCode(playerId)])
-    );
-    const winningTeamCode = scored ? getMiniFantasyWinningTeamCode({ liveData, schedule, matchNo }) : '';
-    const totalPoints = scored
-      ? scoreMiniFantasyLineup({
-          selectedPlayerIds,
-          captainPlayerId: entry?.captainPlayerId || entry?.captain_player_id || '',
-          pointsByPlayerId,
-          playerTeamById,
-          winningTeamCode
-        })
-      : 0;
+    const score = scoreMiniFantasyEntry({ entry, liveData, schedule, squads });
+    const scored = Boolean(score.is_scored);
+    const totalPoints = toNumber(score.total_points, 0);
     const existing = grouped.get(ownerHandle) || {
       owner_handle: ownerHandle,
       display_name: displayName,
@@ -1095,7 +1171,8 @@ export function buildMiniFantasyLeaderboard({
       match_no: matchNo,
       total_points: totalPoints,
       is_scored: scored,
-      captain_player_id: entry?.captainPlayerId || entry?.captain_player_id || null
+      captain_player_id: entry?.captainPlayerId || entry?.captain_player_id || null,
+      is_no_result: Boolean(score.is_no_result)
     });
     grouped.set(ownerHandle, existing);
   });

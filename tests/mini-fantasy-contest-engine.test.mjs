@@ -775,11 +775,11 @@ test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy point
   assert.equal(leaderboard.rows[0].display_name, 'Senthil');
   assert.equal(leaderboard.rows[0].medal, 'gold');
   assert.equal(leaderboard.rows[1].medal, 'silver');
-  assert.equal(leaderboard.rows[0].total_points, 112);
-  assert.equal(leaderboard.rows[1].total_points, 98);
+  assert.equal(leaderboard.rows[0].total_points, 123.5);
+  assert.equal(leaderboard.rows[1].total_points, 107);
 });
 
-test('scoreMiniFantasyEntry adds +5 for each selected player from the winning side and skips no-result bonus', () => {
+test('scoreMiniFantasyEntry applies appearance and winning bonuses before captain multiplier and zeroes no-result fixtures', () => {
   const entry = {
     matchNo: 14,
     selectedPlayerIds: [
@@ -842,9 +842,14 @@ test('scoreMiniFantasyEntry adds +5 for each selected player from the winning si
     schedule,
     squads
   });
-  assert.equal(scored.total_points, 112);
+  assert.equal(scored.total_points, 123.5);
+  assert.equal(scored.appearance_bonus_points, 8);
   assert.equal(scored.winner_bonus_points, 10);
   assert.equal(scored.winning_team_code, 'DC');
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 70.5);
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Bowler')], 27);
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Bowler')], 12);
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 14);
 
   const noResult = scoreMiniFantasyEntry({
     entry,
@@ -865,7 +870,10 @@ test('scoreMiniFantasyEntry adds +5 for each selected player from the winning si
     schedule,
     squads
   });
-  assert.equal(noResult.total_points, 102);
+  assert.equal(noResult.total_points, 0);
+  assert.equal(noResult.appearance_bonus_points, 0);
   assert.equal(noResult.winner_bonus_points, 0);
   assert.equal(noResult.winning_team_code, null);
+  assert.equal(noResult.is_no_result, true);
+  assert.equal(noResult.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 0);
 });

@@ -37,7 +37,7 @@ const IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES = parseEnvInt(process.env.IPLT20_MOST
 const IPLT20_MOST_DOTS_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/284-mostdotballsbowledtournament.js?callback=onmostdotballsbowledtournament';
 const IPLT20_FAIRPLAY_ENABLED = parseEnvBool(process.env.IPLT20_FAIRPLAY_ENABLED, true);
 const IPLT20_FAIRPLAY_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/2026-fairplayList.js?callback=onFairplayAward';
-const AGGREGATE_SCHEMA_VERSION = 3;
+const AGGREGATE_SCHEMA_VERSION = 4;
 const LEAST_MVP_MIN_MATCHES = 5;
 const UNCAPPED_MVP_PLAYERS = [
   'Ayush Mhatre', 'Kartik Sharma', 'Urvil Patel', 'Ramakrishna Ghosh', 'Prashant Veer', 'Aman Khan',
@@ -321,6 +321,7 @@ function createEmptyAggregates() {
     battingFifties: {},
     battingHundreds: {},
     battingImpact30s: {},
+    battingDucks: {},
     bowling3w: {},
     bowling4w: {},
     bowling5w: {},
@@ -1281,6 +1282,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
       if (runs >= 100) incrementCountMap(aggregates.battingHundreds, batter);
       if (runs >= 50) incrementCountMap(aggregates.battingFifties, batter);
       if (runs >= 30 && balls > 0 && balls < 15) incrementCountMap(aggregates.battingImpact30s, batter);
+      if (runs === 0 && isDismissedBattingEntry(bat)) incrementCountMap(aggregates.battingDucks, batter);
     }
 
     for (const bowl of safeArray(innings.bowling)) {
@@ -1373,7 +1375,7 @@ function combineAggregates(baseAgg, overlayAgg) {
   const out = clone(baseAgg);
   if (!overlayAgg) return out;
 
-  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
+  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
     for (const [name, value] of Object.entries(overlayAgg[key] || {})) {
       out[key][name] = (out[key][name] || 0) + Number(value || 0);
     }
@@ -1457,7 +1459,7 @@ function buildStandingsRanking(agg) {
 
 
 function battingStrikeRateBonus(runs, balls) {
-  if (runs < 30 || balls <= 0) return 0;
+  if (balls <= 0 || (runs < 30 && balls < 10)) return 0;
   const sr = (100 * runs) / balls;
   if (sr > 170) return 8;
   if (sr > 150) return 5;
@@ -1493,6 +1495,7 @@ function buildMvpRanking(agg, dotsValues) {
     const dotBalls = Number(dotsValues[player] || 0);
     const catches = Number(agg.catches[player] || 0);
     const runsConceded = Number(agg.bowlingRunsConceded[player] || 0);
+    const duckPenalty = Number(agg.battingDucks[player] || 0) * -5;
 
     const battingBase = runs + (sixes * 2);
     const bowlingBase = (wickets * 20) + (dotBalls * 1.5);
@@ -1507,7 +1510,7 @@ function buildMvpRanking(agg, dotsValues) {
       (Number(agg.bowling4w[player] || 0) * 20) +
       (Number(agg.bowling5w[player] || 0) * 30);
 
-    const score = battingBase + bowlingBase + fieldingBase + srBonus + econBonus + milestoneBonus;
+    const score = battingBase + bowlingBase + fieldingBase + srBonus + econBonus + milestoneBonus + duckPenalty;
 
     return [player, {
       score: Number(score.toFixed(2)),
@@ -1522,6 +1525,7 @@ function buildMvpRanking(agg, dotsValues) {
       bonuses: {
         sr: srBonus,
         economy: econBonus,
+        ducks: Number(agg.battingDucks[player] || 0),
         batting50s: Number(agg.battingFifties[player] || 0),
         batting100s: Number(agg.battingHundreds[player] || 0),
         impact30s: Number(agg.battingImpact30s[player] || 0),
@@ -1751,7 +1755,8 @@ function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = nul
       bowling5w: 30
     },
     bonusRules: {
-      battingStrikeRate: { gt170: 8, gt150: 5, gt130: 2, lt100: -5, minRuns: 30 },
+      battingStrikeRate: { gt170: 8, gt150: 5, gt130: 2, lt100: -5, minRuns: 30, minBalls: 10, appliesWhenEitherThresholdIsMet: true },
+      duckOut: -5,
       economy: { lt6: 8, lt7: 5, lt8: 2, gt10: -5, minBalls: 12 }
     }
   };
@@ -1862,6 +1867,7 @@ function needsHistoricalAggregateBackfill(live) {
     agg.battingFifties,
     agg.battingHundreds,
     agg.battingImpact30s,
+    agg.battingDucks,
     agg.bowling3w,
     agg.bowling4w,
     agg.bowling5w
@@ -2242,7 +2248,7 @@ async function main() {
     titleWinner: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     tableBottom: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     mostDots: dotsReport,
-    mvp: { ok: true, source: 'CricketData + IPLT20 official Most Dots', method: 'custom formula using runs, sixes, wickets, dot balls, catches, strike-rate bonus, economy bonus and milestone bonuses' },
+    mvp: { ok: true, source: 'CricketData + IPLT20 official Most Dots', method: 'custom formula using runs, sixes, wickets, dot balls, catches, strike-rate bonus, economy bonus, milestone bonuses, and duck penalties' },
     uncappedMvp: { ok: true, source: 'custom MVP ranking', method: 'filtered to the provided uncapped player pool, then compares picks by their positions in the custom MVP ranking' },
     fairPlay: fairPlayReport,
     leastMvp: { ok: true, source: 'custom MVP ranking', method: `lower in custom MVP ranking wins, filtered to players with minimum ${LEAST_MVP_MIN_MATCHES} matches` },
