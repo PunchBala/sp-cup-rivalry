@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-04-14T19:32:29.878Z",
+    "as_of_utc": "2026-04-14T20:39:07.020Z",
     "price_min": 4,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -17,9 +17,9 @@
   "summary": {
     "total_players_received": 250,
     "eligible_players_ranked": 250,
-    "price_rises": 1,
-    "price_drops": 5,
-    "price_unchanged": 244
+    "price_rises": 0,
+    "price_drops": 1,
+    "price_unchanged": 249
   },
   "players": [
     {
@@ -220,12 +220,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 9,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": 1,
+      "price_change": 0,
       "matches_played": 5,
       "season_avg_points": 26.8,
       "recent_avg_points": 43.33,
@@ -2215,12 +2215,12 @@
       "role": "batter",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 5,
       "season_avg_points": 19.4,
       "recent_avg_points": 5.33,
@@ -2481,34 +2481,6 @@
       "last_match_played_at_utc": null
     },
     {
-      "player_id": "kkr_navdeep-saini",
-      "name": "Navdeep Saini",
-      "team": "KKR",
-      "role": "bowler",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
-      "target_price": 4,
-      "smoothed_price": 6,
-      "final_price": 6,
-      "price_change": -1,
-      "matches_played": 1,
-      "season_avg_points": -5,
-      "recent_avg_points": -5,
-      "last_match_points": -5,
-      "score_basis": -5,
-      "reliability_factor": 0.25,
-      "adjusted_score": -1.25,
-      "percentile": 0.2,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 0.2",
-        "Applied smoothing against the target price"
-      ],
-      "last_match_played_at_utc": "2026-04-09T14:00:00Z"
-    },
-    {
       "player_id": "kkr_prashant-solanki",
       "name": "Prashant Solanki",
       "team": "KKR",
@@ -2723,6 +2695,34 @@
         "No matches played; retained base price"
       ],
       "last_match_played_at_utc": null
+    },
+    {
+      "player_id": "kkr_navdeep-saini",
+      "name": "Navdeep Saini",
+      "team": "KKR",
+      "role": "bowler",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 6,
+      "initial_price": 6,
+      "target_price": 4,
+      "smoothed_price": 5,
+      "final_price": 5,
+      "price_change": -1,
+      "matches_played": 1,
+      "season_avg_points": -5,
+      "recent_avg_points": -5,
+      "last_match_points": -5,
+      "score_basis": -5,
+      "reliability_factor": 0.25,
+      "adjusted_score": -1.25,
+      "percentile": 0.2,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 0.2",
+        "Applied smoothing against the target price"
+      ],
+      "last_match_played_at_utc": "2026-04-09T14:00:00Z"
     },
     {
       "player_id": "lsg_rishabh-pant",
@@ -3382,12 +3382,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
+      "old_price": 5,
+      "initial_price": 5,
       "target_price": 4,
       "smoothed_price": 5,
       "final_price": 5,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 1,
       "season_avg_points": -5,
       "recent_avg_points": -5,
@@ -3869,12 +3869,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
+      "old_price": 6,
+      "initial_price": 6,
       "target_price": 5,
       "smoothed_price": 6,
       "final_price": 6,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 4,
       "season_avg_points": 0,
       "recent_avg_points": 0,
@@ -5596,12 +5596,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 5,
       "season_avg_points": 20.6,
       "recent_avg_points": 13.67,
@@ -6781,5 +6781,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-04-14T19:32:29.878Z"
+  "generated_at_utc": "2026-04-14T20:39:07.020Z"
 }
