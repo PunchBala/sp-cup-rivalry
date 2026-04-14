@@ -4050,18 +4050,19 @@ function titleBandScore(pick, live){
     }
 
     function normalizeUserProfile(profile = {}){
+      const source = profile && typeof profile === 'object' ? profile : {};
       const model = getWarRoomModelApi();
-      const displayName = model.normalizeWhitespace(profile.displayName || profile.name || '');
-      const ownerId = model.normalizeSlug(profile.ownerId || profile.handle || displayName || '');
-      const userId = model.normalizeWhitespace(profile.userId || profile.id || '');
-      const email = model.normalizeWhitespace(profile.email || '');
+      const displayName = model.normalizeWhitespace(source.displayName || source.name || '');
+      const ownerId = model.normalizeSlug(source.ownerId || source.handle || displayName || '');
+      const userId = model.normalizeWhitespace(source.userId || source.id || '');
+      const email = model.normalizeWhitespace(source.email || '');
       if (!displayName || !ownerId) return null;
       return {
         displayName,
         ownerId,
         userId: userId || null,
         email: email || null,
-        authSource: model.normalizeWhitespace(profile.authSource || profile.source || 'local') || 'local'
+        authSource: model.normalizeWhitespace(source.authSource || source.source || 'local') || 'local'
       };
     }
 
