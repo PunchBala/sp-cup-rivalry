@@ -3910,15 +3910,26 @@ function titleBandScore(pick, live){
       return { label: 'Upcoming', cls: 'status-bad' };
     }
 
+    async function fetchJsonWithTimeout(url, { timeoutMs = 15000 } = {}){
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(new DOMException(`Timed out fetching ${url}`, 'AbortError')), timeoutMs);
+      try {
+        const res = await fetch(url, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' },
+          signal: controller.signal
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+    }
+
     async function loadScheduleData(){
       try {
         const cacheBust = `t=${Date.now()}`;
-        const res = await fetch(`ipl_2026_schedule.json?${cacheBust}`, {
-          cache: 'no-store',
-          headers: { 'Accept': 'application/json' }
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        const data = await fetchJsonWithTimeout(`ipl_2026_schedule.json?${cacheBust}`, { timeoutMs: 8000 });
         if (Array.isArray(data) && data.length) {
           LEAGUE_STAGE_SCHEDULE = data.map(match => ({ ...match, fixture: formatFixtureLabel(match.fixture) }));
         }
@@ -3932,12 +3943,7 @@ function titleBandScore(pick, live){
     async function loadSquadsData(){
       try {
         const cacheBust = `t=${Date.now()}`;
-        const res = await fetch(`ipl_2026_squads.json?${cacheBust}`, {
-          cache: 'no-store',
-          headers: { 'Accept': 'application/json' }
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        const data = await fetchJsonWithTimeout(`ipl_2026_squads.json?${cacheBust}`, { timeoutMs: 8000 });
         IPL_SQUADS = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
       } catch (err) {
         console.warn('Falling back to empty squads directory', err);
@@ -3948,12 +3954,7 @@ function titleBandScore(pick, live){
     async function loadTeamRolesData(){
       try {
         const cacheBust = `t=${Date.now()}`;
-        const res = await fetch(`ipl_2026_team_roles.json?${cacheBust}`, {
-          cache: 'no-store',
-          headers: { 'Accept': 'application/json' }
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        const data = await fetchJsonWithTimeout(`ipl_2026_team_roles.json?${cacheBust}`, { timeoutMs: 8000 });
         IPL_TEAM_ROLES = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
       } catch (err) {
         console.warn('Falling back to empty team roles directory', err);
@@ -3964,12 +3965,7 @@ function titleBandScore(pick, live){
     async function loadMiniFantasyPriceBook(){
       try {
         const cacheBust = `t=${Date.now()}`;
-        const res = await fetch(`data/mini_fantasy_prices.json?${cacheBust}`, {
-          cache: 'no-store',
-          headers: { 'Accept': 'application/json' }
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        const data = await fetchJsonWithTimeout(`data/mini_fantasy_prices.json?${cacheBust}`, { timeoutMs: 12000 });
         MINI_FANTASY_PRICE_BOOK = data && typeof data === 'object' && !Array.isArray(data) ? data : null;
       } catch (err) {
         console.warn('Mini Fantasy price book fetch failed, regenerating in browser', err);
@@ -4854,12 +4850,7 @@ function titleBandScore(pick, live){
       try {
         const slug = getRequestedRoomSlug();
         const cacheBust = `t=${Date.now()}`;
-        const res = await fetch(`${buildWarRoomFixturePath(slug)}?${cacheBust}`, {
-          cache: 'no-store',
-          headers: { 'Accept': 'application/json' }
-        });
-        if (!res.ok) throw new Error(`Failed to fetch war room fixture: HTTP ${res.status}`);
-        const rawRoom = await res.json();
+        const rawRoom = await fetchJsonWithTimeout(`${buildWarRoomFixturePath(slug)}?${cacheBust}`, { timeoutMs: 10000 });
         const model = getWarRoomModelApi();
         const validation = model.validateWarRoomConfig(rawRoom, { requireCompletePicks: rawRoom?.state === 'locked' });
         if (!validation.ok) throw new Error(`War room fixture validation failed: ${validation.errors.join(' | ')}`);
@@ -9346,16 +9337,7 @@ function titleBandScore(pick, live){
     async function loadLiveData(){
       try {
         const cacheBust = `t=${Date.now()}`;
-        const res = await fetch(`data/live.json?${cacheBust}`, {
-          cache: 'no-store',
-          headers: { 'Accept': 'application/json' }
-        });
-
-        if (!res.ok) {
-          throw new Error(`Failed to fetch live data: HTTP ${res.status}`);
-        }
-
-        const fetched = normalizeFetchedLiveData(await res.json());
+        const fetched = normalizeFetchedLiveData(await fetchJsonWithTimeout(`data/live.json?${cacheBust}`, { timeoutMs: 20000 }));
         Object.assign(LIVE_2026, fetched);
 
         const providerBits = [
@@ -9373,30 +9355,35 @@ function titleBandScore(pick, live){
     }
 
     async function initializeDuelsApp(){
-      CUSTOM_DUEL_STORE = loadStoredCustomDuels();
-      REMOTE_DUEL_STORE = emptyCustomDuelStore();
-      setRemoteMiniFantasyEntries([]);
-      setRemoteMiniFantasyLeaderboardEntries([]);
-      resetMiniFantasyDrafts();
-      if (usesHostedDuelsBackend()) {
-        try {
-          CURRENT_USER = normalizeUserProfile(await DUELS_BACKEND.bootstrap()) || null;
-        } catch (error) {
-          console.warn('Hosted auth bootstrap fell back to signed-out state:', error);
-          CURRENT_USER = null;
+      try {
+        CUSTOM_DUEL_STORE = loadStoredCustomDuels();
+        REMOTE_DUEL_STORE = emptyCustomDuelStore();
+        setRemoteMiniFantasyEntries([]);
+        setRemoteMiniFantasyLeaderboardEntries([]);
+        resetMiniFantasyDrafts();
+        if (usesHostedDuelsBackend()) {
+          try {
+            CURRENT_USER = normalizeUserProfile(await DUELS_BACKEND.bootstrap()) || null;
+          } catch (error) {
+            console.warn('Hosted auth bootstrap fell back to signed-out state:', error);
+            CURRENT_USER = null;
+          }
+        } else {
+          CURRENT_USER = loadStoredUserProfile();
         }
-      } else {
-        CURRENT_USER = loadStoredUserProfile();
+        await syncMiniFantasyEntries();
+        renderDuelStudio();
+        await loadWarRoomData().catch(() => {});
+        await loadScheduleData().catch(() => {});
+        await loadSquadsData().catch(() => {});
+        await loadTeamRolesData().catch(() => {});
+        await loadLiveData();
+        await loadMiniFantasyPriceBook();
+      } catch (error) {
+        console.error('Duels app initialization failed:', error);
+      } finally {
+        render();
       }
-      await syncMiniFantasyEntries();
-      renderDuelStudio();
-      await loadWarRoomData().catch(() => {});
-      await loadScheduleData().catch(() => {});
-      await loadSquadsData().catch(() => {});
-      await loadTeamRolesData().catch(() => {});
-      await loadLiveData();
-      await loadMiniFantasyPriceBook();
-      render();
     }
 
     initializeDuelsApp();
