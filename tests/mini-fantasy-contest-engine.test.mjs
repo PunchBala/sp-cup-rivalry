@@ -5,6 +5,7 @@ import {
   MINI_FANTASY_BUDGET,
   buildMiniFantasyLeaderboard,
   buildMiniFantasyFixturePointsIndex,
+  buildMiniFantasyPlayerPointsIndex,
   buildMiniFantasyPlayerId,
   buildFixturePlayerPool,
   deriveCompletedMatchHistories,
@@ -90,7 +91,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Digvesh Singh Rathi': 1,
                   'Vijaykumar Vyshak': 1,
                   'Tilak Varma': 1,
-                  'Vaibhav Sooryavanshi': 1
+                  'Vaibhav Sooryavanshi': 1,
+                  'Suryakumar Yadav': 1
                 }
               }
             },
@@ -101,7 +103,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Digvesh Singh Rathi': { score: 10 },
                 'Vijaykumar Vyshak': { score: 25 },
                 'Tilak Varma': { score: 15 },
-                'Vaibhav Sooryavanshi': { score: 52 }
+                'Vaibhav Sooryavanshi': { score: 52 },
+                'Suryakumar Yadav': { score: 33 }
               }
             }
           }
@@ -117,7 +120,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Digvesh Singh Rathi': 1,
                   'Vijaykumar Vyshak': 2,
                   'Tilak Varma': 2,
-                  'Vaibhav Sooryavanshi': 1
+                  'Vaibhav Sooryavanshi': 1,
+                  'Suryakumar Yadav': 2
                 }
               }
             },
@@ -128,7 +132,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Digvesh Singh Rathi': { score: 10 },
                 'Vijaykumar Vyshak': { score: 60 },
                 'Tilak Varma': { score: 25 },
-                'Vaibhav Sooryavanshi': { score: 52 }
+                'Vaibhav Sooryavanshi': { score: 52 },
+                'Suryakumar Yadav': { score: 83 }
               }
             }
           }
@@ -148,6 +153,140 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
   assert.deepEqual(resolvePlayerHistory('Vyshak Vijaykumar', histories)?.match_points, [25, 35]);
   assert.deepEqual(resolvePlayerHistory('N. Tilak Varma', histories)?.match_points, [15, 10]);
   assert.deepEqual(resolvePlayerHistory('Vaibhav Suryavanshi', histories)?.match_points, [52]);
+  assert.deepEqual(resolvePlayerHistory('Surya Kumar Yadav', histories)?.match_points, [33, 50]);
+});
+
+test('buildMiniFantasyPlayerPointsIndex keeps completed fixture points for Surya Kumar Yadav aliases', () => {
+  const liveData = {
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 1,
+          fetchedAt: '2026-04-01T17:00:00Z',
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Suryakumar Yadav': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Suryakumar Yadav': { score: 33 }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 2,
+          fetchedAt: '2026-04-02T17:00:00Z',
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Suryakumar Yadav': 2
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Suryakumar Yadav': { score: 83 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 1, datetime_utc: '2026-04-01T14:00:00Z' },
+    { match_no: 2, datetime_utc: '2026-04-02T14:00:00Z' }
+  ];
+  const squads = {
+    MI: ['Surya Kumar Yadav']
+  };
+
+  const pointsIndex = buildMiniFantasyPlayerPointsIndex({
+    liveData,
+    schedule,
+    squads
+  });
+
+  assert.deepEqual(pointsIndex.get(buildMiniFantasyPlayerId('MI', 'Surya Kumar Yadav')), {
+    player_id: buildMiniFantasyPlayerId('MI', 'Surya Kumar Yadav'),
+    name: 'Surya Kumar Yadav',
+    team: 'MI',
+    match_points: [33, 50],
+    points_by_match_no: { 1: 33, 2: 50 },
+    matches_played: 2,
+    last_match_played_at_utc: '2026-04-02T14:00:00Z'
+  });
+});
+
+test('buildMiniFantasyFixturePointsIndex does not collide same-initial same-surname players', () => {
+  const schedule = [
+    { match_no: 15, datetime_utc: '2026-04-09T14:00:00Z' },
+    { match_no: 16, datetime_utc: '2026-04-10T14:00:00Z' }
+  ];
+  const squads = {
+    RCB: ['Suyash Sharma'],
+    RR: ['Sandeep Sharma']
+  };
+  const liveData = {
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 15,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Suyash Sharma': 2,
+                  'Sandeep Sharma': 3
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Suyash Sharma': { score: 64.5 },
+                'Sandeep Sharma': { score: 69.5 }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 16,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Suyash Sharma': 2,
+                  'Sandeep Sharma': 4
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Suyash Sharma': { score: 64.5 },
+                'Sandeep Sharma': { score: 95 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  const pointsIndex = buildMiniFantasyFixturePointsIndex({
+    liveData,
+    schedule,
+    squads,
+    matchNo: 16
+  });
+
+  assert.equal(pointsIndex.get(buildMiniFantasyPlayerId('RCB', 'Suyash Sharma')), 0);
+  assert.equal(pointsIndex.get(buildMiniFantasyPlayerId('RR', 'Sandeep Sharma')), 25.5);
 });
 
 test('getMiniFantasyOpenFixtures opens Match 14 now and later fixtures from the day-before window', () => {

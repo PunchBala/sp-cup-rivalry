@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const liveFixture = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../fixtures/live_early_season.json'), 'utf8'));
+const AUTH_STORAGE_KEY = 'sp-cup-duels-auth-v1';
+const MINI_FANTASY_ENTRIES_STORAGE_KEY = 'sp-cup-mini-fantasy-entries-v1';
 
 async function setHiddenPick(page, key, value) {
   await page.locator(`#activeEntryForm input[data-pick-key="${key}"]`).evaluate((input, nextValue) => {
@@ -253,19 +255,18 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
   await page.locator('#miniFantasyPickerSearch').fill('duckett');
   await page.locator('[data-mini-picker-value="dc_ben-duckett"]').click();
 
-  await page.locator('[data-mini-pick="1"]').click();
   await page.locator('#miniFantasyPickerSearch').fill('chameera');
   await page.locator('[data-mini-picker-value="dc_dushmantha-chameera"]').click();
 
-  await page.locator('[data-mini-pick="2"]').click();
   await page.locator('[data-mini-picker-team="GT"]').click();
   await page.locator('#miniFantasyPickerSearch').fill('shahrukh');
   await page.locator('[data-mini-picker-value="gt_shahrukh-khan"]').click();
 
-  await page.locator('[data-mini-pick="3"]').click();
   await page.locator('[data-mini-picker-team="GT"]').click();
   await page.locator('#miniFantasyPickerSearch').fill('kishore');
   await page.locator('[data-mini-picker-value="gt_sai-kishore"]').click();
+  await page.locator('#miniFantasyPickerDone').click();
+  await expect(page.locator('#miniFantasyPickerModal')).toBeHidden();
 
   await page.locator('[data-mini-captain="0"]').click();
   await expect(page.locator('#miniFantasyBuilder')).toContainText('Lineup ready');
@@ -275,6 +276,117 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
   await expect(page.locator('#miniFantasyLeaderboard')).toContainText('Mini Bala');
   await expect(page.locator('#miniFantasyLeaderboard')).toContainText('@mini-bala');
   await expect(page.locator('#miniFantasyLeaderboard')).toContainText(/medal/i);
+
+  expect(pageErrors).toEqual([]);
+});
+
+test('mini fantasy locked fixture viewer defaults to the latest lock and can switch to older fixtures from the dropdown', async ({ page }) => {
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(String(error)));
+
+  const seededEntries = [
+    {
+      ownerHandle: 'fixture-tester',
+      displayName: 'Fixture Tester',
+      season: 'IPL 2026',
+      matchNo: 14,
+      homeTeamCode: 'DC',
+      awayTeamCode: 'GT',
+      fixtureLabel: 'Gujarat Titans vs Delhi Capitals',
+      fixtureDatetimeUtc: '2026-04-08T14:00:00Z',
+      selectedPlayerIds: ['dc_kl-rahul', 'dc_kuldeep-yadav', 'gt_shubman-gill', 'gt_sai-kishore'],
+      captainPlayerId: 'gt_shubman-gill',
+      priceSnapshot: {},
+      spentCredits: 31,
+      savedAt: '2026-04-08T13:20:00Z'
+    },
+    {
+      ownerHandle: 'fixture-tester',
+      displayName: 'Fixture Tester',
+      season: 'IPL 2026',
+      matchNo: 15,
+      homeTeamCode: 'KKR',
+      awayTeamCode: 'LSG',
+      fixtureLabel: 'Lucknow Super Giants vs Kolkata Knight Riders',
+      fixtureDatetimeUtc: '2026-04-09T14:00:00Z',
+      selectedPlayerIds: ['kkr_ajinkya-rahane', 'kkr_sunil-narine', 'lsg_rishabh-pant', 'lsg_nicholas-pooran'],
+      captainPlayerId: 'kkr_sunil-narine',
+      priceSnapshot: {},
+      spentCredits: 31,
+      savedAt: '2026-04-09T13:25:00Z'
+    },
+    {
+      ownerHandle: 'other-user',
+      displayName: 'Other User',
+      season: 'IPL 2026',
+      matchNo: 14,
+      homeTeamCode: 'DC',
+      awayTeamCode: 'GT',
+      fixtureLabel: 'Gujarat Titans vs Delhi Capitals',
+      fixtureDatetimeUtc: '2026-04-08T14:00:00Z',
+      selectedPlayerIds: ['dc_abishek-porel', 'dc_axar-patel', 'gt_shubman-gill', 'gt_mohammed-siraj'],
+      captainPlayerId: 'dc_axar-patel',
+      priceSnapshot: {},
+      spentCredits: 30,
+      savedAt: '2026-04-08T13:18:00Z'
+    },
+    {
+      ownerHandle: 'other-user',
+      displayName: 'Other User',
+      season: 'IPL 2026',
+      matchNo: 15,
+      homeTeamCode: 'KKR',
+      awayTeamCode: 'LSG',
+      fixtureLabel: 'Lucknow Super Giants vs Kolkata Knight Riders',
+      fixtureDatetimeUtc: '2026-04-09T14:00:00Z',
+      selectedPlayerIds: ['kkr_quinton-de-kock', 'kkr_varun-chakaravarthy', 'lsg_aiden-markram', 'lsg_nicholas-pooran'],
+      captainPlayerId: 'lsg_nicholas-pooran',
+      priceSnapshot: {},
+      spentCredits: 29,
+      savedAt: '2026-04-09T13:16:00Z'
+    }
+  ];
+
+  await page.addInitScript(({ authKey, entriesKey, entries }) => {
+    window.__DUELS_TEST_NOW__ = '2026-04-09T15:00:00Z';
+    window.DUELS_BACKEND_CONFIG = { enabled: false };
+    window.localStorage.setItem(authKey, JSON.stringify({
+      displayName: 'Fixture Tester',
+      ownerId: 'fixture-tester',
+      authSource: 'local'
+    }));
+    window.localStorage.setItem(entriesKey, JSON.stringify({ version: 1, entries }));
+  }, {
+    authKey: AUTH_STORAGE_KEY,
+    entriesKey: MINI_FANTASY_ENTRIES_STORAGE_KEY,
+    entries: seededEntries
+  });
+
+  await page.route(/data\/live\.json(\?.*)?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(liveFixture)
+    });
+  });
+
+  await page.goto('http://127.0.0.1:4173/index.html?room=sp-cup-2026');
+
+  await expect(page.locator('#profileChipButton')).toContainText('Fixture Tester');
+  await expect(page.locator('#miniFantasyLockedViewer')).toContainText('Most Recent Locked Fixture');
+  await expect(page.locator('#miniFantasyHistorySelect')).toHaveValue('15');
+  await expect(page.locator('#miniFantasyHistorySelect')).toContainText('Latest lock - Match 15');
+  await expect(page.locator('#miniFantasyLockedViewer')).toContainText("Now viewing Fixture Tester's Match 15 team");
+  await expect(page.locator('#miniFantasyLeaderboard')).toContainText('Pick rail for Match 15');
+
+  await page.locator('#miniFantasyHistorySelect').selectOption('14');
+
+  await expect(page.locator('#miniFantasyHistorySelect')).toHaveValue('14');
+  await expect(page.locator('#miniFantasyLockedViewer')).toContainText("Now viewing Fixture Tester's Match 14 team");
+  await expect(page.locator('#miniFantasyLockedViewer')).toContainText('Fixture: Match 14');
+  await expect(page.locator('#miniFantasyLeaderboard')).toContainText('Pick rail for Match 14');
+  await expect(page.locator('#miniFantasyLeaderboard')).toContainText('Fixture Tester');
+  await expect(page.locator('#miniFantasyLeaderboard')).toContainText('Other User');
 
   expect(pageErrors).toEqual([]);
 });
