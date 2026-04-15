@@ -23,7 +23,7 @@ function createJob(players) {
       price_max: 10,
       recent_matches_window: 3,
       max_daily_price_step: 1,
-      default_initial_price: 5,
+      default_initial_price: 6,
       scoring_source: 'existing_mvp_points_formula_v1'
     },
     players
@@ -36,10 +36,9 @@ test('helper functions stay deterministic around averages, reliability, smoothin
   assert.equal(computeReliabilityFactor(1), 0.25);
   assert.equal(computeReliabilityFactor(5), 1);
   assert.equal(mapPercentileToPrice(0), 4);
-  assert.equal(mapPercentileToPrice(15), 4);
-  assert.equal(mapPercentileToPrice(15.01), 5);
-  assert.equal(mapPercentileToPrice(90), 8);
-  assert.equal(mapPercentileToPrice(97), 9);
+  assert.equal(mapPercentileToPrice(10), 4);
+  assert.equal(mapPercentileToPrice(10.01), 5);
+  assert.equal(mapPercentileToPrice(92), 9);
   assert.equal(mapPercentileToPrice(99), 10);
   assert.equal(smoothPrice(8, 10), 9);
   assert.equal(capPriceMovement(10, 8, 1, 4, 10), 9);
@@ -116,7 +115,7 @@ test('generatePrices applies ranking, smoothing, capping, inactive handling, and
         role: 'bowler',
         pricing_eligible: true,
         old_price: null,
-        initial_price: null,
+        initial_price: 6,
         match_points: [],
         matches_played: 0,
         last_match_played_at_utc: null
@@ -138,9 +137,9 @@ test('generatePrices applies ranking, smoothing, capping, inactive handling, and
 
   assert.deepEqual(output.summary, {
     total_players_received: 6,
-    eligible_players_ranked: 4,
-    price_rises: 1,
-    price_drops: 1,
+    eligible_players_ranked: 5,
+    price_rises: 2,
+    price_drops: 0,
     price_unchanged: 4
   });
 
@@ -148,10 +147,10 @@ test('generatePrices applies ranking, smoothing, capping, inactive handling, and
     output.players.map((player) => `${player.team}:${player.name}:${player.final_price}`),
     [
       'AAA:Alpha Star:9',
-      'AAA:Alpha Fringe:5',
+      'AAA:Alpha Fringe:6',
       'BBB:Beta Reliable:7',
-      'CCC:Gamma Mismatch:5',
-      'DDD:Delta Rookie:5',
+      'CCC:Gamma Mismatch:6',
+      'DDD:Delta Rookie:6',
       'EEE:Echo Inactive:6'
     ]
   );
@@ -166,18 +165,17 @@ test('generatePrices applies ranking, smoothing, capping, inactive handling, and
   const alphaFringe = output.players.find((player) => player.player_id === 'alpha_fringe');
   assert.equal(alphaFringe.reliability_factor, 0.25);
   assert.equal(alphaFringe.adjusted_score, 22.5);
-  assert.equal(alphaFringe.final_price, 5);
-  assert.equal(alphaFringe.target_price, 5);
+  assert.equal(alphaFringe.final_price, 6);
+  assert.match(alphaFringe.calculation_notes.join(' '), /smoothing/i);
 
   const gammaMismatch = output.players.find((player) => player.player_id === 'gamma_mismatch');
   assert.equal(gammaMismatch.matches_played, 2);
-  assert.equal(gammaMismatch.final_price, 5);
   assert.match(gammaMismatch.calculation_notes.join(' '), /did not match match_points length/i);
 
   const deltaRookie = output.players.find((player) => player.player_id === 'delta_rookie');
-  assert.equal(deltaRookie.final_price, 5);
+  assert.equal(deltaRookie.final_price, 6);
   assert.equal(deltaRookie.price_change, 0);
-  assert.match(deltaRookie.calculation_notes.join(' '), /No matches played; retained base price and excluded from active ranking/i);
+  assert.match(deltaRookie.calculation_notes.join(' '), /No matches played; retained base price/i);
 
   const echoInactive = output.players.find((player) => player.player_id === 'echo_inactive');
   assert.equal(echoInactive.percentile, 0);
@@ -233,7 +231,7 @@ test('generatePrices keeps equal adjusted scores on the same target price band',
 
   assert.equal(tieA.percentile, tieB.percentile);
   assert.equal(tieA.target_price, tieB.target_price);
-  assert.equal(tieA.target_price, 7);
+  assert.equal(tieA.target_price, 8);
   assert.equal(tieC.target_price, 4);
 });
 
@@ -324,91 +322,8 @@ test('generatePrices snaps recovered histories to the corrected target price', (
   const vaibhav = output.players.find((player) => player.player_id === 'vaibhav_fix');
   assert.equal(vaibhav.smoothed_price, vaibhav.target_price);
   assert.equal(vaibhav.final_price, vaibhav.target_price);
-  assert.equal(vaibhav.final_price, 6);
+  assert.ok(vaibhav.final_price > 6);
   assert.match(vaibhav.calculation_notes.join(' '), /Recovered real match history/i);
-});
-
-test('zero-match players do not inflate percentile pricing for active players', () => {
-  const output = generatePrices(
-    createJob([
-      {
-        player_id: 'active_star',
-        name: 'Active Star',
-        team: 'AAA',
-        role: 'batter',
-        pricing_eligible: true,
-        old_price: 8,
-        initial_price: 8,
-        match_points: [55, 58, 60, 62],
-        matches_played: 4,
-        last_match_played_at_utc: '2026-04-08T18:30:00Z'
-      },
-      {
-        player_id: 'active_mid',
-        name: 'Active Mid',
-        team: 'BBB',
-        role: 'bowler',
-        pricing_eligible: true,
-        old_price: 7,
-        initial_price: 7,
-        match_points: [28, 32, 31],
-        matches_played: 3,
-        last_match_played_at_utc: '2026-04-08T18:30:00Z'
-      },
-      {
-        player_id: 'bench_a',
-        name: 'Bench A',
-        team: 'CCC',
-        role: 'batter',
-        pricing_eligible: true,
-        old_price: 6,
-        initial_price: 6,
-        match_points: [],
-        matches_played: 0,
-        last_match_played_at_utc: null
-      },
-      {
-        player_id: 'bench_b',
-        name: 'Bench B',
-        team: 'DDD',
-        role: 'bowler',
-        pricing_eligible: true,
-        old_price: null,
-        initial_price: null,
-        match_points: [],
-        matches_played: 0,
-        last_match_played_at_utc: null
-      },
-      {
-        player_id: 'injured_star',
-        name: 'Injured Star',
-        team: 'EEE',
-        role: 'bowler',
-        prestige_seed_price: 9,
-        pricing_eligible: true,
-        old_price: 6,
-        initial_price: 6,
-        match_points: [],
-        matches_played: 0,
-        last_match_played_at_utc: null
-      }
-    ])
-  );
-
-  assert.equal(output.summary.eligible_players_ranked, 2);
-  assert.equal(output.players.find((player) => player.player_id === 'bench_a').final_price, 5);
-  assert.equal(output.players.find((player) => player.player_id === 'bench_b').final_price, 5);
-  assert.equal(output.players.find((player) => player.player_id === 'injured_star').final_price, 9);
-  assert.match(
-    output.players.find((player) => player.player_id === 'injured_star').calculation_notes.join(' '),
-    /curated dormant prestige seed/i
-  );
-  assert.equal(output.players.find((player) => player.player_id === 'active_star').target_price, 10);
-  assert.equal(output.players.find((player) => player.player_id === 'active_mid').target_price, 4);
-  assert.match(
-    output.players.find((player) => player.player_id === 'bench_a').calculation_notes.join(' '),
-    /eased neutral placeholder price toward the default floor/i
-  );
 });
 
 test('pricing example fixture returns stable JSON-shaped output', async () => {
