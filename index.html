@@ -3926,6 +3926,20 @@ function titleBandScore(pick, live){
       }
     }
 
+    async function awaitWithTimeout(taskPromise, label, timeoutMs = 10000){
+      let timeoutId = null;
+      try {
+        return await Promise.race([
+          taskPromise,
+          new Promise((_, reject) => {
+            timeoutId = window.setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs);
+          })
+        ]);
+      } finally {
+        if (timeoutId != null) window.clearTimeout(timeoutId);
+      }
+    }
+
     async function loadScheduleData(){
       try {
         const cacheBust = `t=${Date.now()}`;
@@ -9363,7 +9377,7 @@ function titleBandScore(pick, live){
         resetMiniFantasyDrafts();
         if (usesHostedDuelsBackend()) {
           try {
-            CURRENT_USER = normalizeUserProfile(await DUELS_BACKEND.bootstrap()) || null;
+            CURRENT_USER = normalizeUserProfile(await awaitWithTimeout(DUELS_BACKEND.bootstrap(), 'Hosted auth bootstrap', 8000)) || null;
           } catch (error) {
             console.warn('Hosted auth bootstrap fell back to signed-out state:', error);
             CURRENT_USER = null;
@@ -9371,16 +9385,31 @@ function titleBandScore(pick, live){
         } else {
           CURRENT_USER = loadStoredUserProfile();
         }
-        await syncMiniFantasyEntries();
+        render();
         renderDuelStudio();
         await Promise.all([
-          loadWarRoomData().catch(() => {}),
-          loadScheduleData().catch(() => {}),
-          loadSquadsData().catch(() => {}),
-          loadTeamRolesData().catch(() => {}),
-          loadLiveData().catch(() => {})
+          awaitWithTimeout(syncMiniFantasyEntries(), 'Mini Fantasy entry sync', 10000).catch((error) => {
+            console.warn('Mini Fantasy entry sync skipped during startup:', error);
+          }),
+          awaitWithTimeout(loadWarRoomData(), 'War room data load', 12000).catch((error) => {
+            console.warn('War room data load skipped during startup:', error);
+          }),
+          awaitWithTimeout(loadScheduleData(), 'Schedule data load', 8000).catch((error) => {
+            console.warn('Schedule data load skipped during startup:', error);
+          }),
+          awaitWithTimeout(loadSquadsData(), 'Squads data load', 8000).catch((error) => {
+            console.warn('Squads data load skipped during startup:', error);
+          }),
+          awaitWithTimeout(loadTeamRolesData(), 'Team roles load', 8000).catch((error) => {
+            console.warn('Team roles load skipped during startup:', error);
+          }),
+          awaitWithTimeout(loadLiveData(), 'Live data load', 20000).catch((error) => {
+            console.warn('Live data load skipped during startup:', error);
+          })
         ]);
-        await loadMiniFantasyPriceBook().catch(() => {});
+        await awaitWithTimeout(loadMiniFantasyPriceBook(), 'Mini Fantasy price book load', 12000).catch((error) => {
+          console.warn('Mini Fantasy price book load skipped during startup:', error);
+        });
       } catch (error) {
         console.error('Duels app initialization failed:', error);
       } finally {
