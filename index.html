@@ -1208,7 +1208,7 @@
                   <ul class="fantasy-guide-list">
                     <li><strong>Fixture-only scoring:</strong> your 4-player team scores only from the fixture it locked against. There is no season carry-over into that match score.</li>
                     <li><strong>Same MVP engine as Nerd Room / Duel:</strong> base player points are <code>runs + (sixes x 2) + (wickets x 20) + (dot balls x 1.5) + (catches x 8)</code>.</li>
-                    <li><strong>Batting strike-rate bonus:</strong> applies once a batter either scores 30+ runs or faces 10+ balls, then SR above 170 = +8, above 150 = +5, above 130 = +2, below 100 = -5.</li>
+                    <li><strong>Batting strike-rate bonus:</strong> minimum 30 runs, then SR above 170 = +8, above 150 = +5, above 130 = +2, below 100 = -5.</li>
                     <li><strong>Bowling economy bonus:</strong> minimum 2 overs, then economy below 6 = +8, below 7 = +5, below 8 = +2, above 10 = -5.</li>
                     <li><strong>Milestone bonuses:</strong> fifty +10, hundred +25, quick 30 under 15 balls +8, 3 wickets +12, 4 wickets +20, 5 wickets +30, and a duck penalty of -5 when a batter is dismissed for 0.</li>
                     <li><strong>Mini Fantasy extras:</strong> each selected player who appears in the fixture gets <code>+2</code>. Each selected player from the winning side gets <code>+5</code> once the result is final.</li>
@@ -3920,40 +3920,15 @@ function titleBandScore(pick, live){
       return { label: 'Upcoming', cls: 'status-bad' };
     }
 
-    async function fetchJsonWithTimeout(url, { timeoutMs = 15000 } = {}){
-      const controller = new AbortController();
-      const timeoutId = window.setTimeout(() => controller.abort(new DOMException(`Timed out fetching ${url}`, 'AbortError')), timeoutMs);
-      try {
-        const res = await fetch(url, {
-          cache: 'no-store',
-          headers: { 'Accept': 'application/json' },
-          signal: controller.signal
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return await res.json();
-      } finally {
-        window.clearTimeout(timeoutId);
-      }
-    }
-
-    async function awaitWithTimeout(taskPromise, label, timeoutMs = 10000){
-      let timeoutId = null;
-      try {
-        return await Promise.race([
-          taskPromise,
-          new Promise((_, reject) => {
-            timeoutId = window.setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs);
-          })
-        ]);
-      } finally {
-        if (timeoutId != null) window.clearTimeout(timeoutId);
-      }
-    }
-
     async function loadScheduleData(){
       try {
         const cacheBust = `t=${Date.now()}`;
-        const data = await fetchJsonWithTimeout(`ipl_2026_schedule.json?${cacheBust}`, { timeoutMs: 8000 });
+        const res = await fetch(`ipl_2026_schedule.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
         if (Array.isArray(data) && data.length) {
           LEAGUE_STAGE_SCHEDULE = data.map(match => ({ ...match, fixture: formatFixtureLabel(match.fixture) }));
         }
@@ -3967,7 +3942,12 @@ function titleBandScore(pick, live){
     async function loadSquadsData(){
       try {
         const cacheBust = `t=${Date.now()}`;
-        const data = await fetchJsonWithTimeout(`ipl_2026_squads.json?${cacheBust}`, { timeoutMs: 8000 });
+        const res = await fetch(`ipl_2026_squads.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
         IPL_SQUADS = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
       } catch (err) {
         console.warn('Falling back to empty squads directory', err);
@@ -3978,7 +3958,12 @@ function titleBandScore(pick, live){
     async function loadTeamRolesData(){
       try {
         const cacheBust = `t=${Date.now()}`;
-        const data = await fetchJsonWithTimeout(`ipl_2026_team_roles.json?${cacheBust}`, { timeoutMs: 8000 });
+        const res = await fetch(`ipl_2026_team_roles.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
         IPL_TEAM_ROLES = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
       } catch (err) {
         console.warn('Falling back to empty team roles directory', err);
@@ -3989,7 +3974,12 @@ function titleBandScore(pick, live){
     async function loadMiniFantasyPriceBook(){
       try {
         const cacheBust = `t=${Date.now()}`;
-        const data = await fetchJsonWithTimeout(`data/mini_fantasy_prices.json?${cacheBust}`, { timeoutMs: 12000 });
+        const res = await fetch(`data/mini_fantasy_prices.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
         MINI_FANTASY_PRICE_BOOK = data && typeof data === 'object' && !Array.isArray(data) ? data : null;
       } catch (err) {
         console.warn('Mini Fantasy price book fetch failed, regenerating in browser', err);
@@ -4070,13 +4060,12 @@ function titleBandScore(pick, live){
     }
 
     function normalizeUserProfile(profile = {}){
-      const source = profile && typeof profile === 'object' ? profile : {};
       const model = getWarRoomModelApi();
-      const displayName = model.normalizeWhitespace(source.displayName || source.name || '');
-      const ownerId = model.normalizeSlug(source.ownerId || source.handle || displayName || '');
-      const userId = model.normalizeWhitespace(source.userId || source.id || '');
-      const email = model.normalizeWhitespace(source.email || '');
-      const createdAt = model.normalizeWhitespace(source.createdAt || source.created_at || '');
+      const displayName = model.normalizeWhitespace(profile.displayName || profile.name || '');
+      const ownerId = model.normalizeSlug(profile.ownerId || profile.handle || displayName || '');
+      const userId = model.normalizeWhitespace(profile.userId || profile.id || '');
+      const email = model.normalizeWhitespace(profile.email || '');
+      const createdAt = model.normalizeWhitespace(profile.createdAt || profile.created_at || '');
       if (!displayName || !ownerId) return null;
       return {
         displayName,
@@ -4084,7 +4073,7 @@ function titleBandScore(pick, live){
         userId: userId || null,
         email: email || null,
         createdAt: createdAt || null,
-        authSource: model.normalizeWhitespace(source.authSource || source.source || 'local') || 'local'
+        authSource: model.normalizeWhitespace(profile.authSource || profile.source || 'local') || 'local'
       };
     }
 
@@ -4956,7 +4945,12 @@ function titleBandScore(pick, live){
       try {
         const slug = getRequestedRoomSlug();
         const cacheBust = `t=${Date.now()}`;
-        const rawRoom = await fetchJsonWithTimeout(`${buildWarRoomFixturePath(slug)}?${cacheBust}`, { timeoutMs: 10000 });
+        const res = await fetch(`${buildWarRoomFixturePath(slug)}?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`Failed to fetch war room fixture: HTTP ${res.status}`);
+        const rawRoom = await res.json();
         const model = getWarRoomModelApi();
         const validation = model.validateWarRoomConfig(rawRoom, { requireCompletePicks: rawRoom?.state === 'locked' });
         if (!validation.ok) throw new Error(`War room fixture validation failed: ${validation.errors.join(' | ')}`);
@@ -8033,36 +8027,36 @@ function titleBandScore(pick, live){
           return {
             totalPoints: 0,
             pointsByPlayerId: {},
-          scoredPointsByPlayerId: {},
           players: [],
           captain: null,
           bestPick: null,
-          summary: 'No team was locked for this fixture.',
-          isNoResult: false
+          summary: 'No team was locked for this fixture.'
         };
       }
         const playerPool = miniFantasyEntryPlayerPool(entry);
         const poolById = new Map(playerPool.map((player) => [player.player_id, player]));
-        const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds)
-          ? entry.selectedPlayerIds.filter(Boolean)
-          : (Array.isArray(entry.selected_player_ids) ? entry.selected_player_ids.filter(Boolean) : []);
-        const captainPlayerId = normalizeTextValue(entry.captainPlayerId || entry.captain_player_id || '');
-        const score = scoreMiniFantasyEntry({
-          entry,
+        const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds) ? entry.selectedPlayerIds.filter(Boolean) : [];
+        const pointsByPlayerId = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Number(fixturePointsIndex.get(playerId) || 0)]));
+        const playerTeamById = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, (poolById.get(playerId)?.team || resolveMiniFantasyPlayerTeamCode(playerId))]));
+        const winningTeamCode = getMiniFantasyWinningTeamCode({
           liveData: LIVE_2026,
           schedule: LEAGUE_STAGE_SCHEDULE,
-          squads: IPL_SQUADS
+          matchNo: entry.matchNo
         });
-        const pointsByPlayerId = score.points_by_player_id || Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Number(fixturePointsIndex.get(playerId) || 0)]));
-        const scoredPointsByPlayerId = score.scored_points_by_player_id || {};
-        const appearanceBonusByPlayerId = score.appearance_bonus_by_player_id || {};
-        const winnerBonusByPlayerId = score.winner_bonus_by_player_id || {};
-        const totalPoints = Number(score.total_points || 0) || 0;
+        const fixture = miniFantasyFixtureByMatchNo(entry.matchNo);
+        const isCompletedFixture = fixture ? Number(entry.matchNo || 0) <= getCompletedMiniFantasyMatchCount(LIVE_2026) : false;
+        const totalPoints = scoreMiniFantasyLineup({
+          selectedPlayerIds,
+          captainPlayerId: entry.captainPlayerId || '',
+          pointsByPlayerId,
+          playerTeamById,
+          winningTeamCode: isCompletedFixture ? winningTeamCode : ''
+        });
         const players = selectedPlayerIds.map((playerId) => {
           const player = poolById.get(playerId) || null;
-          const isCaptain = captainPlayerId === playerId;
+          const isCaptain = normalizeTextValue(entry.captainPlayerId || '') === playerId;
           const rawPoints = Number(pointsByPlayerId[playerId] || 0);
-          const scoredPoints = Number(scoredPointsByPlayerId[playerId] ?? rawPoints) || 0;
+          const scoredPoints = isCaptain ? rawPoints * MINI_FANTASY_CAPTAIN_MULTIPLIER : rawPoints;
         return {
           playerId,
           name: player?.name || fallbackMiniFantasyPlayerName(playerId),
@@ -8070,8 +8064,6 @@ function titleBandScore(pick, live){
           role: player?.role || '',
           price: Number(player?.final_price || 0) || 0,
           points: rawPoints,
-          appearanceBonus: Number(appearanceBonusByPlayerId[playerId] || 0) || 0,
-          winnerBonus: Number(winnerBonusByPlayerId[playerId] || 0) || 0,
           scoredPoints,
           isCaptain
         };
@@ -8081,16 +8073,12 @@ function titleBandScore(pick, live){
       return {
         totalPoints,
         pointsByPlayerId,
-        scoredPointsByPlayerId,
         players,
         captain,
         bestPick,
-        summary: score.is_no_result
-          ? 'This fixture ended with no result, so no Mini Fantasy points were awarded.'
-          : captain
-            ? `${captain.name} carries the captain armband.`
-            : 'Captain is not set on this saved team.',
-        isNoResult: Boolean(score.is_no_result)
+        summary: captain
+          ? `${captain.name} carries the captain armband.`
+          : 'Captain is not set on this saved team.'
       };
     }
 
@@ -8665,9 +8653,7 @@ function titleBandScore(pick, live){
             <span class="pill">Spent: ${escapeHtml(String(recapEntry.spentCredits || 0))} / ${MINI_FANTASY_BUDGET}</span>
             ${bestPick ? `<span class="pill">Best pick: ${escapeHtml(bestPick.name)} ${escapeHtml(formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points))} pts</span>` : ''}
           </div>
-          <div class="fantasy-window-note">${escapeHtml(detail.isNoResult
-            ? 'This fixture ended with no result, so everyone finished on 0 Mini Fantasy points.'
-            : stage === 'final'
+          <div class="fantasy-window-note">${escapeHtml(stage === 'final'
             ? `Final recap: ${detail.captain ? `${detail.captain.name} delivered ${formatMiniFantasyPoints(detail.captain.scoredPoints ?? detail.captain.points)} captain points.` : 'Captain was not set.'} ${bestPick ? `${bestPick.name} was your best pick on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)} points.` : ''}`
             : stage === 'live'
               ? `This team is still live. ${detail.captain ? `${detail.captain.name} is currently returning ${formatMiniFantasyPoints(detail.captain.scoredPoints ?? detail.captain.points)} captain points.` : 'Captain is not set yet.'}`
@@ -8767,8 +8753,6 @@ function titleBandScore(pick, live){
       const captain = selectedRow.fixtureCaptain;
       const detailNote = selectedRow.fixtureStatus === 'did_not_lock'
         ? `${selectedRow.display_name || selectedRow.owner_handle} did not save a team before this fixture locked.`
-        : selectedRow.fixtureIsNoResult
-          ? `Match ${board.fixture.match_no} ended with no result, so no Mini Fantasy points were awarded.`
         : board.stage === 'final'
           ? `${selectedRow.display_name || selectedRow.owner_handle} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)}.` : ''}`
           : board.stage === 'live'
@@ -9499,7 +9483,16 @@ function titleBandScore(pick, live){
     async function loadLiveData(){
       try {
         const cacheBust = `t=${Date.now()}`;
-        const fetched = normalizeFetchedLiveData(await fetchJsonWithTimeout(`data/live.json?${cacheBust}`, { timeoutMs: 20000 }));
+        const res = await fetch(`data/live.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch live data: HTTP ${res.status}`);
+        }
+
+        const fetched = normalizeFetchedLiveData(await res.json());
         Object.assign(LIVE_2026, fetched);
 
         const providerBits = [
@@ -9517,57 +9510,35 @@ function titleBandScore(pick, live){
     }
 
     async function initializeDuelsApp(){
-      try {
-        CUSTOM_DUEL_STORE = loadStoredCustomDuels();
-        REMOTE_DUEL_STORE = emptyCustomDuelStore();
-        setRemoteMiniFantasyEntries([]);
-        setRemoteMiniFantasyLeaderboardEntries([]);
-        setRemoteMiniFantasyProfiles([]);
-        setRemoteMiniFantasyDailyBonuses([]);
-        resetMiniFantasyDrafts();
-        if (usesHostedDuelsBackend()) {
-          try {
-            CURRENT_USER = normalizeUserProfile(await awaitWithTimeout(DUELS_BACKEND.bootstrap(), 'Hosted auth bootstrap', 8000)) || null;
-          } catch (error) {
-            console.warn('Hosted auth bootstrap fell back to signed-out state:', error);
-            CURRENT_USER = null;
-          }
-        } else {
-          CURRENT_USER = loadStoredUserProfile();
+      CUSTOM_DUEL_STORE = loadStoredCustomDuels();
+      REMOTE_DUEL_STORE = emptyCustomDuelStore();
+      setRemoteMiniFantasyEntries([]);
+      setRemoteMiniFantasyLeaderboardEntries([]);
+      setRemoteMiniFantasyProfiles([]);
+      setRemoteMiniFantasyDailyBonuses([]);
+      resetMiniFantasyDrafts();
+      if (usesHostedDuelsBackend()) {
+        try {
+          CURRENT_USER = normalizeUserProfile(await DUELS_BACKEND.bootstrap()) || null;
+        } catch (error) {
+          console.warn('Hosted auth bootstrap fell back to signed-out state:', error);
+          CURRENT_USER = null;
         }
-        render();
-        renderDuelStudio();
-        await Promise.all([
-          awaitWithTimeout(syncMiniFantasyEntries(), 'Mini Fantasy entry sync', 10000).catch((error) => {
-            console.warn('Mini Fantasy entry sync skipped during startup:', error);
-          }),
-          awaitWithTimeout(loadWarRoomData(), 'War room data load', 12000).catch((error) => {
-            console.warn('War room data load skipped during startup:', error);
-          }),
-          awaitWithTimeout(loadScheduleData(), 'Schedule data load', 8000).catch((error) => {
-            console.warn('Schedule data load skipped during startup:', error);
-          }),
-          awaitWithTimeout(loadSquadsData(), 'Squads data load', 8000).catch((error) => {
-            console.warn('Squads data load skipped during startup:', error);
-          }),
-          awaitWithTimeout(loadTeamRolesData(), 'Team roles load', 8000).catch((error) => {
-            console.warn('Team roles load skipped during startup:', error);
-          }),
-          awaitWithTimeout(loadLiveData(), 'Live data load', 20000).catch((error) => {
-            console.warn('Live data load skipped during startup:', error);
-          })
-        ]);
-        await awaitWithTimeout(loadMiniFantasyPriceBook(), 'Mini Fantasy price book load', 12000).catch((error) => {
-          console.warn('Mini Fantasy price book load skipped during startup:', error);
-        });
-        await awaitWithTimeout(maybeClaimMiniFantasyDailyVisitBonus(), 'Mini Fantasy daily visit bonus claim', 6000).catch((error) => {
-          console.warn('Mini Fantasy daily visit bonus claim skipped during startup:', error);
-        });
-      } catch (error) {
-        console.error('Duels app initialization failed:', error);
-      } finally {
-        render();
+      } else {
+        CURRENT_USER = loadStoredUserProfile();
       }
+      await syncMiniFantasyEntries();
+      renderDuelStudio();
+      await loadWarRoomData().catch(() => {});
+      await loadScheduleData().catch(() => {});
+      await loadSquadsData().catch(() => {});
+      await loadTeamRolesData().catch(() => {});
+      await loadLiveData();
+      await loadMiniFantasyPriceBook();
+      await maybeClaimMiniFantasyDailyVisitBonus().catch((error) => {
+        console.warn('Mini Fantasy daily visit bonus claim skipped during startup:', error);
+      });
+      render();
     }
 
     initializeDuelsApp();
