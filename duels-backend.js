@@ -10,7 +10,8 @@
       profiles: 'profiles',
       duels: 'duels',
       duelEntries: 'duel_entries',
-      miniFantasyEntries: 'mini_fantasy_entries'
+      miniFantasyEntries: 'mini_fantasy_entries',
+      miniFantasyDailyBonuses: 'mini_fantasy_daily_bonus_claims'
     }
   };
 
@@ -188,6 +189,9 @@
         async saveOwnedEntry() { throw disabledError(); },
         async listMiniFantasyEntries() { return []; },
         async listPublicMiniFantasyEntries() { return []; },
+        async listPublicMiniFantasyProfiles() { return []; },
+        async listPublicMiniFantasyDailyBonuses() { return []; },
+        async claimMiniFantasyDailyBonus() { throw disabledError(); },
         async upsertMiniFantasyEntry() { throw disabledError(); }
       };
   }
@@ -291,7 +295,7 @@
       const rows = await restRequest(config.tables.profiles, {
         method: 'GET',
         query: {
-          select: 'id,handle,display_name,email',
+          select: 'id,handle,display_name,email,created_at',
           id: `eq.${userId}`
         },
         accessToken
@@ -305,7 +309,7 @@
       const rows = await restRequest(config.tables.profiles, {
         method: 'GET',
         query: {
-          select: 'id,handle,display_name,email',
+          select: 'id,handle,display_name,email,created_at',
           id: `in.(${ids.join(',')})`
         },
         accessToken
@@ -324,7 +328,7 @@
         method: 'POST',
         query: {
           on_conflict: 'id',
-          select: 'id,handle,display_name,email'
+          select: 'id,handle,display_name,email,created_at'
         },
         body: payload,
         accessToken,
@@ -344,6 +348,7 @@
         email: user.email || profile?.email || null,
         displayName,
         ownerId,
+        createdAt: profile?.created_at || null,
         authSource: 'supabase'
       };
     }
@@ -425,6 +430,37 @@ function normalizeMiniFantasyEntryRow(row) {
         savedAt: row.saved_at || null,
         createdAt: row.created_at || null,
         updatedAt: row.updated_at || null
+      };
+    }
+
+    function normalizeMiniFantasyProfileRow(row) {
+      if (!row) return null;
+      return {
+        id: row.id || null,
+        userId: row.id || null,
+        handle: normalizeSlug(row.handle || ''),
+        ownerHandle: normalizeSlug(row.handle || ''),
+        displayName: normalizeWhitespace(row.display_name || row.handle || ''),
+        email: normalizeWhitespace(row.email || '') || null,
+        createdAt: row.created_at || null,
+        created_at: row.created_at || null
+      };
+    }
+
+    function normalizeMiniFantasyDailyBonusRow(row) {
+      if (!row) return null;
+      return {
+        id: row.id || null,
+        userId: row.user_id || null,
+        ownerHandle: normalizeSlug(row.owner_handle || ''),
+        displayName: normalizeWhitespace(row.display_name || row.owner_handle || ''),
+        season: normalizeWhitespace(row.season || ''),
+        bonusDateIst: normalizeWhitespace(row.bonus_date_ist || ''),
+        bonus_date_ist: normalizeWhitespace(row.bonus_date_ist || ''),
+        bonusPoints: Number(row.bonus_points || 0) || 0,
+        bonus_points: Number(row.bonus_points || 0) || 0,
+        createdAt: row.created_at || null,
+        created_at: row.created_at || null
       };
     }
 
@@ -765,6 +801,64 @@ function normalizeMiniFantasyEntryRow(row) {
         });
         const enrichedRows = await enrichMiniFantasyEntriesWithProfiles(rows, activeSession?.access_token || currentUser?.accessToken || null);
         return enrichedRows.map(normalizeMiniFantasyEntryRow).filter(Boolean);
+      },
+
+      async listPublicMiniFantasyProfiles({ currentUser } = {}) {
+        const activeSession = await ensureFreshSession();
+        const rows = await restRequest(config.tables.profiles, {
+          method: 'GET',
+          query: {
+            select: 'id,handle,display_name,email,created_at',
+            order: 'created_at.asc.nullslast'
+          },
+          accessToken: activeSession?.access_token || currentUser?.accessToken || null
+        });
+        return (Array.isArray(rows) ? rows : []).map(normalizeMiniFantasyProfileRow).filter(Boolean);
+      },
+
+      async listPublicMiniFantasyDailyBonuses({ season, currentUser } = {}) {
+        const activeSession = await ensureFreshSession();
+        const safeSeason = normalizeWhitespace(season || '');
+        const rows = await restRequest(config.tables.miniFantasyDailyBonuses, {
+          method: 'GET',
+          query: {
+            select: 'id,user_id,owner_handle,display_name,season,bonus_date_ist,bonus_points,created_at',
+            ...(safeSeason ? { season: `eq.${safeSeason}` } : {}),
+            order: 'bonus_date_ist.asc.nullslast,created_at.asc.nullslast'
+          },
+          accessToken: activeSession?.access_token || currentUser?.accessToken || null
+        });
+        return (Array.isArray(rows) ? rows : []).map(normalizeMiniFantasyDailyBonusRow).filter(Boolean);
+      },
+
+      async claimMiniFantasyDailyBonus({ currentUser, season, bonusDateIst, bonusPoints }) {
+        const activeSession = await ensureFreshSession();
+        if (!activeSession?.access_token || !currentUser?.userId) {
+          throw new Error('Sign in with a backend account before claiming the Mini Fantasy visit bonus.');
+        }
+        const safeSeason = normalizeWhitespace(season || '');
+        const safeBonusDateIst = normalizeWhitespace(bonusDateIst || '');
+        if (!safeSeason || !safeBonusDateIst) {
+          throw new Error('Mini Fantasy daily visit bonus needs both season and India date.');
+        }
+        const rows = await restRequest(config.tables.miniFantasyDailyBonuses, {
+          method: 'POST',
+          query: {
+            on_conflict: 'user_id,season,bonus_date_ist',
+            select: 'id,user_id,owner_handle,display_name,season,bonus_date_ist,bonus_points,created_at'
+          },
+          body: {
+            user_id: currentUser.userId,
+            owner_handle: currentUser.ownerId,
+            display_name: normalizeWhitespace(currentUser.displayName || currentUser.ownerId || ''),
+            season: safeSeason,
+            bonus_date_ist: safeBonusDateIst,
+            bonus_points: Number(bonusPoints || 0) || 0
+          },
+          accessToken: activeSession.access_token,
+          prefer: 'resolution=merge-duplicates,return=representation'
+        });
+        return normalizeMiniFantasyDailyBonusRow(firstArrayItem(rows));
       },
 
       async upsertMiniFantasyEntry({ currentUser, entry }) {

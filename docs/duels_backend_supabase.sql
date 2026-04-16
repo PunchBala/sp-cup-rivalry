@@ -63,6 +63,18 @@ create table if not exists public.mini_fantasy_entries (
   unique (user_id, season, match_no)
 );
 
+create table if not exists public.mini_fantasy_daily_bonus_claims (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  owner_handle text not null,
+  display_name text not null default '',
+  season text not null,
+  bonus_date_ist text not null,
+  bonus_points integer not null default 5 check (bonus_points >= 0),
+  created_at timestamptz not null default timezone('utc', now()),
+  unique (user_id, season, bonus_date_ist)
+);
+
 alter table public.mini_fantasy_entries
   add column if not exists display_name text not null default '';
 
@@ -100,6 +112,7 @@ alter table public.profiles enable row level security;
 alter table public.duels enable row level security;
 alter table public.duel_entries enable row level security;
 alter table public.mini_fantasy_entries enable row level security;
+alter table public.mini_fantasy_daily_bonus_claims enable row level security;
 
 drop policy if exists "profiles are public readable" on public.profiles;
 create policy "profiles are public readable"
@@ -219,4 +232,20 @@ with check (
   auth.uid() = user_id
   and match_no >= 14
   and timezone('utc', now()) < fixture_datetime_utc - interval '1 minute'
+);
+
+drop policy if exists "mini fantasy daily bonuses are public readable" on public.mini_fantasy_daily_bonus_claims;
+create policy "mini fantasy daily bonuses are public readable"
+on public.mini_fantasy_daily_bonus_claims
+for select
+using (true);
+
+drop policy if exists "users claim their own mini fantasy daily bonus" on public.mini_fantasy_daily_bonus_claims;
+create policy "users claim their own mini fantasy daily bonus"
+on public.mini_fantasy_daily_bonus_claims
+for insert
+with check (
+  auth.uid() = user_id
+  and season <> ''
+  and bonus_date_ist <> ''
 );
