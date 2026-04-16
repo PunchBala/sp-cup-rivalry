@@ -248,4 +248,6 @@ with check (
   auth.uid() = user_id
   and season <> ''
   and bonus_date_ist <> ''
+  and bonus_points = 5
+  and bonus_date_ist = to_char(timezone('Asia/Kolkata', now()), 'YYYY-MM-DD')
 );

@@ -1276,7 +1276,7 @@ export function buildMiniFantasyLeaderboard({
       owner_handle: ownerHandle || profile.owner_handle || '',
       user_id: userId || profile.user_id || null,
       display_name: normalizeWhitespace(seed?.display_name || seed?.displayName || profile.display_name || ownerHandle || userId || 'Mini Fantasy player'),
-      created_at: normalizeWhitespace(seed?.created_at || seed?.createdAt || profile.created_at || '') || null,
+      created_at: normalizeWhitespace(profile.created_at || seed?.created_at || seed?.createdAt || '') || null,
       total_points: 0,
       saved_entries: 0,
       scored_entries: 0,
@@ -1291,7 +1291,7 @@ export function buildMiniFantasyLeaderboard({
     existing.owner_handle = existing.owner_handle || ownerHandle || profile.owner_handle || '';
     existing.user_id = existing.user_id || userId || profile.user_id || null;
     existing.display_name = normalizeWhitespace(existing.display_name || seed?.display_name || seed?.displayName || profile.display_name || existing.owner_handle || existing.user_id || 'Mini Fantasy player');
-    existing.created_at = existing.created_at || normalizeWhitespace(seed?.created_at || seed?.createdAt || profile.created_at || '') || null;
+    existing.created_at = existing.created_at || normalizeWhitespace(profile.created_at || seed?.created_at || seed?.createdAt || '') || null;
     grouped.set(key, existing);
     return existing;
   }

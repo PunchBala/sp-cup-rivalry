@@ -817,6 +817,85 @@ test('buildMiniFantasyLeaderboard adds missed-lock relief, daily visit bonus, an
   assert.equal(newbie.matches[0].source, 'new_player_baseline');
 });
 
+test('buildMiniFantasyLeaderboard uses profile created_at ahead of first saved-entry timestamp for baseline classification', () => {
+  const liveData = {
+    meta: {
+      cache: {
+        matchList: [
+          {
+            matchNo: 14,
+            status: 'Delhi Capitals won by 6 wkts',
+            teams: ['Delhi Capitals', 'Gujarat Titans']
+          }
+        ]
+      },
+      scoreHistory: [
+        {
+          processedMatchCount: 14,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'DC Batter': 1,
+                  'DC Bowler': 1,
+                  'GT Bowler': 1,
+                  'GT Keeper': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'DC Batter': { score: 40 },
+                'DC Bowler': { score: 20 },
+                'GT Bowler': { score: 10 },
+                'GT Keeper': { score: 12 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 14, datetime_utc: '2026-04-08T14:00:00Z', home_team: 'Delhi Capitals', away_team: 'Gujarat Titans' }
+  ];
+  const squads = {
+    DC: ['DC Batter', 'DC Bowler'],
+    GT: ['GT Bowler', 'GT Keeper']
+  };
+
+  const leaderboard = buildMiniFantasyLeaderboard({
+    entries: [
+      {
+        userId: 'user-early',
+        ownerHandle: 'earlybird',
+        displayName: 'Early Bird',
+        createdAt: '2026-04-10T09:00:00Z',
+        matchNo: 14,
+        selectedPlayerIds: [
+          buildMiniFantasyPlayerId('DC', 'DC Batter'),
+          buildMiniFantasyPlayerId('DC', 'DC Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Keeper')
+        ],
+        captainPlayerId: buildMiniFantasyPlayerId('DC', 'DC Batter')
+      }
+    ],
+    liveData,
+    schedule,
+    squads,
+    profiles: [
+      { id: 'user-early', handle: 'earlybird', display_name: 'Early Bird', created_at: '2026-04-05T09:00:00Z' }
+    ]
+  });
+
+  const earlyBird = leaderboard.rows.find((row) => row.owner_handle === 'earlybird');
+  assert.equal(earlyBird.new_player_baseline_points, 0);
+  assert.equal(earlyBird.missed_lock_points, 0);
+  assert.equal(earlyBird.matches[0].source, 'locked_entry');
+  assert.equal(earlyBird.saved_entries, 1);
+});
+
 test('calculateMiniFantasyMissedLockPoints lowers the cap after the third missed lock', () => {
   assert.deepEqual(calculateMiniFantasyMissedLockPoints(200, 1), {
     cap: 50,

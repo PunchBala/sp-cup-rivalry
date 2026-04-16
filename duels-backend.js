@@ -853,7 +853,7 @@ function normalizeMiniFantasyEntryRow(row) {
             display_name: normalizeWhitespace(currentUser.displayName || currentUser.ownerId || ''),
             season: safeSeason,
             bonus_date_ist: safeBonusDateIst,
-            bonus_points: Number(bonusPoints || 0) || 0
+            bonus_points: 5
           },
           accessToken: activeSession.access_token,
           prefer: 'resolution=merge-duplicates,return=representation'
