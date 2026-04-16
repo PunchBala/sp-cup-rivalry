@@ -321,6 +321,7 @@ function createEmptyAggregates() {
     battingFifties: {},
     battingHundreds: {},
     battingImpact30s: {},
+    battingDucks: {},
     bowling3w: {},
     bowling4w: {},
     bowling5w: {},
@@ -1281,6 +1282,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
       if (runs >= 100) incrementCountMap(aggregates.battingHundreds, batter);
       if (runs >= 50) incrementCountMap(aggregates.battingFifties, batter);
       if (runs >= 30 && balls > 0 && balls < 15) incrementCountMap(aggregates.battingImpact30s, batter);
+      if (runs === 0 && isDismissedBattingEntry(bat)) incrementCountMap(aggregates.battingDucks, batter);
     }
 
     for (const bowl of safeArray(innings.bowling)) {
@@ -1373,7 +1375,8 @@ function combineAggregates(baseAgg, overlayAgg) {
   const out = clone(baseAgg);
   if (!overlayAgg) return out;
 
-  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
+  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
+    out[key] = out[key] || {};
     for (const [name, value] of Object.entries(overlayAgg[key] || {})) {
       out[key][name] = (out[key][name] || 0) + Number(value || 0);
     }
@@ -1457,7 +1460,7 @@ function buildStandingsRanking(agg) {
 
 
 function battingStrikeRateBonus(runs, balls) {
-  if (runs < 30 || balls <= 0) return 0;
+  if (balls <= 0 || (runs < 30 && balls < 10)) return 0;
   const sr = (100 * runs) / balls;
   if (sr > 170) return 8;
   if (sr > 150) return 5;
@@ -1493,6 +1496,7 @@ function buildMvpRanking(agg, dotsValues) {
     const dotBalls = Number(dotsValues[player] || 0);
     const catches = Number(agg.catches[player] || 0);
     const runsConceded = Number(agg.bowlingRunsConceded[player] || 0);
+    const duckPenalty = Number(agg.battingDucks?.[player] || 0) * -5;
 
     const battingBase = runs + (sixes * 2);
     const bowlingBase = (wickets * 20) + (dotBalls * 1.5);
@@ -1507,7 +1511,7 @@ function buildMvpRanking(agg, dotsValues) {
       (Number(agg.bowling4w[player] || 0) * 20) +
       (Number(agg.bowling5w[player] || 0) * 30);
 
-    const score = battingBase + bowlingBase + fieldingBase + srBonus + econBonus + milestoneBonus;
+    const score = battingBase + bowlingBase + fieldingBase + srBonus + econBonus + milestoneBonus + duckPenalty;
 
     return [player, {
       score: Number(score.toFixed(2)),
@@ -1522,6 +1526,7 @@ function buildMvpRanking(agg, dotsValues) {
       bonuses: {
         sr: srBonus,
         economy: econBonus,
+        ducks: Number(agg.battingDucks?.[player] || 0),
         batting50s: Number(agg.battingFifties[player] || 0),
         batting100s: Number(agg.battingHundreds[player] || 0),
         impact30s: Number(agg.battingImpact30s[player] || 0),

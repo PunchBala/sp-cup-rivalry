@@ -1208,7 +1208,7 @@
                   <ul class="fantasy-guide-list">
                     <li><strong>Fixture-only scoring:</strong> your 4-player team scores only from the fixture it locked against. There is no season carry-over into that match score.</li>
                     <li><strong>Same MVP engine as Nerd Room / Duel:</strong> base player points are <code>runs + (sixes x 2) + (wickets x 20) + (dot balls x 1.5) + (catches x 8)</code>.</li>
-                    <li><strong>Batting strike-rate bonus:</strong> minimum 30 runs, then SR above 170 = +8, above 150 = +5, above 130 = +2, below 100 = -5.</li>
+                    <li><strong>Batting strike-rate bonus:</strong> applies once a batter either scores 30+ runs or faces 10+ balls, then SR above 170 = +8, above 150 = +5, above 130 = +2, below 100 = -5.</li>
                     <li><strong>Bowling economy bonus:</strong> minimum 2 overs, then economy below 6 = +8, below 7 = +5, below 8 = +2, above 10 = -5.</li>
                     <li><strong>Milestone bonuses:</strong> fifty +10, hundred +25, quick 30 under 15 balls +8, 3 wickets +12, 4 wickets +20, 5 wickets +30, and a duck penalty of -5 when a batter is dismissed for 0.</li>
                     <li><strong>Mini Fantasy extras:</strong> each selected player who appears in the fixture gets <code>+2</code>. Each selected player from the winning side gets <code>+5</code> once the result is final.</li>
@@ -8027,60 +8027,66 @@ function titleBandScore(pick, live){
           return {
             totalPoints: 0,
             pointsByPlayerId: {},
-          players: [],
-          captain: null,
-          bestPick: null,
-          summary: 'No team was locked for this fixture.'
-        };
-      }
+            scoredPointsByPlayerId: {},
+            players: [],
+            captain: null,
+            bestPick: null,
+            summary: 'No team was locked for this fixture.',
+            isNoResult: false
+          };
+        }
         const playerPool = miniFantasyEntryPlayerPool(entry);
         const poolById = new Map(playerPool.map((player) => [player.player_id, player]));
-        const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds) ? entry.selectedPlayerIds.filter(Boolean) : [];
-        const pointsByPlayerId = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Number(fixturePointsIndex.get(playerId) || 0)]));
-        const playerTeamById = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, (poolById.get(playerId)?.team || resolveMiniFantasyPlayerTeamCode(playerId))]));
-        const winningTeamCode = getMiniFantasyWinningTeamCode({
+        const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds)
+          ? entry.selectedPlayerIds.filter(Boolean)
+          : (Array.isArray(entry.selected_player_ids) ? entry.selected_player_ids.filter(Boolean) : []);
+        const captainPlayerId = normalizeTextValue(entry.captainPlayerId || entry.captain_player_id || '');
+        const score = scoreMiniFantasyEntry({
+          entry,
           liveData: LIVE_2026,
           schedule: LEAGUE_STAGE_SCHEDULE,
-          matchNo: entry.matchNo
+          squads: IPL_SQUADS
         });
-        const fixture = miniFantasyFixtureByMatchNo(entry.matchNo);
-        const isCompletedFixture = fixture ? Number(entry.matchNo || 0) <= getCompletedMiniFantasyMatchCount(LIVE_2026) : false;
-        const totalPoints = scoreMiniFantasyLineup({
-          selectedPlayerIds,
-          captainPlayerId: entry.captainPlayerId || '',
-          pointsByPlayerId,
-          playerTeamById,
-          winningTeamCode: isCompletedFixture ? winningTeamCode : ''
-        });
+        const pointsByPlayerId = score.points_by_player_id || Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Number(fixturePointsIndex.get(playerId) || 0)]));
+        const scoredPointsByPlayerId = score.scored_points_by_player_id || {};
+        const appearanceBonusByPlayerId = score.appearance_bonus_by_player_id || {};
+        const winnerBonusByPlayerId = score.winner_bonus_by_player_id || {};
+        const totalPoints = Number(score.total_points || 0) || 0;
         const players = selectedPlayerIds.map((playerId) => {
           const player = poolById.get(playerId) || null;
-          const isCaptain = normalizeTextValue(entry.captainPlayerId || '') === playerId;
+          const isCaptain = captainPlayerId === playerId;
           const rawPoints = Number(pointsByPlayerId[playerId] || 0);
-          const scoredPoints = isCaptain ? rawPoints * MINI_FANTASY_CAPTAIN_MULTIPLIER : rawPoints;
+          const scoredPoints = Number(scoredPointsByPlayerId[playerId] ?? rawPoints) || 0;
+          return {
+            playerId,
+            name: player?.name || fallbackMiniFantasyPlayerName(playerId),
+            team: player?.team || '',
+            role: player?.role || '',
+            price: Number(player?.final_price || 0) || 0,
+            points: rawPoints,
+            appearanceBonus: Number(appearanceBonusByPlayerId[playerId] || 0) || 0,
+            winnerBonus: Number(winnerBonusByPlayerId[playerId] || 0) || 0,
+            scoredPoints,
+            isCaptain
+          };
+        });
+        const captain = players.find((player) => player.isCaptain) || null;
+        const bestPick = [...players].sort((a, b) => b.scoredPoints - a.scoredPoints || a.name.localeCompare(b.name))[0] || null;
         return {
-          playerId,
-          name: player?.name || fallbackMiniFantasyPlayerName(playerId),
-          team: player?.team || '',
-          role: player?.role || '',
-          price: Number(player?.final_price || 0) || 0,
-          points: rawPoints,
-          scoredPoints,
-          isCaptain
+          totalPoints,
+          pointsByPlayerId,
+          scoredPointsByPlayerId,
+          players,
+          captain,
+          bestPick,
+          summary: score.is_no_result
+            ? 'This fixture ended with no result, so no Mini Fantasy points were awarded.'
+            : captain
+              ? `${captain.name} carries the captain armband.`
+              : 'Captain is not set on this saved team.',
+          isNoResult: Boolean(score.is_no_result)
         };
-      });
-      const captain = players.find((player) => player.isCaptain) || null;
-      const bestPick = [...players].sort((a, b) => b.scoredPoints - a.scoredPoints || a.name.localeCompare(b.name))[0] || null;
-      return {
-        totalPoints,
-        pointsByPlayerId,
-        players,
-        captain,
-        bestPick,
-        summary: captain
-          ? `${captain.name} carries the captain armband.`
-          : 'Captain is not set on this saved team.'
-      };
-    }
+      }
 
     function currentUserLatestMiniFantasyEntry(){
       return currentMiniFantasyEntries()
@@ -8653,7 +8659,9 @@ function titleBandScore(pick, live){
             <span class="pill">Spent: ${escapeHtml(String(recapEntry.spentCredits || 0))} / ${MINI_FANTASY_BUDGET}</span>
             ${bestPick ? `<span class="pill">Best pick: ${escapeHtml(bestPick.name)} ${escapeHtml(formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points))} pts</span>` : ''}
           </div>
-          <div class="fantasy-window-note">${escapeHtml(stage === 'final'
+          <div class="fantasy-window-note">${escapeHtml(detail.isNoResult
+            ? 'This fixture ended with no result, so everyone finished on 0 Mini Fantasy points.'
+            : stage === 'final'
             ? `Final recap: ${detail.captain ? `${detail.captain.name} delivered ${formatMiniFantasyPoints(detail.captain.scoredPoints ?? detail.captain.points)} captain points.` : 'Captain was not set.'} ${bestPick ? `${bestPick.name} was your best pick on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)} points.` : ''}`
             : stage === 'live'
               ? `This team is still live. ${detail.captain ? `${detail.captain.name} is currently returning ${formatMiniFantasyPoints(detail.captain.scoredPoints ?? detail.captain.points)} captain points.` : 'Captain is not set yet.'}`
@@ -8753,6 +8761,8 @@ function titleBandScore(pick, live){
       const captain = selectedRow.fixtureCaptain;
       const detailNote = selectedRow.fixtureStatus === 'did_not_lock'
         ? `${selectedRow.display_name || selectedRow.owner_handle} did not save a team before this fixture locked.`
+        : selectedRow.fixtureIsNoResult
+          ? `Match ${board.fixture.match_no} ended with no result, so no Mini Fantasy points were awarded.`
         : board.stage === 'final'
           ? `${selectedRow.display_name || selectedRow.owner_handle} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)}.` : ''}`
           : board.stage === 'live'
@@ -8797,7 +8807,7 @@ function titleBandScore(pick, live){
                       <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}</div>
                     </div>
                     <div class="fantasy-entry-copy" style="justify-items:end">
-                      <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.points))}</div>
+                      <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.scoredPoints ?? player.points))}</div>
                       <div class="fantasy-picker-role">${escapeHtml(String(player.price || 0))} cr</div>
                     </div>
                   </div>

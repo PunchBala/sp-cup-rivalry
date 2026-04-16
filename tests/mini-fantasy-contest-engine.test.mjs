@@ -707,8 +707,8 @@ test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy point
   assert.equal(leaderboard.rows[0].display_name, 'Senthil');
   assert.equal(leaderboard.rows[0].medal, 'gold');
   assert.equal(leaderboard.rows[1].medal, 'silver');
-  assert.equal(leaderboard.rows[0].total_points, 112);
-  assert.equal(leaderboard.rows[1].total_points, 98);
+  assert.equal(leaderboard.rows[0].total_points, 123.5);
+  assert.equal(leaderboard.rows[1].total_points, 107);
 });
 
 test('buildMiniFantasyLeaderboard adds missed-lock relief, daily visit bonus, and new-player baseline points', () => {
@@ -806,10 +806,10 @@ test('buildMiniFantasyLeaderboard adds missed-lock relief, daily visit bonus, an
   const kavi = leaderboard.rows.find((row) => row.owner_handle === 'kavison');
   const newbie = leaderboard.rows.find((row) => row.owner_handle === 'newbie');
 
-  assert.equal(senthil.total_points, 112);
-  assert.equal(kavi.total_points, 47);
+  assert.equal(senthil.total_points, 123.5);
+  assert.equal(kavi.total_points, 51.1);
   assert.equal(kavi.daily_bonus_points, 5);
-  assert.equal(kavi.missed_lock_points, 42);
+  assert.equal(kavi.missed_lock_points, 46.1);
   assert.equal(kavi.matches[0].source, 'missed_lock_relief');
   assert.equal(newbie.total_points, MINI_FANTASY_NEW_PLAYER_BASELINE_POINTS + 5);
   assert.equal(newbie.new_player_baseline_points, MINI_FANTASY_NEW_PLAYER_BASELINE_POINTS);
@@ -891,9 +891,14 @@ test('scoreMiniFantasyEntry applies appearance and winning bonuses before captai
     schedule,
     squads
   });
-  assert.equal(scored.total_points, 112);
+  assert.equal(scored.total_points, 123.5);
+  assert.equal(scored.appearance_bonus_points, 8);
   assert.equal(scored.winner_bonus_points, 10);
   assert.equal(scored.winning_team_code, 'DC');
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 70.5);
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Bowler')], 27);
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Bowler')], 12);
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 14);
 
   const noResult = scoreMiniFantasyEntry({
     entry,
@@ -914,7 +919,10 @@ test('scoreMiniFantasyEntry applies appearance and winning bonuses before captai
     schedule,
     squads
   });
-  assert.equal(noResult.total_points, 102);
+  assert.equal(noResult.total_points, 0);
+  assert.equal(noResult.appearance_bonus_points, 0);
   assert.equal(noResult.winner_bonus_points, 0);
   assert.equal(noResult.winning_team_code, null);
+  assert.equal(noResult.is_no_result, true);
+  assert.equal(noResult.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 0);
 });
