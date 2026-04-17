@@ -205,10 +205,19 @@ with check (
 
 drop policy if exists "users read their own mini fantasy entries" on public.mini_fantasy_entries;
 drop policy if exists "mini fantasy entries are public readable" on public.mini_fantasy_entries;
-create policy "mini fantasy entries are public readable"
+drop policy if exists "locked mini fantasy entries are public readable" on public.mini_fantasy_entries;
+
+create policy "users read their own mini fantasy entries"
 on public.mini_fantasy_entries
 for select
-using (true);
+using (auth.uid() = user_id);
+
+create policy "locked mini fantasy entries are public readable"
+on public.mini_fantasy_entries
+for select
+using (
+  timezone('utc', now()) >= fixture_datetime_utc - interval '1 minute'
+);
 
 drop policy if exists "users insert their own mini fantasy entries before lock" on public.mini_fantasy_entries;
 create policy "users insert their own mini fantasy entries before lock"
