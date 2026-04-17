@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-04-17T19:16:21.512Z",
+    "as_of_utc": "2026-04-17T20:09:11.164Z",
     "price_min": 4,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -17,9 +17,9 @@
   "summary": {
     "total_players_received": 250,
     "eligible_players_ranked": 250,
-    "price_rises": 1,
-    "price_drops": 2,
-    "price_unchanged": 247
+    "price_rises": 0,
+    "price_drops": 0,
+    "price_unchanged": 250
   },
   "players": [
     {
@@ -1485,12 +1485,12 @@
       "role": "batter",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 10,
-      "initial_price": 10,
+      "old_price": 9,
+      "initial_price": 9,
       "target_price": 8,
       "smoothed_price": 9,
       "final_price": 9,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 5,
       "season_avg_points": 33,
       "recent_avg_points": 19.33,
@@ -2273,12 +2273,12 @@
       "role": "batter",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 5,
       "season_avg_points": 24.2,
       "recent_avg_points": 8.33,
@@ -2413,12 +2413,12 @@
       "role": "wicket_keeper",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
+      "old_price": 7,
+      "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
       "final_price": 7,
-      "price_change": 1,
+      "price_change": 0,
       "matches_played": 1,
       "season_avg_points": 23,
       "recent_avg_points": 23,
@@ -2428,9 +2428,7 @@
       "adjusted_score": 5.75,
       "percentile": 47.39,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Recovered real match history from a previously blank price; used the corrected target price immediately",
-        "Target price mapped from percentile 47.39"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-17T14:00:00Z"
     },
@@ -6798,5 +6796,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-04-17T19:16:21.512Z"
+  "generated_at_utc": "2026-04-17T20:09:11.164Z"
 }
