@@ -72,6 +72,7 @@ export interface PricingPlayerOutput {
   final_price: number;
   price_change: number;
   matches_played: number;
+  season_total_points: number;
   season_avg_points: number;
   recent_avg_points: number;
   last_match_points: number;
@@ -220,6 +221,14 @@ export function getRecentMatchPoints(matchPoints: number[], windowSize: number):
 
 export function computeSeasonAveragePoints(matchPoints: number[]): number {
   return roundTo(average(matchPoints), 2);
+}
+
+export function computeSeasonTotalPoints(matchPoints: number[]): number {
+  if (!Array.isArray(matchPoints) || matchPoints.length === 0) {
+    return 0;
+  }
+
+  return roundTo(matchPoints.reduce((sum, points) => sum + Number(points || 0), 0), 2);
 }
 
 export function computeRecentAveragePoints(matchPoints: number[], windowSize: number): number {
@@ -457,6 +466,7 @@ function derivePlayerInputs(player: PricingPlayerInput, jobMeta: PricingJobMetaI
     basePrice,
     maxDailyPriceStep: jobMeta.max_daily_price_step,
     recoveredHistory: Boolean(player.recovered_history) && effectiveMatchesPlayed > 0,
+    matchPoints,
     seasonAveragePoints,
     recentAveragePoints,
     lastMatchPoints,
@@ -540,6 +550,7 @@ export function generatePrices(input: PricingJobInput): PricingJobOutput {
         final_price: finalPrice,
         price_change: priceChange,
         matches_played: entry.effectiveMatchesPlayed,
+        season_total_points: computeSeasonTotalPoints(entry.matchPoints),
         season_avg_points: entry.seasonAveragePoints,
         recent_avg_points: entry.recentAveragePoints,
         last_match_points: entry.lastMatchPoints,

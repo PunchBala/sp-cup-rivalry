@@ -9443,7 +9443,7 @@ function titleBandScore(pick, live){
                 <div class="fantasy-picker-row">
                   <div>
                     <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
-                    <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml(player.role.replace('_', ' '))}${player.matches_played ? ` - ${escapeHtml(String(player.matches_played))} matches` : ''}${draft.captainPlayerId === player.player_id ? ' - captain' : ''}</div>
+                    <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml(player.role.replace('_', ' '))} - ${escapeHtml(formatMiniFantasyPoints(player.season_total_points || 0))} pts total${player.matches_played ? ` - ${escapeHtml(formatMiniFantasyPoints(player.last_match_points || 0))} last match - ${escapeHtml(String(player.matches_played))} matches` : ''}${draft.captainPlayerId === player.player_id ? ' - captain' : ''}</div>
                     ${(player.pickedInOtherSlot || player.selectedInCurrentSlot || player.selectedSlotIndex !== -1) ? `
                       <div class="fantasy-picker-meta-row">
                         <div class="fantasy-picker-meta-badges">

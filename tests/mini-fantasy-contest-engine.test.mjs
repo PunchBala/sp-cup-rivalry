@@ -457,6 +457,10 @@ test('generateMiniFantasyPriceBook and buildFixturePlayerPool work from live his
 
   assert.equal(priceBook.players.length, 4);
   assert.equal(priceBook.summary.total_players_received, 4);
+  assert.equal(priceBook.players.find((player) => player.name === 'DC Batter')?.season_total_points, 62);
+  assert.equal(priceBook.players.find((player) => player.name === 'GT Bowler')?.season_total_points, 18);
+  assert.equal(priceBook.players.find((player) => player.name === 'DC Batter')?.last_match_points, 62);
+  assert.equal(priceBook.players.find((player) => player.name === 'GT Bowler')?.last_match_points, 18);
 
   const pool = buildFixturePlayerPool({
     fixture: {
@@ -473,6 +477,10 @@ test('generateMiniFantasyPriceBook and buildFixturePlayerPool work from live his
 
   assert.equal(pool.length, 4);
   assert.equal(pool[0].team <= pool[pool.length - 1].team, true);
+  assert.equal(pool.find((player) => player.name === 'DC Batter')?.season_total_points, 62);
+  assert.equal(pool.find((player) => player.name === 'GT Bowler')?.season_total_points, 18);
+  assert.equal(pool.find((player) => player.name === 'DC Batter')?.last_match_points, 62);
+  assert.equal(pool.find((player) => player.name === 'GT Bowler')?.last_match_points, 18);
 });
 
 test('generateMiniFantasyPriceBook marks uncapped players and caps them at 9 credits', () => {
