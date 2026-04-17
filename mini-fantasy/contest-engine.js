@@ -992,33 +992,14 @@ function hasFixturePoints(pointsByMatchNo = {}, matchNo = null) {
   return Object.prototype.hasOwnProperty.call(pointsByMatchNo, targetMatchNo);
 }
 
-function buildMiniFantasyFixturePlayerRecordMap({
+function buildMiniFantasyLiveDeltaHistoryMap({
   liveData = {},
   schedule = [],
-  squads = {},
   matchNo = null
 } = {}) {
   const targetMatchNo = Number(matchNo || 0) || null;
-  const recordMap = new Map();
-  if (!targetMatchNo) return recordMap;
-
-  const baseIndex = buildMiniFantasyPlayerPointsIndex({ liveData, schedule, squads });
-  const completedMatchCount = getCompletedMiniFantasyMatchCount(liveData);
-
-  if (targetMatchNo <= completedMatchCount) {
-    baseIndex.forEach((payload, playerId) => {
-      const pointsByMatchNo = payload?.points_by_match_no || {};
-      recordMap.set(playerId, {
-        points: toNumber(pointsByMatchNo[targetMatchNo], 0),
-        appeared: hasFixturePoints(pointsByMatchNo, targetMatchNo)
-      });
-    });
-    return recordMap;
-  }
-
-  if (targetMatchNo !== completedMatchCount + 1) {
-    return recordMap;
-  }
+  const liveDeltaHistories = new Map();
+  if (!targetMatchNo) return liveDeltaHistories;
 
   const lastCompletedEntry = latestCompletedScoreHistoryEntry(liveData);
   const previousSnapshot = lastCompletedEntry?.snapshot || {};
@@ -1027,7 +1008,6 @@ function buildMiniFantasyFixturePlayerRecordMap({
   const currentMatches = snapshotPlayerMatches(currentSnapshot);
   const previousScores = snapshotMvpScoreLookup(previousSnapshot);
   const currentScores = snapshotMvpScoreLookup(currentSnapshot);
-  const liveDeltaHistories = new Map();
   const playedAt = ((Array.isArray(schedule) ? schedule : []).find((fixture) => Number(fixture?.match_no || 0) === targetMatchNo) || {}).datetime_utc || liveData?.fetchedAt || null;
 
   const allNames = new Set([
@@ -1051,6 +1031,48 @@ function buildMiniFantasyFixturePlayerRecordMap({
       last_match_played_at_utc: playedAt
     });
   });
+
+  return liveDeltaHistories;
+}
+
+function buildMiniFantasyFixturePlayerRecordMap({
+  liveData = {},
+  schedule = [],
+  squads = {},
+  matchNo = null,
+  playerPointsIndex = null,
+  completedMatchCount = undefined,
+  liveDeltaHistoryMap = null
+} = {}) {
+  const targetMatchNo = Number(matchNo || 0) || null;
+  const recordMap = new Map();
+  if (!targetMatchNo) return recordMap;
+
+  const baseIndex = playerPointsIndex instanceof Map
+    ? playerPointsIndex
+    : buildMiniFantasyPlayerPointsIndex({ liveData, schedule, squads });
+  const resolvedCompletedMatchCount = Number.isFinite(Number(completedMatchCount))
+    ? Number(completedMatchCount)
+    : getCompletedMiniFantasyMatchCount(liveData);
+
+  if (targetMatchNo <= resolvedCompletedMatchCount) {
+    baseIndex.forEach((payload, playerId) => {
+      const pointsByMatchNo = payload?.points_by_match_no || {};
+      recordMap.set(playerId, {
+        points: toNumber(pointsByMatchNo[targetMatchNo], 0),
+        appeared: hasFixturePoints(pointsByMatchNo, targetMatchNo)
+      });
+    });
+    return recordMap;
+  }
+
+  if (targetMatchNo !== resolvedCompletedMatchCount + 1) {
+    return recordMap;
+  }
+
+  const liveDeltaHistories = liveDeltaHistoryMap instanceof Map
+    ? liveDeltaHistoryMap
+    : buildMiniFantasyLiveDeltaHistoryMap({ liveData, schedule, matchNo: targetMatchNo });
 
   Object.entries(squads || {}).forEach(([teamCode, squadPlayers]) => {
     (Array.isArray(squadPlayers) ? squadPlayers : []).forEach((playerName) => {
@@ -1264,7 +1286,9 @@ export function buildMiniFantasyLeaderboard({
   const completedFixtures = completedMiniFantasyFixtures(schedule, liveData);
   const grouped = new Map();
   const profileByKey = new Map();
+  const playerPointsIndex = buildMiniFantasyPlayerPointsIndex({ liveData, schedule, squads });
   const fixtureScoreContextCache = new Map();
+  const liveDeltaHistoryCache = new Map();
 
   (Array.isArray(profiles) ? profiles : []).forEach((profile) => {
     const ownerHandle = profileHandle(profile);
@@ -1326,12 +1350,22 @@ export function buildMiniFantasyLeaderboard({
     const noResult = targetMatchNo <= completedMatchCount
       ? isMiniFantasyNoResultFixture({ liveData, matchNo: targetMatchNo })
       : false;
+    let liveDeltaHistoryMap = null;
+    if (targetMatchNo === completedMatchCount + 1) {
+      if (!liveDeltaHistoryCache.has(targetMatchNo)) {
+        liveDeltaHistoryCache.set(targetMatchNo, buildMiniFantasyLiveDeltaHistoryMap({ liveData, schedule, matchNo: targetMatchNo }));
+      }
+      liveDeltaHistoryMap = liveDeltaHistoryCache.get(targetMatchNo);
+    }
     const context = {
       fixtureRecordMap: buildMiniFantasyFixturePlayerRecordMap({
         liveData,
         schedule,
         squads,
-        matchNo: targetMatchNo
+        matchNo: targetMatchNo,
+        playerPointsIndex,
+        completedMatchCount,
+        liveDeltaHistoryMap
       }),
       winningTeamCode: targetMatchNo <= completedMatchCount && !noResult
         ? getMiniFantasyWinningTeamCode({ liveData, schedule, matchNo: targetMatchNo })
