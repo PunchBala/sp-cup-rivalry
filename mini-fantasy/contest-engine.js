@@ -797,6 +797,8 @@ export function buildFixturePlayerPool({
         final_price: Number.isFinite(price?.final_price) ? price.final_price : DEFAULT_PRICE_JOB_META.default_initial_price,
         old_price: price?.old_price ?? null,
         matches_played: Number(price?.matches_played || 0),
+        season_total_points: Number(price?.season_total_points || 0),
+        last_match_points: Number(price?.last_match_points || 0),
         adjusted_score: Number(price?.adjusted_score || 0),
         last_match_played_at_utc: price?.last_match_played_at_utc || null
       };
