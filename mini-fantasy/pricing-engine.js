@@ -80,6 +80,14 @@ export function computeSeasonAveragePoints(matchPoints) {
   return roundTo(average(matchPoints), 2);
 }
 
+export function computeSeasonTotalPoints(matchPoints) {
+  if (!Array.isArray(matchPoints) || matchPoints.length === 0) {
+    return 0;
+  }
+
+  return roundTo(matchPoints.reduce((sum, points) => sum + Number(points || 0), 0), 2);
+}
+
 export function computeRecentAveragePoints(matchPoints, windowSize) {
   return roundTo(average(getRecentMatchPoints(matchPoints, windowSize)), 2);
 }
@@ -286,6 +294,7 @@ function derivePlayerInputs(player, jobMeta) {
     basePrice,
     maxDailyPriceStep: jobMeta.max_daily_price_step,
     recoveredHistory: Boolean(player.recovered_history) && effectiveMatchesPlayed > 0,
+    matchPoints,
     seasonAveragePoints,
     recentAveragePoints,
     lastMatchPoints,
@@ -362,6 +371,7 @@ export function generatePrices(input) {
         final_price: finalPrice,
         price_change: priceChange,
         matches_played: entry.effectiveMatchesPlayed,
+        season_total_points: computeSeasonTotalPoints(entry.matchPoints),
         season_avg_points: entry.seasonAveragePoints,
         recent_avg_points: entry.recentAveragePoints,
         last_match_points: entry.lastMatchPoints,
