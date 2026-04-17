@@ -1446,6 +1446,12 @@
     let REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = [];
     let REMOTE_MINI_FANTASY_PROFILES = [];
     let REMOTE_MINI_FANTASY_DAILY_BONUSES = [];
+    let MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';
+    let MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
+    let MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE = true;
+    let MINI_FANTASY_COMPUTE_REVISION = 0;
+    let MINI_FANTASY_LEADERBOARD_CACHE = { key: '', value: null };
+    let MINI_FANTASY_RECENT_BOARD_CACHE = { key: '', value: null };
     const DUELS_BACKEND = window.DUELS_BACKEND_API || window.createDuelsBackend?.(window.DUELS_BACKEND_CONFIG || {}) || { enabled: false, label: 'Local beta storage' };
     let DUEL_STUDIO_NOTICE = null;
     let IPL_SQUADS = {};
@@ -3936,6 +3942,7 @@ function titleBandScore(pick, live){
         console.warn('Falling back to embedded league schedule', err);
         LEAGUE_STAGE_SCHEDULE = LEAGUE_STAGE_SCHEDULE_FALLBACK.map(match => ({ ...match, fixture: formatFixtureLabel(match.fixture) }));
       }
+      invalidateMiniFantasyComputedData();
       updateNextPlannedRefreshPill();
     }
 
@@ -3953,6 +3960,7 @@ function titleBandScore(pick, live){
         console.warn('Falling back to empty squads directory', err);
         IPL_SQUADS = {};
       }
+      invalidateMiniFantasyComputedData();
     }
 
     async function loadTeamRolesData(){
@@ -3969,6 +3977,7 @@ function titleBandScore(pick, live){
         console.warn('Falling back to empty team roles directory', err);
         IPL_TEAM_ROLES = {};
       }
+      invalidateMiniFantasyComputedData();
     }
 
     async function loadMiniFantasyPriceBook(){
@@ -4060,12 +4069,13 @@ function titleBandScore(pick, live){
     }
 
     function normalizeUserProfile(profile = {}){
+      const safeProfile = profile && typeof profile === 'object' && !Array.isArray(profile) ? profile : {};
       const model = getWarRoomModelApi();
-      const displayName = model.normalizeWhitespace(profile.displayName || profile.name || '');
-      const ownerId = model.normalizeSlug(profile.ownerId || profile.handle || displayName || '');
-      const userId = model.normalizeWhitespace(profile.userId || profile.id || '');
-      const email = model.normalizeWhitespace(profile.email || '');
-      const createdAt = model.normalizeWhitespace(profile.createdAt || profile.created_at || '');
+      const displayName = model.normalizeWhitespace(safeProfile.displayName || safeProfile.name || '');
+      const ownerId = model.normalizeSlug(safeProfile.ownerId || safeProfile.handle || displayName || '');
+      const userId = model.normalizeWhitespace(safeProfile.userId || safeProfile.id || '');
+      const email = model.normalizeWhitespace(safeProfile.email || '');
+      const createdAt = model.normalizeWhitespace(safeProfile.createdAt || safeProfile.created_at || '');
       if (!displayName || !ownerId) return null;
       return {
         displayName,
@@ -4073,7 +4083,7 @@ function titleBandScore(pick, live){
         userId: userId || null,
         email: email || null,
         createdAt: createdAt || null,
-        authSource: model.normalizeWhitespace(profile.authSource || profile.source || 'local') || 'local'
+        authSource: model.normalizeWhitespace(safeProfile.authSource || safeProfile.source || 'local') || 'local'
       };
     }
 
@@ -4156,10 +4166,12 @@ function titleBandScore(pick, live){
     }
 
     function writeStoredMiniFantasyEntries(entries = []){
-      return writeStoredJson(LOCAL_MINI_FANTASY_ENTRIES_STORAGE_KEY, {
+      const result = writeStoredJson(LOCAL_MINI_FANTASY_ENTRIES_STORAGE_KEY, {
         version: 1,
         entries: Array.isArray(entries) ? entries : []
       });
+      invalidateMiniFantasyComputedData();
+      return result;
     }
 
     function localMiniFantasyEntriesForCurrentUser(){
@@ -4199,23 +4211,72 @@ function titleBandScore(pick, live){
       return normalized;
     }
 
+    function invalidateMiniFantasyComputedData(){
+      MINI_FANTASY_COMPUTE_REVISION += 1;
+      MINI_FANTASY_LEADERBOARD_CACHE = { key: '', value: null };
+      MINI_FANTASY_RECENT_BOARD_CACHE = { key: '', value: null };
+    }
+
+    function isMiniFantasyDailyBonusTableError(error){
+      const message = normalizeTextValue(error?.message || error || '').toLowerCase();
+      return message.includes('mini_fantasy_daily_bonus_claims')
+        && (message.includes('could not find the table') || message.includes('relation') || message.includes('http 404') || message.includes('404'));
+    }
+
+    function noteMissingMiniFantasyDailyBonusTable(error){
+      if (!isMiniFantasyDailyBonusTableError(error)) return false;
+      MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE = false;
+      return true;
+    }
+
+    function queueMiniFantasyPublicDataLoad({ force = false } = {}){
+      if (!usesHostedDuelsBackend() || activeView !== 'fantasy') return Promise.resolve([]);
+      if (!force && (MINI_FANTASY_PUBLIC_DATA_STATUS === 'loading' || MINI_FANTASY_PUBLIC_DATA_STATUS === 'ready')) {
+        return MINI_FANTASY_PUBLIC_DATA_PROMISE || Promise.resolve(currentMiniFantasyLeaderboardEntries());
+      }
+      MINI_FANTASY_PUBLIC_DATA_STATUS = 'loading';
+      MINI_FANTASY_PUBLIC_DATA_PROMISE = Promise.resolve().then(() => syncMiniFantasyEntries({
+        includePublicData: true,
+        includeProfiles: true,
+        includeDailyBonuses: MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE,
+        resetDrafts: false
+      })).then((entries) => {
+        MINI_FANTASY_PUBLIC_DATA_STATUS = 'ready';
+        return entries;
+      }).catch((error) => {
+        MINI_FANTASY_PUBLIC_DATA_STATUS = 'error';
+        console.warn('Mini Fantasy public leaderboard sync skipped:', error);
+        return currentMiniFantasyLeaderboardEntries();
+      }).finally(() => {
+        MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
+        if (activeView === 'fantasy') {
+          renderMiniFantasySection();
+        }
+      });
+      return MINI_FANTASY_PUBLIC_DATA_PROMISE;
+    }
+
     function setRemoteMiniFantasyEntries(entries = []){
       REMOTE_MINI_FANTASY_ENTRIES = Array.isArray(entries) ? cloneJson(entries) : [];
+      invalidateMiniFantasyComputedData();
       return REMOTE_MINI_FANTASY_ENTRIES;
     }
 
     function setRemoteMiniFantasyLeaderboardEntries(entries = []){
       REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = Array.isArray(entries) ? cloneJson(entries) : [];
+      invalidateMiniFantasyComputedData();
       return REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES;
     }
 
     function setRemoteMiniFantasyProfiles(profiles = []){
       REMOTE_MINI_FANTASY_PROFILES = Array.isArray(profiles) ? cloneJson(profiles) : [];
+      invalidateMiniFantasyComputedData();
       return REMOTE_MINI_FANTASY_PROFILES;
     }
 
     function setRemoteMiniFantasyDailyBonuses(bonuses = []){
       REMOTE_MINI_FANTASY_DAILY_BONUSES = Array.isArray(bonuses) ? cloneJson(bonuses) : [];
+      invalidateMiniFantasyComputedData();
       return REMOTE_MINI_FANTASY_DAILY_BONUSES;
     }
 
@@ -4228,6 +4289,7 @@ function titleBandScore(pick, live){
           && normalizeTextValue(item.bonusDateIst || item.bonus_date_ist || item.dateKey || '') === safeDateKey));
       nextBonuses.push(cloneJson(bonus));
       REMOTE_MINI_FANTASY_DAILY_BONUSES = nextBonuses;
+      invalidateMiniFantasyComputedData();
       return bonus;
     }
 
@@ -4241,6 +4303,7 @@ function titleBandScore(pick, live){
         .filter((item) => miniFantasyEntryStoreKey(item) !== miniFantasyEntryStoreKey(entry));
       leaderboardEntries.push(cloneJson(entry));
       REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = leaderboardEntries;
+      invalidateMiniFantasyComputedData();
       return entry;
     }
 
@@ -4249,23 +4312,23 @@ function titleBandScore(pick, live){
     }
 
     function currentMiniFantasyEntries(){
-      return usesHostedDuelsBackend() ? cloneJson(REMOTE_MINI_FANTASY_ENTRIES || []) : localMiniFantasyEntriesForCurrentUser();
+      return usesHostedDuelsBackend() ? (REMOTE_MINI_FANTASY_ENTRIES || []) : localMiniFantasyEntriesForCurrentUser();
     }
 
     function currentMiniFantasyLeaderboardEntries(){
       return usesHostedDuelsBackend()
-        ? cloneJson(REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES || [])
+        ? (REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES || [])
         : loadStoredMiniFantasyEntriesStore().entries;
     }
 
     function currentMiniFantasyProfiles(){
       return usesHostedDuelsBackend()
-        ? cloneJson(REMOTE_MINI_FANTASY_PROFILES || [])
-        : (CURRENT_USER ? [cloneJson(CURRENT_USER)] : []);
+        ? (REMOTE_MINI_FANTASY_PROFILES || [])
+        : (CURRENT_USER ? [CURRENT_USER] : []);
     }
 
     function currentMiniFantasyDailyBonuses(){
-      return usesHostedDuelsBackend() ? cloneJson(REMOTE_MINI_FANTASY_DAILY_BONUSES || []) : [];
+      return usesHostedDuelsBackend() ? (REMOTE_MINI_FANTASY_DAILY_BONUSES || []) : [];
     }
 
     function findMiniFantasyEntryForMatch(matchNo){
@@ -4286,12 +4349,18 @@ function titleBandScore(pick, live){
       MINI_FANTASY_NOTICE = null;
     }
 
-    async function syncMiniFantasyEntries(){
+    async function syncMiniFantasyEntries({
+      includePublicData = false,
+      includeProfiles = false,
+      includeDailyBonuses = false,
+      resetDrafts = true
+    } = {}){
       if (!usesHostedDuelsBackend()) {
-        resetMiniFantasyDrafts();
+        if (resetDrafts) resetMiniFantasyDrafts();
         return localMiniFantasyEntriesForCurrentUser();
       }
       try {
+        const shouldLoadDailyBonuses = includeDailyBonuses && MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE;
         const [entries, leaderboardEntries, profiles, dailyBonuses] = await Promise.all([
           CURRENT_USER
             ? DUELS_BACKEND.listMiniFantasyEntries({
@@ -4299,28 +4368,36 @@ function titleBandScore(pick, live){
                 currentUser: CURRENT_USER
               })
             : Promise.resolve([]),
-          DUELS_BACKEND.listPublicMiniFantasyEntries({
-            season: MINI_FANTASY_SEASON,
-            currentUser: CURRENT_USER
-          }),
-          DUELS_BACKEND.listPublicMiniFantasyProfiles({
-            currentUser: CURRENT_USER
-          }).catch((error) => {
-            console.warn('Hosted mini fantasy profiles load failed:', error);
-            return [];
-          }),
-          DUELS_BACKEND.listPublicMiniFantasyDailyBonuses({
-            season: MINI_FANTASY_SEASON,
-            currentUser: CURRENT_USER
-          }).catch((error) => {
-            console.warn('Hosted mini fantasy daily bonuses load failed:', error);
-            return [];
-          })
+          includePublicData
+            ? DUELS_BACKEND.listPublicMiniFantasyEntries({
+                season: MINI_FANTASY_SEASON,
+                currentUser: CURRENT_USER
+              })
+            : Promise.resolve(REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES || []),
+          includeProfiles
+            ? DUELS_BACKEND.listPublicMiniFantasyProfiles({
+                currentUser: CURRENT_USER
+              }).catch((error) => {
+                console.warn('Hosted mini fantasy profiles load failed:', error);
+                return REMOTE_MINI_FANTASY_PROFILES || [];
+              })
+            : Promise.resolve(REMOTE_MINI_FANTASY_PROFILES || []),
+          shouldLoadDailyBonuses
+            ? DUELS_BACKEND.listPublicMiniFantasyDailyBonuses({
+                season: MINI_FANTASY_SEASON,
+                currentUser: CURRENT_USER
+              }).catch((error) => {
+                if (!noteMissingMiniFantasyDailyBonusTable(error)) {
+                  console.warn('Hosted mini fantasy daily bonuses load failed:', error);
+                }
+                return REMOTE_MINI_FANTASY_DAILY_BONUSES || [];
+              })
+            : Promise.resolve(REMOTE_MINI_FANTASY_DAILY_BONUSES || [])
         ]);
         setRemoteMiniFantasyEntries(entries || []);
-        setRemoteMiniFantasyLeaderboardEntries(leaderboardEntries || []);
-        setRemoteMiniFantasyProfiles(profiles || []);
-        setRemoteMiniFantasyDailyBonuses(dailyBonuses || []);
+        if (includePublicData) setRemoteMiniFantasyLeaderboardEntries(leaderboardEntries || []);
+        if (includeProfiles) setRemoteMiniFantasyProfiles(profiles || []);
+        if (shouldLoadDailyBonuses) setRemoteMiniFantasyDailyBonuses(dailyBonuses || []);
       } catch (error) {
         console.error('Hosted mini fantasy load failed:', error);
         MINI_FANTASY_NOTICE = {
@@ -4329,16 +4406,16 @@ function titleBandScore(pick, live){
           text: 'Your saved teams could not be refreshed right now. Please try again in a moment.'
         };
         setRemoteMiniFantasyEntries([]);
-        setRemoteMiniFantasyLeaderboardEntries([]);
-        setRemoteMiniFantasyProfiles([]);
-        setRemoteMiniFantasyDailyBonuses([]);
+        if (includePublicData) setRemoteMiniFantasyLeaderboardEntries([]);
+        if (includeProfiles) setRemoteMiniFantasyProfiles([]);
+        if (shouldLoadDailyBonuses) setRemoteMiniFantasyDailyBonuses([]);
       }
-      resetMiniFantasyDrafts();
+      if (resetDrafts) resetMiniFantasyDrafts();
       return currentMiniFantasyEntries();
     }
 
     async function maybeClaimMiniFantasyDailyVisitBonus(){
-      if (!usesHostedDuelsBackend() || !CURRENT_USER?.userId) return null;
+      if (!usesHostedDuelsBackend() || !CURRENT_USER?.userId || !MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE) return null;
       if (!Array.isArray(LEAGUE_STAGE_SCHEDULE) || !LEAGUE_STAGE_SCHEDULE.length) return null;
       const now = currentNowDate();
       if (!isMiniFantasyFixtureDayInTimeZone(LEAGUE_STAGE_SCHEDULE, now, MINI_FANTASY_DAILY_VISIT_TIME_ZONE)) {
@@ -4363,7 +4440,9 @@ function titleBandScore(pick, live){
         }
         return claimed;
       } catch (error) {
-        console.warn('Mini Fantasy daily visit bonus claim skipped:', error);
+        if (!noteMissingMiniFantasyDailyBonusTable(error)) {
+          console.warn('Mini Fantasy daily visit bonus claim skipped:', error);
+        }
         return null;
       }
     }
@@ -5702,6 +5781,8 @@ function titleBandScore(pick, live){
             }
             clearStoredUserProfile();
             setAuthPanelNotice(null);
+            MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';
+            MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
             await syncMiniFantasyEntries();
             setStudioNotice('info', usesHostedDuelsBackend()
               ? 'Signed out of the hosted Duels account.'
@@ -5837,6 +5918,8 @@ function titleBandScore(pick, live){
                   nextStep: 'Use only email + password in Sign in. Display name and handle are already saved.'
                 });
                 showToast('good', 'Account created. Sign in now with the same email + password.');
+                MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';
+                MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
                 await syncMiniFantasyEntries();
                 render();
                 return;
@@ -5856,8 +5939,17 @@ function titleBandScore(pick, live){
               });
               setActiveDrawer(null);
               showToast('good', `Signed in as ${CURRENT_USER.displayName}. Your Duels and Mini Fantasy account is ready.`);
+              MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';
+              MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
               await syncMiniFantasyEntries();
-              await maybeClaimMiniFantasyDailyVisitBonus();
+              setTimeout(() => {
+                queueMiniFantasyPublicDataLoad().catch(() => {});
+                maybeClaimMiniFantasyDailyVisitBonus()
+                  .then((claimed) => {
+                    if (claimed && activeView === 'fantasy') renderMiniFantasySection();
+                  })
+                  .catch(() => {});
+              }, 0);
             } catch (error) {
               const friendlyError = friendlyHostedAuthError(action, error);
               setAuthPanelNotice('bad', friendlyError);
@@ -6632,6 +6724,16 @@ function titleBandScore(pick, live){
             activeView = 'schedule';
           }
           render();
+          if (activeView === 'fantasy') {
+            setTimeout(() => {
+              queueMiniFantasyPublicDataLoad().catch(() => {});
+              maybeClaimMiniFantasyDailyVisitBonus()
+                .then((claimed) => {
+                  if (claimed && activeView === 'fantasy') renderMiniFantasySection();
+                })
+                .catch(() => {});
+            }, 0);
+          }
         };
       });
     }
@@ -8120,11 +8222,22 @@ function titleBandScore(pick, live){
     }
 
     function miniFantasyRecentFixtureBoardData(){
+      const cacheKey = [
+        MINI_FANTASY_COMPUTE_REVISION,
+        LIVE_2026?.fetchedAt || '',
+        Number(LIVE_2026?.meta?.scoreHistory?.length || 0),
+        Number(MINI_FANTASY_RECENT_MATCH_NO || 0) || ''
+      ].join('|');
+      if (MINI_FANTASY_RECENT_BOARD_CACHE.key === cacheKey && MINI_FANTASY_RECENT_BOARD_CACHE.value) {
+        return MINI_FANTASY_RECENT_BOARD_CACHE.value;
+      }
       const fixture = selectedMiniFantasyRecentFixture();
       const leaderboard = miniFantasyLeaderboardData();
       const leaderboardRows = Array.isArray(leaderboard.rows) ? leaderboard.rows : [];
       if (!fixture) {
-        return { fixture: null, stage: 'none', rows: [], summary: [] };
+        const emptyValue = { fixture: null, stage: 'none', rows: [], summary: [] };
+        MINI_FANTASY_RECENT_BOARD_CACHE = { key: cacheKey, value: emptyValue };
+        return emptyValue;
       }
       const matchNo = Number(fixture.match_no || 0) || null;
       const stage = miniFantasyRecentFixtureStage(fixture);
@@ -8195,7 +8308,7 @@ function titleBandScore(pick, live){
         .slice(0, 3)
         .map(([name, count]) => `${name} ${count}`);
 
-      return {
+      const value = {
         fixture,
         stage,
         rows,
@@ -8207,6 +8320,8 @@ function titleBandScore(pick, live){
           captainSplit.length ? `Captain split: ${captainSplit.join(' • ')}` : 'Captain split: waiting for captain choices'
         ]
       };
+      MINI_FANTASY_RECENT_BOARD_CACHE = { key: cacheKey, value };
+      return value;
     }
 
     function selectedMiniFantasyRecentRow(board = miniFantasyRecentFixtureBoardData()){
@@ -8374,7 +8489,16 @@ function titleBandScore(pick, live){
     }
 
     function miniFantasyLeaderboardData(){
-      return buildMiniFantasyLeaderboard({
+      const cacheKey = [
+        MINI_FANTASY_COMPUTE_REVISION,
+        LIVE_2026?.fetchedAt || '',
+        Number(LIVE_2026?.meta?.scoreHistory?.length || 0),
+        Number(LEAGUE_STAGE_SCHEDULE?.length || 0)
+      ].join('|');
+      if (MINI_FANTASY_LEADERBOARD_CACHE.key === cacheKey && MINI_FANTASY_LEADERBOARD_CACHE.value) {
+        return MINI_FANTASY_LEADERBOARD_CACHE.value;
+      }
+      const value = buildMiniFantasyLeaderboard({
         entries: currentMiniFantasyLeaderboardEntries(),
         liveData: LIVE_2026,
         schedule: LEAGUE_STAGE_SCHEDULE,
@@ -8382,6 +8506,8 @@ function titleBandScore(pick, live){
         profiles: currentMiniFantasyProfiles(),
         dailyBonuses: currentMiniFantasyDailyBonuses()
       });
+      MINI_FANTASY_LEADERBOARD_CACHE = { key: cacheKey, value };
+      return value;
     }
 
     function miniFantasyMedalLabel(medal){
@@ -8832,6 +8958,10 @@ function titleBandScore(pick, live){
             fixturePoints: 0
           }));
       const selectedRow = recentBoard.fixture ? selectedMiniFantasyRecentRow(recentBoard) : null;
+      if (usesHostedDuelsBackend() && MINI_FANTASY_PUBLIC_DATA_STATUS === 'loading' && !rows.length) {
+        panel.innerHTML = '<div class="fantasy-empty">Loading Mini Fantasy leaderboard and locked teams…</div>';
+        return;
+      }
       if (!rows.length) {
         panel.innerHTML = '<div class="fantasy-empty">No Mini Fantasy teams have been saved yet. Once lineups start locking, everyone will be ranked here by total points and the top three will show medal tags.</div>';
         return;
@@ -8891,6 +9021,10 @@ function titleBandScore(pick, live){
       const panel = document.getElementById('miniFantasyLockedViewer');
       if (!panel) return;
       const board = miniFantasyRecentFixtureBoardData();
+      if (usesHostedDuelsBackend() && MINI_FANTASY_PUBLIC_DATA_STATUS === 'loading' && !board.fixture) {
+        panel.innerHTML = '<div class="fantasy-empty">Loading the latest locked fixture and field view…</div>';
+        return;
+      }
       if (!board.fixture) {
         panel.innerHTML = '<div class="fantasy-empty">Once the first Mini Fantasy fixture locks, this area will turn into a fixture archive so you can inspect any past locked team from the leaderboard.</div>';
         return;
@@ -9390,6 +9524,11 @@ function titleBandScore(pick, live){
     }
 
     function renderMiniFantasySection(){
+      if (usesHostedDuelsBackend() && MINI_FANTASY_PUBLIC_DATA_STATUS === 'idle') {
+        setTimeout(() => {
+          queueMiniFantasyPublicDataLoad().catch(() => {});
+        }, 0);
+      }
       renderMiniFantasyFixtures();
       renderMiniFantasyBuilder();
       renderMiniFantasyLeaderboard();
@@ -9404,11 +9543,15 @@ function titleBandScore(pick, live){
       renderPublicDuelLayer();
       renderDuelStudio();
       renderPickPicker();
-      renderMiniFantasySection();
       document.getElementById('warRoomSection').classList.toggle('section-hidden', activeView !== 'warroom');
       document.getElementById('miniFantasySection').classList.toggle('section-hidden', activeView !== 'fantasy');
       document.getElementById('statsSection').classList.toggle('section-hidden', activeView !== 'stats');
       document.getElementById('scheduleSection').classList.toggle('section-hidden', activeView !== 'schedule');
+      if (activeView === 'fantasy') {
+        renderMiniFantasySection();
+      } else {
+        renderMiniFantasyPicker();
+      }
       renderStatsTab();
       renderScheduleTab();
       const matchup = activeMatchup();
@@ -9504,6 +9647,7 @@ function titleBandScore(pick, live){
 
         const fetched = normalizeFetchedLiveData(await res.json());
         Object.assign(LIVE_2026, fetched);
+        invalidateMiniFantasyComputedData();
 
         const providerBits = [
           fetched.provider || 'data/live.json',
@@ -9526,6 +9670,9 @@ function titleBandScore(pick, live){
       setRemoteMiniFantasyLeaderboardEntries([]);
       setRemoteMiniFantasyProfiles([]);
       setRemoteMiniFantasyDailyBonuses([]);
+      MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';
+      MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
+      MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE = true;
       resetMiniFantasyDrafts();
       if (usesHostedDuelsBackend()) {
         try {
@@ -9537,7 +9684,11 @@ function titleBandScore(pick, live){
       } else {
         CURRENT_USER = loadStoredUserProfile();
       }
-      await syncMiniFantasyEntries();
+      await syncMiniFantasyEntries({
+        includePublicData: false,
+        includeProfiles: false,
+        includeDailyBonuses: false
+      });
       renderDuelStudio();
       await loadWarRoomData().catch(() => {});
       await loadScheduleData().catch(() => {});
@@ -9545,10 +9696,19 @@ function titleBandScore(pick, live){
       await loadTeamRolesData().catch(() => {});
       await loadLiveData();
       await loadMiniFantasyPriceBook();
-      await maybeClaimMiniFantasyDailyVisitBonus().catch((error) => {
-        console.warn('Mini Fantasy daily visit bonus claim skipped during startup:', error);
-      });
       render();
+      setTimeout(() => {
+        if (activeView === 'fantasy') {
+          queueMiniFantasyPublicDataLoad().catch(() => {});
+          maybeClaimMiniFantasyDailyVisitBonus()
+            .then((claimed) => {
+              if (claimed && activeView === 'fantasy') renderMiniFantasySection();
+            })
+            .catch((error) => {
+              console.warn('Mini Fantasy daily visit bonus claim skipped during deferred startup:', error);
+            });
+        }
+      }, 0);
     }
 
     initializeDuelsApp();
