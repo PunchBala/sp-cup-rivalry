@@ -3,12 +3,13 @@ import assert from 'node:assert/strict';
 
 import {
   MINI_FANTASY_BUDGET,
-  buildPricingJobFromLiveData,
+  MINI_FANTASY_NEW_PLAYER_BASELINE_POINTS,
   buildMiniFantasyLeaderboard,
   buildMiniFantasyFixturePointsIndex,
   buildMiniFantasyPlayerPointsIndex,
   buildMiniFantasyPlayerId,
   buildFixturePlayerPool,
+  calculateMiniFantasyMissedLockPoints,
   deriveCompletedMatchHistories,
   generateMiniFantasyPriceBook,
   getMiniFantasyOpenFixtures,
@@ -622,75 +623,6 @@ test('generateMiniFantasyPriceBook keeps alias-matched LSG bowlers from falling 
   assert.equal(siddharth.last_match_played_at_utc, '2026-04-01T14:00:00Z');
 });
 
-test('buildPricingJobFromLiveData only marks recovered history when a previous blank record existed', () => {
-  const liveData = {
-    fetchedAt: '2026-04-09T00:10:00Z',
-    meta: {
-      scoreHistory: [
-        {
-          processedMatchCount: 5,
-          snapshot: {
-            meta: {
-              aggregates: {
-                playerMatches: {
-                  'Recovered Bowler': 1,
-                  'Brand New Star': 1
-                }
-              }
-            },
-            mvp: {
-              values: {
-                'Recovered Bowler': { score: 18 },
-                'Brand New Star': { score: 65 }
-              }
-            }
-          }
-        }
-      ]
-    }
-  };
-  const schedule = [
-    { match_no: 5, datetime_utc: '2026-04-09T14:00:00Z', home_team: 'Lucknow Super Giants', away_team: 'Delhi Capitals' }
-  ];
-  const squads = {
-    LSG: ['Recovered Bowler', 'Brand New Star']
-  };
-  const teamRoles = {
-    teams: {
-      LSG: {
-        players: {
-          'Recovered Bowler': 'bowler',
-          'Brand New Star': 'batter'
-        }
-      }
-    }
-  };
-  const previousPriceBook = {
-    players: [
-      {
-        player_id: buildMiniFantasyPlayerId('LSG', 'Recovered Bowler'),
-        final_price: 6,
-        matches_played: 0
-      }
-    ]
-  };
-
-  const input = buildPricingJobFromLiveData({
-    liveData,
-    schedule,
-    squads,
-    teamRoles,
-    previousPriceBook,
-    asOfUtc: '2026-04-09T00:10:00Z'
-  });
-
-  const recovered = input.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'Recovered Bowler'));
-  const brandNew = input.players.find((player) => player.player_id === buildMiniFantasyPlayerId('LSG', 'Brand New Star'));
-
-  assert.equal(recovered.recovered_history, true);
-  assert.equal(brandNew.recovered_history, false);
-});
-
 test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy points', () => {
   const liveData = {
     meta: {
@@ -775,11 +707,207 @@ test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy point
   assert.equal(leaderboard.rows[0].display_name, 'Senthil');
   assert.equal(leaderboard.rows[0].medal, 'gold');
   assert.equal(leaderboard.rows[1].medal, 'silver');
-  assert.equal(leaderboard.rows[0].total_points, 112);
-  assert.equal(leaderboard.rows[1].total_points, 98);
+  assert.equal(leaderboard.rows[0].total_points, 123.5);
+  assert.equal(leaderboard.rows[1].total_points, 107);
 });
 
-test('scoreMiniFantasyEntry adds +5 for each selected player from the winning side and skips no-result bonus', () => {
+test('buildMiniFantasyLeaderboard adds missed-lock relief, daily visit bonus, and new-player baseline points', () => {
+  const liveData = {
+    meta: {
+      cache: {
+        matchList: [
+          {
+            matchNo: 14,
+            status: 'Delhi Capitals won by 6 wkts',
+            teams: ['Delhi Capitals', 'Gujarat Titans']
+          }
+        ]
+      },
+      scoreHistory: [
+        {
+          processedMatchCount: 14,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'DC Batter': 1,
+                  'DC Bowler': 1,
+                  'GT Bowler': 1,
+                  'GT Keeper': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'DC Batter': { score: 40 },
+                'DC Bowler': { score: 20 },
+                'GT Bowler': { score: 10 },
+                'GT Keeper': { score: 12 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 14, datetime_utc: '2026-04-08T14:00:00Z', home_team: 'Delhi Capitals', away_team: 'Gujarat Titans' }
+  ];
+  const squads = {
+    DC: ['DC Batter', 'DC Bowler'],
+    GT: ['GT Bowler', 'GT Keeper']
+  };
+
+  const leaderboard = buildMiniFantasyLeaderboard({
+    entries: [
+      {
+        userId: 'user-senthil',
+        ownerHandle: 'senthil',
+        displayName: 'Senthil',
+        matchNo: 14,
+        selectedPlayerIds: [
+          buildMiniFantasyPlayerId('DC', 'DC Batter'),
+          buildMiniFantasyPlayerId('DC', 'DC Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Keeper')
+        ],
+        captainPlayerId: buildMiniFantasyPlayerId('DC', 'DC Batter')
+      },
+      {
+        userId: 'user-sai',
+        ownerHandle: 'sai',
+        displayName: 'Sai',
+        matchNo: 14,
+        selectedPlayerIds: [
+          buildMiniFantasyPlayerId('DC', 'DC Batter'),
+          buildMiniFantasyPlayerId('DC', 'DC Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Keeper')
+        ],
+        captainPlayerId: buildMiniFantasyPlayerId('GT', 'GT Keeper')
+      }
+    ],
+    liveData,
+    schedule,
+    squads,
+    profiles: [
+      { id: 'user-senthil', handle: 'senthil', display_name: 'Senthil', created_at: '2026-04-05T09:00:00Z' },
+      { id: 'user-sai', handle: 'sai', display_name: 'Sai', created_at: '2026-04-05T09:00:00Z' },
+      { id: 'user-kavi', handle: 'kavison', display_name: 'Kavison', created_at: '2026-04-05T09:00:00Z' },
+      { id: 'user-new', handle: 'newbie', display_name: 'Newbie', created_at: '2026-04-09T09:00:00Z' }
+    ],
+    dailyBonuses: [
+      { user_id: 'user-kavi', owner_handle: 'kavison', display_name: 'Kavison', bonus_date_ist: '2026-04-08', bonus_points: 5 },
+      { user_id: 'user-new', owner_handle: 'newbie', display_name: 'Newbie', bonus_date_ist: '2026-04-09', bonus_points: 5 }
+    ]
+  });
+
+  const senthil = leaderboard.rows.find((row) => row.owner_handle === 'senthil');
+  const kavi = leaderboard.rows.find((row) => row.owner_handle === 'kavison');
+  const newbie = leaderboard.rows.find((row) => row.owner_handle === 'newbie');
+
+  assert.equal(senthil.total_points, 123.5);
+  assert.equal(kavi.total_points, 51.1);
+  assert.equal(kavi.daily_bonus_points, 5);
+  assert.equal(kavi.missed_lock_points, 46.1);
+  assert.equal(kavi.matches[0].source, 'missed_lock_relief');
+  assert.equal(newbie.total_points, MINI_FANTASY_NEW_PLAYER_BASELINE_POINTS + 5);
+  assert.equal(newbie.new_player_baseline_points, MINI_FANTASY_NEW_PLAYER_BASELINE_POINTS);
+  assert.equal(newbie.daily_bonus_points, 5);
+  assert.equal(newbie.matches[0].source, 'new_player_baseline');
+});
+
+test('buildMiniFantasyLeaderboard uses profile created_at ahead of first saved-entry timestamp for baseline classification', () => {
+  const liveData = {
+    meta: {
+      cache: {
+        matchList: [
+          {
+            matchNo: 14,
+            status: 'Delhi Capitals won by 6 wkts',
+            teams: ['Delhi Capitals', 'Gujarat Titans']
+          }
+        ]
+      },
+      scoreHistory: [
+        {
+          processedMatchCount: 14,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'DC Batter': 1,
+                  'DC Bowler': 1,
+                  'GT Bowler': 1,
+                  'GT Keeper': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'DC Batter': { score: 40 },
+                'DC Bowler': { score: 20 },
+                'GT Bowler': { score: 10 },
+                'GT Keeper': { score: 12 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 14, datetime_utc: '2026-04-08T14:00:00Z', home_team: 'Delhi Capitals', away_team: 'Gujarat Titans' }
+  ];
+  const squads = {
+    DC: ['DC Batter', 'DC Bowler'],
+    GT: ['GT Bowler', 'GT Keeper']
+  };
+
+  const leaderboard = buildMiniFantasyLeaderboard({
+    entries: [
+      {
+        userId: 'user-early',
+        ownerHandle: 'earlybird',
+        displayName: 'Early Bird',
+        createdAt: '2026-04-10T09:00:00Z',
+        matchNo: 14,
+        selectedPlayerIds: [
+          buildMiniFantasyPlayerId('DC', 'DC Batter'),
+          buildMiniFantasyPlayerId('DC', 'DC Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Bowler'),
+          buildMiniFantasyPlayerId('GT', 'GT Keeper')
+        ],
+        captainPlayerId: buildMiniFantasyPlayerId('DC', 'DC Batter')
+      }
+    ],
+    liveData,
+    schedule,
+    squads,
+    profiles: [
+      { id: 'user-early', handle: 'earlybird', display_name: 'Early Bird', created_at: '2026-04-05T09:00:00Z' }
+    ]
+  });
+
+  const earlyBird = leaderboard.rows.find((row) => row.owner_handle === 'earlybird');
+  assert.equal(earlyBird.new_player_baseline_points, 0);
+  assert.equal(earlyBird.missed_lock_points, 0);
+  assert.equal(earlyBird.matches[0].source, 'locked_entry');
+  assert.equal(earlyBird.saved_entries, 1);
+});
+
+test('calculateMiniFantasyMissedLockPoints lowers the cap after the third missed lock', () => {
+  assert.deepEqual(calculateMiniFantasyMissedLockPoints(200, 1), {
+    cap: 50,
+    total: 50
+  });
+  assert.deepEqual(calculateMiniFantasyMissedLockPoints(200, 4), {
+    cap: 30,
+    total: 30
+  });
+});
+
+test('scoreMiniFantasyEntry applies appearance and winning bonuses before captain multiplier and zeroes no-result fixtures', () => {
   const entry = {
     matchNo: 14,
     selectedPlayerIds: [
@@ -842,9 +970,14 @@ test('scoreMiniFantasyEntry adds +5 for each selected player from the winning si
     schedule,
     squads
   });
-  assert.equal(scored.total_points, 112);
+  assert.equal(scored.total_points, 123.5);
+  assert.equal(scored.appearance_bonus_points, 8);
   assert.equal(scored.winner_bonus_points, 10);
   assert.equal(scored.winning_team_code, 'DC');
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 70.5);
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Bowler')], 27);
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Bowler')], 12);
+  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 14);
 
   const noResult = scoreMiniFantasyEntry({
     entry,
@@ -865,7 +998,10 @@ test('scoreMiniFantasyEntry adds +5 for each selected player from the winning si
     schedule,
     squads
   });
-  assert.equal(noResult.total_points, 102);
+  assert.equal(noResult.total_points, 0);
+  assert.equal(noResult.appearance_bonus_points, 0);
   assert.equal(noResult.winner_bonus_points, 0);
   assert.equal(noResult.winning_team_code, null);
+  assert.equal(noResult.is_no_result, true);
+  assert.equal(noResult.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 0);
 });

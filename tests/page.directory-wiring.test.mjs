@@ -79,6 +79,14 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /How Mini Fantasy works/);
   assert.match(html, /Fixture-only scoring:/);
   assert.match(html, /Lineup total:/);
+  assert.match(html, /scores 30\+ runs or faces 10\+ balls/);
+  assert.match(html, /each selected player who appears in the fixture gets <code>\+2<\/code>/);
+  assert.match(html, /duck penalty of -5/);
+  assert.match(html, /If a fixture ends with no result, every Mini Fantasy player score for that match becomes <code>0<\/code>/);
+  assert.match(html, /your captain gets <code>1\.5x<\/code> of every eligible point/);
+  assert.match(html, /Missed-lock safety net:/);
+  assert.match(html, /Fixture-day visit bonus:/);
+  assert.match(html, /New-player catch-up:/);
   assert.match(html, /Opens the day before/);
   assert.match(html, /Locks at/);
   assert.match(html, /data-directory-filter=/);
