@@ -8072,7 +8072,7 @@ function titleBandScore(pick, live){
         const availabilityMeta = IPL_PLAYER_AVAILABILITY?.[String(player.team || '').toUpperCase()]?.[normalizeName(player.name)] || null;
         return {
           ...player,
-          availabilityStatus: availabilityMeta?.status || '',
+          availabilityStatus: String(availabilityMeta?.status || '').toLowerCase() === 'available' ? '' : (availabilityMeta?.status || ''),
           availabilityNote: availabilityMeta?.note || '',
           availabilityReplacementFor: availabilityMeta?.replacementFor || '',
           availabilityReplacedBy: availabilityMeta?.replacedBy || ''
@@ -8083,7 +8083,6 @@ function titleBandScore(pick, live){
     function miniFantasyAvailabilityBadgeLabel(player){
       const status = String(player?.availabilityStatus || '').toLowerCase();
       if (!status) return '';
-      if (status === 'available') return 'Available';
       if (status === 'doubtful') return 'Doubtful';
       if (status === 'unavailable') return 'Unavailable';
       if (status === 'replaced') return 'Replaced';
