@@ -17,6 +17,12 @@ import {
   writeCachedScorecard
 } from '../scripts/update-live-data.mjs';
 
+function stripZeroEntries(mapObj = {}) {
+  return Object.fromEntries(
+    Object.entries(mapObj || {}).filter(([, value]) => Number(value || 0) !== 0)
+  );
+}
+
 function makeFinalScorecard({
   teams,
   winner,
@@ -31,6 +37,7 @@ function makeFinalScorecard({
   wickets,
   concededRuns,
   overs,
+  stumpings = 0,
   scoreA,
   scoreB
 }) {
@@ -62,7 +69,8 @@ function makeFinalScorecard({
         ],
         catching: [{
           catcher: { name: catcher },
-          catch: 1
+          catch: 1,
+          stumped: stumpings
         }],
         extras: {},
         inning: `${teams[0]} Inning 1`
@@ -198,6 +206,93 @@ test('historical rebuild tracks cache hits separately from paid API scorecard ca
   assert.equal(rebuilt.scoreHistory[2].processedMatchCount, 2);
   assert.equal(rebuilt.aggregates.battingRuns['Prabhsimran Singh'], 61);
   assert.equal(rebuilt.aggregates.battingRuns['Virat Kohli'], 88);
+});
+
+test('historical rebuild falls back to prior score history when a processed match cache is missing', async () => {
+  const scorecards = {
+    'match-1': makeFinalScorecard({
+      teams: ['Punjab Kings', 'Delhi Capitals'],
+      winner: 'Punjab Kings',
+      batter: 'Prabhsimran Singh',
+      bowler: 'Kuldeep Yadav',
+      catcher: 'Shashank Singh',
+      runs: 61,
+      balls: 36,
+      sixes: 3,
+      wickets: 2,
+      concededRuns: 31,
+      overs: '4',
+      scoreA: 176,
+      scoreB: 161
+    }),
+    'match-2': makeFinalScorecard({
+      teams: ['Royal Challengers Bengaluru', 'Rajasthan Royals'],
+      winner: 'Royal Challengers Bengaluru',
+      batter: 'Virat Kohli',
+      bowler: 'Jofra Archer',
+      catcher: 'Rajat Patidar',
+      runs: 88,
+      balls: 50,
+      sixes: 5,
+      wickets: 1,
+      concededRuns: 38,
+      overs: '4',
+      scoreA: 189,
+      scoreB: 175
+    })
+  };
+
+  const baseLive = {
+    meta: {
+      scoreHistory: [{ processedMatchCount: 0, fetchedAt: '2026-04-01T00:00:00.000Z' }]
+    }
+  };
+
+  const fullHistory = await rebuildHistoricalState(
+    ['match-1', 'match-2'],
+    baseLive,
+    {
+      includeHistory: true,
+      loadScorecard: async (matchId) => ({
+        data: scorecards[matchId],
+        source: 'cache'
+      })
+    }
+  );
+
+  const rebuilt = await rebuildHistoricalState(
+    ['match-1', 'match-2'],
+    {
+      meta: {
+        scoreHistory: fullHistory.scoreHistory
+      }
+    },
+    {
+      includeHistory: true,
+      loadScorecard: async (matchId) => {
+        if (matchId === 'match-2') {
+          throw new Error('Missing cached scorecard for processed match match-2');
+        }
+        return { data: scorecards[matchId], source: 'cache' };
+      }
+    }
+  );
+
+  assert.equal(rebuilt.cacheHits, 1);
+  assert.equal(rebuilt.apiCalls, 0);
+  assert.equal(rebuilt.historyFallbacks, 1);
+  assert.deepEqual(rebuilt.aggregates.battingRuns, fullHistory.aggregates.battingRuns);
+  assert.deepEqual(rebuilt.aggregates.catches, fullHistory.aggregates.catches);
+  assert.deepEqual(stripZeroEntries(rebuilt.aggregates.stumpings), stripZeroEntries(fullHistory.aggregates.stumpings));
+  assert.equal(rebuilt.scoreHistory.length, 3);
+  assert.deepEqual(
+    rebuilt.scoreHistory[2].snapshot.meta.aggregates.battingRuns,
+    fullHistory.scoreHistory[2].snapshot.meta.aggregates.battingRuns
+  );
+  assert.deepEqual(
+    stripZeroEntries(rebuilt.scoreHistory[2].snapshot.meta.aggregates.stumpings),
+    stripZeroEntries(fullHistory.scoreHistory[2].snapshot.meta.aggregates.stumpings)
+  );
 });
 
 test('stable processed match keys prevent duplicate backlog when CricketData rotates match ids', () => {
@@ -408,7 +503,11 @@ test('historical replay snapshots apply the 10-ball strike-rate gate and duck pe
                 w: 2,
                 r: 30
               }],
-              catching: [],
+              catching: [{
+                catcher: { name: 'Jitesh Sharma' },
+                catch: 0,
+                stumped: 1
+              }],
               extras: {},
               inning: 'Mumbai Indians Inning 1'
             },
@@ -444,6 +543,7 @@ test('historical replay snapshots apply the 10-ball strike-rate gate and duck pe
   const snapshot = rebuilt.scoreHistory.find((entry) => entry.processedMatchCount === 1)?.snapshot;
   assert.equal(snapshot?.mvp?.values?.['Surya Kumar Yadav']?.score, 30);
   assert.equal(snapshot?.mvp?.values?.['Travis Head']?.score, -5);
+  assert.equal(snapshot?.mvp?.values?.['Jitesh Sharma']?.score, 12);
 });
 
 test('standings still update when scorecard omits the top-level score summary', async () => {

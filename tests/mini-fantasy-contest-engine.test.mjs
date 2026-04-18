@@ -94,7 +94,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Vijaykumar Vyshak': 1,
                   'Tilak Varma': 1,
                   'Vaibhav Sooryavanshi': 1,
-                  'Suryakumar Yadav': 1
+                  'Suryakumar Yadav': 1,
+                  'AM Ghazanfar': 1
                 }
               }
             },
@@ -106,7 +107,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Vijaykumar Vyshak': { score: 25 },
                 'Tilak Varma': { score: 15 },
                 'Vaibhav Sooryavanshi': { score: 52 },
-                'Suryakumar Yadav': { score: 33 }
+                'Suryakumar Yadav': { score: 33 },
+                'AM Ghazanfar': { score: 44 }
               }
             }
           }
@@ -123,7 +125,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Vijaykumar Vyshak': 2,
                   'Tilak Varma': 2,
                   'Vaibhav Sooryavanshi': 1,
-                  'Suryakumar Yadav': 2
+                  'Suryakumar Yadav': 2,
+                  'AM Ghazanfar': 2
                 }
               }
             },
@@ -135,7 +138,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Vijaykumar Vyshak': { score: 60 },
                 'Tilak Varma': { score: 25 },
                 'Vaibhav Sooryavanshi': { score: 52 },
-                'Suryakumar Yadav': { score: 83 }
+                'Suryakumar Yadav': { score: 83 },
+                'AM Ghazanfar': { score: 96 }
               }
             }
           }
@@ -156,6 +160,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
   assert.deepEqual(resolvePlayerHistory('N. Tilak Varma', histories)?.match_points, [15, 10]);
   assert.deepEqual(resolvePlayerHistory('Vaibhav Suryavanshi', histories)?.match_points, [52]);
   assert.deepEqual(resolvePlayerHistory('Surya Kumar Yadav', histories)?.match_points, [33, 50]);
+  assert.deepEqual(resolvePlayerHistory('Allah Ghazanfar', histories)?.match_points, [44, 52]);
 });
 
 test('buildMiniFantasyPlayerPointsIndex keeps completed fixture points for Surya Kumar Yadav aliases', () => {
@@ -481,6 +486,102 @@ test('generateMiniFantasyPriceBook and buildFixturePlayerPool work from live his
   assert.equal(pool.find((player) => player.name === 'GT Bowler')?.season_total_points, 18);
   assert.equal(pool.find((player) => player.name === 'DC Batter')?.last_match_points, 62);
   assert.equal(pool.find((player) => player.name === 'GT Bowler')?.last_match_points, 18);
+
+  const legacyPriceBook = {
+    ...priceBook,
+    players: priceBook.players.map((player) => {
+      const legacyPlayer = { ...player };
+      delete legacyPlayer.season_total_points;
+      return legacyPlayer;
+    })
+  };
+
+  const legacyPool = buildFixturePlayerPool({
+    fixture: {
+      match_no: 14,
+      home_team: 'Delhi Capitals',
+      away_team: 'Gujarat Titans',
+      home_team_code: 'DC',
+      away_team_code: 'GT'
+    },
+    priceBook: legacyPriceBook,
+    squads,
+    teamRoles
+  });
+
+  assert.equal(legacyPool.find((player) => player.name === 'DC Batter')?.season_total_points, 62);
+  assert.equal(legacyPool.find((player) => player.name === 'GT Bowler')?.season_total_points, 18);
+});
+
+test('generateMiniFantasyPriceBook matches Allah Ghazanfar against AM Ghazanfar history', () => {
+  const liveData = {
+    fetchedAt: '2026-04-18T00:10:00Z',
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 1,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'AM Ghazanfar': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'AM Ghazanfar': { score: 44 }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 2,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'AM Ghazanfar': 2
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'AM Ghazanfar': { score: 96 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 1, datetime_utc: '2026-04-10T14:00:00Z', home_team: 'Mumbai Indians', away_team: 'Chennai Super Kings' },
+    { match_no: 2, datetime_utc: '2026-04-12T14:00:00Z', home_team: 'Mumbai Indians', away_team: 'Delhi Capitals' }
+  ];
+  const squads = {
+    MI: ['Allah Ghazanfar']
+  };
+  const teamRoles = {
+    teams: {
+      MI: { players: { 'Allah Ghazanfar': 'bowler' } }
+    }
+  };
+
+  const priceBook = generateMiniFantasyPriceBook({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    asOfUtc: '2026-04-18T00:10:00Z'
+  });
+
+  const player = priceBook.players.find((entry) => entry.name === 'Allah Ghazanfar');
+  assert.ok(player);
+  assert.equal(player.matches_played, 2);
+  assert.equal(player.season_total_points, 96);
+  assert.equal(player.last_match_points, 52);
+  assert.equal(player.final_price > 6, true);
 });
 
 test('generateMiniFantasyPriceBook marks uncapped players and caps them at 9 credits', () => {

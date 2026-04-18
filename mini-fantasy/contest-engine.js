@@ -184,6 +184,39 @@ const NAME_TOKEN_EXPANSIONS = Object.freeze({
   suryakumar: Object.freeze(['surya', 'kumar'])
 });
 
+const EXPLICIT_NAME_ALIASES = Object.freeze({
+  'allah ghazanfar': Object.freeze([
+    'am ghazanfar',
+    'allah mohammad ghazanfar',
+    'allah mohammed ghazanfar',
+    'allah mohammad ghafanzar'
+  ]),
+  'am ghazanfar': Object.freeze([
+    'allah ghazanfar',
+    'allah mohammad ghazanfar',
+    'allah mohammed ghazanfar',
+    'allah mohammad ghafanzar'
+  ]),
+  'allah mohammad ghazanfar': Object.freeze([
+    'allah ghazanfar',
+    'am ghazanfar',
+    'allah mohammed ghazanfar',
+    'allah mohammad ghafanzar'
+  ]),
+  'allah mohammed ghazanfar': Object.freeze([
+    'allah ghazanfar',
+    'am ghazanfar',
+    'allah mohammad ghazanfar',
+    'allah mohammad ghafanzar'
+  ]),
+  'allah mohammad ghafanzar': Object.freeze([
+    'allah ghazanfar',
+    'am ghazanfar',
+    'allah mohammad ghazanfar',
+    'allah mohammad ghazanfar'
+  ])
+});
+
 export function slugify(value) {
   return normalizeWhitespace(value)
     .normalize('NFKD')
@@ -239,6 +272,7 @@ function buildNameAliasKeys(value) {
   const rawTokens = tokenizeAliasName(value);
   const significantTokens = tokenizeAliasName(value, { dropInitials: true });
   const keys = new Set();
+  const normalizedValue = normalizeName(value);
 
   addAliasKey(keys, rawTokens);
   if (significantTokens.length && significantTokens.length !== rawTokens.length) {
@@ -259,7 +293,21 @@ function buildNameAliasKeys(value) {
     }
   }
 
+  (EXPLICIT_NAME_ALIASES[normalizedValue] || []).forEach((aliasName) => {
+    addAliasKey(keys, tokenizeAliasName(aliasName));
+    addAliasKey(keys, tokenizeAliasName(aliasName, { dropInitials: true }));
+  });
+
   return [...keys].filter(Boolean);
+}
+
+function hasExplicitAliasMatch(targetName, candidateName) {
+  const targetAliases = EXPLICIT_NAME_ALIASES[normalizeName(targetName)] || [];
+  const candidateAliases = EXPLICIT_NAME_ALIASES[normalizeName(candidateName)] || [];
+  const normalizedCandidate = normalizeName(candidateName);
+  const normalizedTarget = normalizeName(targetName);
+  return targetAliases.some((alias) => normalizeName(alias) === normalizedCandidate)
+    || candidateAliases.some((alias) => normalizeName(alias) === normalizedTarget);
 }
 
 function countSharedAliasTokens(a, b) {
@@ -322,6 +370,7 @@ export function resolvePlayerHistory(playerName, historyMap = new Map()) {
     const candidateName = history?.player_name || fallbackKey;
     const candidateTokens = tokenizeAliasName(candidateName, { dropInitials: true });
     const sharedTokens = countSharedAliasTokens(playerName, candidateName);
+    const explicitAliasMatch = hasExplicitAliasMatch(playerName, candidateName);
     const subsetMatch =
       areAliasTokensSubset(targetSignificantTokens, candidateTokens) ||
       areAliasTokensSubset(candidateTokens, targetSignificantTokens);
@@ -331,7 +380,7 @@ export function resolvePlayerHistory(playerName, historyMap = new Map()) {
     if (!directAliasMatch && sharedTokens < 2) {
       return;
     }
-    if (!subsetMatch && overlap < 0.67) {
+    if (!explicitAliasMatch && !subsetMatch && overlap < 0.67) {
       return;
     }
     matches.push(history);
@@ -786,6 +835,12 @@ export function buildFixturePlayerPool({
       const playerId = buildMiniFantasyPlayerId(teamCode, playerName);
       const price = priceMap.get(playerId);
       const role = resolveRoleFromTeamMap(teamCode, playerName, roleLookup[teamCode] || {});
+      const matchesPlayed = Number(price?.matches_played || 0);
+      const seasonTotalPoints = Number.isFinite(Number(price?.season_total_points))
+        ? Number(price.season_total_points)
+        : (matchesPlayed && Number.isFinite(Number(price?.season_avg_points))
+          ? roundTo(Number(price.season_avg_points) * matchesPlayed, 2)
+          : 0);
       return {
         player_id: playerId,
         name: playerName,
@@ -796,8 +851,8 @@ export function buildFixturePlayerPool({
         pricing_eligible: price?.pricing_eligible ?? Boolean(role),
         final_price: Number.isFinite(price?.final_price) ? price.final_price : DEFAULT_PRICE_JOB_META.default_initial_price,
         old_price: price?.old_price ?? null,
-        matches_played: Number(price?.matches_played || 0),
-        season_total_points: Number(price?.season_total_points || 0),
+        matches_played: matchesPlayed,
+        season_total_points: seasonTotalPoints,
         last_match_points: Number(price?.last_match_points || 0),
         adjusted_score: Number(price?.adjusted_score || 0),
         last_match_played_at_utc: price?.last_match_played_at_utc || null
