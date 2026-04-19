@@ -14,6 +14,7 @@ import {
   generateMiniFantasyPriceBook,
   getMiniFantasyOpenFixtures,
   resolvePlayerHistory,
+  serializeMiniFantasyLeaderboardRows,
   scoreMiniFantasyEntry,
   validateMiniFantasyEntry
 } from '../mini-fantasy/contest-engine.js';
@@ -94,7 +95,11 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Vijaykumar Vyshak': 1,
                   'Tilak Varma': 1,
                   'Vaibhav Sooryavanshi': 1,
-                  'Suryakumar Yadav': 1
+                  'Suryakumar Yadav': 1,
+                  'AM Ghazanfar': 1,
+                  'Philip Salt': 1,
+                  'Lungi Ngidi': 1,
+                  'Lhuan-dre Pretorius': 1
                 }
               }
             },
@@ -106,7 +111,11 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Vijaykumar Vyshak': { score: 25 },
                 'Tilak Varma': { score: 15 },
                 'Vaibhav Sooryavanshi': { score: 52 },
-                'Suryakumar Yadav': { score: 33 }
+                'Suryakumar Yadav': { score: 33 },
+                'AM Ghazanfar': { score: 44 },
+                'Philip Salt': { score: 49 },
+                'Lungi Ngidi': { score: 28 },
+                'Lhuan-dre Pretorius': { score: 35 }
               }
             }
           }
@@ -123,7 +132,12 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Vijaykumar Vyshak': 2,
                   'Tilak Varma': 2,
                   'Vaibhav Sooryavanshi': 1,
-                  'Suryakumar Yadav': 2
+                  'Suryakumar Yadav': 2,
+                  'AM Ghazanfar': 2,
+                  'Philip Salt': 2,
+                  'Lungisani Ngidi': 1,
+                  'Lungi Ngidi': 1,
+                  'Lhuan-dre Pretorius': 2
                 }
               }
             },
@@ -135,7 +149,12 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Vijaykumar Vyshak': { score: 60 },
                 'Tilak Varma': { score: 25 },
                 'Vaibhav Sooryavanshi': { score: 52 },
-                'Suryakumar Yadav': { score: 83 }
+                'Suryakumar Yadav': { score: 83 },
+                'AM Ghazanfar': { score: 96 },
+                'Philip Salt': { score: 67 },
+                'Lungisani Ngidi': { score: 51 },
+                'Lungi Ngidi': { score: 79 },
+                'Lhuan-dre Pretorius': { score: 80 }
               }
             }
           }
@@ -156,6 +175,10 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
   assert.deepEqual(resolvePlayerHistory('N. Tilak Varma', histories)?.match_points, [15, 10]);
   assert.deepEqual(resolvePlayerHistory('Vaibhav Suryavanshi', histories)?.match_points, [52]);
   assert.deepEqual(resolvePlayerHistory('Surya Kumar Yadav', histories)?.match_points, [33, 50]);
+  assert.deepEqual(resolvePlayerHistory('Allah Ghazanfar', histories)?.match_points, [44, 52]);
+  assert.deepEqual(resolvePlayerHistory('Phil Salt', histories)?.match_points, [49, 18]);
+  assert.deepEqual(resolvePlayerHistory('Lungisani Ngidi', histories)?.match_points, [28, 51]);
+  assert.deepEqual(resolvePlayerHistory('Lhuan-dre Pretorious', histories)?.match_points, [35, 45]);
 });
 
 test('buildMiniFantasyPlayerPointsIndex keeps completed fixture points for Surya Kumar Yadav aliases', () => {
@@ -481,6 +504,255 @@ test('generateMiniFantasyPriceBook and buildFixturePlayerPool work from live his
   assert.equal(pool.find((player) => player.name === 'GT Bowler')?.season_total_points, 18);
   assert.equal(pool.find((player) => player.name === 'DC Batter')?.last_match_points, 62);
   assert.equal(pool.find((player) => player.name === 'GT Bowler')?.last_match_points, 18);
+
+  const legacyPriceBook = {
+    ...priceBook,
+    players: priceBook.players.map((player) => {
+      const legacyPlayer = { ...player };
+      delete legacyPlayer.season_total_points;
+      return legacyPlayer;
+    })
+  };
+
+  const legacyPool = buildFixturePlayerPool({
+    fixture: {
+      match_no: 14,
+      home_team: 'Delhi Capitals',
+      away_team: 'Gujarat Titans',
+      home_team_code: 'DC',
+      away_team_code: 'GT'
+    },
+    priceBook: legacyPriceBook,
+    squads,
+    teamRoles
+  });
+
+  assert.equal(legacyPool.find((player) => player.name === 'DC Batter')?.season_total_points, 62);
+  assert.equal(legacyPool.find((player) => player.name === 'GT Bowler')?.season_total_points, 18);
+});
+
+test('generateMiniFantasyPriceBook matches Allah Ghazanfar against AM Ghazanfar history', () => {
+  const liveData = {
+    fetchedAt: '2026-04-18T00:10:00Z',
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 1,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'AM Ghazanfar': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'AM Ghazanfar': { score: 44 }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 2,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'AM Ghazanfar': 2
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'AM Ghazanfar': { score: 96 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 1, datetime_utc: '2026-04-10T14:00:00Z', home_team: 'Mumbai Indians', away_team: 'Chennai Super Kings' },
+    { match_no: 2, datetime_utc: '2026-04-12T14:00:00Z', home_team: 'Mumbai Indians', away_team: 'Delhi Capitals' }
+  ];
+  const squads = {
+    MI: ['Allah Ghazanfar']
+  };
+  const teamRoles = {
+    teams: {
+      MI: { players: { 'Allah Ghazanfar': 'bowler' } }
+    }
+  };
+
+  const priceBook = generateMiniFantasyPriceBook({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    asOfUtc: '2026-04-18T00:10:00Z'
+  });
+
+  const player = priceBook.players.find((entry) => entry.name === 'Allah Ghazanfar');
+  assert.ok(player);
+  assert.equal(player.matches_played, 2);
+  assert.equal(player.season_total_points, 96);
+  assert.equal(player.last_match_points, 52);
+  assert.equal(player.final_price > 6, true);
+});
+
+test('generateMiniFantasyPriceBook matches Phil Salt and Lungisani Ngidi against split history aliases', () => {
+  const liveData = {
+    fetchedAt: '2026-04-18T00:10:00Z',
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 1,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Philip Salt': 1,
+                  'Lungi Ngidi': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Philip Salt': { score: 49 },
+                'Lungi Ngidi': { score: 28 }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 2,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Philip Salt': 2,
+                  'Lungi Ngidi': 1,
+                  'Lungisani Ngidi': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Philip Salt': { score: 67 },
+                'Lungi Ngidi': { score: 28 },
+                'Lungisani Ngidi': { score: 51 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 1, datetime_utc: '2026-04-17T14:00:00Z' },
+    { match_no: 2, datetime_utc: '2026-04-18T14:00:00Z' }
+  ];
+  const squads = {
+    RCB: ['Phil Salt'],
+    DC: ['Lungisani Ngidi']
+  };
+  const teamRoles = {
+    teams: {
+      RCB: { players: { 'Phil Salt': 'wicket_keeper' } },
+      DC: { players: { 'Lungisani Ngidi': 'bowler' } }
+    }
+  };
+
+  const priceBook = generateMiniFantasyPriceBook({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    asOfUtc: '2026-04-18T00:10:00Z'
+  });
+
+  const salt = priceBook.players.find((entry) => entry.name === 'Phil Salt');
+  const ngidi = priceBook.players.find((entry) => entry.name === 'Lungisani Ngidi');
+  assert.ok(salt);
+  assert.equal(salt.matches_played, 2);
+  assert.equal(salt.season_total_points, 67);
+  assert.equal(salt.last_match_points, 18);
+  assert.ok(ngidi);
+  assert.equal(ngidi.matches_played, 2);
+  assert.equal(ngidi.season_total_points, 79);
+  assert.equal(ngidi.last_match_points, 51);
+});
+
+test('generateMiniFantasyPriceBook matches Lhuan-dre Pretorious against Pretorius history', () => {
+  const liveData = {
+    fetchedAt: '2026-04-18T00:10:00Z',
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 1,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Lhuan-dre Pretorius': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Lhuan-dre Pretorius': { score: 35 }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 2,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Lhuan-dre Pretorius': 2
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Lhuan-dre Pretorius': { score: 80 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 1, datetime_utc: '2026-04-17T14:00:00Z' },
+    { match_no: 2, datetime_utc: '2026-04-18T14:00:00Z' }
+  ];
+  const squads = {
+    RR: ['Lhuan-dre Pretorious']
+  };
+  const teamRoles = {
+    teams: {
+      RR: { players: { 'Lhuan-dre Pretorius': 'wicket_keeper' } }
+    }
+  };
+
+  const priceBook = generateMiniFantasyPriceBook({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    asOfUtc: '2026-04-18T00:10:00Z'
+  });
+
+  const pretorious = priceBook.players.find((entry) => entry.name === 'Lhuan-dre Pretorious');
+  assert.ok(pretorious);
+  assert.equal(pretorious.matches_played, 2);
+  assert.equal(pretorious.season_total_points, 80);
+  assert.equal(pretorious.last_match_points, 45);
 });
 
 test('generateMiniFantasyPriceBook marks uncapped players and caps them at 9 credits', () => {
@@ -902,6 +1174,71 @@ test('buildMiniFantasyLeaderboard uses profile created_at ahead of first saved-e
   assert.equal(earlyBird.missed_lock_points, 0);
   assert.equal(earlyBird.matches[0].source, 'locked_entry');
   assert.equal(earlyBird.saved_entries, 1);
+});
+
+test('serializeMiniFantasyLeaderboardRows keeps the leaderboard snapshot shape stable for database publishing', () => {
+  const rows = serializeMiniFantasyLeaderboardRows({
+    leaderboard: {
+      completed_match_count: 14,
+      rows: [
+        {
+          owner_handle: 'senthil',
+          user_id: 'user-senthil',
+          display_name: 'Senthil',
+          rank: 1,
+          medal: 'gold',
+          total_points: 123.5,
+          saved_entries: 2,
+          scored_entries: 2,
+          pending_entries: 0,
+          latest_saved_at: '2026-04-10T15:00:00Z',
+          daily_bonus_points: 5,
+          missed_lock_points: 10,
+          new_player_baseline_points: 40,
+          matches: [
+            {
+              match_no: 14,
+              total_points: 83.5,
+              source: 'locked_entry'
+            }
+          ]
+        }
+      ]
+    },
+    liveData: {
+      fetchedAt: '2026-04-19T10:00:00Z'
+    },
+    generatedAtUtc: '2026-04-19T10:05:00Z'
+  });
+
+  assert.deepEqual(rows, [
+    {
+      season: 'IPL 2026',
+      owner_handle: 'senthil',
+      user_id: 'user-senthil',
+      display_name: 'Senthil',
+      rank: 1,
+      medal: 'gold',
+      total_points: 123.5,
+      saved_entries: 2,
+      scored_entries: 2,
+      pending_entries: 0,
+      latest_saved_at: '2026-04-10T15:00:00Z',
+      daily_bonus_points: 5,
+      missed_lock_points: 10,
+      new_player_baseline_points: 40,
+      completed_match_count: 14,
+      matches: [
+        {
+          match_no: 14,
+          total_points: 83.5,
+          source: 'locked_entry'
+        }
+      ],
+      live_data_fetched_at: '2026-04-19T10:00:00Z',
+      generated_at: '2026-04-19T10:05:00Z'
+    }
+  ]);
 });
 
 test('calculateMiniFantasyMissedLockPoints lowers the cap after the third missed lock', () => {

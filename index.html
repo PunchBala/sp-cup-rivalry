@@ -928,6 +928,10 @@
     .fantasy-picker-badge{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,200,87,.32);background:rgba(255,200,87,.14);color:#ffe2a8;font-size:11px;font-weight:800;letter-spacing:.01em}
     .fantasy-picker-meta-row .fantasy-picker-badge{margin-top:0}
     .fantasy-picker-badge.current{border-color:rgba(95,240,200,.28);background:rgba(95,240,200,.14);color:#c6ffe9}
+    .fantasy-picker-badge.availability-available{border-color:rgba(95,240,200,.28);background:rgba(95,240,200,.12);color:#c6ffe9}
+    .fantasy-picker-badge.availability-doubtful{border-color:rgba(255,200,87,.32);background:rgba(255,200,87,.14);color:#ffe2a8}
+    .fantasy-picker-badge.availability-unavailable,
+    .fantasy-picker-badge.availability-replaced{border-color:rgba(255,118,118,.34);background:rgba(255,118,118,.12);color:#ffc7c7}
     .fantasy-picker-captain-btn{
       display:inline-flex;
       align-items:center;
@@ -1143,7 +1147,7 @@
           <div class="pill">Team/table better-prediction rows still stay at 1 point</div>
           <div class="pill">Least MVP: lower in custom MVP ranking wins (min 5 games)</div>
           <div class="pill">Tie-aware stat ranking: equal values share rank and the next lower value skips accordingly</div>
-          <div class="pill">Custom MVP = Runs + (6s×2) + (Wkts×20) + (Dots×1.5) + (Catches×8)</div>
+          <div class="pill">Custom MVP = Runs + (6s×2) + (Wkts×20) + (Dots×1.5) + (Catches×8) + (Stumpings×12)</div>
           <div class="pill">MVP bonuses: batting SR, bowling economy, 50/100, quick 30+, 3w/4w/5w</div>
           <div class="pill">Striker: minimum 100 runs required</div>
           <div class="pill">Best bowling strike rate: minimum 12 overs required</div>
@@ -1207,7 +1211,7 @@
                   <div class="fantasy-guide-heading">Mini Fantasy scoring</div>
                   <ul class="fantasy-guide-list">
                     <li><strong>Fixture-only scoring:</strong> your 4-player team scores only from the fixture it locked against. There is no season carry-over into that match score.</li>
-                    <li><strong>Same MVP engine as Nerd Room / Duel:</strong> base player points are <code>runs + (sixes x 2) + (wickets x 20) + (dot balls x 1.5) + (catches x 8)</code>.</li>
+                <li><strong>Same MVP engine as Nerd Room / Duel:</strong> base player points are <code>runs + (sixes x 2) + (wickets x 20) + (dot balls x 1.5) + (catches x 8) + (stumpings x 12)</code>.</li>
                     <li><strong>Batting strike-rate bonus:</strong> applies once a batter either scores 30+ runs or faces 10+ balls, then SR above 170 = +8, above 150 = +5, above 130 = +2, below 100 = -5.</li>
                     <li><strong>Bowling economy bonus:</strong> minimum 2 overs, then economy below 6 = +8, below 7 = +5, below 8 = +2, above 10 = -5.</li>
                     <li><strong>Milestone bonuses:</strong> fifty +10, hundred +25, quick 30 under 15 balls +8, 3 wickets +12, 4 wickets +20, 5 wickets +30, and a duck penalty of -5 when a batter is dismissed for 0.</li>
@@ -1444,17 +1448,20 @@
     let REMOTE_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_MINI_FANTASY_ENTRIES = [];
     let REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = [];
+    let REMOTE_MINI_FANTASY_LEADERBOARD_ROWS = [];
     let REMOTE_MINI_FANTASY_PROFILES = [];
     let REMOTE_MINI_FANTASY_DAILY_BONUSES = [];
     let MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';
     let MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
     let MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE = true;
+    let MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = false;
     let MINI_FANTASY_COMPUTE_REVISION = 0;
     let MINI_FANTASY_LEADERBOARD_CACHE = { key: '', value: null };
     let MINI_FANTASY_RECENT_BOARD_CACHE = { key: '', value: null };
     const DUELS_BACKEND = window.DUELS_BACKEND_API || window.createDuelsBackend?.(window.DUELS_BACKEND_CONFIG || {}) || { enabled: false, label: 'Local beta storage' };
     let DUEL_STUDIO_NOTICE = null;
     let IPL_SQUADS = {};
+    let IPL_PLAYER_AVAILABILITY = {};
     let IPL_TEAM_ROLES = {};
     let MINI_FANTASY_PRICE_BOOK = null;
     let MINI_FANTASY_NOTICE = null;
@@ -3963,6 +3970,43 @@ function titleBandScore(pick, live){
       invalidateMiniFantasyComputedData();
     }
 
+    function normalizePlayerAvailabilityData(data){
+      const normalized = {};
+      Object.entries(data && typeof data === 'object' && !Array.isArray(data) ? data : {}).forEach(([teamCode, playerMap]) => {
+        const teamKey = String(teamCode || '').toUpperCase();
+        if (!teamKey) return;
+        normalized[teamKey] = {};
+        Object.entries(playerMap && typeof playerMap === 'object' && !Array.isArray(playerMap) ? playerMap : {}).forEach(([playerName, meta]) => {
+          const key = normalizeName(playerName);
+          if (!key) return;
+          normalized[teamKey][key] = {
+            status: String(meta?.status || '').toLowerCase(),
+            note: String(meta?.note || ''),
+            replacementFor: String(meta?.replacement_for || ''),
+            replacedBy: String(meta?.replaced_by || '')
+          };
+        });
+      });
+      return normalized;
+    }
+
+    async function loadPlayerAvailabilityData(){
+      try {
+        const cacheBust = `t=${Date.now()}`;
+        const res = await fetch(`ipl_2026_player_availability.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        IPL_PLAYER_AVAILABILITY = normalizePlayerAvailabilityData(data);
+      } catch (err) {
+        console.warn('Falling back to empty player availability directory', err);
+        IPL_PLAYER_AVAILABILITY = {};
+      }
+      invalidateMiniFantasyComputedData();
+    }
+
     async function loadTeamRolesData(){
       try {
         const cacheBust = `t=${Date.now()}`;
@@ -4232,7 +4276,7 @@ function titleBandScore(pick, live){
     function queueMiniFantasyPublicDataLoad({ force = false } = {}){
       if (!usesHostedDuelsBackend() || activeView !== 'fantasy') return Promise.resolve([]);
       if (!force && (MINI_FANTASY_PUBLIC_DATA_STATUS === 'loading' || MINI_FANTASY_PUBLIC_DATA_STATUS === 'ready')) {
-        return MINI_FANTASY_PUBLIC_DATA_PROMISE || Promise.resolve(currentMiniFantasyLeaderboardEntries());
+        return MINI_FANTASY_PUBLIC_DATA_PROMISE || Promise.resolve(currentMiniFantasyLeaderboardRows());
       }
       MINI_FANTASY_PUBLIC_DATA_STATUS = 'loading';
       MINI_FANTASY_PUBLIC_DATA_PROMISE = Promise.resolve().then(() => syncMiniFantasyEntries({
@@ -4246,7 +4290,7 @@ function titleBandScore(pick, live){
       }).catch((error) => {
         MINI_FANTASY_PUBLIC_DATA_STATUS = 'error';
         console.warn('Mini Fantasy public leaderboard sync skipped:', error);
-        return currentMiniFantasyLeaderboardEntries();
+        return currentMiniFantasyLeaderboardRows();
       }).finally(() => {
         MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
         if (activeView === 'fantasy') {
@@ -4266,6 +4310,13 @@ function titleBandScore(pick, live){
       REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = Array.isArray(entries) ? cloneJson(entries) : [];
       invalidateMiniFantasyComputedData();
       return REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES;
+    }
+
+    function setRemoteMiniFantasyLeaderboardRows(rows = []){
+      REMOTE_MINI_FANTASY_LEADERBOARD_ROWS = Array.isArray(rows) ? cloneJson(rows) : [];
+      MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = false;
+      invalidateMiniFantasyComputedData();
+      return REMOTE_MINI_FANTASY_LEADERBOARD_ROWS;
     }
 
     function setRemoteMiniFantasyProfiles(profiles = []){
@@ -4289,6 +4340,7 @@ function titleBandScore(pick, live){
           && normalizeTextValue(item.bonusDateIst || item.bonus_date_ist || item.dateKey || '') === safeDateKey));
       nextBonuses.push(cloneJson(bonus));
       REMOTE_MINI_FANTASY_DAILY_BONUSES = nextBonuses;
+      MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = true;
       invalidateMiniFantasyComputedData();
       return bonus;
     }
@@ -4303,6 +4355,7 @@ function titleBandScore(pick, live){
         .filter((item) => miniFantasyEntryStoreKey(item) !== miniFantasyEntryStoreKey(entry));
       leaderboardEntries.push(cloneJson(entry));
       REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = leaderboardEntries;
+      MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = true;
       invalidateMiniFantasyComputedData();
       return entry;
     }
@@ -4319,6 +4372,10 @@ function titleBandScore(pick, live){
       return usesHostedDuelsBackend()
         ? (REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES || [])
         : loadStoredMiniFantasyEntriesStore().entries;
+    }
+
+    function currentMiniFantasyLeaderboardRows(){
+      return usesHostedDuelsBackend() ? (REMOTE_MINI_FANTASY_LEADERBOARD_ROWS || []) : [];
     }
 
     function currentMiniFantasyProfiles(){
@@ -4361,7 +4418,7 @@ function titleBandScore(pick, live){
       }
       try {
         const shouldLoadDailyBonuses = includeDailyBonuses && MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE;
-        const [entries, leaderboardEntries, profiles, dailyBonuses] = await Promise.all([
+        const [entries, leaderboardEntries, leaderboardRows, profiles, dailyBonuses] = await Promise.all([
           CURRENT_USER
             ? DUELS_BACKEND.listMiniFantasyEntries({
                 season: MINI_FANTASY_SEASON,
@@ -4374,6 +4431,15 @@ function titleBandScore(pick, live){
                 currentUser: CURRENT_USER
               })
             : Promise.resolve(REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES || []),
+          includePublicData
+            ? DUELS_BACKEND.listMiniFantasyLeaderboardRows({
+                season: MINI_FANTASY_SEASON,
+                currentUser: CURRENT_USER
+              }).catch((error) => {
+                console.warn('Hosted mini fantasy leaderboard snapshot load failed:', error);
+                return REMOTE_MINI_FANTASY_LEADERBOARD_ROWS || [];
+              })
+            : Promise.resolve(REMOTE_MINI_FANTASY_LEADERBOARD_ROWS || []),
           includeProfiles
             ? DUELS_BACKEND.listPublicMiniFantasyProfiles({
                 currentUser: CURRENT_USER
@@ -4396,6 +4462,7 @@ function titleBandScore(pick, live){
         ]);
         setRemoteMiniFantasyEntries(entries || []);
         if (includePublicData) setRemoteMiniFantasyLeaderboardEntries(leaderboardEntries || []);
+        if (includePublicData) setRemoteMiniFantasyLeaderboardRows(leaderboardRows || []);
         if (includeProfiles) setRemoteMiniFantasyProfiles(profiles || []);
         if (shouldLoadDailyBonuses) setRemoteMiniFantasyDailyBonuses(dailyBonuses || []);
       } catch (error) {
@@ -4407,6 +4474,7 @@ function titleBandScore(pick, live){
         };
         setRemoteMiniFantasyEntries([]);
         if (includePublicData) setRemoteMiniFantasyLeaderboardEntries([]);
+        if (includePublicData) setRemoteMiniFantasyLeaderboardRows([]);
         if (includeProfiles) setRemoteMiniFantasyProfiles([]);
         if (shouldLoadDailyBonuses) setRemoteMiniFantasyDailyBonuses([]);
       }
@@ -8023,9 +8091,28 @@ function titleBandScore(pick, live){
         teamRoles: IPL_TEAM_ROLES
       });
       const savedEntry = findMiniFantasyEntryForMatch(fixture.match_no);
-      return savedEntry?.priceSnapshot && Object.keys(savedEntry.priceSnapshot).length
+      const resolvedPool = savedEntry?.priceSnapshot && Object.keys(savedEntry.priceSnapshot).length
         ? applyPriceSnapshotToPool(basePool, savedEntry.priceSnapshot)
         : basePool;
+      return resolvedPool.map((player) => {
+        const availabilityMeta = IPL_PLAYER_AVAILABILITY?.[String(player.team || '').toUpperCase()]?.[normalizeName(player.name)] || null;
+        return {
+          ...player,
+          availabilityStatus: String(availabilityMeta?.status || '').toLowerCase() === 'available' ? '' : (availabilityMeta?.status || ''),
+          availabilityNote: availabilityMeta?.note || '',
+          availabilityReplacementFor: availabilityMeta?.replacementFor || '',
+          availabilityReplacedBy: availabilityMeta?.replacedBy || ''
+        };
+      });
+    }
+
+    function miniFantasyAvailabilityBadgeLabel(player){
+      const status = String(player?.availabilityStatus || '').toLowerCase();
+      if (!status) return '';
+      if (status === 'doubtful') return 'Doubtful';
+      if (status === 'unavailable') return 'Unavailable';
+      if (status === 'replaced') return 'Replaced';
+      return status.charAt(0).toUpperCase() + status.slice(1);
     }
 
     function nextMiniFantasyOpeningFixture(){
@@ -8493,10 +8580,27 @@ function titleBandScore(pick, live){
         MINI_FANTASY_COMPUTE_REVISION,
         LIVE_2026?.fetchedAt || '',
         Number(LIVE_2026?.meta?.scoreHistory?.length || 0),
-        Number(LEAGUE_STAGE_SCHEDULE?.length || 0)
+        Number(LEAGUE_STAGE_SCHEDULE?.length || 0),
+        MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK ? 'fallback' : 'snapshot'
       ].join('|');
       if (MINI_FANTASY_LEADERBOARD_CACHE.key === cacheKey && MINI_FANTASY_LEADERBOARD_CACHE.value) {
         return MINI_FANTASY_LEADERBOARD_CACHE.value;
+      }
+      const liveFetchedAt = normalizeTextValue(LIVE_2026?.fetchedAt || '');
+      const leaderboardRows = currentMiniFantasyLeaderboardRows();
+      const canUsePrecomputedRows = usesHostedDuelsBackend()
+        && !MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK
+        && liveFetchedAt
+        && Array.isArray(leaderboardRows)
+        && leaderboardRows.length
+        && leaderboardRows.every((row) => normalizeTextValue(row.liveDataFetchedAt || row.live_data_fetched_at || '') === liveFetchedAt);
+      if (canUsePrecomputedRows) {
+        const value = {
+          completed_match_count: Number(leaderboardRows[0]?.completedMatchCount || leaderboardRows[0]?.completed_match_count || 0) || 0,
+          rows: cloneJson(leaderboardRows)
+        };
+        MINI_FANTASY_LEADERBOARD_CACHE = { key: cacheKey, value };
+        return value;
       }
       const value = buildMiniFantasyLeaderboard({
         entries: currentMiniFantasyLeaderboardEntries(),
@@ -9443,10 +9547,11 @@ function titleBandScore(pick, live){
                 <div class="fantasy-picker-row">
                   <div>
                     <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
-                    <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml(player.role.replace('_', ' '))} - ${escapeHtml(formatMiniFantasyPoints(player.season_total_points || 0))} pts total${player.matches_played ? ` - ${escapeHtml(formatMiniFantasyPoints(player.last_match_points || 0))} last match - ${escapeHtml(String(player.matches_played))} matches` : ''}${draft.captainPlayerId === player.player_id ? ' - captain' : ''}</div>
-                    ${(player.pickedInOtherSlot || player.selectedInCurrentSlot || player.selectedSlotIndex !== -1) ? `
+                    <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml(player.role.replace('_', ' '))} - ${escapeHtml(formatMiniFantasyPoints(player.season_total_points || 0))} pts total${player.matches_played ? ` - ${escapeHtml(formatMiniFantasyPoints(player.last_match_points || 0))} pts last match - ${escapeHtml(String(player.matches_played))} matches` : ''}${draft.captainPlayerId === player.player_id ? ' - captain' : ''}</div>
+                    ${(player.availabilityStatus || player.pickedInOtherSlot || player.selectedInCurrentSlot || player.selectedSlotIndex !== -1) ? `
                       <div class="fantasy-picker-meta-row">
                         <div class="fantasy-picker-meta-badges">
+                          ${player.availabilityStatus ? `<div class="fantasy-picker-badge availability-${escapeHtml(player.availabilityStatus)}" title="${escapeHtml(player.availabilityNote || '')}">${escapeHtml(miniFantasyAvailabilityBadgeLabel(player))}</div>` : ''}
                           ${player.pickedInOtherSlot ? `<div class="fantasy-picker-badge">Picked in slot ${player.selectedSlotIndex + 1} - tap to unselect</div>` : ''}
                           ${player.selectedInCurrentSlot ? '<div class="fantasy-picker-badge current">Selected in this slot - tap to unselect</div>' : ''}
                         </div>
@@ -9668,6 +9773,7 @@ function titleBandScore(pick, live){
       REMOTE_DUEL_STORE = emptyCustomDuelStore();
       setRemoteMiniFantasyEntries([]);
       setRemoteMiniFantasyLeaderboardEntries([]);
+      setRemoteMiniFantasyLeaderboardRows([]);
       setRemoteMiniFantasyProfiles([]);
       setRemoteMiniFantasyDailyBonuses([]);
       MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';
@@ -9693,6 +9799,7 @@ function titleBandScore(pick, live){
       await loadWarRoomData().catch(() => {});
       await loadScheduleData().catch(() => {});
       await loadSquadsData().catch(() => {});
+      await loadPlayerAvailabilityData().catch(() => {});
       await loadTeamRolesData().catch(() => {});
       await loadLiveData();
       await loadMiniFantasyPriceBook();

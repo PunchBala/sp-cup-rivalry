@@ -51,7 +51,7 @@ Once configured:
 - public duel browsing reads directly from backend records
 - `Mini Fantasy` saves one hosted entry per user per match
 - saved Mini Fantasy entries carry a fixture-specific price snapshot
-- Mini Fantasy leaderboard reads from the hosted Mini Fantasy entry table
+- Mini Fantasy leaderboard prefers the hosted snapshot table and falls back to hosted entry rows if the snapshot is stale or empty
 
 ## Current scope
 
@@ -62,6 +62,7 @@ The backend owns:
 - duel entries
 - Mini Fantasy match entries
 - Mini Fantasy leaderboard source rows
+- precomputed Mini Fantasy leaderboard snapshot rows
 - entry ownership
 - persisted submitted picks
 - persisted saved Mini Fantasy lineups plus captain choice
@@ -82,8 +83,20 @@ If you already ran the SQL once before Mini Fantasy leaderboard support landed, 
 That refresh keeps:
 
 - `mini_fantasy_entries` present
+- `mini_fantasy_leaderboard_rows` present
 - latest insert/update lock policies in place
 - public read policy in place for the leaderboard
+
+## Optional leaderboard publishing
+
+The site can fall back to client-side leaderboard computation, but the faster path is a precomputed snapshot written to Supabase by the live-data workflow.
+
+To enable that publisher in GitHub Actions, add:
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+The service-role key is only for the workflow publisher. Do not place it in frontend code.
 
 ## Public vs private
 

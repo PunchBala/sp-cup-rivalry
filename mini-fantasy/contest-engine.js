@@ -184,6 +184,57 @@ const NAME_TOKEN_EXPANSIONS = Object.freeze({
   suryakumar: Object.freeze(['surya', 'kumar'])
 });
 
+const EXPLICIT_NAME_ALIASES = Object.freeze({
+  'phil salt': Object.freeze([
+    'philip salt'
+  ]),
+  'philip salt': Object.freeze([
+    'phil salt'
+  ]),
+  'lhuan dre pretorious': Object.freeze([
+    'lhuan dre pretorius'
+  ]),
+  'lhuan dre pretorius': Object.freeze([
+    'lhuan dre pretorious'
+  ]),
+  'lungi ngidi': Object.freeze([
+    'lungisani ngidi'
+  ]),
+  'lungisani ngidi': Object.freeze([
+    'lungi ngidi'
+  ]),
+  'allah ghazanfar': Object.freeze([
+    'am ghazanfar',
+    'allah mohammad ghazanfar',
+    'allah mohammed ghazanfar',
+    'allah mohammad ghafanzar'
+  ]),
+  'am ghazanfar': Object.freeze([
+    'allah ghazanfar',
+    'allah mohammad ghazanfar',
+    'allah mohammed ghazanfar',
+    'allah mohammad ghafanzar'
+  ]),
+  'allah mohammad ghazanfar': Object.freeze([
+    'allah ghazanfar',
+    'am ghazanfar',
+    'allah mohammed ghazanfar',
+    'allah mohammad ghafanzar'
+  ]),
+  'allah mohammed ghazanfar': Object.freeze([
+    'allah ghazanfar',
+    'am ghazanfar',
+    'allah mohammad ghazanfar',
+    'allah mohammad ghafanzar'
+  ]),
+  'allah mohammad ghafanzar': Object.freeze([
+    'allah ghazanfar',
+    'am ghazanfar',
+    'allah mohammad ghazanfar',
+    'allah mohammad ghazanfar'
+  ])
+});
+
 export function slugify(value) {
   return normalizeWhitespace(value)
     .normalize('NFKD')
@@ -239,6 +290,7 @@ function buildNameAliasKeys(value) {
   const rawTokens = tokenizeAliasName(value);
   const significantTokens = tokenizeAliasName(value, { dropInitials: true });
   const keys = new Set();
+  const normalizedValue = normalizeName(value);
 
   addAliasKey(keys, rawTokens);
   if (significantTokens.length && significantTokens.length !== rawTokens.length) {
@@ -259,7 +311,21 @@ function buildNameAliasKeys(value) {
     }
   }
 
+  (EXPLICIT_NAME_ALIASES[normalizedValue] || []).forEach((aliasName) => {
+    addAliasKey(keys, tokenizeAliasName(aliasName));
+    addAliasKey(keys, tokenizeAliasName(aliasName, { dropInitials: true }));
+  });
+
   return [...keys].filter(Boolean);
+}
+
+function hasExplicitAliasMatch(targetName, candidateName) {
+  const targetAliases = EXPLICIT_NAME_ALIASES[normalizeName(targetName)] || [];
+  const candidateAliases = EXPLICIT_NAME_ALIASES[normalizeName(candidateName)] || [];
+  const normalizedCandidate = normalizeName(candidateName);
+  const normalizedTarget = normalizeName(targetName);
+  return targetAliases.some((alias) => normalizeName(alias) === normalizedCandidate)
+    || candidateAliases.some((alias) => normalizeName(alias) === normalizedTarget);
 }
 
 function countSharedAliasTokens(a, b) {
@@ -322,6 +388,7 @@ export function resolvePlayerHistory(playerName, historyMap = new Map()) {
     const candidateName = history?.player_name || fallbackKey;
     const candidateTokens = tokenizeAliasName(candidateName, { dropInitials: true });
     const sharedTokens = countSharedAliasTokens(playerName, candidateName);
+    const explicitAliasMatch = hasExplicitAliasMatch(playerName, candidateName);
     const subsetMatch =
       areAliasTokensSubset(targetSignificantTokens, candidateTokens) ||
       areAliasTokensSubset(candidateTokens, targetSignificantTokens);
@@ -331,7 +398,7 @@ export function resolvePlayerHistory(playerName, historyMap = new Map()) {
     if (!directAliasMatch && sharedTokens < 2) {
       return;
     }
-    if (!subsetMatch && overlap < 0.67) {
+    if (!explicitAliasMatch && !subsetMatch && overlap < 0.67) {
       return;
     }
     matches.push(history);
@@ -786,6 +853,12 @@ export function buildFixturePlayerPool({
       const playerId = buildMiniFantasyPlayerId(teamCode, playerName);
       const price = priceMap.get(playerId);
       const role = resolveRoleFromTeamMap(teamCode, playerName, roleLookup[teamCode] || {});
+      const matchesPlayed = Number(price?.matches_played || 0);
+      const seasonTotalPoints = Number.isFinite(Number(price?.season_total_points))
+        ? Number(price.season_total_points)
+        : (matchesPlayed && Number.isFinite(Number(price?.season_avg_points))
+          ? roundTo(Number(price.season_avg_points) * matchesPlayed, 2)
+          : 0);
       return {
         player_id: playerId,
         name: playerName,
@@ -796,8 +869,8 @@ export function buildFixturePlayerPool({
         pricing_eligible: price?.pricing_eligible ?? Boolean(role),
         final_price: Number.isFinite(price?.final_price) ? price.final_price : DEFAULT_PRICE_JOB_META.default_initial_price,
         old_price: price?.old_price ?? null,
-        matches_played: Number(price?.matches_played || 0),
-        season_total_points: Number(price?.season_total_points || 0),
+        matches_played: matchesPlayed,
+        season_total_points: seasonTotalPoints,
         last_match_points: Number(price?.last_match_points || 0),
         adjusted_score: Number(price?.adjusted_score || 0),
         last_match_played_at_utc: price?.last_match_played_at_utc || null
@@ -1546,4 +1619,44 @@ export function buildMiniFantasyLeaderboard({
     completed_match_count: completedMatchCount,
     rows
   };
+}
+
+export function serializeMiniFantasyLeaderboardRows({
+  leaderboard = null,
+  season = MINI_FANTASY_SEASON,
+  liveData = {},
+  generatedAtUtc = new Date().toISOString()
+} = {}) {
+  const safeSeason = normalizeWhitespace(season || MINI_FANTASY_SEASON) || MINI_FANTASY_SEASON;
+  const safeGeneratedAt = normalizeWhitespace(generatedAtUtc || new Date().toISOString()) || new Date().toISOString();
+  const liveDataFetchedAt = normalizeWhitespace(liveData?.fetchedAt || liveData?.meta?.fetchedAt || '') || null;
+  const completedMatchCount = Number(leaderboard?.completed_match_count || 0) || 0;
+  const rows = Array.isArray(leaderboard?.rows) ? leaderboard.rows : [];
+
+  return rows
+    .map((row, index) => {
+      const ownerHandle = normalizeWhitespace(row?.owner_handle || row?.ownerHandle || '');
+      if (!ownerHandle) return null;
+      return {
+        season: safeSeason,
+        owner_handle: ownerHandle,
+        user_id: normalizeWhitespace(row?.user_id || row?.userId || '') || null,
+        display_name: normalizeWhitespace(row?.display_name || row?.displayName || ownerHandle),
+        rank: Number(row?.rank || 0) || index + 1,
+        medal: normalizeWhitespace(row?.medal || '') || null,
+        total_points: roundTo(toNumber(row?.total_points, 0), 2),
+        saved_entries: Number(row?.saved_entries || 0) || 0,
+        scored_entries: Number(row?.scored_entries || 0) || 0,
+        pending_entries: Number(row?.pending_entries || 0) || 0,
+        latest_saved_at: row?.latest_saved_at || null,
+        daily_bonus_points: roundTo(toNumber(row?.daily_bonus_points, 0), 2),
+        missed_lock_points: roundTo(toNumber(row?.missed_lock_points, 0), 2),
+        new_player_baseline_points: roundTo(toNumber(row?.new_player_baseline_points, 0), 2),
+        completed_match_count: completedMatchCount,
+        matches: JSON.parse(JSON.stringify(Array.isArray(row?.matches) ? row.matches : [])),
+        live_data_fetched_at: liveDataFetchedAt,
+        generated_at: safeGeneratedAt
+      };
+    })
+    .filter(Boolean);
 }

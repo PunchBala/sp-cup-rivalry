@@ -32,6 +32,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /duels-backend\.config\.js/);
   assert.match(html, /duels-backend\.js/);
   assert.match(html, /mini-fantasy\/contest-engine\.js/);
+  assert.match(html, /ipl_2026_player_availability\.json/);
   assert.match(html, /function sortedDirectoryDuels\(/);
     assert.match(html, /function buildDuelShareUrl\(/);
     assert.match(html, /function joinDuelByCode\(/);
@@ -53,6 +54,9 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function withFreshLifecycle\(/);
   assert.match(html, /function syncRemoteBundlesForRoom\(/);
   assert.match(html, /function syncMiniFantasyEntries\(/);
+  assert.match(html, /function upsertRemoteMiniFantasyEntry\(/);
+  assert.match(html, /function loadPlayerAvailabilityData\(/);
+  assert.match(html, /function miniFantasyAvailabilityBadgeLabel\(/);
   assert.match(html, /function renderMiniFantasySection\(/);
   assert.match(html, /function renderMiniFantasyFixtures\(/);
   assert.match(html, /function renderMiniFantasyBuilder\(/);
@@ -87,6 +91,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /Missed-lock safety net:/);
   assert.match(html, /Fixture-day visit bonus:/);
   assert.match(html, /New-player catch-up:/);
+  assert.match(html, /function upsertRemoteMiniFantasyEntry\([\s\S]*MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = true;/);
   assert.match(html, /Opens the day before/);
   assert.match(html, /Locks at/);
   assert.match(html, /data-directory-filter=/);
@@ -94,6 +99,10 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /data-mini-pick=/);
   assert.match(html, /data-mini-picker-role=/);
   assert.match(html, /data-mini-picker-value=/);
+  assert.match(html, /availability-available/);
+  assert.match(html, /availability-doubtful/);
+  assert.match(html, /availability-unavailable/);
+  assert.match(html, /availability-replaced/);
   assert.match(html, /const savedScroll = scrollEl \? scrollEl\.scrollTop : 0/);
   assert.match(html, /scrollElAfter\) scrollElAfter\.scrollTop = savedScroll/);
   assert.match(html, /window\.history\.replaceState/);

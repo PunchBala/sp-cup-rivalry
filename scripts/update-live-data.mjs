@@ -37,7 +37,7 @@ const IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES = parseEnvInt(process.env.IPLT20_MOST
 const IPLT20_MOST_DOTS_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/284-mostdotballsbowledtournament.js?callback=onmostdotballsbowledtournament';
 const IPLT20_FAIRPLAY_ENABLED = parseEnvBool(process.env.IPLT20_FAIRPLAY_ENABLED, true);
 const IPLT20_FAIRPLAY_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/2026-fairplayList.js?callback=onFairplayAward';
-const AGGREGATE_SCHEMA_VERSION = 3;
+const AGGREGATE_SCHEMA_VERSION = 4;
 const LEAST_MVP_MIN_MATCHES = 5;
 const UNCAPPED_MVP_PLAYERS = [
   'Ayush Mhatre', 'Kartik Sharma', 'Urvil Patel', 'Ramakrishna Ghosh', 'Prashant Veer', 'Aman Khan',
@@ -314,6 +314,7 @@ function createEmptyAggregates() {
     bowlingBalls: {},
     bowlingRunsConceded: {},
     catches: {},
+    stumpings: {},
     teamHighestScore: {},
     standings: {},
     bestBowlingFigures: {},
@@ -821,7 +822,8 @@ function playerCandidateNames(agg) {
     ...Object.keys(agg.bowlingWickets || {}),
     ...Object.keys(agg.bestBowlingFigures || {}),
     ...Object.keys(agg.battingRuns || {}),
-    ...Object.keys(agg.catches || {})
+    ...Object.keys(agg.catches || {}),
+    ...Object.keys(agg.stumpings || {})
   ].filter(Boolean))];
 }
 
@@ -1304,6 +1306,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
       if (catcher) {
         participants.add(catcher);
         addNumberMap(aggregates.catches, catcher, field?.catch || 0);
+        addNumberMap(aggregates.stumpings, catcher, field?.stumped || 0);
       }
     }
   }
@@ -1375,7 +1378,7 @@ function combineAggregates(baseAgg, overlayAgg) {
   const out = clone(baseAgg);
   if (!overlayAgg) return out;
 
-  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
+  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'stumpings', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
     out[key] = out[key] || {};
     for (const [name, value] of Object.entries(overlayAgg[key] || {})) {
       out[key][name] = (out[key][name] || 0) + Number(value || 0);
@@ -1396,6 +1399,84 @@ function combineAggregates(baseAgg, overlayAgg) {
   }
 
   return out;
+}
+
+function diffNumericMap(currentMap = {}, previousMap = {}) {
+  const out = {};
+  const keys = new Set([...Object.keys(currentMap || {}), ...Object.keys(previousMap || {})]);
+  for (const key of keys) {
+    const delta = Number(currentMap?.[key] || 0) - Number(previousMap?.[key] || 0);
+    if (delta) out[key] = delta;
+  }
+  return out;
+}
+
+function diffNestedNumericMap(currentMap = {}, previousMap = {}) {
+  const out = {};
+  const keys = new Set([...Object.keys(currentMap || {}), ...Object.keys(previousMap || {})]);
+  for (const key of keys) {
+    const delta = diffNumericMap(currentMap?.[key] || {}, previousMap?.[key] || {});
+    if (Object.keys(delta).length) out[key] = delta;
+  }
+  return out;
+}
+
+function figuresEqual(a, b) {
+  if (!a && !b) return true;
+  if (!a || !b) return false;
+  return (
+    Number(a.wickets || 0) === Number(b.wickets || 0) &&
+    Number(a.runs || 0) === Number(b.runs || 0) &&
+    Number(a.balls || 0) === Number(b.balls || 0)
+  );
+}
+
+function historySnapshotAggregate(entry) {
+  return cloneJson(entry?.snapshot?.meta?.aggregates || createEmptyAggregates());
+}
+
+function buildHistoricalAggregateOverlay(baseLive, processedMatchCount) {
+  const scoreHistory = safeArray(baseLive?.meta?.scoreHistory);
+  if (!scoreHistory.length || processedMatchCount <= 0) return null;
+
+  const byCount = new Map(scoreHistory.map((entry) => [historyEntryCount(entry), entry]));
+  const currentEntry = byCount.get(processedMatchCount);
+  const previousEntry = byCount.get(processedMatchCount - 1);
+  if (!currentEntry || !previousEntry) return null;
+
+  const currentAgg = historySnapshotAggregate(currentEntry);
+  const previousAgg = historySnapshotAggregate(previousEntry);
+  const overlay = createEmptyAggregates();
+
+  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'stumpings', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
+    overlay[key] = diffNumericMap(currentAgg[key], previousAgg[key]);
+  }
+
+  overlay.standings = diffNestedNumericMap(currentAgg.standings, previousAgg.standings);
+
+  for (const [team, value] of Object.entries(currentAgg.teamHighestScore || {})) {
+    if (Number(value || 0) !== Number(previousAgg.teamHighestScore?.[team] || 0)) {
+      overlay.teamHighestScore[team] = Number(value || 0);
+    }
+  }
+
+  const bowlingFigureKeys = new Set([
+    ...Object.keys(currentAgg.bestBowlingFigures || {}),
+    ...Object.keys(previousAgg.bestBowlingFigures || {})
+  ]);
+  for (const bowler of bowlingFigureKeys) {
+    const currentFigure = currentAgg.bestBowlingFigures?.[bowler] || null;
+    const previousFigure = previousAgg.bestBowlingFigures?.[bowler] || null;
+    if (currentFigure && !figuresEqual(currentFigure, previousFigure)) {
+      overlay.bestBowlingFigures[bowler] = cloneJson(currentFigure);
+    }
+  }
+
+  return overlay;
+}
+
+function isMissingProcessedScorecardError(error) {
+  return /Missing cached scorecard for processed match/i.test(String(error?.message || ''));
 }
 
 function sortByValueDesc(mapObj) {
@@ -1485,7 +1566,8 @@ function buildMvpRanking(agg, dotsValues) {
     ...Object.keys(agg.battingSixes || {}),
     ...Object.keys(agg.bowlingWickets || {}),
     ...Object.keys(dotsValues || {}),
-    ...Object.keys(agg.catches || {})
+    ...Object.keys(agg.catches || {}),
+    ...Object.keys(agg.stumpings || {})
   ])].filter(Boolean);
 
   const rows = players.map((player) => {
@@ -1495,12 +1577,13 @@ function buildMvpRanking(agg, dotsValues) {
     const wickets = Number(agg.bowlingWickets[player] || 0);
     const dotBalls = Number(dotsValues[player] || 0);
     const catches = Number(agg.catches[player] || 0);
+    const stumpings = Number(agg.stumpings?.[player] || 0);
     const runsConceded = Number(agg.bowlingRunsConceded[player] || 0);
     const duckPenalty = Number(agg.battingDucks?.[player] || 0) * -5;
 
     const battingBase = runs + (sixes * 2);
     const bowlingBase = (wickets * 20) + (dotBalls * 1.5);
-    const fieldingBase = catches * 8;
+    const fieldingBase = (catches * 8) + (stumpings * 12);
     const srBonus = battingStrikeRateBonus(runs, balls);
     const econBonus = bowlingEconomyBonus(runsConceded, Number(agg.bowlingBalls[player] || 0));
     const milestoneBonus =
@@ -1520,6 +1603,7 @@ function buildMvpRanking(agg, dotsValues) {
       wickets,
       dotBalls,
       catches,
+      stumpings,
       battingStrikeRate: balls > 0 ? Number(((100 * runs) / balls).toFixed(2)) : null,
       economy: Number(agg.bowlingBalls[player] || 0) > 0 ? Number((((runsConceded * 6) / Number(agg.bowlingBalls[player] || 0))).toFixed(2)) : null,
       matches: Number(agg.playerMatches[player] || 0),
@@ -1606,7 +1690,7 @@ function upsertScoreHistorySnapshot(live, processedMatchCount, fetchedAt = isoNo
 }
 
 export async function rebuildHistoricalState(processedIds, baseLive = null, { includeHistory = false, loadScorecard = null } = {}) {
-  const rebuilt = createEmptyAggregates();
+  let rebuilt = createEmptyAggregates();
   const history = includeHistory ? [{
     processedMatchCount: 0,
     fetchedAt: baseLive?.meta?.scoreHistory?.find((entry) => historyEntryCount(entry) === 0)?.fetchedAt || null,
@@ -1614,28 +1698,68 @@ export async function rebuildHistoricalState(processedIds, baseLive = null, { in
   }] : null;
   let cacheHits = 0;
   let apiCalls = 0;
+  let historyFallbacks = 0;
   const resolveScorecard = loadScorecard || ((matchId) => processScorecard(matchId, baseLive, {
     preferCache: true,
     allowApiFallback: ALLOW_HISTORICAL_REPLAY_API
   }));
 
-  for (const matchId of processedIds) {
-    const scorecardResult = normalizeScorecardResult(await resolveScorecard(matchId));
-    if (scorecardResult.source === 'cache') cacheHits += 1;
-    if (scorecardResult.source === 'api') apiCalls += 1;
-    applyScorecardToAggregates(rebuilt, scorecardResult.data, { isFinal: true });
+  for (let index = 0; index < processedIds.length; index += 1) {
+    const matchId = processedIds[index];
+    const processedMatchCount = index + 1;
+    let scorecardResult = null;
+
+    try {
+      scorecardResult = normalizeScorecardResult(await resolveScorecard(matchId));
+    } catch (error) {
+      const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
+      if (!missingScorecard && !isMissingProcessedScorecardError(error)) throw error;
+      const fallbackOverlay = buildHistoricalAggregateOverlay(baseLive, processedMatchCount);
+      if (!fallbackOverlay) throw error;
+      rebuilt = combineAggregates(rebuilt, fallbackOverlay);
+      historyFallbacks += 1;
+    }
+
+    if (scorecardResult) {
+      if (scorecardResult.source === 'cache') cacheHits += 1;
+      if (scorecardResult.source === 'api') apiCalls += 1;
+      applyScorecardToAggregates(rebuilt, scorecardResult.data, { isFinal: true });
+    }
+
     if (includeHistory) {
+      const existingHistoryEntry = baseLive?.meta?.scoreHistory?.find((entry) => historyEntryCount(entry) === processedMatchCount);
       history.push({
-        processedMatchCount: history.length,
-        fetchedAt: isoNow(),
+        processedMatchCount,
+        fetchedAt: existingHistoryEntry?.fetchedAt || isoNow(),
         snapshot: createScoreHistorySnapshotFromAggregates(rebuilt, baseLive)
       });
     }
   }
 
   return includeHistory
-    ? { aggregates: rebuilt, scoreHistory: history, cacheHits, apiCalls }
-    : { aggregates: rebuilt, cacheHits, apiCalls };
+    ? { aggregates: rebuilt, scoreHistory: history, cacheHits, apiCalls, historyFallbacks }
+    : { aggregates: rebuilt, cacheHits, apiCalls, historyFallbacks };
+}
+
+export function refreshDerivedOutputs(live) {
+  fillDerivedOutputs(
+    live,
+    live?.meta?.aggregates || createEmptyAggregates(),
+    live?.mostDots ? {
+      ranking: safeArray(live.mostDots.ranking),
+      extendedRanking: safeArray(live.mostDots.extendedRanking),
+      values: cloneJson(live.mostDots.values || {})
+    } : null,
+    live?.fairPlay ? {
+      winner: live.fairPlay.winner || null,
+      ranking: safeArray(live.fairPlay.ranking),
+      extendedRanking: safeArray(live.fairPlay.extendedRanking),
+      values: cloneJson(live.fairPlay.values || {}),
+      updatedAt: live.fairPlay.updatedAt || null,
+      source: live.fairPlay.source || null
+    } : null
+  );
+  return live;
 }
 
 export async function repairScoreHistoryGaps(live, processedRefs, { loadScorecard = null } = {}) {
@@ -1746,7 +1870,7 @@ function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = nul
     ranking: mvpExtendedRanking.slice(0, 10),
     extendedRanking: mvpExtendedRanking,
     values: mvp.values,
-    formula: 'Runs + (Sixes×2) + (Wickets×20) + (Dot balls×1.5) + (Catches×8) + batting SR bonus + bowling economy bonus + milestone bonuses',
+    formula: 'Runs + (Sixes×2) + (Wickets×20) + (Dot balls×1.5) + (Catches×8) + (Stumpings×12) + batting SR bonus + bowling economy bonus + milestone bonuses',
     milestoneRules: {
       batting50: 10,
       batting100: 25,
@@ -2014,7 +2138,7 @@ async function main() {
           replayIds,
           live,
           {
-            includeHistory: requiresScoreHistoryBackfill,
+            includeHistory: (requiresScoreHistoryBackfill || requiresHistoricalBackfill),
             loadScorecard: (matchId) => processScorecard(matchId, live, {
               preferCache: true,
               allowApiFallback: ALLOW_HISTORICAL_REPLAY_API
@@ -2022,7 +2146,7 @@ async function main() {
           }
         );
         finalizedAgg = rebuiltState.aggregates;
-        if (requiresScoreHistoryBackfill) {
+        if (requiresScoreHistoryBackfill || requiresHistoricalBackfill) {
           live.meta.scoreHistory = rebuiltState.scoreHistory;
         }
         live.meta.lastRun.scorecardCalls += rebuiltState.apiCalls;
@@ -2247,7 +2371,7 @@ async function main() {
     titleWinner: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     tableBottom: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     mostDots: dotsReport,
-    mvp: { ok: true, source: 'CricketData + IPLT20 official Most Dots', method: 'custom formula using runs, sixes, wickets, dot balls, catches, strike-rate bonus, economy bonus and milestone bonuses' },
+    mvp: { ok: true, source: 'CricketData + IPLT20 official Most Dots', method: 'custom formula using runs, sixes, wickets, dot balls, catches, stumpings, strike-rate bonus, economy bonus and milestone bonuses' },
     uncappedMvp: { ok: true, source: 'custom MVP ranking', method: 'filtered to the provided uncapped player pool, then compares picks by their positions in the custom MVP ranking' },
     fairPlay: fairPlayReport,
     leastMvp: { ok: true, source: 'custom MVP ranking', method: `lower in custom MVP ranking wins, filtered to players with minimum ${LEAST_MVP_MIN_MATCHES} matches` },
