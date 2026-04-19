@@ -1620,3 +1620,43 @@ export function buildMiniFantasyLeaderboard({
     rows
   };
 }
+
+export function serializeMiniFantasyLeaderboardRows({
+  leaderboard = null,
+  season = MINI_FANTASY_SEASON,
+  liveData = {},
+  generatedAtUtc = new Date().toISOString()
+} = {}) {
+  const safeSeason = normalizeWhitespace(season || MINI_FANTASY_SEASON) || MINI_FANTASY_SEASON;
+  const safeGeneratedAt = normalizeWhitespace(generatedAtUtc || new Date().toISOString()) || new Date().toISOString();
+  const liveDataFetchedAt = normalizeWhitespace(liveData?.fetchedAt || liveData?.meta?.fetchedAt || '') || null;
+  const completedMatchCount = Number(leaderboard?.completed_match_count || 0) || 0;
+  const rows = Array.isArray(leaderboard?.rows) ? leaderboard.rows : [];
+
+  return rows
+    .map((row, index) => {
+      const ownerHandle = normalizeWhitespace(row?.owner_handle || row?.ownerHandle || '');
+      if (!ownerHandle) return null;
+      return {
+        season: safeSeason,
+        owner_handle: ownerHandle,
+        user_id: normalizeWhitespace(row?.user_id || row?.userId || '') || null,
+        display_name: normalizeWhitespace(row?.display_name || row?.displayName || ownerHandle),
+        rank: Number(row?.rank || 0) || index + 1,
+        medal: normalizeWhitespace(row?.medal || '') || null,
+        total_points: roundTo(toNumber(row?.total_points, 0), 2),
+        saved_entries: Number(row?.saved_entries || 0) || 0,
+        scored_entries: Number(row?.scored_entries || 0) || 0,
+        pending_entries: Number(row?.pending_entries || 0) || 0,
+        latest_saved_at: row?.latest_saved_at || null,
+        daily_bonus_points: roundTo(toNumber(row?.daily_bonus_points, 0), 2),
+        missed_lock_points: roundTo(toNumber(row?.missed_lock_points, 0), 2),
+        new_player_baseline_points: roundTo(toNumber(row?.new_player_baseline_points, 0), 2),
+        completed_match_count: completedMatchCount,
+        matches: JSON.parse(JSON.stringify(Array.isArray(row?.matches) ? row.matches : [])),
+        live_data_fetched_at: liveDataFetchedAt,
+        generated_at: safeGeneratedAt
+      };
+    })
+    .filter(Boolean);
+}
