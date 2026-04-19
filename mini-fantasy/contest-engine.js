@@ -185,6 +185,18 @@ const NAME_TOKEN_EXPANSIONS = Object.freeze({
 });
 
 const EXPLICIT_NAME_ALIASES = Object.freeze({
+  'phil salt': Object.freeze([
+    'philip salt'
+  ]),
+  'philip salt': Object.freeze([
+    'phil salt'
+  ]),
+  'lungi ngidi': Object.freeze([
+    'lungisani ngidi'
+  ]),
+  'lungisani ngidi': Object.freeze([
+    'lungi ngidi'
+  ]),
   'allah ghazanfar': Object.freeze([
     'am ghazanfar',
     'allah mohammad ghazanfar',
