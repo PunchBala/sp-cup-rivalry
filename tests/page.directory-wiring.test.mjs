@@ -54,6 +54,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function withFreshLifecycle\(/);
   assert.match(html, /function syncRemoteBundlesForRoom\(/);
   assert.match(html, /function syncMiniFantasyEntries\(/);
+  assert.match(html, /function upsertRemoteMiniFantasyEntry\(/);
   assert.match(html, /function loadPlayerAvailabilityData\(/);
   assert.match(html, /function miniFantasyAvailabilityBadgeLabel\(/);
   assert.match(html, /function renderMiniFantasySection\(/);
@@ -90,6 +91,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /Missed-lock safety net:/);
   assert.match(html, /Fixture-day visit bonus:/);
   assert.match(html, /New-player catch-up:/);
+  assert.match(html, /function upsertRemoteMiniFantasyEntry\([\s\S]*MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = true;/);
   assert.match(html, /Opens the day before/);
   assert.match(html, /Locks at/);
   assert.match(html, /data-directory-filter=/);

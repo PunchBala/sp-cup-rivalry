@@ -4355,6 +4355,7 @@ function titleBandScore(pick, live){
         .filter((item) => miniFantasyEntryStoreKey(item) !== miniFantasyEntryStoreKey(entry));
       leaderboardEntries.push(cloneJson(entry));
       REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = leaderboardEntries;
+      MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = true;
       invalidateMiniFantasyComputedData();
       return entry;
     }
