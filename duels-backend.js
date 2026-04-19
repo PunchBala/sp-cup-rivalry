@@ -500,6 +500,8 @@ function normalizeMiniFantasyEntryRow(row) {
         matches: cloneJson(row.matches || []),
         liveDataFetchedAt: row.live_data_fetched_at || null,
         live_data_fetched_at: row.live_data_fetched_at || null,
+        snapshotVersion: normalizeWhitespace(row.snapshot_version || '') || null,
+        snapshot_version: normalizeWhitespace(row.snapshot_version || '') || null,
         generatedAt: row.generated_at || null,
         generated_at: row.generated_at || null
       };
@@ -880,7 +882,7 @@ function normalizeMiniFantasyEntryRow(row) {
         const rows = await restRequest(config.tables.miniFantasyLeaderboardRows, {
           method: 'GET',
           query: {
-            select: 'id,season,owner_handle,user_id,display_name,rank,medal,total_points,saved_entries,scored_entries,pending_entries,latest_saved_at,daily_bonus_points,missed_lock_points,new_player_baseline_points,completed_match_count,matches,live_data_fetched_at,generated_at',
+            select: 'id,season,owner_handle,user_id,display_name,rank,medal,total_points,saved_entries,scored_entries,pending_entries,latest_saved_at,daily_bonus_points,missed_lock_points,new_player_baseline_points,completed_match_count,matches,live_data_fetched_at,snapshot_version,generated_at',
             ...(safeSeason ? { season: `eq.${safeSeason}` } : {}),
             order: 'rank.asc,total_points.desc'
           },
