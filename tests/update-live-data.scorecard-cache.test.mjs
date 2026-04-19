@@ -10,6 +10,7 @@ import {
   findMissingScorecardCaches,
   freshScorecardBudgetRemaining,
   inferProcessedMatchKeys,
+  buildMiniFantasyPlayerHistoriesFromProcessedMatches,
   matchKeyForMatch,
   readCachedScorecard,
   repairScoreHistoryGaps,
@@ -544,6 +545,117 @@ test('historical replay snapshots apply the 10-ball strike-rate gate and duck pe
   assert.equal(snapshot?.mvp?.values?.['Surya Kumar Yadav']?.score, 30);
   assert.equal(snapshot?.mvp?.values?.['Travis Head']?.score, -5);
   assert.equal(snapshot?.mvp?.values?.['Jitesh Sharma']?.score, 12);
+});
+
+test('mini fantasy histories score batting strike-rate bonus from the fixture itself', async () => {
+  const histories = await buildMiniFantasyPlayerHistoriesFromProcessedMatches(
+    [
+      { id: 'match-1', match_no: 1, dateTimeGMT: '2026-04-18T10:00:00Z' },
+      { id: 'match-2', match_no: 2, dateTimeGMT: '2026-04-19T10:00:00Z' }
+    ],
+    null,
+    {
+      loadScorecard: async (matchId) => ({
+        data: matchId === 'match-1'
+          ? makeFinalScorecard({
+            teams: ['Rajasthan Royals', 'Kolkata Knight Riders'],
+            winner: 'Rajasthan Royals',
+            batter: 'Vaibhav Suryavanshi',
+            bowler: 'Varun Chakaravarthy',
+            catcher: 'Sanju Samson',
+            runs: 10,
+            balls: 15,
+            sixes: 0,
+            wickets: 1,
+            concededRuns: 22,
+            overs: '4',
+            scoreA: 150,
+            scoreB: 141
+          })
+          : makeFinalScorecard({
+            teams: ['Rajasthan Royals', 'Kolkata Knight Riders'],
+            winner: 'Rajasthan Royals',
+            batter: 'Vaibhav Suryavanshi',
+            bowler: 'Varun Chakaravarthy',
+            catcher: 'Sanju Samson',
+            runs: 46,
+            balls: 28,
+            sixes: 2,
+            wickets: 1,
+            concededRuns: 14,
+            overs: '4',
+            scoreA: 189,
+            scoreB: 161
+          }),
+        source: 'cache'
+      })
+    }
+  );
+
+  assert.equal(histories['vaibhav suryavanshi']?.points_by_match_no?.[2], 55);
+});
+
+test('mini fantasy histories score bowling economy bonus from the fixture itself', async () => {
+  const histories = await buildMiniFantasyPlayerHistoriesFromProcessedMatches(
+    [
+      { id: 'match-1', match_no: 1, dateTimeGMT: '2026-04-19T10:00:00Z' }
+    ],
+    null,
+    {
+      loadScorecard: async () => ({
+        data: makeFinalScorecard({
+          teams: ['Rajasthan Royals', 'Kolkata Knight Riders'],
+          winner: 'Kolkata Knight Riders',
+          batter: 'Yashasvi Jaiswal',
+          bowler: 'Varun Chakaravarthy',
+          catcher: 'Sunil Narine',
+          runs: 32,
+          balls: 22,
+          sixes: 1,
+          wickets: 3,
+          concededRuns: 14,
+          overs: '4',
+          scoreA: 161,
+          scoreB: 189
+        }),
+        source: 'cache'
+      })
+    }
+  );
+
+  assert.equal(histories['varun chakaravarthy']?.points_by_match_no?.[1], 80);
+});
+
+test('mini fantasy histories store points under fallback processed matchNo values', async () => {
+  const histories = await buildMiniFantasyPlayerHistoriesFromProcessedMatches(
+    [
+      { id: 'match-40', matchNo: 40, dateTimeGMT: '2026-05-01T10:00:00Z' }
+    ],
+    null,
+    {
+      loadScorecard: async () => ({
+        data: makeFinalScorecard({
+          teams: ['Royal Challengers Bengaluru', 'Mumbai Indians'],
+          winner: 'Royal Challengers Bengaluru',
+          batter: 'Phil Salt',
+          bowler: 'Jasprit Bumrah',
+          catcher: 'Rajat Patidar',
+          runs: 30,
+          balls: 18,
+          sixes: 2,
+          wickets: 1,
+          concededRuns: 24,
+          overs: '4',
+          scoreA: 182,
+          scoreB: 161
+        }),
+        source: 'cache'
+      })
+    }
+  );
+
+  assert.equal(histories['phil salt']?.points_by_match_no?.[40], 39);
+  assert.equal(histories['phil salt']?.points_by_match_no?.[1], undefined);
 });
 
 test('standings still update when scorecard omits the top-level score summary', async () => {
