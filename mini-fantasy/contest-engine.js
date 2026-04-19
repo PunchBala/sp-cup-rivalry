@@ -191,6 +191,12 @@ const EXPLICIT_NAME_ALIASES = Object.freeze({
   'philip salt': Object.freeze([
     'phil salt'
   ]),
+  'lhuan dre pretorious': Object.freeze([
+    'lhuan dre pretorius'
+  ]),
+  'lhuan dre pretorius': Object.freeze([
+    'lhuan dre pretorious'
+  ]),
   'lungi ngidi': Object.freeze([
     'lungisani ngidi'
   ]),

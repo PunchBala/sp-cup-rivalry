@@ -97,7 +97,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Suryakumar Yadav': 1,
                   'AM Ghazanfar': 1,
                   'Philip Salt': 1,
-                  'Lungi Ngidi': 1
+                  'Lungi Ngidi': 1,
+                  'Lhuan-dre Pretorius': 1
                 }
               }
             },
@@ -112,7 +113,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Suryakumar Yadav': { score: 33 },
                 'AM Ghazanfar': { score: 44 },
                 'Philip Salt': { score: 49 },
-                'Lungi Ngidi': { score: 28 }
+                'Lungi Ngidi': { score: 28 },
+                'Lhuan-dre Pretorius': { score: 35 }
               }
             }
           }
@@ -133,7 +135,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'AM Ghazanfar': 2,
                   'Philip Salt': 2,
                   'Lungisani Ngidi': 1,
-                  'Lungi Ngidi': 1
+                  'Lungi Ngidi': 1,
+                  'Lhuan-dre Pretorius': 2
                 }
               }
             },
@@ -149,7 +152,8 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'AM Ghazanfar': { score: 96 },
                 'Philip Salt': { score: 67 },
                 'Lungisani Ngidi': { score: 51 },
-                'Lungi Ngidi': { score: 79 }
+                'Lungi Ngidi': { score: 79 },
+                'Lhuan-dre Pretorius': { score: 80 }
               }
             }
           }
@@ -173,6 +177,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
   assert.deepEqual(resolvePlayerHistory('Allah Ghazanfar', histories)?.match_points, [44, 52]);
   assert.deepEqual(resolvePlayerHistory('Phil Salt', histories)?.match_points, [49, 18]);
   assert.deepEqual(resolvePlayerHistory('Lungisani Ngidi', histories)?.match_points, [28, 51]);
+  assert.deepEqual(resolvePlayerHistory('Lhuan-dre Pretorious', histories)?.match_points, [35, 45]);
 });
 
 test('buildMiniFantasyPlayerPointsIndex keeps completed fixture points for Surya Kumar Yadav aliases', () => {
@@ -677,6 +682,76 @@ test('generateMiniFantasyPriceBook matches Phil Salt and Lungisani Ngidi against
   assert.equal(ngidi.matches_played, 2);
   assert.equal(ngidi.season_total_points, 79);
   assert.equal(ngidi.last_match_points, 51);
+});
+
+test('generateMiniFantasyPriceBook matches Lhuan-dre Pretorious against Pretorius history', () => {
+  const liveData = {
+    fetchedAt: '2026-04-18T00:10:00Z',
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 1,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Lhuan-dre Pretorius': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Lhuan-dre Pretorius': { score: 35 }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 2,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Lhuan-dre Pretorius': 2
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Lhuan-dre Pretorius': { score: 80 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 1, datetime_utc: '2026-04-17T14:00:00Z' },
+    { match_no: 2, datetime_utc: '2026-04-18T14:00:00Z' }
+  ];
+  const squads = {
+    RR: ['Lhuan-dre Pretorious']
+  };
+  const teamRoles = {
+    teams: {
+      RR: { players: { 'Lhuan-dre Pretorius': 'wicket_keeper' } }
+    }
+  };
+
+  const priceBook = generateMiniFantasyPriceBook({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    asOfUtc: '2026-04-18T00:10:00Z'
+  });
+
+  const pretorious = priceBook.players.find((entry) => entry.name === 'Lhuan-dre Pretorious');
+  assert.ok(pretorious);
+  assert.equal(pretorious.matches_played, 2);
+  assert.equal(pretorious.season_total_points, 80);
+  assert.equal(pretorious.last_match_points, 45);
 });
 
 test('generateMiniFantasyPriceBook marks uncapped players and caps them at 9 credits', () => {
