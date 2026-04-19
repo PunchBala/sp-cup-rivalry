@@ -626,6 +626,38 @@ test('mini fantasy histories score bowling economy bonus from the fixture itself
   assert.equal(histories['varun chakaravarthy']?.points_by_match_no?.[1], 80);
 });
 
+test('mini fantasy histories store points under fallback processed matchNo values', async () => {
+  const histories = await buildMiniFantasyPlayerHistoriesFromProcessedMatches(
+    [
+      { id: 'match-40', matchNo: 40, dateTimeGMT: '2026-05-01T10:00:00Z' }
+    ],
+    null,
+    {
+      loadScorecard: async () => ({
+        data: makeFinalScorecard({
+          teams: ['Royal Challengers Bengaluru', 'Mumbai Indians'],
+          winner: 'Royal Challengers Bengaluru',
+          batter: 'Phil Salt',
+          bowler: 'Jasprit Bumrah',
+          catcher: 'Rajat Patidar',
+          runs: 30,
+          balls: 18,
+          sixes: 2,
+          wickets: 1,
+          concededRuns: 24,
+          overs: '4',
+          scoreA: 182,
+          scoreB: 161
+        }),
+        source: 'cache'
+      })
+    }
+  );
+
+  assert.equal(histories['phil salt']?.points_by_match_no?.[40], 39);
+  assert.equal(histories['phil salt']?.points_by_match_no?.[1], undefined);
+});
+
 test('standings still update when scorecard omits the top-level score summary', async () => {
   const rebuilt = await rebuildHistoricalState(
     ['match-13'],

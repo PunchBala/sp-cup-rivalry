@@ -1593,7 +1593,7 @@ export async function buildMiniFantasyPlayerHistoriesFromProcessedMatches(proces
     applyMiniFantasyMatchAggregateToHistories(
       histories,
       matchAggregate,
-      processedRef?.match_no || processedMatchNo,
+      processedRef?.match_no || processedRef?.matchNo || processedMatchNo,
       processedRef?.dateTimeGMT || processedRef?.dateTime || processedRef?.date || processedRef?.datetime_utc || null
     );
   }
