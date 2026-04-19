@@ -1383,7 +1383,6 @@
       MINI_FANTASY_DAILY_VISIT_TIME_ZONE,
       MINI_FANTASY_FIRST_MATCH_OPEN_AT_UTC,
       MINI_FANTASY_FIRST_OPEN_MATCH_NO,
-      MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION,
       MINI_FANTASY_LAUNCH_AT_UTC,
       MINI_FANTASY_NEW_PLAYER_BASELINE_POINTS,
       MINI_FANTASY_SEASON,
@@ -8579,7 +8578,6 @@ function titleBandScore(pick, live){
     function miniFantasyLeaderboardData(){
       const cacheKey = [
         MINI_FANTASY_COMPUTE_REVISION,
-        MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION,
         LIVE_2026?.fetchedAt || '',
         Number(LIVE_2026?.meta?.scoreHistory?.length || 0),
         Number(LEAGUE_STAGE_SCHEDULE?.length || 0),
@@ -8595,10 +8593,7 @@ function titleBandScore(pick, live){
         && liveFetchedAt
         && Array.isArray(leaderboardRows)
         && leaderboardRows.length
-        && leaderboardRows.every((row) =>
-          normalizeTextValue(row.liveDataFetchedAt || row.live_data_fetched_at || '') === liveFetchedAt
-          && normalizeTextValue(row.snapshotVersion || row.snapshot_version || '') === MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION
-        );
+        && leaderboardRows.every((row) => normalizeTextValue(row.liveDataFetchedAt || row.live_data_fetched_at || '') === liveFetchedAt);
       if (canUsePrecomputedRows) {
         const value = {
           completed_match_count: Number(leaderboardRows[0]?.completedMatchCount || leaderboardRows[0]?.completed_match_count || 0) || 0,

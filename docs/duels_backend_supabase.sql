@@ -94,13 +94,9 @@ create table if not exists public.mini_fantasy_leaderboard_rows (
   completed_match_count integer not null default 0,
   matches jsonb not null default '[]'::jsonb,
   live_data_fetched_at timestamptz,
-  snapshot_version text,
   generated_at timestamptz not null default timezone('utc', now()),
   unique (season, owner_handle)
 );
-
-alter table public.mini_fantasy_leaderboard_rows
-  add column if not exists snapshot_version text;
 
 alter table public.mini_fantasy_entries
   add column if not exists display_name text not null default '';

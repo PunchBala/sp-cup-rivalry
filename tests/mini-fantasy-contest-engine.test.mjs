@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 
 import {
   MINI_FANTASY_BUDGET,
-  MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION,
   MINI_FANTASY_NEW_PLAYER_BASELINE_POINTS,
   buildMiniFantasyLeaderboard,
   buildMiniFantasyFixturePointsIndex,
@@ -80,65 +79,6 @@ test('deriveCompletedMatchHistories keeps zero-point appearances when playerMatc
   assert.deepEqual(histories.get('player c')?.match_points, [60]);
 });
 
-test('deriveCompletedMatchHistories prefers precomputed direct match histories when available', () => {
-  const liveData = {
-    meta: {
-      miniFantasyPlayerHistories: {
-        'vaibhav suryavanshi': {
-          player_name: 'Vaibhav Suryavanshi',
-          match_points: [10, 55],
-          points_by_match_no: {
-            1: 10,
-            2: 55
-          },
-          matches_played: 2,
-          last_match_played_at_utc: '2026-04-19T10:00:00Z'
-        }
-      },
-      scoreHistory: [
-        {
-          processedMatchCount: 1,
-          snapshot: {
-            meta: {
-              aggregates: {
-                playerMatches: {
-                  'Vaibhav Suryavanshi': 1
-                }
-              }
-            },
-            mvp: {
-              values: {
-                'Vaibhav Suryavanshi': { score: 10 }
-              }
-            }
-          }
-        },
-        {
-          processedMatchCount: 2,
-          snapshot: {
-            meta: {
-              aggregates: {
-                playerMatches: {
-                  'Vaibhav Suryavanshi': 2
-                }
-              }
-            },
-            mvp: {
-              values: {
-                'Vaibhav Suryavanshi': { score: 60 }
-              }
-            }
-          }
-        }
-      ]
-    }
-  };
-
-  const histories = deriveCompletedMatchHistories(liveData, []);
-  assert.equal(histories.get('vaibhav suryavanshi')?.points_by_match_no?.[2], 55);
-  assert.deepEqual(histories.get('vaibhav suryavanshi')?.match_points, [10, 55]);
-});
-
 test('resolvePlayerHistory matches safe alias variations used by squad lists', () => {
   const liveData = {
     meta: {
@@ -159,8 +99,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'AM Ghazanfar': 1,
                   'Philip Salt': 1,
                   'Lungi Ngidi': 1,
-                  'Lhuan-dre Pretorius': 1,
-                  'Varun Chakaravarthy': 1
+                  'Lhuan-dre Pretorius': 1
                 }
               }
             },
@@ -176,8 +115,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'AM Ghazanfar': { score: 44 },
                 'Philip Salt': { score: 49 },
                 'Lungi Ngidi': { score: 28 },
-                'Lhuan-dre Pretorius': { score: 35 },
-                'Varun Chakaravarthy': { score: 18 }
+                'Lhuan-dre Pretorius': { score: 35 }
               }
             }
           }
@@ -199,8 +137,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Philip Salt': 2,
                   'Lungisani Ngidi': 1,
                   'Lungi Ngidi': 1,
-                  'Lhuan-dre Pretorius': 2,
-                  'Varun Chakaravarthy': 2
+                  'Lhuan-dre Pretorius': 2
                 }
               }
             },
@@ -217,8 +154,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Philip Salt': { score: 67 },
                 'Lungisani Ngidi': { score: 51 },
                 'Lungi Ngidi': { score: 79 },
-                'Lhuan-dre Pretorius': { score: 80 },
-                'Varun Chakaravarthy': { score: 108.5 }
+                'Lhuan-dre Pretorius': { score: 80 }
               }
             }
           }
@@ -243,7 +179,6 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
   assert.deepEqual(resolvePlayerHistory('Phil Salt', histories)?.match_points, [49, 18]);
   assert.deepEqual(resolvePlayerHistory('Lungisani Ngidi', histories)?.match_points, [28, 51]);
   assert.deepEqual(resolvePlayerHistory('Lhuan-dre Pretorious', histories)?.match_points, [35, 45]);
-  assert.deepEqual(resolvePlayerHistory('Varun Chakravarthy', histories)?.match_points, [18, 90.5]);
 });
 
 test('buildMiniFantasyPlayerPointsIndex keeps completed fixture points for Surya Kumar Yadav aliases', () => {
@@ -1301,7 +1236,6 @@ test('serializeMiniFantasyLeaderboardRows keeps the leaderboard snapshot shape s
         }
       ],
       live_data_fetched_at: '2026-04-19T10:00:00Z',
-      snapshot_version: MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION,
       generated_at: '2026-04-19T10:05:00Z'
     }
   ]);
@@ -1415,83 +1349,4 @@ test('scoreMiniFantasyEntry applies appearance and winning bonuses before captai
   assert.equal(noResult.winning_team_code, null);
   assert.equal(noResult.is_no_result, true);
   assert.equal(noResult.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 0);
-});
-
-test('scoreMiniFantasyEntry uses precomputed direct match histories for completed captain scores', () => {
-  const entry = {
-    matchNo: 28,
-    selectedPlayerIds: [
-      buildMiniFantasyPlayerId('RR', 'Vaibhav Suryavanshi'),
-      buildMiniFantasyPlayerId('RR', 'Nandre Burger'),
-      buildMiniFantasyPlayerId('KKR', 'Varun Chakravarthy'),
-      buildMiniFantasyPlayerId('KKR', 'Tim Seifert')
-    ],
-    captainPlayerId: buildMiniFantasyPlayerId('RR', 'Vaibhav Suryavanshi')
-  };
-  const schedule = [
-    { match_no: 28, datetime_utc: '2026-04-19T14:00:00Z', home_team: 'Rajasthan Royals', away_team: 'Kolkata Knight Riders' }
-  ];
-  const squads = {
-    RR: ['Vaibhav Suryavanshi', 'Nandre Burger'],
-    KKR: ['Varun Chakaravarthy', 'Tim Seifert']
-  };
-  const liveData = {
-    meta: {
-      cache: {
-        matchList: [
-          {
-            matchNo: 28,
-            status: 'Kolkata Knight Riders won by 7 runs',
-            teams: ['Rajasthan Royals', 'Kolkata Knight Riders']
-          }
-        ]
-      },
-      miniFantasyPlayerHistories: {
-        'vaibhav suryavanshi': {
-          player_name: 'Vaibhav Suryavanshi',
-          match_points: [55],
-          points_by_match_no: { 28: 55 },
-          matches_played: 1,
-          last_match_played_at_utc: '2026-04-19T14:00:00Z'
-        },
-        'nandre burger': {
-          player_name: 'Nandre Burger',
-          match_points: [26],
-          points_by_match_no: { 28: 26 },
-          matches_played: 1,
-          last_match_played_at_utc: '2026-04-19T14:00:00Z'
-        },
-        'varun chakaravarthy': {
-          player_name: 'Varun Chakaravarthy',
-          match_points: [99.5],
-          points_by_match_no: { 28: 99.5 },
-          matches_played: 1,
-          last_match_played_at_utc: '2026-04-19T14:00:00Z'
-        },
-        'tim seifert': {
-          player_name: 'Tim Seifert',
-          match_points: [3],
-          points_by_match_no: { 28: 3 },
-          matches_played: 1,
-          last_match_played_at_utc: '2026-04-19T14:00:00Z'
-        }
-      }
-    }
-  };
-
-  const scored = scoreMiniFantasyEntry({
-    entry,
-    liveData,
-    schedule,
-    squads,
-    completedMatchCount: 28
-  });
-
-  assert.equal(scored.points_by_player_id[buildMiniFantasyPlayerId('RR', 'Vaibhav Suryavanshi')], 55);
-  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('RR', 'Vaibhav Suryavanshi')], 85.5);
-  assert.equal(scored.points_by_player_id[buildMiniFantasyPlayerId('KKR', 'Varun Chakravarthy')], 99.5);
-  assert.equal(scored.scored_points_by_player_id[buildMiniFantasyPlayerId('KKR', 'Varun Chakravarthy')], 106.5);
-  assert.equal(scored.appearance_bonus_points, 8);
-  assert.equal(scored.winner_bonus_points, 10);
-  assert.equal(scored.total_points, 230);
 });

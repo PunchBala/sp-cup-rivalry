@@ -355,7 +355,6 @@ function createEmptyLive() {
       processedMatchIds: [],
       processedMatchKeys: [],
       scoreHistory: [],
-      miniFantasyPlayerHistories: {},
       aggregates: createEmptyAggregates(),
       liveOverlay: {
         matchId: null,
@@ -454,9 +453,6 @@ async function readExistingLive() {
         processedMatchIds: Array.isArray(parsed.meta?.processedMatchIds) ? parsed.meta.processedMatchIds : [],
         processedMatchKeys: Array.isArray(parsed.meta?.processedMatchKeys) ? parsed.meta.processedMatchKeys : [],
         scoreHistory: Array.isArray(parsed.meta?.scoreHistory) ? parsed.meta.scoreHistory : [],
-        miniFantasyPlayerHistories: parsed.meta?.miniFantasyPlayerHistories && typeof parsed.meta.miniFantasyPlayerHistories === 'object'
-          ? parsed.meta.miniFantasyPlayerHistories
-          : {},
         aggregates: { ...fresh.meta.aggregates, ...(parsed.meta?.aggregates || {}) },
         liveOverlay: { ...fresh.meta.liveOverlay, ...(parsed.meta?.liveOverlay || {}) },
         scorecardBudget: { ...fresh.meta.scorecardBudget, ...(parsed.meta?.scorecardBudget || {}) },
@@ -1378,11 +1374,6 @@ function clone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
-function roundTo(value, decimals = 2) {
-  const factor = 10 ** decimals;
-  return Math.round((Number(value || 0) + Number.EPSILON) * factor) / factor;
-}
-
 function combineAggregates(baseAgg, overlayAgg) {
   const out = clone(baseAgg);
   if (!overlayAgg) return out;
@@ -1441,164 +1432,7 @@ function figuresEqual(a, b) {
 }
 
 function historySnapshotAggregate(entry) {
-  const aggregate = cloneJson(entry?.snapshot?.meta?.aggregates || createEmptyAggregates());
-  if (!Object.keys(aggregate.bowlingDots || {}).length) {
-    aggregate.bowlingDots = historicalSnapshotDotsValues(entry);
-  }
-  return aggregate;
-}
-
-function rankDotsValues(values = {}) {
-  return Object.entries(values || {})
-    .sort((a, b) => Number(b[1] || 0) - Number(a[1] || 0) || a[0].localeCompare(b[0]))
-    .map(([player]) => player);
-}
-
-function historicalSnapshotDotsValues(entry) {
-  const aggregateValues = cloneJson(entry?.snapshot?.meta?.aggregates?.bowlingDots || {});
-  if (Object.keys(aggregateValues).length) return aggregateValues;
-  return cloneJson(entry?.snapshot?.mostDots?.values || {});
-}
-
-function resolveHistoricalCumulativeDots(baseLive, processedMatchCountValue) {
-  const processedCount = Number(processedMatchCountValue || 0);
-  if (processedCount <= 0) return {};
-  const scoreHistory = safeArray(baseLive?.meta?.scoreHistory);
-  if (!scoreHistory.length) {
-    return processedCount === processedMatchCount(baseLive)
-      ? cloneJson(baseLive?.mostDots?.values || {})
-      : {};
-  }
-
-  const byCount = new Map(scoreHistory.map((entry) => [historyEntryCount(entry), entry]));
-  const exactValues = historicalSnapshotDotsValues(byCount.get(processedCount));
-  if (Object.keys(exactValues).length) return exactValues;
-
-  if (processedCount === processedMatchCount(baseLive)) {
-    const finalValues = cloneJson(baseLive?.mostDots?.values || {});
-    if (Object.keys(finalValues).length) return finalValues;
-  }
-
-  for (let cursor = processedCount - 1; cursor >= 0; cursor -= 1) {
-    const previousValues = historicalSnapshotDotsValues(byCount.get(cursor));
-    if (Object.keys(previousValues).length) return previousValues;
-  }
-
-  return {};
-}
-
-function buildHistoricalDotOverlay(baseLive, processedMatchCountValue) {
-  const currentDots = resolveHistoricalCumulativeDots(baseLive, processedMatchCountValue);
-  const previousDots = resolveHistoricalCumulativeDots(baseLive, Number(processedMatchCountValue || 0) - 1);
-  return diffNumericMap(currentDots, previousDots);
-}
-
-function createMostDotsPayloadFromValues(values = {}, source = null) {
-  const payloadValues = cloneJson(values || {});
-  const ranking = rankDotsValues(payloadValues);
-  if (!ranking.length) return null;
-  return {
-    ranking: ranking.slice(0, 10),
-    extendedRanking: ranking,
-    values: payloadValues,
-    source
-  };
-}
-
-function buildMiniFantasyMatchPointsFromAggregate(matchAgg = {}) {
-  const aggregate = {
-    ...createEmptyAggregates(),
-    ...(matchAgg || {}),
-    bowlingDots: cloneJson(matchAgg?.bowlingDots || {})
-  };
-  const pointsByPlayer = {};
-  const scoreValues = buildMvpRanking(aggregate, aggregate.bowlingDots || {}).values || {};
-  const participants = new Set([
-    ...Object.keys(aggregate.playerMatches || {}),
-    ...Object.keys(scoreValues || {})
-  ]);
-
-  participants.forEach((playerName) => {
-    pointsByPlayer[playerName] = roundTo(Number(scoreValues?.[playerName]?.score || 0), 2);
-  });
-
-  return pointsByPlayer;
-}
-
-function applyMiniFantasyMatchAggregateToHistories(histories, matchAgg, matchNo, playedAt = null) {
-  const pointsByPlayer = buildMiniFantasyMatchPointsFromAggregate(matchAgg);
-  const participants = new Set([
-    ...Object.keys(matchAgg?.playerMatches || {}),
-    ...Object.keys(pointsByPlayer || {})
-  ]);
-
-  participants.forEach((playerName) => {
-    const appearances = Math.max(0, Math.trunc(Number(matchAgg?.playerMatches?.[playerName] || 0)));
-    if (appearances <= 0 && !Object.prototype.hasOwnProperty.call(pointsByPlayer, playerName)) return;
-    const historyKey = canonicalPlayerPoolKey(playerName);
-    const history = histories[historyKey] || {
-      player_name: playerName,
-      match_points: [],
-      points_by_match_no: {},
-      matches_played: 0,
-      last_match_played_at_utc: null
-    };
-    const matchPoints = roundTo(Number(pointsByPlayer[playerName] || 0), 2);
-    const appearanceCount = Math.max(1, appearances || 0);
-    for (let step = 0; step < appearanceCount; step += 1) {
-      const effectiveMatchNo = Math.max(1, Number(matchNo || 0) - (appearanceCount - 1) + step);
-      const effectivePoints = step === appearanceCount - 1 ? matchPoints : 0;
-      history.match_points.push(effectivePoints);
-      history.points_by_match_no[effectiveMatchNo] = effectivePoints;
-    }
-    history.matches_played += appearanceCount;
-    history.last_match_played_at_utc = playedAt || history.last_match_played_at_utc || null;
-    histories[historyKey] = history;
-  });
-}
-
-export async function buildMiniFantasyPlayerHistoriesFromProcessedMatches(processedRefs, baseLive = null, { loadScorecard = null } = {}) {
-  const histories = {};
-  const resolveScorecard = loadScorecard || ((matchId) => processScorecard(matchId, baseLive, {
-    preferCache: true,
-    allowApiFallback: ALLOW_HISTORICAL_REPLAY_API
-  }));
-
-  for (let index = 0; index < safeArray(processedRefs).length; index += 1) {
-    const processedRef = processedRefs[index];
-    const processedMatchNo = index + 1;
-    let matchAggregate = null;
-
-    try {
-      const scorecardResult = normalizeScorecardResult(await resolveScorecard(processedRef?.id));
-      if (scorecardResult) {
-        matchAggregate = createEmptyAggregates();
-        applyScorecardToAggregates(matchAggregate, scorecardResult.data, { isFinal: true });
-      }
-    } catch (error) {
-      const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-      if (!missingScorecard && !isMissingProcessedScorecardError(error)) throw error;
-    }
-
-    if (!matchAggregate) {
-      matchAggregate = buildHistoricalAggregateOverlay(baseLive, processedMatchNo);
-    }
-    if (!matchAggregate) continue;
-
-    const historicalDotOverlay = buildHistoricalDotOverlay(baseLive, processedMatchNo);
-    if (Object.keys(historicalDotOverlay).length) {
-      matchAggregate.bowlingDots = historicalDotOverlay;
-    }
-
-    applyMiniFantasyMatchAggregateToHistories(
-      histories,
-      matchAggregate,
-      processedRef?.match_no || processedRef?.matchNo || processedMatchNo,
-      processedRef?.dateTimeGMT || processedRef?.dateTime || processedRef?.date || processedRef?.datetime_utc || null
-    );
-  }
-
-  return histories;
+  return cloneJson(entry?.snapshot?.meta?.aggregates || createEmptyAggregates());
 }
 
 function buildHistoricalAggregateOverlay(baseLive, processedMatchCount) {
@@ -1616,9 +1450,6 @@ function buildHistoricalAggregateOverlay(baseLive, processedMatchCount) {
 
   for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'stumpings', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
     overlay[key] = diffNumericMap(currentAgg[key], previousAgg[key]);
-  }
-  if (!Object.keys(overlay.bowlingDots || {}).length) {
-    overlay.bowlingDots = buildHistoricalDotOverlay(baseLive, processedMatchCount);
   }
 
   overlay.standings = diffNestedNumericMap(currentAgg.standings, previousAgg.standings);
@@ -1801,19 +1632,17 @@ function cloneJson(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function createScoreHistorySnapshotFromAggregates(agg, baseLive = null, { processedMatchCount = null } = {}) {
+function createScoreHistorySnapshotFromAggregates(agg, baseLive = null) {
   const snapshot = createEmptyLive();
   snapshot.meta.aggregates = cloneJson(agg || createEmptyAggregates());
-  const historicalDots = createMostDotsPayloadFromValues(
-    Object.keys(snapshot.meta.aggregates.bowlingDots || {}).length
-      ? snapshot.meta.aggregates.bowlingDots
-      : resolveHistoricalCumulativeDots(baseLive, processedMatchCount),
-    baseLive?.mostDots?.source || null
-  );
   fillDerivedOutputs(
     snapshot,
     snapshot.meta.aggregates,
-    historicalDots,
+    baseLive?.mostDots ? {
+      ranking: safeArray(baseLive.mostDots.ranking),
+      extendedRanking: safeArray(baseLive.mostDots.extendedRanking),
+      values: cloneJson(baseLive.mostDots.values || {})
+    } : null,
     baseLive?.fairPlay ? {
       winner: baseLive.fairPlay.winner || null,
       ranking: safeArray(baseLive.fairPlay.ranking),
@@ -1855,7 +1684,7 @@ function upsertScoreHistorySnapshot(live, processedMatchCount, fetchedAt = isoNo
   byCount.set(processedMatchCount, {
     processedMatchCount,
     fetchedAt,
-    snapshot: createScoreHistorySnapshotFromAggregates(live.meta.aggregates, live, { processedMatchCount })
+    snapshot: createScoreHistorySnapshotFromAggregates(live.meta.aggregates, live)
   });
   live.meta.scoreHistory = Array.from(byCount.values()).sort((a, b) => historyEntryCount(a) - historyEntryCount(b));
 }
@@ -1896,17 +1725,13 @@ export async function rebuildHistoricalState(processedIds, baseLive = null, { in
       if (scorecardResult.source === 'api') apiCalls += 1;
       applyScorecardToAggregates(rebuilt, scorecardResult.data, { isFinal: true });
     }
-    const historicalCumulativeDots = resolveHistoricalCumulativeDots(baseLive, processedMatchCount);
-    if (Object.keys(historicalCumulativeDots).length) {
-      rebuilt.bowlingDots = historicalCumulativeDots;
-    }
 
     if (includeHistory) {
       const existingHistoryEntry = baseLive?.meta?.scoreHistory?.find((entry) => historyEntryCount(entry) === processedMatchCount);
       history.push({
         processedMatchCount,
         fetchedAt: existingHistoryEntry?.fetchedAt || isoNow(),
-        snapshot: createScoreHistorySnapshotFromAggregates(rebuilt, baseLive, { processedMatchCount })
+        snapshot: createScoreHistorySnapshotFromAggregates(rebuilt, baseLive)
       });
     }
   }
@@ -1980,7 +1805,7 @@ export async function repairScoreHistoryGaps(live, processedRefs, { loadScorecar
     byCount.set(count, {
       processedMatchCount: count,
       fetchedAt: isoNow(),
-      snapshot: createScoreHistorySnapshotFromAggregates(nextAgg, live, { processedMatchCount: count })
+      snapshot: createScoreHistorySnapshotFromAggregates(nextAgg, live)
     });
     repaired += 1;
   }
@@ -2500,7 +2325,6 @@ async function main() {
       dotsReport.cachedRows = live.mostDots.extendedRanking.length;
     }
   }
-  live.meta.aggregates.bowlingDots = { ...(combinedAgg.bowlingDots || {}) };
 
   let fairPlayPayload = live.fairPlay || { winner: null, ranking: [], extendedRanking: [], values: {} };
   let fairPlayReport = {
@@ -2534,16 +2358,6 @@ async function main() {
   }
 
   fillDerivedOutputs(live, combinedAgg, dotsPayload, fairPlayPayload);
-  live.meta.miniFantasyPlayerHistories = await buildMiniFantasyPlayerHistoriesFromProcessedMatches(
-    processedRefs,
-    live,
-    {
-      loadScorecard: (matchId) => processScorecard(matchId, live, {
-        preferCache: true,
-        allowApiFallback: false
-      })
-    }
-  );
 
   live.scrapeReport = {
     orangeCap: { ok: true, source: 'CricketData scorecards', method: 'computed season total runs' },
