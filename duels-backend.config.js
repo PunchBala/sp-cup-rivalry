@@ -9,6 +9,8 @@ window.DUELS_BACKEND_CONFIG = Object.assign({
     profiles: 'profiles',
     duels: 'duels',
     duelEntries: 'duel_entries',
-    miniFantasyEntries: 'mini_fantasy_entries'
+    miniFantasyEntries: 'mini_fantasy_entries',
+    miniFantasyDailyBonuses: 'mini_fantasy_daily_bonus_claims',
+    miniFantasyLeaderboardRows: 'mini_fantasy_leaderboard_rows'
   }
 }, window.DUELS_BACKEND_CONFIG || {});

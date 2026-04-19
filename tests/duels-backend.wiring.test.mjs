@@ -15,6 +15,7 @@ test('backend config, adapter, and setup docs are present for real auth + duel a
   assert.match(configJs, /DUELS_BACKEND_CONFIG/);
   assert.match(configJs, /supabaseUrl/);
   assert.match(configJs, /supabaseAnonKey/);
+  assert.match(configJs, /miniFantasyLeaderboardRows/);
 
   assert.match(backendJs, /createDuelsBackend/);
   assert.match(backendJs, /signUp/);
@@ -28,6 +29,7 @@ test('backend config, adapter, and setup docs are present for real auth + duel a
   assert.match(backendJs, /saveOwnedEntry/);
   assert.match(backendJs, /listMiniFantasyEntries/);
   assert.match(backendJs, /listPublicMiniFantasyEntries/);
+  assert.match(backendJs, /listMiniFantasyLeaderboardRows/);
   assert.match(backendJs, /fixture_datetime_utc:\s*`lte\.\$\{publicVisibleAtUtc\}`/);
   assert.match(backendJs, /upsertMiniFantasyEntry/);
 
@@ -39,7 +41,9 @@ test('backend config, adapter, and setup docs are present for real auth + duel a
   assert.match(schemaSql, /create table if not exists public\.duels/i);
   assert.match(schemaSql, /create table if not exists public\.duel_entries/i);
   assert.match(schemaSql, /create table if not exists public\.mini_fantasy_entries/i);
+  assert.match(schemaSql, /create table if not exists public\.mini_fantasy_leaderboard_rows/i);
   assert.match(schemaSql, /create policy "users read their own mini fantasy entries"/i);
   assert.match(schemaSql, /create policy "locked mini fantasy entries are public readable"/i);
+  assert.match(schemaSql, /create policy "mini fantasy leaderboard rows are public readable"/i);
   assert.match(schemaSql, /enable row level security/i);
 });

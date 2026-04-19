@@ -14,6 +14,7 @@ import {
   generateMiniFantasyPriceBook,
   getMiniFantasyOpenFixtures,
   resolvePlayerHistory,
+  serializeMiniFantasyLeaderboardRows,
   scoreMiniFantasyEntry,
   validateMiniFantasyEntry
 } from '../mini-fantasy/contest-engine.js';
@@ -1173,6 +1174,71 @@ test('buildMiniFantasyLeaderboard uses profile created_at ahead of first saved-e
   assert.equal(earlyBird.missed_lock_points, 0);
   assert.equal(earlyBird.matches[0].source, 'locked_entry');
   assert.equal(earlyBird.saved_entries, 1);
+});
+
+test('serializeMiniFantasyLeaderboardRows keeps the leaderboard snapshot shape stable for database publishing', () => {
+  const rows = serializeMiniFantasyLeaderboardRows({
+    leaderboard: {
+      completed_match_count: 14,
+      rows: [
+        {
+          owner_handle: 'senthil',
+          user_id: 'user-senthil',
+          display_name: 'Senthil',
+          rank: 1,
+          medal: 'gold',
+          total_points: 123.5,
+          saved_entries: 2,
+          scored_entries: 2,
+          pending_entries: 0,
+          latest_saved_at: '2026-04-10T15:00:00Z',
+          daily_bonus_points: 5,
+          missed_lock_points: 10,
+          new_player_baseline_points: 40,
+          matches: [
+            {
+              match_no: 14,
+              total_points: 83.5,
+              source: 'locked_entry'
+            }
+          ]
+        }
+      ]
+    },
+    liveData: {
+      fetchedAt: '2026-04-19T10:00:00Z'
+    },
+    generatedAtUtc: '2026-04-19T10:05:00Z'
+  });
+
+  assert.deepEqual(rows, [
+    {
+      season: 'IPL 2026',
+      owner_handle: 'senthil',
+      user_id: 'user-senthil',
+      display_name: 'Senthil',
+      rank: 1,
+      medal: 'gold',
+      total_points: 123.5,
+      saved_entries: 2,
+      scored_entries: 2,
+      pending_entries: 0,
+      latest_saved_at: '2026-04-10T15:00:00Z',
+      daily_bonus_points: 5,
+      missed_lock_points: 10,
+      new_player_baseline_points: 40,
+      completed_match_count: 14,
+      matches: [
+        {
+          match_no: 14,
+          total_points: 83.5,
+          source: 'locked_entry'
+        }
+      ],
+      live_data_fetched_at: '2026-04-19T10:00:00Z',
+      generated_at: '2026-04-19T10:05:00Z'
+    }
+  ]);
 });
 
 test('calculateMiniFantasyMissedLockPoints lowers the cap after the third missed lock', () => {

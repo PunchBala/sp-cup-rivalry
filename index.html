@@ -1448,11 +1448,13 @@
     let REMOTE_DUEL_STORE = { version: 1, rooms: {} };
     let REMOTE_MINI_FANTASY_ENTRIES = [];
     let REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = [];
+    let REMOTE_MINI_FANTASY_LEADERBOARD_ROWS = [];
     let REMOTE_MINI_FANTASY_PROFILES = [];
     let REMOTE_MINI_FANTASY_DAILY_BONUSES = [];
     let MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';
     let MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
     let MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE = true;
+    let MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = false;
     let MINI_FANTASY_COMPUTE_REVISION = 0;
     let MINI_FANTASY_LEADERBOARD_CACHE = { key: '', value: null };
     let MINI_FANTASY_RECENT_BOARD_CACHE = { key: '', value: null };
@@ -4274,7 +4276,7 @@ function titleBandScore(pick, live){
     function queueMiniFantasyPublicDataLoad({ force = false } = {}){
       if (!usesHostedDuelsBackend() || activeView !== 'fantasy') return Promise.resolve([]);
       if (!force && (MINI_FANTASY_PUBLIC_DATA_STATUS === 'loading' || MINI_FANTASY_PUBLIC_DATA_STATUS === 'ready')) {
-        return MINI_FANTASY_PUBLIC_DATA_PROMISE || Promise.resolve(currentMiniFantasyLeaderboardEntries());
+        return MINI_FANTASY_PUBLIC_DATA_PROMISE || Promise.resolve(currentMiniFantasyLeaderboardRows());
       }
       MINI_FANTASY_PUBLIC_DATA_STATUS = 'loading';
       MINI_FANTASY_PUBLIC_DATA_PROMISE = Promise.resolve().then(() => syncMiniFantasyEntries({
@@ -4288,7 +4290,7 @@ function titleBandScore(pick, live){
       }).catch((error) => {
         MINI_FANTASY_PUBLIC_DATA_STATUS = 'error';
         console.warn('Mini Fantasy public leaderboard sync skipped:', error);
-        return currentMiniFantasyLeaderboardEntries();
+        return currentMiniFantasyLeaderboardRows();
       }).finally(() => {
         MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
         if (activeView === 'fantasy') {
@@ -4308,6 +4310,13 @@ function titleBandScore(pick, live){
       REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = Array.isArray(entries) ? cloneJson(entries) : [];
       invalidateMiniFantasyComputedData();
       return REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES;
+    }
+
+    function setRemoteMiniFantasyLeaderboardRows(rows = []){
+      REMOTE_MINI_FANTASY_LEADERBOARD_ROWS = Array.isArray(rows) ? cloneJson(rows) : [];
+      MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = false;
+      invalidateMiniFantasyComputedData();
+      return REMOTE_MINI_FANTASY_LEADERBOARD_ROWS;
     }
 
     function setRemoteMiniFantasyProfiles(profiles = []){
@@ -4331,6 +4340,7 @@ function titleBandScore(pick, live){
           && normalizeTextValue(item.bonusDateIst || item.bonus_date_ist || item.dateKey || '') === safeDateKey));
       nextBonuses.push(cloneJson(bonus));
       REMOTE_MINI_FANTASY_DAILY_BONUSES = nextBonuses;
+      MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = true;
       invalidateMiniFantasyComputedData();
       return bonus;
     }
@@ -4345,6 +4355,7 @@ function titleBandScore(pick, live){
         .filter((item) => miniFantasyEntryStoreKey(item) !== miniFantasyEntryStoreKey(entry));
       leaderboardEntries.push(cloneJson(entry));
       REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES = leaderboardEntries;
+      MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = true;
       invalidateMiniFantasyComputedData();
       return entry;
     }
@@ -4361,6 +4372,10 @@ function titleBandScore(pick, live){
       return usesHostedDuelsBackend()
         ? (REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES || [])
         : loadStoredMiniFantasyEntriesStore().entries;
+    }
+
+    function currentMiniFantasyLeaderboardRows(){
+      return usesHostedDuelsBackend() ? (REMOTE_MINI_FANTASY_LEADERBOARD_ROWS || []) : [];
     }
 
     function currentMiniFantasyProfiles(){
@@ -4403,7 +4418,7 @@ function titleBandScore(pick, live){
       }
       try {
         const shouldLoadDailyBonuses = includeDailyBonuses && MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE;
-        const [entries, leaderboardEntries, profiles, dailyBonuses] = await Promise.all([
+        const [entries, leaderboardEntries, leaderboardRows, profiles, dailyBonuses] = await Promise.all([
           CURRENT_USER
             ? DUELS_BACKEND.listMiniFantasyEntries({
                 season: MINI_FANTASY_SEASON,
@@ -4416,6 +4431,15 @@ function titleBandScore(pick, live){
                 currentUser: CURRENT_USER
               })
             : Promise.resolve(REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES || []),
+          includePublicData
+            ? DUELS_BACKEND.listMiniFantasyLeaderboardRows({
+                season: MINI_FANTASY_SEASON,
+                currentUser: CURRENT_USER
+              }).catch((error) => {
+                console.warn('Hosted mini fantasy leaderboard snapshot load failed:', error);
+                return REMOTE_MINI_FANTASY_LEADERBOARD_ROWS || [];
+              })
+            : Promise.resolve(REMOTE_MINI_FANTASY_LEADERBOARD_ROWS || []),
           includeProfiles
             ? DUELS_BACKEND.listPublicMiniFantasyProfiles({
                 currentUser: CURRENT_USER
@@ -4438,6 +4462,7 @@ function titleBandScore(pick, live){
         ]);
         setRemoteMiniFantasyEntries(entries || []);
         if (includePublicData) setRemoteMiniFantasyLeaderboardEntries(leaderboardEntries || []);
+        if (includePublicData) setRemoteMiniFantasyLeaderboardRows(leaderboardRows || []);
         if (includeProfiles) setRemoteMiniFantasyProfiles(profiles || []);
         if (shouldLoadDailyBonuses) setRemoteMiniFantasyDailyBonuses(dailyBonuses || []);
       } catch (error) {
@@ -4449,6 +4474,7 @@ function titleBandScore(pick, live){
         };
         setRemoteMiniFantasyEntries([]);
         if (includePublicData) setRemoteMiniFantasyLeaderboardEntries([]);
+        if (includePublicData) setRemoteMiniFantasyLeaderboardRows([]);
         if (includeProfiles) setRemoteMiniFantasyProfiles([]);
         if (shouldLoadDailyBonuses) setRemoteMiniFantasyDailyBonuses([]);
       }
@@ -8554,10 +8580,27 @@ function titleBandScore(pick, live){
         MINI_FANTASY_COMPUTE_REVISION,
         LIVE_2026?.fetchedAt || '',
         Number(LIVE_2026?.meta?.scoreHistory?.length || 0),
-        Number(LEAGUE_STAGE_SCHEDULE?.length || 0)
+        Number(LEAGUE_STAGE_SCHEDULE?.length || 0),
+        MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK ? 'fallback' : 'snapshot'
       ].join('|');
       if (MINI_FANTASY_LEADERBOARD_CACHE.key === cacheKey && MINI_FANTASY_LEADERBOARD_CACHE.value) {
         return MINI_FANTASY_LEADERBOARD_CACHE.value;
+      }
+      const liveFetchedAt = normalizeTextValue(LIVE_2026?.fetchedAt || '');
+      const leaderboardRows = currentMiniFantasyLeaderboardRows();
+      const canUsePrecomputedRows = usesHostedDuelsBackend()
+        && !MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK
+        && liveFetchedAt
+        && Array.isArray(leaderboardRows)
+        && leaderboardRows.length
+        && leaderboardRows.every((row) => normalizeTextValue(row.liveDataFetchedAt || row.live_data_fetched_at || '') === liveFetchedAt);
+      if (canUsePrecomputedRows) {
+        const value = {
+          completed_match_count: Number(leaderboardRows[0]?.completedMatchCount || leaderboardRows[0]?.completed_match_count || 0) || 0,
+          rows: cloneJson(leaderboardRows)
+        };
+        MINI_FANTASY_LEADERBOARD_CACHE = { key: cacheKey, value };
+        return value;
       }
       const value = buildMiniFantasyLeaderboard({
         entries: currentMiniFantasyLeaderboardEntries(),
@@ -9730,6 +9773,7 @@ function titleBandScore(pick, live){
       REMOTE_DUEL_STORE = emptyCustomDuelStore();
       setRemoteMiniFantasyEntries([]);
       setRemoteMiniFantasyLeaderboardEntries([]);
+      setRemoteMiniFantasyLeaderboardRows([]);
       setRemoteMiniFantasyProfiles([]);
       setRemoteMiniFantasyDailyBonuses([]);
       MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';

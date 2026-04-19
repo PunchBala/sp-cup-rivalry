@@ -47,6 +47,12 @@ jobs:
       - name: Refresh Mini Fantasy prices
         run: node scripts/update-mini-fantasy-prices.mjs
 
+      - name: Publish Mini Fantasy leaderboard snapshot
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/publish-mini-fantasy-leaderboard.mjs
+
       - name: Commit live data
         shell: bash
         run: |
