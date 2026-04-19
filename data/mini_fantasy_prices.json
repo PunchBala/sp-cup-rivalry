@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-04-18T19:55:41.170Z",
+    "as_of_utc": "2026-04-19T11:08:56.845Z",
     "price_min": 4,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -18,8 +18,8 @@
     "total_players_received": 250,
     "eligible_players_ranked": 250,
     "price_rises": 0,
-    "price_drops": 2,
-    "price_unchanged": 248
+    "price_drops": 0,
+    "price_unchanged": 250
   },
   "players": [
     {
@@ -413,8 +413,7 @@
       "adjusted_score": 8.75,
       "percentile": 50.2,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Recovered real match history from a previously blank price; used the corrected target price immediately"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-18T14:00:00Z"
     },
@@ -1405,12 +1404,12 @@
       "role": "all_rounder",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
+      "old_price": 5,
+      "initial_price": 5,
       "target_price": 4,
       "smoothed_price": 5,
       "final_price": 5,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 2,
       "season_total_points": -1,
       "season_avg_points": -0.5,
@@ -4248,12 +4247,12 @@
       "role": "all_rounder",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 10,
-      "initial_price": 10,
+      "old_price": 9,
+      "initial_price": 9,
       "target_price": 8,
       "smoothed_price": 9,
       "final_price": 9,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 4,
       "season_total_points": 181,
       "season_avg_points": 45.25,
@@ -7065,5 +7064,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-04-18T19:55:41.170Z"
+  "generated_at_utc": "2026-04-19T11:08:56.845Z"
 }
