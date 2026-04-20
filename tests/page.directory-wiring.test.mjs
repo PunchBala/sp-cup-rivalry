@@ -92,7 +92,10 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /Fixture-day visit bonus:/);
   assert.match(html, /New-player catch-up:/);
   assert.match(html, /function upsertRemoteMiniFantasyEntry\([\s\S]*MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = true;/);
+  assert.match(html, /MINI_FANTASY_PRECOMPUTED_LEADERBOARD_ENABLED = false;/);
+  assert.match(html, /includePublicData && MINI_FANTASY_PRECOMPUTED_LEADERBOARD_ENABLED[\s\S]*DUELS_BACKEND\.listMiniFantasyLeaderboardRows/);
   assert.match(html, /MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION/);
+  assert.match(html, /const canUsePrecomputedRows = MINI_FANTASY_PRECOMPUTED_LEADERBOARD_ENABLED/);
   assert.match(html, /row\.snapshotVersion \|\| row\.snapshot_version \|\| ''\) === MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION/);
   assert.match(html, /Opens the day before/);
   assert.match(html, /Locks at/);
