@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   MINI_FANTASY_BUDGET,
+  MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION,
   MINI_FANTASY_NEW_PLAYER_BASELINE_POINTS,
   buildMiniFantasyLeaderboard,
   buildMiniFantasyFixturePointsIndex,
@@ -1300,6 +1301,7 @@ test('serializeMiniFantasyLeaderboardRows keeps the leaderboard snapshot shape s
         }
       ],
       live_data_fetched_at: '2026-04-19T10:00:00Z',
+      snapshot_version: MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION,
       generated_at: '2026-04-19T10:05:00Z'
     }
   ]);

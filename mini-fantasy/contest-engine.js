@@ -14,6 +14,7 @@ import {
 
 export const MINI_FANTASY_ENGINE_VERSION = 'mini_fantasy_v1';
 export const MINI_FANTASY_PRICE_BOOK_VERSION = 'mini_fantasy_price_book_v1';
+export const MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION = 'mini_fantasy_leaderboard_v2_direct_histories';
 export const MINI_FANTASY_SEASON = 'IPL 2026';
 export const MINI_FANTASY_LAUNCH_AT_UTC = '2026-04-06T00:00:00Z';
 export const MINI_FANTASY_FIRST_OPEN_MATCH_NO = 14;
@@ -1682,11 +1683,13 @@ export function serializeMiniFantasyLeaderboardRows({
   leaderboard = null,
   season = MINI_FANTASY_SEASON,
   liveData = {},
+  snapshotVersion = MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION,
   generatedAtUtc = new Date().toISOString()
 } = {}) {
   const safeSeason = normalizeWhitespace(season || MINI_FANTASY_SEASON) || MINI_FANTASY_SEASON;
   const safeGeneratedAt = normalizeWhitespace(generatedAtUtc || new Date().toISOString()) || new Date().toISOString();
   const liveDataFetchedAt = normalizeWhitespace(liveData?.fetchedAt || liveData?.meta?.fetchedAt || '') || null;
+  const safeSnapshotVersion = normalizeWhitespace(snapshotVersion || MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION) || MINI_FANTASY_LEADERBOARD_SNAPSHOT_VERSION;
   const completedMatchCount = Number(leaderboard?.completed_match_count || 0) || 0;
   const rows = Array.isArray(leaderboard?.rows) ? leaderboard.rows : [];
 
@@ -1712,6 +1715,7 @@ export function serializeMiniFantasyLeaderboardRows({
         completed_match_count: completedMatchCount,
         matches: JSON.parse(JSON.stringify(Array.isArray(row?.matches) ? row.matches : [])),
         live_data_fetched_at: liveDataFetchedAt,
+        snapshot_version: safeSnapshotVersion,
         generated_at: safeGeneratedAt
       };
     })
