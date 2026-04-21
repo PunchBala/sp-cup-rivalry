@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-04-20T20:49:26.695Z",
+    "as_of_utc": "2026-04-21T12:10:05.964Z",
     "price_min": 4,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -17,9 +17,9 @@
   "summary": {
     "total_players_received": 254,
     "eligible_players_ranked": 254,
-    "price_rises": 4,
-    "price_drops": 3,
-    "price_unchanged": 247
+    "price_rises": 1,
+    "price_drops": 0,
+    "price_unchanged": 253
   },
   "players": [
     {
@@ -926,12 +926,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 5,
       "season_total_points": 116,
       "season_avg_points": 23.2,
@@ -1656,12 +1656,12 @@
       "role": "all_rounder",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 6,
       "season_total_points": 177.5,
       "season_avg_points": 29.58,
@@ -1685,12 +1685,12 @@
       "role": "batter",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 6,
       "season_total_points": 160,
       "season_avg_points": 26.67,
@@ -3567,12 +3567,12 @@
       "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
+      "old_price": 9,
+      "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
       "final_price": 9,
-      "price_change": 3,
+      "price_change": 0,
       "matches_played": 1,
       "season_total_points": 138,
       "season_avg_points": 138,
@@ -3583,9 +3583,36 @@
       "adjusted_score": 34.5,
       "percentile": 84.19,
       "calculation_notes": [
+        "Used old_price for smoothing"
+      ],
+      "last_match_played_at_utc": "2026-04-20T14:00:00Z"
+    },
+    {
+      "player_id": "mi_n-tilak-varma",
+      "name": "N. Tilak Varma",
+      "team": "MI",
+      "role": "batter",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 10,
+      "smoothed_price": 9,
+      "final_price": 9,
+      "price_change": 1,
+      "matches_played": 6,
+      "season_total_points": 244,
+      "season_avg_points": 40.67,
+      "recent_avg_points": 57.67,
+      "last_match_points": 156,
+      "score_basis": 50.87,
+      "reliability_factor": 1,
+      "adjusted_score": 50.87,
+      "percentile": 93.28,
+      "calculation_notes": [
         "Used old_price for smoothing",
-        "Recovered real match history from a previously blank price; used the corrected target price immediately",
-        "Target price mapped from percentile 84.19"
+        "Target price mapped from percentile 93.28",
+        "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-20T14:00:00Z"
     },
@@ -3712,12 +3739,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 9,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": 1,
+      "price_change": 0,
       "matches_played": 4,
       "season_total_points": 135,
       "season_avg_points": 33.75,
@@ -3816,35 +3843,6 @@
       "percentile": 76.28,
       "calculation_notes": [
         "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-20T14:00:00Z"
-    },
-    {
-      "player_id": "mi_n-tilak-varma",
-      "name": "N. Tilak Varma",
-      "team": "MI",
-      "role": "batter",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
-      "target_price": 10,
-      "smoothed_price": 8,
-      "final_price": 8,
-      "price_change": 1,
-      "matches_played": 6,
-      "season_total_points": 244,
-      "season_avg_points": 40.67,
-      "recent_avg_points": 57.67,
-      "last_match_points": 156,
-      "score_basis": 50.87,
-      "reliability_factor": 1,
-      "adjusted_score": 50.87,
-      "percentile": 93.28,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 93.28",
-        "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-04-20T14:00:00Z"
     },
@@ -4070,8 +4068,7 @@
       "adjusted_score": 0.5,
       "percentile": 39.92,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Recovered real match history from a previously blank price; used the corrected target price immediately"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-20T14:00:00Z"
     },
@@ -4082,12 +4079,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 5,
-      "initial_price": 5,
+      "old_price": 6,
+      "initial_price": 6,
       "target_price": 7,
       "smoothed_price": 6,
       "final_price": 6,
-      "price_change": 1,
+      "price_change": 0,
       "matches_played": 6,
       "season_total_points": 36.5,
       "season_avg_points": 6.08,
@@ -4127,8 +4124,7 @@
       "adjusted_score": 6.25,
       "percentile": 44.66,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Recovered real match history from a previously blank price; used the corrected target price immediately"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-20T14:00:00Z"
     },
@@ -4183,8 +4179,7 @@
       "adjusted_score": 2,
       "percentile": 41.9,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Recovered real match history from a previously blank price; used the corrected target price immediately"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-20T14:00:00Z"
     },
@@ -7169,5 +7164,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-04-20T20:49:26.695Z"
+  "generated_at_utc": "2026-04-21T12:10:05.964Z"
 }
