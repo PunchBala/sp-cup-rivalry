@@ -203,6 +203,12 @@ const EXPLICIT_NAME_ALIASES = Object.freeze({
   'lungisani ngidi': Object.freeze([
     'lungi ngidi'
   ]),
+  'varun chakravarthy': Object.freeze([
+    'varun chakaravarthy'
+  ]),
+  'varun chakaravarthy': Object.freeze([
+    'varun chakravarthy'
+  ]),
   'allah ghazanfar': Object.freeze([
     'am ghazanfar',
     'allah mohammad ghazanfar',
@@ -247,6 +253,17 @@ export function slugify(value) {
 
 export function buildMiniFantasyPlayerId(teamCode, playerName) {
   return `${String(teamCode || '').toLowerCase()}_${slugify(playerName)}`;
+}
+
+function buildMiniFantasyAliasPlayerIds(teamCode, playerName) {
+  const canonicalPlayerId = buildMiniFantasyPlayerId(teamCode, playerName);
+  const normalized = normalizeName(playerName);
+  const aliases = Array.isArray(EXPLICIT_NAME_ALIASES[normalized]) ? EXPLICIT_NAME_ALIASES[normalized] : [];
+  return [...new Set(
+    aliases
+      .map((aliasName) => buildMiniFantasyPlayerId(teamCode, aliasName))
+      .filter((playerId) => playerId && playerId !== canonicalPlayerId)
+  )];
 }
 
 export function resolveMiniFantasyPlayerTeamCode(playerId = '') {
@@ -647,6 +664,26 @@ export function getMiniFantasyOpenFixtures(schedule = [], now = new Date(), opti
 }
 
 export function deriveCompletedMatchHistories(liveData = {}, schedule = []) {
+  const precomputedHistories = liveData?.meta?.miniFantasyPlayerHistories;
+  if (precomputedHistories && typeof precomputedHistories === 'object' && Object.keys(precomputedHistories).length) {
+    const histories = new Map();
+    Object.entries(precomputedHistories).forEach(([canonicalKey, rawHistory]) => {
+      if (!rawHistory || typeof rawHistory !== 'object') return;
+      histories.set(canonicalKey, {
+        player_name: rawHistory.player_name || rawHistory.playerName || '',
+        match_points: Array.isArray(rawHistory.match_points)
+          ? rawHistory.match_points.map((points) => roundTo(toNumber(points, 0), 2))
+          : [],
+        points_by_match_no: Object.fromEntries(
+          Object.entries(rawHistory.points_by_match_no || {}).map(([matchNo, points]) => [Number(matchNo), roundTo(toNumber(points, 0), 2)])
+        ),
+        matches_played: Math.max(0, Math.trunc(toNumber(rawHistory.matches_played, 0))),
+        last_match_played_at_utc: rawHistory.last_match_played_at_utc || null
+      });
+    });
+    if (histories.size) return histories;
+  }
+
   const scoreHistory = Array.isArray(liveData?.meta?.scoreHistory) ? liveData.meta.scoreHistory : [];
   const ordered = [...scoreHistory].sort((a, b) => Number(a.processedMatchCount || 0) - Number(b.processedMatchCount || 0));
   const histories = new Map();
@@ -1030,14 +1067,23 @@ export function buildMiniFantasyPlayerPointsIndex({
   Object.entries(squads || {}).forEach(([teamCode, squadPlayers]) => {
     (Array.isArray(squadPlayers) ? squadPlayers : []).forEach((playerName) => {
       const history = resolvePlayerHistory(playerName, historyMap);
-      index.set(buildMiniFantasyPlayerId(teamCode, playerName), {
-        player_id: buildMiniFantasyPlayerId(teamCode, playerName),
+      const playerId = buildMiniFantasyPlayerId(teamCode, playerName);
+      const payload = {
+        player_id: playerId,
         name: playerName,
         team: teamCode,
         match_points: [...(history?.match_points || [])],
         points_by_match_no: { ...(history?.points_by_match_no || {}) },
         matches_played: Number(history?.matches_played || 0),
         last_match_played_at_utc: history?.last_match_played_at_utc || null
+      };
+      index.set(playerId, payload);
+      buildMiniFantasyAliasPlayerIds(teamCode, playerName).forEach((aliasPlayerId) => {
+        if (index.has(aliasPlayerId)) return;
+        index.set(aliasPlayerId, {
+          ...payload,
+          player_id: aliasPlayerId
+        });
       });
     });
   });
@@ -1154,9 +1200,14 @@ function buildMiniFantasyFixturePlayerRecordMap({
       const playerId = buildMiniFantasyPlayerId(teamCode, playerName);
       const history = resolvePlayerHistory(playerName, liveDeltaHistories);
       const pointsByMatchNo = history?.points_by_match_no || {};
-      recordMap.set(playerId, {
+      const record = {
         points: toNumber(pointsByMatchNo[targetMatchNo], 0),
         appeared: hasFixturePoints(pointsByMatchNo, targetMatchNo)
+      };
+      recordMap.set(playerId, record);
+      buildMiniFantasyAliasPlayerIds(teamCode, playerName).forEach((aliasPlayerId) => {
+        if (recordMap.has(aliasPlayerId)) return;
+        recordMap.set(aliasPlayerId, { ...record });
       });
     });
   });
@@ -1281,7 +1332,13 @@ export function scoreMiniFantasyEntry({
   const captainPlayerId = entry?.captainPlayerId || entry?.captain_player_id || '';
   const resolvedFixtureRecordMap = fixtureRecordMap instanceof Map
     ? fixtureRecordMap
-    : buildMiniFantasyFixturePlayerRecordMap({ liveData, schedule, squads, matchNo });
+    : buildMiniFantasyFixturePlayerRecordMap({
+        liveData,
+        schedule,
+        squads,
+        matchNo,
+        completedMatchCount: resolvedCompletedMatchCount
+      });
   const pointsByPlayerId = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, toNumber(resolvedFixtureRecordMap.get(playerId)?.points, 0)]));
   const appearedByPlayerId = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Boolean(resolvedFixtureRecordMap.get(playerId)?.appeared)]));
   const playerTeamById = Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, resolveMiniFantasyPlayerTeamCode(playerId)]));
