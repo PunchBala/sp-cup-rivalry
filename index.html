@@ -1454,7 +1454,8 @@
     let MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';
     let MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
     let MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE = true;
-    let MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = false;
+    const MINI_FANTASY_PRECOMPUTED_LEADERBOARD_ENABLED = false;
+    let MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = !MINI_FANTASY_PRECOMPUTED_LEADERBOARD_ENABLED;
     let MINI_FANTASY_COMPUTE_REVISION = 0;
     let MINI_FANTASY_LEADERBOARD_CACHE = { key: '', value: null };
     let MINI_FANTASY_RECENT_BOARD_CACHE = { key: '', value: null };
@@ -4314,7 +4315,7 @@ function titleBandScore(pick, live){
 
     function setRemoteMiniFantasyLeaderboardRows(rows = []){
       REMOTE_MINI_FANTASY_LEADERBOARD_ROWS = Array.isArray(rows) ? cloneJson(rows) : [];
-      MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = false;
+      MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = !MINI_FANTASY_PRECOMPUTED_LEADERBOARD_ENABLED;
       invalidateMiniFantasyComputedData();
       return REMOTE_MINI_FANTASY_LEADERBOARD_ROWS;
     }
@@ -4431,7 +4432,7 @@ function titleBandScore(pick, live){
                 currentUser: CURRENT_USER
               })
             : Promise.resolve(REMOTE_MINI_FANTASY_LEADERBOARD_ENTRIES || []),
-          includePublicData
+          includePublicData && MINI_FANTASY_PRECOMPUTED_LEADERBOARD_ENABLED
             ? DUELS_BACKEND.listMiniFantasyLeaderboardRows({
                 season: MINI_FANTASY_SEASON,
                 currentUser: CURRENT_USER
@@ -8588,7 +8589,8 @@ function titleBandScore(pick, live){
       }
       const liveFetchedAt = normalizeTextValue(LIVE_2026?.fetchedAt || '');
       const leaderboardRows = currentMiniFantasyLeaderboardRows();
-      const canUsePrecomputedRows = usesHostedDuelsBackend()
+      const canUsePrecomputedRows = MINI_FANTASY_PRECOMPUTED_LEADERBOARD_ENABLED
+        && usesHostedDuelsBackend()
         && !MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK
         && liveFetchedAt
         && Array.isArray(leaderboardRows)
