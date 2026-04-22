@@ -623,6 +623,25 @@ function assertCompletedScorecardCacheable(matchId, scorecard) {
   throw error;
 }
 
+export function isIncompleteCompletedScorecardError(error) {
+  return String(error?.code || '') === 'CRICKETDATA_INCOMPLETE_SCORECARD';
+}
+
+export function incompleteCompletedScorecardDetails(error, fallbackMatchId = null) {
+  if (!isIncompleteCompletedScorecardError(error)) return null;
+  const integrityIssues = safeArray(error?.integrityIssues)
+    .map((issue) => String(issue || '').trim())
+    .filter(Boolean);
+  return {
+    reason: 'incomplete_completed_scorecard',
+    rawReason: integrityIssues.length
+      ? integrityIssues.join('; ')
+      : String(error?.message || 'completed scorecard failed integrity checks'),
+    matchId: String(error?.matchId || fallbackMatchId || '').trim() || null,
+    integrityIssues
+  };
+}
+
 export async function findMissingScorecardCaches(matchIds, { cacheDir = SCORECARD_CACHE_DIR } = {}) {
   const missing = [];
   for (const matchId of safeArray(matchIds)) {
@@ -703,6 +722,13 @@ export function parseCricketDataScorecardNotFoundDetails(error) {
 
 export function isCricketDataScorecardNotFoundError(error) {
   return Boolean(parseCricketDataScorecardNotFoundDetails(error));
+}
+
+function scorecardNotReadyDetails(error, fallbackMatchId = null) {
+  return (
+    parseCricketDataScorecardNotFoundDetails(error) ||
+    incompleteCompletedScorecardDetails(error, fallbackMatchId)
+  );
 }
 
 export function isCricketDataFallbackEligibleError(error) {
@@ -1692,8 +1718,8 @@ export async function buildMiniFantasyPlayerHistoriesFromProcessedMatches(proces
         applyScorecardToAggregates(matchAggregate, scorecardResult.data, { isFinal: true });
       }
     } catch (error) {
-      const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-      if (!missingScorecard && !isMissingProcessedScorecardError(error)) throw error;
+      const notReadyScorecard = scorecardNotReadyDetails(error, processedRef?.id);
+      if (!notReadyScorecard && !isMissingProcessedScorecardError(error)) throw error;
     }
 
     if (!matchAggregate) {
@@ -1999,8 +2025,8 @@ export async function rebuildHistoricalState(processedIds, baseLive = null, { in
     try {
       scorecardResult = normalizeScorecardResult(await resolveScorecard(matchId));
     } catch (error) {
-      const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-      if (!missingScorecard && !isMissingProcessedScorecardError(error)) throw error;
+      const notReadyScorecard = scorecardNotReadyDetails(error, matchId);
+      if (!notReadyScorecard && !isMissingProcessedScorecardError(error)) throw error;
       const fallbackOverlay = buildHistoricalAggregateOverlay(baseLive, processedMatchCount);
       if (!fallbackOverlay) throw error;
       rebuilt = combineAggregates(rebuilt, fallbackOverlay);
@@ -2082,9 +2108,9 @@ export async function repairScoreHistoryGaps(live, processedRefs, { loadScorecar
     try {
       scorecardResult = normalizeScorecardResult(await resolveScorecard(matchRef.id));
     } catch (error) {
-      const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-      if (!missingScorecard) throw error;
-      noteDeferredScorecard(live, `score history gap ${count}`, matchRef.id, missingScorecard);
+      const notReadyScorecard = scorecardNotReadyDetails(error, matchRef.id);
+      if (!notReadyScorecard) throw error;
+      noteDeferredScorecard(live, `score history gap ${count}`, matchRef.id, notReadyScorecard);
       break;
     }
 
@@ -2464,11 +2490,11 @@ async function main() {
         live.meta.lastRun.historicalReplayUsedApiFallback = rebuiltState.apiCalls > 0;
         appliedHistoricalBackfill = true;
       } catch (error) {
-        const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-        if (!missingScorecard) throw error;
+        const notReadyScorecard = scorecardNotReadyDetails(error);
+        if (!notReadyScorecard) throw error;
         live.meta.lastRun.historicalReplaySkipped = true;
-        live.meta.lastRun.historicalReplayReason = `historical replay deferred; ${missingScorecard.rawReason}`;
-        noteDeferredScorecard(live, 'historical replay', missingScorecard.matchId, missingScorecard);
+        live.meta.lastRun.historicalReplayReason = `historical replay deferred; ${notReadyScorecard.rawReason}`;
+        noteDeferredScorecard(live, 'historical replay', notReadyScorecard.matchId, notReadyScorecard);
       }
     }
   }
@@ -2487,11 +2513,11 @@ async function main() {
     }
     let scorecardResult;
     try {
-        scorecardResult = await processScorecard(match.id, live, { preferCache: true });
+      scorecardResult = await processScorecard(match.id, live, { preferCache: true });
     } catch (error) {
-      const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-      if (!missingScorecard) throw error;
-      noteDeferredScorecard(live, 'backlog', match.id, missingScorecard);
+      const notReadyScorecard = scorecardNotReadyDetails(error, match.id);
+      if (!notReadyScorecard) throw error;
+      noteDeferredScorecard(live, 'backlog', match.id, notReadyScorecard);
       continue;
     }
     if (scorecardResult.source === 'cache') {
@@ -2551,9 +2577,9 @@ async function main() {
         live.meta.scorecardBudget.lastLiveScorecardAt = isoNow();
         live.meta.scorecardBudget.lastLiveScorecardMatchId = activeMatch.id;
       } catch (error) {
-        const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-        if (!missingScorecard) throw error;
-        noteDeferredScorecard(live, 'live overlay', activeMatch.id, missingScorecard);
+        const notReadyScorecard = scorecardNotReadyDetails(error, activeMatch.id);
+        if (!notReadyScorecard) throw error;
+        noteDeferredScorecard(live, 'live overlay', activeMatch.id, notReadyScorecard);
         live.meta.lastRun.liveOverlaySkippedReason = 'scorecard not ready';
         overlayAgg = reusableOverlayAggregates(live, activeMatch);
         live.meta.lastRun.liveOverlayReused = !!overlayAgg;

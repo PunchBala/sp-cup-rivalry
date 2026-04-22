@@ -10,7 +10,9 @@ import {
   completedScorecardIntegrityIssues,
   findMissingScorecardCaches,
   freshScorecardBudgetRemaining,
+  incompleteCompletedScorecardDetails,
   inferProcessedMatchKeys,
+  isIncompleteCompletedScorecardError,
   matchKeyForMatch,
   readCachedScorecard,
   repairScoreHistoryGaps,
@@ -298,6 +300,21 @@ test('completed scorecard integrity check exempts no-result and abandoned matche
   assert.deepEqual(completedScorecardIntegrityIssues(abandoned), []);
 });
 
+test('incomplete completed scorecard errors are normalized as retryable not-ready scorecards', () => {
+  const error = new Error('Incomplete completed scorecard for match-31');
+  error.code = 'CRICKETDATA_INCOMPLETE_SCORECARD';
+  error.matchId = 'match-31';
+  error.integrityIssues = ['final score has 2 innings but scorecard has 1'];
+
+  assert.equal(isIncompleteCompletedScorecardError(error), true);
+  assert.deepEqual(incompleteCompletedScorecardDetails(error), {
+    reason: 'incomplete_completed_scorecard',
+    rawReason: 'final score has 2 innings but scorecard has 1',
+    matchId: 'match-31',
+    integrityIssues: ['final score has 2 innings but scorecard has 1']
+  });
+});
+
 test('historical rebuild tracks cache hits separately from paid API scorecard calls', async () => {
   const scorecards = {
     'match-1': makeFinalScorecard({
@@ -577,6 +594,75 @@ test('repairs missing score-history checkpoints from the nearest earlier snapsho
   assert.equal(repaired.cacheHits, 0);
   assert.deepEqual(repairedCounts, [0, 1, 2]);
   assert.equal(repairedSnapshot.snapshot.meta.aggregates.battingRuns['Virat Kohli'], 88);
+});
+
+test('defers incomplete completed scorecards during score-history gap repair', async () => {
+  const scorecards = {
+    'match-1': makeFinalScorecard({
+      teams: ['Punjab Kings', 'Delhi Capitals'],
+      winner: 'Punjab Kings',
+      batter: 'Prabhsimran Singh',
+      bowler: 'Kuldeep Yadav',
+      catcher: 'Shashank Singh',
+      runs: 61,
+      balls: 36,
+      sixes: 3,
+      wickets: 2,
+      concededRuns: 31,
+      overs: '4',
+      scoreA: 176,
+      scoreB: 161
+    })
+  };
+
+  const baseLive = {
+    mostDots: { ranking: [], extendedRanking: [], values: {} },
+    fairPlay: { winner: null, ranking: [], extendedRanking: [], values: {}, updatedAt: null, source: null },
+    meta: {
+      scoreHistory: [{ processedMatchCount: 0, fetchedAt: '2026-04-01T00:00:00.000Z' }]
+    }
+  };
+  const throughOneMatch = await rebuildHistoricalState(
+    ['match-1'],
+    baseLive,
+    {
+      includeHistory: true,
+      loadScorecard: async (matchId) => ({ data: scorecards[matchId], source: 'cache' })
+    }
+  );
+  const live = {
+    ...baseLive,
+    meta: {
+      lastRun: {},
+      scorecardBudget: {},
+      scoreHistory: throughOneMatch.scoreHistory
+    }
+  };
+  const incompleteError = new Error('Incomplete completed scorecard for match-2');
+  incompleteError.code = 'CRICKETDATA_INCOMPLETE_SCORECARD';
+  incompleteError.matchId = 'match-2';
+  incompleteError.integrityIssues = ['final score has 2 innings but scorecard has 1'];
+
+  const repaired = await repairScoreHistoryGaps(
+    live,
+    [
+      { id: 'match-1', matchKey: 'match:1' },
+      { id: 'match-2', matchKey: 'match:2' },
+      { id: 'match-3', matchKey: 'match:3' }
+    ],
+    {
+      loadScorecard: async (matchId) => {
+        if (matchId === 'match-2') throw incompleteError;
+        return { data: scorecards[matchId], source: 'cache' };
+      }
+    }
+  );
+
+  assert.equal(repaired.repaired, 0);
+  assert.equal(live.meta.lastRun.deferredScorecards, 1);
+  assert.deepEqual(live.meta.lastRun.deferredScorecardMatchIds, ['match-2']);
+  assert.match(live.meta.lastRun.deferredScorecardReason, /score history gap 2/);
+  assert.match(live.meta.lastRun.deferredScorecardReason, /final score has 2 innings but scorecard has 1/);
 });
 
 test('standings award one point each for no-result matches', async () => {
