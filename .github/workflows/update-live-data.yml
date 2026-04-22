@@ -2,22 +2,78 @@ name: Update live IPL data
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Run the normal data refresh or a no-write scorecard API diagnostic
+        required: true
+        default: refresh
+        type: choice
+        options:
+          - refresh
+          - diagnose-scorecard
+      match_id:
+        description: CricketData match id to diagnose
+        required: false
+        default: e4f4995f-036e-451d-861e-42567c82d87f
+      expected_player:
+        description: Batter to verify in the fresh scorecard
+        required: false
+        default: Abhishek Sharma
+      expected_runs:
+        description: Expected runs for that batter
+        required: false
+        default: '135'
+      expected_innings:
+        description: Minimum scorecard innings expected
+        required: false
+        default: '2'
   schedule:
     - cron: '0 9,13,14,15,18,19 28-31 3 *'
     - cron: '0 9,13,14,15,18,19 * 4 *'
     - cron: '0 9,13,14,15,18,19 1-24 5 *'
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: update-live-data
   cancel-in-progress: false
 
 jobs:
+  diagnose-scorecard:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'diagnose-scorecard'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Diagnose CricketData scorecard
+        env:
+          CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY }}
+          CRICKETDATA_API_KEY_FALLBACK: ${{ secrets.CRICKETDATA_API_KEY_FALLBACK }}
+          DIAGNOSTIC_SCORECARD_MATCH_ID: ${{ inputs.match_id }}
+          DIAGNOSTIC_SCORECARD_EXPECTED_PLAYER: ${{ inputs.expected_player }}
+          DIAGNOSTIC_SCORECARD_EXPECTED_RUNS: ${{ inputs.expected_runs }}
+          DIAGNOSTIC_SCORECARD_EXPECTED_INNINGS: ${{ inputs.expected_innings }}
+        run: node scripts/diagnose-scorecard-api.mjs
+
   update-live-data:
+    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'refresh'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
