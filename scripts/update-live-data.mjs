@@ -32,6 +32,8 @@ const LIVE_SCORECARD_INTERVAL_MINUTES = parseEnvInt(process.env.CRICKETDATA_LIVE
 const MAX_BACKLOG_SCORECARDS_PER_RUN = parseEnvInt(process.env.CRICKETDATA_MAX_BACKLOG_SCORECARDS_PER_RUN, 2);
 const MAX_FRESH_SCORECARD_CALLS_PER_RUN = parseEnvNonNegativeInt(process.env.CRICKETDATA_MAX_FRESH_SCORECARD_CALLS_PER_RUN, 1);
 const ALLOW_HISTORICAL_REPLAY_API = parseEnvBool(process.env.CRICKETDATA_ALLOW_HISTORICAL_REPLAY, false);
+const FORCE_REFETCH_SCORECARD_IDS = parseEnvList(process.env.CRICKETDATA_FORCE_REFETCH_SCORECARD_IDS);
+const FORCE_REFETCH_SCORECARD_ID_SET = new Set(FORCE_REFETCH_SCORECARD_IDS);
 const IPLT20_MOST_DOTS_ENABLED = parseEnvBool(process.env.IPLT20_MOST_DOTS_ENABLED, true);
 const IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES = parseEnvInt(process.env.IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES, 120);
 const IPLT20_MOST_DOTS_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/284-mostdotballsbowledtournament.js?callback=onmostdotballsbowledtournament';
@@ -87,6 +89,13 @@ function parseEnvInt(value, fallback) {
 function parseEnvNonNegativeInt(value, fallback) {
   const n = Number.parseInt(String(value ?? ''), 10);
   return Number.isFinite(n) && n >= 0 ? n : fallback;
+}
+
+function parseEnvList(value) {
+  return String(value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 function buildSeriesInfoUrl(apiKey) {
@@ -505,6 +514,39 @@ export async function writeCachedScorecard(matchId, scorecard, { cacheDir = SCOR
     }, null, 2),
     'utf8'
   );
+}
+
+function scorecardInningsCount(scorecard) {
+  return safeArray(scorecard?.scorecard).length;
+}
+
+function topLevelScoreInningsCount(scorecard) {
+  return safeArray(scorecard?.score)
+    .filter((entry) => Number.isFinite(Number(entry?.r ?? entry?.runs)))
+    .length;
+}
+
+export function completedScorecardIntegrityIssues(scorecard) {
+  const issues = [];
+  if (!scorecard?.matchEnded) return issues;
+
+  const scoreInnings = topLevelScoreInningsCount(scorecard);
+  const scorecardInnings = scorecardInningsCount(scorecard);
+  if (scoreInnings >= 2 && scorecardInnings < scoreInnings) {
+    issues.push(`final score has ${scoreInnings} innings but scorecard has ${scorecardInnings}`);
+  }
+
+  return issues;
+}
+
+function assertCompletedScorecardCacheable(matchId, scorecard) {
+  const issues = completedScorecardIntegrityIssues(scorecard);
+  if (!issues.length) return;
+  const error = new Error(`Incomplete completed scorecard for ${matchId}: ${issues.join('; ')}`);
+  error.code = 'CRICKETDATA_INCOMPLETE_SCORECARD';
+  error.matchId = matchId;
+  error.integrityIssues = issues;
+  throw error;
 }
 
 export async function findMissingScorecardCaches(matchIds, { cacheDir = SCORECARD_CACHE_DIR } = {}) {
@@ -1893,7 +1935,7 @@ export async function rebuildHistoricalState(processedIds, baseLive = null, { in
 
     if (scorecardResult) {
       if (scorecardResult.source === 'cache') cacheHits += 1;
-      if (scorecardResult.source === 'api') apiCalls += 1;
+      if (isApiScorecardSource(scorecardResult.source)) apiCalls += 1;
       applyScorecardToAggregates(rebuilt, scorecardResult.data, { isFinal: true });
     }
     const historicalCumulativeDots = resolveHistoricalCumulativeDots(baseLive, processedMatchCount);
@@ -1973,7 +2015,7 @@ export async function repairScoreHistoryGaps(live, processedRefs, { loadScorecar
     }
 
     if (scorecardResult.source === 'cache') cacheHits += 1;
-    if (scorecardResult.source === 'api') apiCalls += 1;
+    if (isApiScorecardSource(scorecardResult.source)) apiCalls += 1;
 
     const nextAgg = cloneJson(previousAgg);
     applyScorecardToAggregates(nextAgg, scorecardResult.data, { isFinal: true });
@@ -2117,8 +2159,8 @@ function liveMatchCandidate(matchList) {
   return safeArray(matchList).find((m) => m.matchStarted && !m.matchEnded) || null;
 }
 
-async function processScorecard(matchId, live, { preferCache = false, allowApiFallback = true } = {}) {
-  if (preferCache) {
+async function processScorecard(matchId, live, { preferCache = false, allowApiFallback = true, forceRefresh = false } = {}) {
+  if (preferCache && !forceRefresh) {
     const cached = await readCachedScorecard(matchId);
     if (cached) return { data: cached, source: 'cache' };
     if (!allowApiFallback) {
@@ -2127,8 +2169,16 @@ async function processScorecard(matchId, live, { preferCache = false, allowApiFa
   }
 
   const json = await fetchCricketDataJson((apiKey) => buildScorecardUrl(apiKey, matchId), live);
+  assertCompletedScorecardCacheable(matchId, json.data);
   await writeCachedScorecard(matchId, json.data);
-  return { data: json.data, source: 'api' };
+  if (forceRefresh) {
+    live.meta.lastRun.forcedScorecardRefetches = Number(live.meta.lastRun.forcedScorecardRefetches || 0) + 1;
+  }
+  return { data: json.data, source: forceRefresh ? 'api-force-refresh' : 'api' };
+}
+
+function isApiScorecardSource(source) {
+  return source === 'api' || source === 'api-force-refresh';
 }
 
 function shouldFetchLiveScorecard(live, activeMatch, currentMs) {
@@ -2205,7 +2255,9 @@ async function main() {
     freshScorecardBudgetSkips: 0,
     deferredScorecards: 0,
     deferredScorecardMatchIds: [],
-    deferredScorecardReason: null
+    deferredScorecardReason: null,
+    forcedScorecardRefetchIds: FORCE_REFETCH_SCORECARD_IDS,
+    forcedScorecardRefetches: 0
   };
   live.meta.scorecardBudget.lastBudgetExhaustedAt = null;
   live.meta.scorecardBudget.lastBudgetSkipReason = null;
@@ -2277,15 +2329,23 @@ async function main() {
   const processedIds = new Set(processedRefs.map((match) => match?.id).filter(Boolean));
   const processedKeySet = new Set(processedMatchKeys);
   let finalizedAgg = live.meta.aggregates || createEmptyAggregates();
+  const forcedProcessedRefetchIds = processedRefs
+    .map((match) => match?.id)
+    .filter((matchId) => FORCE_REFETCH_SCORECARD_ID_SET.has(matchId));
 
   let requiresHistoricalBackfill = needsHistoricalAggregateBackfill(live);
   let requiresScoreHistoryBackfill = needsScoreHistoryBackfill(live);
+  if (forcedProcessedRefetchIds.length) {
+    requiresHistoricalBackfill = true;
+    requiresScoreHistoryBackfill = true;
+  }
 
   if (requiresScoreHistoryBackfill && processedRefs.length) {
     const gapRepair = await repairScoreHistoryGaps(live, processedRefs, {
       loadScorecard: (matchId) => processScorecard(matchId, live, {
         preferCache: true,
-        allowApiFallback: ALLOW_HISTORICAL_REPLAY_API
+        allowApiFallback: ALLOW_HISTORICAL_REPLAY_API,
+        forceRefresh: FORCE_REFETCH_SCORECARD_ID_SET.has(matchId)
       })
     });
     live.meta.lastRun.scorecardCalls += gapRepair.apiCalls;
@@ -2316,7 +2376,8 @@ async function main() {
             includeHistory: (requiresScoreHistoryBackfill || requiresHistoricalBackfill),
             loadScorecard: (matchId) => processScorecard(matchId, live, {
               preferCache: true,
-              allowApiFallback: ALLOW_HISTORICAL_REPLAY_API
+              allowApiFallback: ALLOW_HISTORICAL_REPLAY_API,
+              forceRefresh: FORCE_REFETCH_SCORECARD_ID_SET.has(matchId)
             })
           }
         );
@@ -2352,7 +2413,7 @@ async function main() {
     }
     let scorecardResult;
     try {
-      scorecardResult = await processScorecard(match.id, live, { preferCache: true });
+        scorecardResult = await processScorecard(match.id, live, { preferCache: true });
     } catch (error) {
       const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
       if (!missingScorecard) throw error;
@@ -2572,6 +2633,8 @@ async function main() {
       historicalReplayApiFallbackAllowed: ALLOW_HISTORICAL_REPLAY_API,
       scorecardCallsThisRun: live.meta.lastRun.scorecardCalls,
       scorecardCacheHitsThisRun: live.meta.lastRun.scorecardCacheHits,
+      forcedScorecardRefetchIds: live.meta.lastRun.forcedScorecardRefetchIds,
+      forcedScorecardRefetches: live.meta.lastRun.forcedScorecardRefetches,
       historicalReplaySkipped: live.meta.lastRun.historicalReplaySkipped,
       historicalReplayMissingCaches: live.meta.lastRun.historicalReplayMissingCaches,
       freshScorecardBudgetExhausted: live.meta.lastRun.freshScorecardBudgetExhausted,

@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import {
   endedUnprocessedMatches,
   canUseFreshScorecardCall,
+  completedScorecardIntegrityIssues,
   findMissingScorecardCaches,
   freshScorecardBudgetRemaining,
   inferProcessedMatchKeys,
@@ -149,6 +150,38 @@ test('fresh scorecard budget helper hard-stops paid calls once the run cap is re
   assert.equal(canUseFreshScorecardCall({ meta: { lastRun: { scorecardCalls: 0 } } }, 1, 2), true);
 });
 
+test('completed scorecard integrity check catches final-score shells with partial player scorecards', () => {
+  const partial = {
+    matchEnded: true,
+    score: [
+      { inning: 'Sunrisers Hyderabad Inning 1', r: 242, w: 2, o: 20 },
+      { inning: 'Delhi Capitals Inning 1', r: 195, w: 9, o: 20 }
+    ],
+    scorecard: [
+      {
+        inning: 'Sunrisers Hyderabad Inning 1',
+        batting: [{ batsman: { name: 'Abhishek Sharma' }, r: 75 }]
+      }
+    ]
+  };
+
+  assert.deepEqual(
+    completedScorecardIntegrityIssues(partial),
+    ['final score has 2 innings but scorecard has 1']
+  );
+
+  assert.deepEqual(
+    completedScorecardIntegrityIssues({
+      ...partial,
+      scorecard: [
+        ...partial.scorecard,
+        { inning: 'Delhi Capitals Inning 1', batting: [{ batsman: { name: 'KL Rahul' }, r: 37 }] }
+      ]
+    }),
+    []
+  );
+});
+
 test('historical rebuild tracks cache hits separately from paid API scorecard calls', async () => {
   const scorecards = {
     'match-1': makeFinalScorecard({
@@ -194,7 +227,7 @@ test('historical rebuild tracks cache hits separately from paid API scorecard ca
       includeHistory: true,
       loadScorecard: async (matchId) => ({
         data: scorecards[matchId],
-        source: matchId === 'match-1' ? 'cache' : 'api'
+        source: matchId === 'match-1' ? 'cache' : 'api-force-refresh'
       })
     }
   );
