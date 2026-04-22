@@ -526,15 +526,89 @@ function topLevelScoreInningsCount(scorecard) {
     .length;
 }
 
+function isNoResultScorecard(scorecard) {
+  const winnerText = normalizeName(scorecard?.matchWinner || '').toLowerCase();
+  const status = normalizeName(scorecard?.status || '').toLowerCase();
+  return (
+    winnerText === 'no winner' ||
+    status.includes('no result') ||
+    status.includes('abandon') ||
+    status.includes('abandoned') ||
+    status.includes('washout')
+  );
+}
+
+function scoreRuns(entry) {
+  const value = Number(entry?.r ?? entry?.runs);
+  return Number.isFinite(value) ? value : null;
+}
+
+function inningLabel(entry) {
+  return normalizeName(entry?.inning || entry?.name || '');
+}
+
+function battingRowsForIntegrity(innings) {
+  return safeArray(innings?.batting || innings?.batsman);
+}
+
+function bowlingRowsForIntegrity(innings) {
+  return safeArray(innings?.bowling || innings?.bowler);
+}
+
+function scoreEntryForInnings(scoreEntries, innings, index) {
+  const label = inningLabel(innings);
+  if (label) {
+    const exact = scoreEntries.find((entry) => inningLabel(entry) === label);
+    if (exact) return exact;
+  }
+  return scoreEntries[index] || null;
+}
+
+function sumNumeric(rows, pickValue) {
+  return safeArray(rows).reduce((sum, row) => {
+    const value = Number(pickValue(row) || 0);
+    return Number.isFinite(value) ? sum + value : sum;
+  }, 0);
+}
+
 export function completedScorecardIntegrityIssues(scorecard) {
   const issues = [];
   if (!scorecard?.matchEnded) return issues;
+  if (isNoResultScorecard(scorecard)) return issues;
 
-  const scoreInnings = topLevelScoreInningsCount(scorecard);
+  const scoreEntries = safeArray(scorecard?.score)
+    .filter((entry) => Number.isFinite(Number(entry?.r ?? entry?.runs)));
+  const scoreInnings = scoreEntries.length;
   const scorecardInnings = scorecardInningsCount(scorecard);
   if (scoreInnings >= 2 && scorecardInnings < scoreInnings) {
     issues.push(`final score has ${scoreInnings} innings but scorecard has ${scorecardInnings}`);
   }
+
+  safeArray(scorecard?.scorecard).forEach((innings, index) => {
+    const scoreEntry = scoreEntryForInnings(scoreEntries, innings, index);
+    const topRuns = scoreRuns(scoreEntry);
+    if (topRuns === null) return;
+
+    const battingRuns = sumNumeric(battingRowsForIntegrity(innings), (row) => row?.r ?? row?.runs);
+    const bowlingRows = bowlingRowsForIntegrity(innings);
+    const bowlingRuns = sumNumeric(bowlingRows, (row) => row?.r ?? row?.runs);
+    const knownBowlingExtras = sumNumeric(bowlingRows, (row) => Number(row?.nb || 0) + Number(row?.wd || 0));
+    const extrasGap = topRuns - battingRuns;
+    const label = inningLabel(innings) || `innings ${index + 1}`;
+
+    if (battingRuns > topRuns) {
+      issues.push(`${label} batting rows total ${battingRuns} exceeds top-level total ${topRuns}`);
+    }
+    if (bowlingRuns > topRuns) {
+      issues.push(`${label} bowling rows total ${bowlingRuns} exceeds top-level total ${topRuns}`);
+    }
+    if (extrasGap >= 0 && knownBowlingExtras > extrasGap) {
+      issues.push(`${label} bowling extras ${knownBowlingExtras} exceed top-level extras gap ${extrasGap}`);
+    }
+    if (extrasGap > 40) {
+      issues.push(`${label} top-level total ${topRuns} is ${extrasGap} runs above batting rows total ${battingRuns}`);
+    }
+  });
 
   return issues;
 }
