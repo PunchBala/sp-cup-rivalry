@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-04-23T12:48:00.190Z",
+    "as_of_utc": "2026-04-23T17:55:15.550Z",
     "price_min": 4,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -18,8 +18,8 @@
     "total_players_received": 254,
     "eligible_players_ranked": 254,
     "price_rises": 0,
-    "price_drops": 2,
-    "price_unchanged": 252
+    "price_drops": 0,
+    "price_unchanged": 254
   },
   "players": [
     {
@@ -3451,8 +3451,7 @@
       "adjusted_score": 2.25,
       "percentile": 41.3,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Recovered real match history from a previously blank price; used the corrected target price immediately"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-22T14:00:00"
     },
@@ -5713,12 +5712,12 @@
       "role": "wicket_keeper",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 10,
-      "initial_price": 10,
+      "old_price": 9,
+      "initial_price": 9,
       "target_price": 8,
       "smoothed_price": 9,
       "final_price": 9,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 7,
       "season_total_points": 315,
       "season_avg_points": 45,
@@ -6265,8 +6264,7 @@
       "adjusted_score": 6.75,
       "percentile": 43.87,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Recovered real match history from a previously blank price; used the corrected target price immediately"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-22T14:00:00"
     },
@@ -6361,12 +6359,12 @@
       "role": "wicket_keeper",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 8,
-      "initial_price": 8,
+      "old_price": 5,
+      "initial_price": 5,
       "target_price": 5,
       "smoothed_price": 5,
       "final_price": 5,
-      "price_change": -3,
+      "price_change": 0,
       "matches_played": 1,
       "season_total_points": 0,
       "season_avg_points": 0,
@@ -6377,9 +6375,7 @@
       "adjusted_score": 0,
       "percentile": 18.77,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Recovered real match history from a previously blank price; used the corrected target price immediately",
-        "Target price mapped from percentile 18.77"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-22T14:00:00"
     },
@@ -7175,5 +7171,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-04-23T12:48:00.190Z"
+  "generated_at_utc": "2026-04-23T17:55:15.550Z"
 }
