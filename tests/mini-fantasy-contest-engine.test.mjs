@@ -79,6 +79,83 @@ test('deriveCompletedMatchHistories keeps zero-point appearances when playerMatc
   assert.deepEqual(histories.get('player c')?.match_points, [60]);
 });
 
+test('deriveCompletedMatchHistories ignores stale precomputed histories when scoreHistory has newer completed matches', () => {
+  const liveData = {
+    meta: {
+      miniFantasyPlayerHistories: {
+        'player a': {
+          player_name: 'Player A',
+          match_points: [40],
+          points_by_match_no: { 1: 40 },
+          matches_played: 1,
+          last_match_played_at_utc: '2026-04-08T14:00:00Z'
+        },
+        'player b': {
+          player_name: 'Player B',
+          match_points: [5],
+          points_by_match_no: { 1: 5 },
+          matches_played: 1,
+          last_match_played_at_utc: '2026-04-08T14:00:00Z'
+        }
+      },
+      scoreHistory: [
+        {
+          processedMatchCount: 1,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Player A': 1,
+                  'Player B': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Player A': { score: 40 },
+                'Player B': { score: 5 }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 2,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Player A': 2,
+                  'Player B': 1,
+                  'Player C': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Player A': { score: 40 },
+                'Player B': { score: 5 },
+                'Player C': { score: 60 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  const schedule = [
+    { match_no: 1, datetime_utc: '2026-04-08T14:00:00Z' },
+    { match_no: 2, datetime_utc: '2026-04-09T14:00:00Z' }
+  ];
+
+  const histories = deriveCompletedMatchHistories(liveData, schedule);
+
+  assert.deepEqual(histories.get('player a')?.match_points, [40, 0]);
+  assert.equal(histories.get('player a')?.matches_played, 2);
+  assert.deepEqual(histories.get('player b')?.match_points, [5]);
+  assert.deepEqual(histories.get('player c')?.match_points, [60]);
+});
+
 test('resolvePlayerHistory matches safe alias variations used by squad lists', () => {
   const liveData = {
     meta: {

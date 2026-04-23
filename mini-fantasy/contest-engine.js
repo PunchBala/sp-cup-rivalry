@@ -666,22 +666,33 @@ export function getMiniFantasyOpenFixtures(schedule = [], now = new Date(), opti
 export function deriveCompletedMatchHistories(liveData = {}, schedule = []) {
   const precomputedHistories = liveData?.meta?.miniFantasyPlayerHistories;
   if (precomputedHistories && typeof precomputedHistories === 'object' && Object.keys(precomputedHistories).length) {
+    const scoreHistory = Array.isArray(liveData?.meta?.scoreHistory) ? liveData.meta.scoreHistory : [];
+    const latestProcessedMatchCount = scoreHistory.reduce(
+      (max, entry) => Math.max(max, Math.trunc(toNumber(entry?.processedMatchCount, 0))),
+      0
+    );
     const histories = new Map();
+    let maxHistoryMatchNo = 0;
     Object.entries(precomputedHistories).forEach(([canonicalKey, rawHistory]) => {
       if (!rawHistory || typeof rawHistory !== 'object') return;
+      const normalizedPointsByMatchNo = Object.fromEntries(
+        Object.entries(rawHistory.points_by_match_no || {}).map(([matchNo, points]) => [Number(matchNo), roundTo(toNumber(points, 0), 2)])
+      );
+      Object.keys(normalizedPointsByMatchNo).forEach((matchNo) => {
+        maxHistoryMatchNo = Math.max(maxHistoryMatchNo, Math.trunc(toNumber(matchNo, 0)));
+      });
       histories.set(canonicalKey, {
         player_name: rawHistory.player_name || rawHistory.playerName || '',
         match_points: Array.isArray(rawHistory.match_points)
           ? rawHistory.match_points.map((points) => roundTo(toNumber(points, 0), 2))
           : [],
-        points_by_match_no: Object.fromEntries(
-          Object.entries(rawHistory.points_by_match_no || {}).map(([matchNo, points]) => [Number(matchNo), roundTo(toNumber(points, 0), 2)])
-        ),
+        points_by_match_no: normalizedPointsByMatchNo,
         matches_played: Math.max(0, Math.trunc(toNumber(rawHistory.matches_played, 0))),
         last_match_played_at_utc: rawHistory.last_match_played_at_utc || null
       });
     });
-    if (histories.size) return histories;
+    const historiesAreFreshEnough = latestProcessedMatchCount <= 0 || maxHistoryMatchNo >= latestProcessedMatchCount;
+    if (histories.size && historiesAreFreshEnough) return histories;
   }
 
   const scoreHistory = Array.isArray(liveData?.meta?.scoreHistory) ? liveData.meta.scoreHistory : [];

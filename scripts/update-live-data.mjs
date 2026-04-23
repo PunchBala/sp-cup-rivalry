@@ -1413,6 +1413,14 @@ function buildProcessedMatchRefs(matchList, processedKeys, processedIds = []) {
   });
 }
 
+export function buildCurrentProcessedMatchRefs(live, matchList) {
+  return buildProcessedMatchRefs(
+    matchList,
+    safeArray(live?.meta?.processedMatchKeys),
+    safeArray(live?.meta?.processedMatchIds)
+  );
+}
+
 function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true } = {}) {
   const inningsBlocks = safeArray(scorecardData.scorecard);
   const topScores = scoreLinesForScorecard(scorecardData, inningsBlocks);
@@ -2695,8 +2703,9 @@ async function main() {
   }
 
   fillDerivedOutputs(live, combinedAgg, dotsPayload, fairPlayPayload);
+  const currentProcessedRefs = buildCurrentProcessedMatchRefs(live, matchList);
   live.meta.miniFantasyPlayerHistories = await buildMiniFantasyPlayerHistoriesFromProcessedMatches(
-    processedRefs,
+    currentProcessedRefs,
     live,
     {
       loadScorecard: (matchId) => processScorecard(matchId, live, {

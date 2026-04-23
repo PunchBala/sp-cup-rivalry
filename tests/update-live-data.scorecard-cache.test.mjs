@@ -5,6 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  buildCurrentProcessedMatchRefs,
   endedUnprocessedMatches,
   canUseFreshScorecardCall,
   completedScorecardIntegrityIssues,
@@ -497,6 +498,41 @@ test('stable processed match keys prevent duplicate backlog when CricketData rot
   assert.deepEqual(processedKeys, ['match:1', 'match:2']);
   assert.equal(backlog.length, 1);
   assert.equal(backlog[0].id, 'new-match-3');
+});
+
+test('current processed refs rebuild includes matches added after the initial processed-ref snapshot', () => {
+  const matchList = [
+    {
+      id: 'match-1',
+      name: 'Punjab Kings vs Delhi Capitals, 1st Match, Indian Premier League 2026',
+      dateTimeGMT: '2026-03-28T00:00:00',
+      teams: ['Punjab Kings', 'Delhi Capitals'],
+      matchEnded: true,
+      matchKey: 'match:1'
+    },
+    {
+      id: 'match-2',
+      name: 'Mumbai Indians vs Chennai Super Kings, 2nd Match, Indian Premier League 2026',
+      dateTimeGMT: '2026-03-29T00:00:00',
+      teams: ['Mumbai Indians', 'Chennai Super Kings'],
+      matchEnded: true,
+      matchKey: 'match:2'
+    }
+  ];
+
+  const staleProcessedRefs = [{ id: 'match-1', matchKey: 'match:1' }];
+  const live = {
+    meta: {
+      processedMatchIds: ['match-1', 'match-2'],
+      processedMatchKeys: ['match:1', 'match:2']
+    }
+  };
+
+  const currentProcessedRefs = buildCurrentProcessedMatchRefs(live, matchList);
+
+  assert.deepEqual(staleProcessedRefs.map((match) => match.id), ['match-1']);
+  assert.deepEqual(currentProcessedRefs.map((match) => match.id), ['match-1', 'match-2']);
+  assert.equal(currentProcessedRefs[1].matchKey, 'match:2');
 });
 
 test('repairs missing score-history checkpoints from the nearest earlier snapshot', async () => {
