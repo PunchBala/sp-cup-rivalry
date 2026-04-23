@@ -10,7 +10,9 @@ import {
   completedScorecardIntegrityIssues,
   findMissingScorecardCaches,
   freshScorecardBudgetRemaining,
+  incompleteCompletedScorecardDetails,
   inferProcessedMatchKeys,
+  isIncompleteCompletedScorecardError,
   matchKeyForMatch,
   readCachedScorecard,
   repairScoreHistoryGaps,
@@ -167,19 +169,150 @@ test('completed scorecard integrity check catches final-score shells with partia
 
   assert.deepEqual(
     completedScorecardIntegrityIssues(partial),
-    ['final score has 2 innings but scorecard has 1']
+    [
+      'final score has 2 innings but scorecard has 1',
+      'Sunrisers Hyderabad Inning 1 top-level total 242 is 167 runs above batting rows total 75'
+    ]
   );
+});
+
+test('completed scorecard integrity check catches settled totals with stale batting rows', () => {
+  const staleTwoInnings = {
+    matchEnded: true,
+    status: 'Sunrisers Hyderabad won by 47 runs',
+    matchWinner: 'Sunrisers Hyderabad',
+    score: [
+      { inning: 'Sunrisers Hyderabad Inning 1', r: 242, w: 2, o: 20 },
+      { inning: 'Delhi Capitals Inning 1', r: 195, w: 9, o: 20 }
+    ],
+    scorecard: [
+      {
+        inning: 'Sunrisers Hyderabad Inning 1',
+        batting: [
+          { batsman: { name: 'Abhishek Sharma' }, r: 75 },
+          { batsman: { name: 'Travis Head' }, r: 37 },
+          { batsman: { name: 'Ishan Kishan' }, r: 22 }
+        ],
+        bowling: [
+          { bowler: { name: 'Mukesh Kumar' }, r: 20, nb: 0, wd: 1 },
+          { bowler: { name: 'Nitish Rana' }, r: 32, nb: 0, wd: 2 }
+        ]
+      },
+      {
+        inning: 'Delhi Capitals Inning 1',
+        batting: [
+          { batsman: { name: 'KL Rahul' }, r: 37 },
+          { batsman: { name: 'Nitish Rana' }, r: 57 }
+        ],
+        bowling: [
+          { bowler: { name: 'Eshan Malinga' }, r: 32, nb: 0, wd: 0 },
+          { bowler: { name: 'Sakib Hussain' }, r: 29, nb: 0, wd: 1 }
+        ]
+      }
+    ]
+  };
 
   assert.deepEqual(
-    completedScorecardIntegrityIssues({
-      ...partial,
-      scorecard: [
-        ...partial.scorecard,
-        { inning: 'Delhi Capitals Inning 1', batting: [{ batsman: { name: 'KL Rahul' }, r: 37 }] }
-      ]
-    }),
-    []
+    completedScorecardIntegrityIssues(staleTwoInnings),
+    [
+      'Sunrisers Hyderabad Inning 1 top-level total 242 is 108 runs above batting rows total 134',
+      'Delhi Capitals Inning 1 top-level total 195 is 101 runs above batting rows total 94'
+    ]
   );
+});
+
+test('completed scorecard integrity check accepts valid scorecards with byes or leg byes missing from provider extras', () => {
+  const completeWithUnlistedLegByes = {
+    matchEnded: true,
+    status: 'Rajasthan Royals won by 40 runs',
+    matchWinner: 'Rajasthan Royals',
+    score: [
+      { inning: 'Rajasthan Royals Inning 1', r: 159, w: 6, o: 20 },
+      { inning: 'Lucknow Super Giants Inning 1', r: 119, w: 10, o: 18 }
+    ],
+    scorecard: [
+      {
+        inning: 'Rajasthan Royals Inning 1',
+        batting: [
+          { batsman: { name: 'Yashasvi Jaiswal' }, r: 22 },
+          { batsman: { name: 'Vaibhav Sooryavanshi' }, r: 8 },
+          { batsman: { name: 'Dhruv Jurel' }, r: 0 },
+          { batsman: { name: 'Riyan Parag' }, r: 20 },
+          { batsman: { name: 'Shimron Hetmyer' }, r: 22 },
+          { batsman: { name: 'Ravindra Jadeja' }, r: 43 },
+          { batsman: { name: 'Donovan Ferreira' }, r: 20 },
+          { batsman: { name: 'Shubham Dubey' }, r: 19 }
+        ],
+        bowling: [
+          { bowler: { name: 'Mohammed Shami' }, r: 30, nb: 0, wd: 3 },
+          { bowler: { name: 'Prince Yadav' }, r: 29, nb: 0, wd: 0 },
+          { bowler: { name: 'Mohsin Khan' }, r: 17, nb: 0, wd: 0 },
+          { bowler: { name: 'Mayank Yadav' }, r: 56, nb: 0, wd: 1 },
+          { bowler: { name: 'Digvesh Singh Rathi' }, r: 26, nb: 0, wd: 0 }
+        ]
+      },
+      {
+        inning: 'Lucknow Super Giants Inning 1',
+        batting: [
+          { batsman: { name: 'Mitchell Marsh' }, r: 55 },
+          { batsman: { name: 'Ayush Badoni' }, r: 0 },
+          { batsman: { name: 'Rishabh Pant' }, r: 0 },
+          { batsman: { name: 'Aiden Markram' }, r: 0 },
+          { batsman: { name: 'Nicholas Pooran' }, r: 22 },
+          { batsman: { name: 'Himmat Singh' }, r: 15 },
+          { batsman: { name: 'Mukul Choudhary' }, r: 7 },
+          { batsman: { name: 'Mohammed Shami' }, r: 6 },
+          { batsman: { name: 'Mayank Yadav' }, r: 5 },
+          { batsman: { name: 'Digvesh Singh Rathi' }, r: 2 },
+          { batsman: { name: 'Mohsin Khan' }, r: 0 }
+        ],
+        bowling: [
+          { bowler: { name: 'Jofra Archer' }, r: 20, nb: 0, wd: 1 },
+          { bowler: { name: 'Nandre Burger' }, r: 27, nb: 0, wd: 0 },
+          { bowler: { name: 'Brijesh Sharma' }, r: 18, nb: 0, wd: 1 },
+          { bowler: { name: 'Ravindra Jadeja' }, r: 29, nb: 0, wd: 1 },
+          { bowler: { name: 'Ravi Bishnoi' }, r: 23, nb: 0, wd: 2 }
+        ]
+      }
+    ]
+  };
+
+  assert.deepEqual(completedScorecardIntegrityIssues(completeWithUnlistedLegByes), []);
+});
+
+test('completed scorecard integrity check exempts no-result and abandoned matches', () => {
+  const abandoned = {
+    matchEnded: true,
+    status: 'No result (rain)',
+    matchWinner: 'No Winner',
+    score: [
+      { inning: 'Kolkata Knight Riders Inning 1', r: 210, w: 4, o: 20 },
+      { inning: 'Punjab Kings Inning 1', r: 0, w: 0, o: 0 }
+    ],
+    scorecard: [
+      {
+        inning: 'Kolkata Knight Riders Inning 1',
+        batting: [{ batsman: { name: 'Rinku Singh' }, r: 12 }]
+      }
+    ]
+  };
+
+  assert.deepEqual(completedScorecardIntegrityIssues(abandoned), []);
+});
+
+test('incomplete completed scorecard errors are normalized as retryable not-ready scorecards', () => {
+  const error = new Error('Incomplete completed scorecard for match-31');
+  error.code = 'CRICKETDATA_INCOMPLETE_SCORECARD';
+  error.matchId = 'match-31';
+  error.integrityIssues = ['final score has 2 innings but scorecard has 1'];
+
+  assert.equal(isIncompleteCompletedScorecardError(error), true);
+  assert.deepEqual(incompleteCompletedScorecardDetails(error), {
+    reason: 'incomplete_completed_scorecard',
+    rawReason: 'final score has 2 innings but scorecard has 1',
+    matchId: 'match-31',
+    integrityIssues: ['final score has 2 innings but scorecard has 1']
+  });
 });
 
 test('historical rebuild tracks cache hits separately from paid API scorecard calls', async () => {
@@ -461,6 +594,75 @@ test('repairs missing score-history checkpoints from the nearest earlier snapsho
   assert.equal(repaired.cacheHits, 0);
   assert.deepEqual(repairedCounts, [0, 1, 2]);
   assert.equal(repairedSnapshot.snapshot.meta.aggregates.battingRuns['Virat Kohli'], 88);
+});
+
+test('defers incomplete completed scorecards during score-history gap repair', async () => {
+  const scorecards = {
+    'match-1': makeFinalScorecard({
+      teams: ['Punjab Kings', 'Delhi Capitals'],
+      winner: 'Punjab Kings',
+      batter: 'Prabhsimran Singh',
+      bowler: 'Kuldeep Yadav',
+      catcher: 'Shashank Singh',
+      runs: 61,
+      balls: 36,
+      sixes: 3,
+      wickets: 2,
+      concededRuns: 31,
+      overs: '4',
+      scoreA: 176,
+      scoreB: 161
+    })
+  };
+
+  const baseLive = {
+    mostDots: { ranking: [], extendedRanking: [], values: {} },
+    fairPlay: { winner: null, ranking: [], extendedRanking: [], values: {}, updatedAt: null, source: null },
+    meta: {
+      scoreHistory: [{ processedMatchCount: 0, fetchedAt: '2026-04-01T00:00:00.000Z' }]
+    }
+  };
+  const throughOneMatch = await rebuildHistoricalState(
+    ['match-1'],
+    baseLive,
+    {
+      includeHistory: true,
+      loadScorecard: async (matchId) => ({ data: scorecards[matchId], source: 'cache' })
+    }
+  );
+  const live = {
+    ...baseLive,
+    meta: {
+      lastRun: {},
+      scorecardBudget: {},
+      scoreHistory: throughOneMatch.scoreHistory
+    }
+  };
+  const incompleteError = new Error('Incomplete completed scorecard for match-2');
+  incompleteError.code = 'CRICKETDATA_INCOMPLETE_SCORECARD';
+  incompleteError.matchId = 'match-2';
+  incompleteError.integrityIssues = ['final score has 2 innings but scorecard has 1'];
+
+  const repaired = await repairScoreHistoryGaps(
+    live,
+    [
+      { id: 'match-1', matchKey: 'match:1' },
+      { id: 'match-2', matchKey: 'match:2' },
+      { id: 'match-3', matchKey: 'match:3' }
+    ],
+    {
+      loadScorecard: async (matchId) => {
+        if (matchId === 'match-2') throw incompleteError;
+        return { data: scorecards[matchId], source: 'cache' };
+      }
+    }
+  );
+
+  assert.equal(repaired.repaired, 0);
+  assert.equal(live.meta.lastRun.deferredScorecards, 1);
+  assert.deepEqual(live.meta.lastRun.deferredScorecardMatchIds, ['match-2']);
+  assert.match(live.meta.lastRun.deferredScorecardReason, /score history gap 2/);
+  assert.match(live.meta.lastRun.deferredScorecardReason, /final score has 2 innings but scorecard has 1/);
 });
 
 test('standings award one point each for no-result matches', async () => {

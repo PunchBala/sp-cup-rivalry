@@ -526,15 +526,89 @@ function topLevelScoreInningsCount(scorecard) {
     .length;
 }
 
+function isNoResultScorecard(scorecard) {
+  const winnerText = normalizeName(scorecard?.matchWinner || '').toLowerCase();
+  const status = normalizeName(scorecard?.status || '').toLowerCase();
+  return (
+    winnerText === 'no winner' ||
+    status.includes('no result') ||
+    status.includes('abandon') ||
+    status.includes('abandoned') ||
+    status.includes('washout')
+  );
+}
+
+function scoreRuns(entry) {
+  const value = Number(entry?.r ?? entry?.runs);
+  return Number.isFinite(value) ? value : null;
+}
+
+function inningLabel(entry) {
+  return normalizeName(entry?.inning || entry?.name || '');
+}
+
+function battingRowsForIntegrity(innings) {
+  return safeArray(innings?.batting || innings?.batsman);
+}
+
+function bowlingRowsForIntegrity(innings) {
+  return safeArray(innings?.bowling || innings?.bowler);
+}
+
+function scoreEntryForInnings(scoreEntries, innings, index) {
+  const label = inningLabel(innings);
+  if (label) {
+    const exact = scoreEntries.find((entry) => inningLabel(entry) === label);
+    if (exact) return exact;
+  }
+  return scoreEntries[index] || null;
+}
+
+function sumNumeric(rows, pickValue) {
+  return safeArray(rows).reduce((sum, row) => {
+    const value = Number(pickValue(row) || 0);
+    return Number.isFinite(value) ? sum + value : sum;
+  }, 0);
+}
+
 export function completedScorecardIntegrityIssues(scorecard) {
   const issues = [];
   if (!scorecard?.matchEnded) return issues;
+  if (isNoResultScorecard(scorecard)) return issues;
 
-  const scoreInnings = topLevelScoreInningsCount(scorecard);
+  const scoreEntries = safeArray(scorecard?.score)
+    .filter((entry) => Number.isFinite(Number(entry?.r ?? entry?.runs)));
+  const scoreInnings = scoreEntries.length;
   const scorecardInnings = scorecardInningsCount(scorecard);
   if (scoreInnings >= 2 && scorecardInnings < scoreInnings) {
     issues.push(`final score has ${scoreInnings} innings but scorecard has ${scorecardInnings}`);
   }
+
+  safeArray(scorecard?.scorecard).forEach((innings, index) => {
+    const scoreEntry = scoreEntryForInnings(scoreEntries, innings, index);
+    const topRuns = scoreRuns(scoreEntry);
+    if (topRuns === null) return;
+
+    const battingRuns = sumNumeric(battingRowsForIntegrity(innings), (row) => row?.r ?? row?.runs);
+    const bowlingRows = bowlingRowsForIntegrity(innings);
+    const bowlingRuns = sumNumeric(bowlingRows, (row) => row?.r ?? row?.runs);
+    const knownBowlingExtras = sumNumeric(bowlingRows, (row) => Number(row?.nb || 0) + Number(row?.wd || 0));
+    const extrasGap = topRuns - battingRuns;
+    const label = inningLabel(innings) || `innings ${index + 1}`;
+
+    if (battingRuns > topRuns) {
+      issues.push(`${label} batting rows total ${battingRuns} exceeds top-level total ${topRuns}`);
+    }
+    if (bowlingRuns > topRuns) {
+      issues.push(`${label} bowling rows total ${bowlingRuns} exceeds top-level total ${topRuns}`);
+    }
+    if (extrasGap >= 0 && knownBowlingExtras > extrasGap) {
+      issues.push(`${label} bowling extras ${knownBowlingExtras} exceed top-level extras gap ${extrasGap}`);
+    }
+    if (extrasGap > 40) {
+      issues.push(`${label} top-level total ${topRuns} is ${extrasGap} runs above batting rows total ${battingRuns}`);
+    }
+  });
 
   return issues;
 }
@@ -547,6 +621,25 @@ function assertCompletedScorecardCacheable(matchId, scorecard) {
   error.matchId = matchId;
   error.integrityIssues = issues;
   throw error;
+}
+
+export function isIncompleteCompletedScorecardError(error) {
+  return String(error?.code || '') === 'CRICKETDATA_INCOMPLETE_SCORECARD';
+}
+
+export function incompleteCompletedScorecardDetails(error, fallbackMatchId = null) {
+  if (!isIncompleteCompletedScorecardError(error)) return null;
+  const integrityIssues = safeArray(error?.integrityIssues)
+    .map((issue) => String(issue || '').trim())
+    .filter(Boolean);
+  return {
+    reason: 'incomplete_completed_scorecard',
+    rawReason: integrityIssues.length
+      ? integrityIssues.join('; ')
+      : String(error?.message || 'completed scorecard failed integrity checks'),
+    matchId: String(error?.matchId || fallbackMatchId || '').trim() || null,
+    integrityIssues
+  };
 }
 
 export async function findMissingScorecardCaches(matchIds, { cacheDir = SCORECARD_CACHE_DIR } = {}) {
@@ -629,6 +722,13 @@ export function parseCricketDataScorecardNotFoundDetails(error) {
 
 export function isCricketDataScorecardNotFoundError(error) {
   return Boolean(parseCricketDataScorecardNotFoundDetails(error));
+}
+
+function scorecardNotReadyDetails(error, fallbackMatchId = null) {
+  return (
+    parseCricketDataScorecardNotFoundDetails(error) ||
+    incompleteCompletedScorecardDetails(error, fallbackMatchId)
+  );
 }
 
 export function isCricketDataFallbackEligibleError(error) {
@@ -1618,8 +1718,8 @@ export async function buildMiniFantasyPlayerHistoriesFromProcessedMatches(proces
         applyScorecardToAggregates(matchAggregate, scorecardResult.data, { isFinal: true });
       }
     } catch (error) {
-      const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-      if (!missingScorecard && !isMissingProcessedScorecardError(error)) throw error;
+      const notReadyScorecard = scorecardNotReadyDetails(error, processedRef?.id);
+      if (!notReadyScorecard && !isMissingProcessedScorecardError(error)) throw error;
     }
 
     if (!matchAggregate) {
@@ -1925,8 +2025,8 @@ export async function rebuildHistoricalState(processedIds, baseLive = null, { in
     try {
       scorecardResult = normalizeScorecardResult(await resolveScorecard(matchId));
     } catch (error) {
-      const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-      if (!missingScorecard && !isMissingProcessedScorecardError(error)) throw error;
+      const notReadyScorecard = scorecardNotReadyDetails(error, matchId);
+      if (!notReadyScorecard && !isMissingProcessedScorecardError(error)) throw error;
       const fallbackOverlay = buildHistoricalAggregateOverlay(baseLive, processedMatchCount);
       if (!fallbackOverlay) throw error;
       rebuilt = combineAggregates(rebuilt, fallbackOverlay);
@@ -2008,9 +2108,9 @@ export async function repairScoreHistoryGaps(live, processedRefs, { loadScorecar
     try {
       scorecardResult = normalizeScorecardResult(await resolveScorecard(matchRef.id));
     } catch (error) {
-      const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-      if (!missingScorecard) throw error;
-      noteDeferredScorecard(live, `score history gap ${count}`, matchRef.id, missingScorecard);
+      const notReadyScorecard = scorecardNotReadyDetails(error, matchRef.id);
+      if (!notReadyScorecard) throw error;
+      noteDeferredScorecard(live, `score history gap ${count}`, matchRef.id, notReadyScorecard);
       break;
     }
 
@@ -2390,11 +2490,11 @@ async function main() {
         live.meta.lastRun.historicalReplayUsedApiFallback = rebuiltState.apiCalls > 0;
         appliedHistoricalBackfill = true;
       } catch (error) {
-        const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-        if (!missingScorecard) throw error;
+        const notReadyScorecard = scorecardNotReadyDetails(error);
+        if (!notReadyScorecard) throw error;
         live.meta.lastRun.historicalReplaySkipped = true;
-        live.meta.lastRun.historicalReplayReason = `historical replay deferred; ${missingScorecard.rawReason}`;
-        noteDeferredScorecard(live, 'historical replay', missingScorecard.matchId, missingScorecard);
+        live.meta.lastRun.historicalReplayReason = `historical replay deferred; ${notReadyScorecard.rawReason}`;
+        noteDeferredScorecard(live, 'historical replay', notReadyScorecard.matchId, notReadyScorecard);
       }
     }
   }
@@ -2413,11 +2513,11 @@ async function main() {
     }
     let scorecardResult;
     try {
-        scorecardResult = await processScorecard(match.id, live, { preferCache: true });
+      scorecardResult = await processScorecard(match.id, live, { preferCache: true });
     } catch (error) {
-      const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-      if (!missingScorecard) throw error;
-      noteDeferredScorecard(live, 'backlog', match.id, missingScorecard);
+      const notReadyScorecard = scorecardNotReadyDetails(error, match.id);
+      if (!notReadyScorecard) throw error;
+      noteDeferredScorecard(live, 'backlog', match.id, notReadyScorecard);
       continue;
     }
     if (scorecardResult.source === 'cache') {
@@ -2477,9 +2577,9 @@ async function main() {
         live.meta.scorecardBudget.lastLiveScorecardAt = isoNow();
         live.meta.scorecardBudget.lastLiveScorecardMatchId = activeMatch.id;
       } catch (error) {
-        const missingScorecard = parseCricketDataScorecardNotFoundDetails(error);
-        if (!missingScorecard) throw error;
-        noteDeferredScorecard(live, 'live overlay', activeMatch.id, missingScorecard);
+        const notReadyScorecard = scorecardNotReadyDetails(error, activeMatch.id);
+        if (!notReadyScorecard) throw error;
+        noteDeferredScorecard(live, 'live overlay', activeMatch.id, notReadyScorecard);
         live.meta.lastRun.liveOverlaySkippedReason = 'scorecard not ready';
         overlayAgg = reusableOverlayAggregates(live, activeMatch);
         live.meta.lastRun.liveOverlayReused = !!overlayAgg;
