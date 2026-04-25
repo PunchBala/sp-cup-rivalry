@@ -1190,9 +1190,16 @@ function buildMiniFantasyFixturePlayerRecordMap({
   if (targetMatchNo <= resolvedCompletedMatchCount) {
     baseIndex.forEach((payload, playerId) => {
       const pointsByMatchNo = payload?.points_by_match_no || {};
-      recordMap.set(playerId, {
+      const record = {
         points: toNumber(pointsByMatchNo[targetMatchNo], 0),
         appeared: hasFixturePoints(pointsByMatchNo, targetMatchNo)
+      };
+      recordMap.set(playerId, record);
+      const teamCode = payload?.team || resolveMiniFantasyPlayerTeamCode(playerId);
+      const playerName = payload?.name || '';
+      buildMiniFantasyAliasPlayerIds(teamCode, playerName).forEach((aliasPlayerId) => {
+        if (recordMap.has(aliasPlayerId)) return;
+        recordMap.set(aliasPlayerId, { ...record });
       });
     });
     return recordMap;

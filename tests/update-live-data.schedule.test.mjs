@@ -19,7 +19,9 @@ test('builds the expected first refresh windows for a 14:00 UTC match', () => {
   assert.deepEqual(planned, [
     '2026-03-28T13:00:00.000Z',
     '2026-03-28T18:00:00.000Z',
-    '2026-03-28T19:00:00.000Z'
+    '2026-03-28T19:00:00.000Z',
+    '2026-03-28T20:00:00.000Z',
+    '2026-03-28T21:00:00.000Z'
   ]);
 });
 
@@ -41,13 +43,17 @@ test('merges overlapping double-header refresh buckets correctly', () => {
     '2026-04-04T13',
     '2026-04-04T14',
     '2026-04-04T15',
+    '2026-04-04T16',
+    '2026-04-04T17',
     '2026-04-04T18',
-    '2026-04-04T19'
+    '2026-04-04T19',
+    '2026-04-04T20',
+    '2026-04-04T21'
   ]);
 });
 
 test('reports no future refresh once the league-stage plan is complete', () => {
-  const afterFinal = new Date('2026-05-24T20:05:00Z');
+  const afterFinal = new Date('2026-05-24T22:05:00Z');
   assert.equal(nextScheduledRefreshAt(schedule, afterFinal), null);
 
   const decision = createScheduleDecision(schedule, afterFinal);

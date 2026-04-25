@@ -107,7 +107,7 @@ function buildScorecardUrl(apiKey, matchId) {
 }
 
 
-const SCHEDULE_REFRESH_OFFSETS_HOURS = [-1, 4, 5];
+const SCHEDULE_REFRESH_OFFSETS_HOURS = [-1, 4, 5, 6, 7];
 
 export async function readLeagueStageSchedule(scheduleFile = SCHEDULE_FILE) {
   const raw = await fs.readFile(scheduleFile, 'utf8');

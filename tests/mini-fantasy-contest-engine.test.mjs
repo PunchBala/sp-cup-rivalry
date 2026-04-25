@@ -326,6 +326,55 @@ test('buildMiniFantasyPlayerPointsIndex keeps completed fixture points for Surya
   });
 });
 
+test('scoreMiniFantasyEntry keeps completed fixture points for legacy alias player ids', () => {
+  const liveData = {
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 1,
+          fetchedAt: '2026-04-01T17:00:00Z',
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Philip Salt': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Philip Salt': { score: 49 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 1, datetime_utc: '2026-04-01T14:00:00Z', home_team: 'Royal Challengers Bengaluru', away_team: 'Mumbai Indians' }
+  ];
+  const squads = {
+    RCB: ['Phil Salt']
+  };
+
+  const score = scoreMiniFantasyEntry({
+    entry: {
+      matchNo: 1,
+      selectedPlayerIds: [buildMiniFantasyPlayerId('RCB', 'Philip Salt')],
+      captainPlayerId: buildMiniFantasyPlayerId('RCB', 'Philip Salt')
+    },
+    liveData,
+    schedule,
+    squads
+  });
+
+  assert.equal(score.points_by_player_id[buildMiniFantasyPlayerId('RCB', 'Philip Salt')], 49);
+  assert.equal(score.appeared_by_player_id[buildMiniFantasyPlayerId('RCB', 'Philip Salt')], true);
+  assert.equal(score.scored_points_by_player_id[buildMiniFantasyPlayerId('RCB', 'Philip Salt')], 76.5);
+  assert.equal(score.total_points, 76.5);
+});
+
 test('buildMiniFantasyFixturePointsIndex does not collide same-initial same-surname players', () => {
   const schedule = [
     { match_no: 15, datetime_utc: '2026-04-09T14:00:00Z' },
