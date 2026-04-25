@@ -685,6 +685,10 @@ function startOfUtcDayMs(dateValue) {
 export function getMiniFantasyFixtureOpenAtUtc(fixture, options = {}) {
   const firstOpenMatchNo = Number(options.first_open_match_no || MINI_FANTASY_FIRST_OPEN_MATCH_NO);
   const firstMatchOpenAtUtc = options.first_match_open_at_utc || MINI_FANTASY_FIRST_MATCH_OPEN_AT_UTC;
+  const explicitOpenMs = Date.parse(fixture?.mini_fantasy_opens_at_utc || '');
+  if (Number.isFinite(explicitOpenMs)) {
+    return new Date(explicitOpenMs).toISOString();
+  }
   const startMs = Date.parse(fixture?.datetime_utc || fixture?.starts_at_utc || '');
   if (!Number.isFinite(startMs)) return null;
   const regularOpenMs = startOfUtcDayMs(startMs) - 24 * 60 * 60 * 1000;

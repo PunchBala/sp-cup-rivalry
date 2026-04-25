@@ -12,6 +12,7 @@ import {
   calculateMiniFantasyMissedLockPoints,
   deriveCompletedMatchHistories,
   generateMiniFantasyPriceBook,
+  getMiniFantasyFixtureOpenAtUtc,
   getMiniFantasyOpenFixtures,
   resolvePlayerHistory,
   serializeMiniFantasyLeaderboardRows,
@@ -529,6 +530,20 @@ test('getMiniFantasyOpenFixtures opens Match 14 now and later fixtures from the 
 
   const nearLock = getMiniFantasyOpenFixtures(schedule, new Date('2026-04-08T13:59:00Z'));
   assert.deepEqual(nearLock.fixtures.map((fixture) => fixture.match_no), [15]);
+});
+
+test('getMiniFantasyFixtureOpenAtUtc honors an explicit fixture override without affecting the day-before default', () => {
+  const fixture = {
+    match_no: 39,
+    datetime_utc: '2026-04-27T14:00:00Z',
+    mini_fantasy_opens_at_utc: '2026-04-26T15:00:00Z'
+  };
+
+  assert.equal(getMiniFantasyFixtureOpenAtUtc(fixture), '2026-04-26T15:00:00.000Z');
+  assert.equal(
+    getMiniFantasyFixtureOpenAtUtc({ match_no: 40, datetime_utc: '2026-04-28T14:00:00Z' }),
+    '2026-04-27T00:00:00.000Z'
+  );
 });
 
 test('buildMiniFantasyFixturePointsIndex derives live match points from the current snapshot delta', () => {
