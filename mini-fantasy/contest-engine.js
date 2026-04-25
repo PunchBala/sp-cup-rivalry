@@ -1,14 +1,18 @@
 import {
   ENGINE_VERSION as PRICING_ENGINE_VERSION,
-  calculateEligiblePercentiles,
+  DEFAULT_MISSED_FIXTURE_PENALTIES,
+  DEFAULT_RANK_PRICE_BUCKETS,
+  assignRankBucketPrices,
+  clamp,
   computeAdjustedScore,
   computeLastMatchPoints,
+  computeMissedFixturePenalty,
   computeRecentAveragePoints,
   computeReliabilityFactor,
   computeScoreBasis,
   computeSeasonAveragePoints,
   generatePrices,
-  mapPercentileToPrice,
+  resolvePlayerPriceMax,
   roundTo
 } from './pricing-engine.js';
 
@@ -50,10 +54,17 @@ export const TEAM_NAME_TO_CODE = Object.freeze(
 );
 
 const DEFAULT_PRICE_JOB_META = Object.freeze({
-  price_min: 4,
+  price_min: 4.5,
   price_max: 10,
   recent_matches_window: 3,
-  max_daily_price_step: 1,
+  max_daily_price_step: 2,
+  price_increment: 0.5,
+  rank_price_buckets: DEFAULT_RANK_PRICE_BUCKETS,
+  smoothing: Object.freeze({
+    old_price_weight: 0.4,
+    target_price_weight: 0.6
+  }),
+  missed_fixture_penalties: DEFAULT_MISSED_FIXTURE_PENALTIES,
   default_initial_price: 6,
   scoring_source: 'existing_mvp_points_formula_v1',
   notes: 'Daily pricing refresh after all completed matches for the day'
@@ -827,6 +838,63 @@ export function deriveCompletedMatchHistories(liveData = {}, schedule = []) {
   return histories;
 }
 
+function getLatestCompletedMiniFantasyMatchNo(liveData = {}, historyMap = new Map()) {
+  const scoreHistory = Array.isArray(liveData?.meta?.scoreHistory) ? liveData.meta.scoreHistory : [];
+  const latestScoreHistoryMatchNo = scoreHistory.reduce(
+    (max, entry) => Math.max(max, Math.trunc(toNumber(entry?.processedMatchCount, 0))),
+    0
+  );
+  let latestHistoryMatchNo = 0;
+  if (historyMap instanceof Map) {
+    historyMap.forEach((history) => {
+      Object.keys(history?.points_by_match_no || {}).forEach((matchNo) => {
+        latestHistoryMatchNo = Math.max(latestHistoryMatchNo, Math.trunc(toNumber(matchNo, 0)));
+      });
+    });
+  }
+  return Math.max(latestScoreHistoryMatchNo, latestHistoryMatchNo, 0);
+}
+
+function buildTeamCompletedFixtureMap(schedule = [], latestCompletedMatchNo = 0) {
+  const teamFixtureMap = new Map();
+  (Array.isArray(schedule) ? schedule : []).forEach((fixture) => {
+    const matchNo = Math.trunc(toNumber(fixture?.match_no, 0));
+    if (matchNo <= 0 || matchNo > latestCompletedMatchNo) return;
+    const teamCodes = [
+      fixture?.home_team_code || resolveFixtureTeamCode(fixture?.home_team),
+      fixture?.away_team_code || resolveFixtureTeamCode(fixture?.away_team)
+    ].filter(Boolean);
+    teamCodes.forEach((teamCode) => {
+      if (!teamFixtureMap.has(teamCode)) {
+        teamFixtureMap.set(teamCode, []);
+      }
+      teamFixtureMap.get(teamCode).push(matchNo);
+    });
+  });
+
+  teamFixtureMap.forEach((matchNos) => {
+    matchNos.sort((left, right) => left - right);
+  });
+  return teamFixtureMap;
+}
+
+function calculateConsecutiveMissedFixtures(teamCode = '', history = {}, teamCompletedFixtureMap = new Map()) {
+  const completedFixtures = teamCompletedFixtureMap.get(teamCode) || [];
+  if (!completedFixtures.length) return 0;
+  const playedMatchNos = new Set(
+    Object.keys(history?.points_by_match_no || {})
+      .map((matchNo) => Math.trunc(toNumber(matchNo, 0)))
+      .filter((matchNo) => matchNo > 0)
+  );
+  let streak = 0;
+  for (let index = completedFixtures.length - 1; index >= 0; index -= 1) {
+    const matchNo = completedFixtures[index];
+    if (playedMatchNos.has(matchNo)) break;
+    streak += 1;
+  }
+  return streak;
+}
+
 export function seedInitialPriceMap(players = [], jobMeta = DEFAULT_PRICE_JOB_META) {
   const eligiblePlayers = (Array.isArray(players) ? players : [])
     .filter((player) => player.pricing_eligible)
@@ -836,20 +904,27 @@ export function seedInitialPriceMap(players = [], jobMeta = DEFAULT_PRICE_JOB_ME
       const scoreBasis = computeScoreBasis(recentAveragePoints, seasonAveragePoints);
       const reliabilityFactor = computeReliabilityFactor(player.matches_played || 0);
       const adjustedScore = computeAdjustedScore(scoreBasis, reliabilityFactor);
-      return {
-        player_id: player.player_id,
-        adjusted_score: adjustedScore
-      };
-    });
-  const percentiles = calculateEligiblePercentiles(eligiblePlayers);
+        return {
+          player_id: player.player_id,
+          adjusted_score: adjustedScore,
+          adjusted_score_raw: adjustedScore
+        };
+      });
+  const targetPrices = assignRankBucketPrices(eligiblePlayers, jobMeta.rank_price_buckets || DEFAULT_RANK_PRICE_BUCKETS);
   const seedMap = new Map();
   (Array.isArray(players) ? players : []).forEach((player) => {
-    if (!player.pricing_eligible || !Number(player.matches_played || 0)) {
+    if (!player.pricing_eligible) {
       seedMap.set(player.player_id, jobMeta.default_initial_price);
       return;
     }
-    const percentile = percentiles.get(player.player_id) ?? 0;
-    seedMap.set(player.player_id, mapPercentileToPrice(percentile));
+    const priceMax = resolvePlayerPriceMax(player, jobMeta.price_max);
+    const rawTargetPrice = targetPrices.get(player.player_id) ?? jobMeta.default_initial_price;
+    const penalizedTargetPrice = clamp(
+      rawTargetPrice - computeMissedFixturePenalty(player.missed_fixture_streak, jobMeta.missed_fixture_penalties),
+      jobMeta.price_min,
+      priceMax
+    );
+    seedMap.set(player.player_id, penalizedTargetPrice);
   });
   return seedMap;
 }
@@ -878,10 +953,12 @@ export function buildPricingJobFromLiveData({
     as_of_utc: asOfUtc,
     ...DEFAULT_PRICE_JOB_META,
     ...(jobMeta || {})
-  };
-  const roleLookup = buildTeamRoleLookup(teamRoles);
-  const previousPrices = buildPreviousPriceMap(previousPriceBook);
-  const historyMap = deriveCompletedMatchHistories(liveData, schedule);
+    };
+    const roleLookup = buildTeamRoleLookup(teamRoles);
+    const previousPrices = buildPreviousPriceMap(previousPriceBook);
+    const historyMap = deriveCompletedMatchHistories(liveData, schedule);
+    const latestCompletedMatchNo = getLatestCompletedMiniFantasyMatchNo(liveData, historyMap);
+    const teamCompletedFixtureMap = buildTeamCompletedFixtureMap(schedule, latestCompletedMatchNo);
 
   const players = [];
   Object.entries(squads || {}).forEach(([teamCode, squadPlayers]) => {
@@ -892,26 +969,29 @@ export function buildPricingJobFromLiveData({
         points_by_match_no: {},
         matches_played: 0,
         last_match_played_at_utc: null
-      };
-      const role = resolveRoleFromTeamMap(teamCode, playerName, roleLookup[teamCode] || {});
-      const playerId = buildMiniFantasyPlayerId(teamCode, playerName);
-      const previous = previousPrices.get(playerId);
-      players.push({
-        player_id: playerId,
-        name: playerName,
-        team: teamCode,
-        role: role || 'batter',
+        };
+        const role = resolveRoleFromTeamMap(teamCode, playerName, roleLookup[teamCode] || {});
+        const playerId = buildMiniFantasyPlayerId(teamCode, playerName);
+        const previous = previousPrices.get(playerId);
+        const missedFixtureStreak = calculateConsecutiveMissedFixtures(teamCode, history, teamCompletedFixtureMap);
+        players.push({
+          player_id: playerId,
+          name: playerName,
+          team: teamCode,
+          role: role || 'batter',
         is_uncapped: UNCAPPED_MVP_PLAYER_KEYS.has(canonicalName),
         pricing_eligible: Boolean(role),
-        old_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
-        initial_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
-        recovered_history: Number(previous?.matches_played || 0) === 0 && Number(history.matches_played || 0) > 0,
-        match_points: [...(history.match_points || [])],
-        matches_played: Number(history.matches_played || 0),
-        last_match_played_at_utc: history.last_match_played_at_utc || null
+          old_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
+          initial_price: Number.isFinite(previous?.final_price) ? previous.final_price : null,
+          recovered_history: Number(previous?.matches_played || 0) === 0 && Number(history.matches_played || 0) > 0,
+          match_points: [...(history.match_points || [])],
+          points_by_match_no: { ...(history.points_by_match_no || {}) },
+          matches_played: Number(history.matches_played || 0),
+          missed_fixture_streak: missedFixtureStreak,
+          last_match_played_at_utc: history.last_match_played_at_utc || null
+        });
       });
     });
-  });
 
   const seededInitialPrices = seedInitialPriceMap(players, effectiveMeta);
   players.forEach((player) => {
