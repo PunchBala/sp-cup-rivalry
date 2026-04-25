@@ -67,7 +67,8 @@ const UNCAPPED_MVP_PLAYERS = [
 ];
 const PLAYER_KEY_ALIASES = {
   // Keep this tiny. Only canonicalize genuinely recurring data-provider variants.
-  'vaibhav sooryavanshi': 'vaibhav suryavanshi'
+  'vaibhav sooryavanshi': 'vaibhav suryavanshi',
+  'mohammed shami': 'mohammad shami'
 };
 const UNCAPPED_MVP_PLAYER_KEYS = new Set(UNCAPPED_MVP_PLAYERS.map((name) => canonicalPlayerPoolKey(name)));
 
@@ -1570,6 +1571,36 @@ function diffNumericMap(currentMap = {}, previousMap = {}) {
   return out;
 }
 
+function buildHistoricalPlayerDisplayNameMap(...maps) {
+  const out = {};
+  maps.flat().forEach((mapObj) => {
+    for (const rawName of Object.keys(mapObj || {})) {
+      const canonicalKey = canonicalPlayerPoolKey(rawName);
+      if (!canonicalKey || out[canonicalKey]) continue;
+      out[canonicalKey] = rawName;
+    }
+  });
+  return out;
+}
+
+function canonicalizePlayerNumericMap(mapObj = {}, displayNameMap = null) {
+  const out = {};
+  for (const [playerName, value] of Object.entries(mapObj || {})) {
+    const canonicalKey = canonicalPlayerPoolKey(playerName);
+    if (!canonicalKey) continue;
+    const outputKey = displayNameMap?.[canonicalKey] || canonicalKey;
+    out[outputKey] = Number(out[outputKey] || 0) + Number(value || 0);
+  }
+  return out;
+}
+
+function diffPlayerNumericMap(currentMap = {}, previousMap = {}, displayNameMap = null) {
+  return diffNumericMap(
+    canonicalizePlayerNumericMap(currentMap, displayNameMap),
+    canonicalizePlayerNumericMap(previousMap, displayNameMap)
+  );
+}
+
 function diffNestedNumericMap(currentMap = {}, previousMap = {}) {
   const out = {};
   const keys = new Set([...Object.keys(currentMap || {}), ...Object.keys(previousMap || {})]);
@@ -1637,10 +1668,10 @@ function resolveHistoricalCumulativeDots(baseLive, processedMatchCountValue) {
   return {};
 }
 
-function buildHistoricalDotOverlay(baseLive, processedMatchCountValue) {
+function buildHistoricalDotOverlay(baseLive, processedMatchCountValue, displayNameMap = null) {
   const currentDots = resolveHistoricalCumulativeDots(baseLive, processedMatchCountValue);
   const previousDots = resolveHistoricalCumulativeDots(baseLive, Number(processedMatchCountValue || 0) - 1);
-  return diffNumericMap(currentDots, previousDots);
+  return diffPlayerNumericMap(currentDots, previousDots, displayNameMap);
 }
 
 function createMostDotsPayloadFromValues(values = {}, source = null) {
@@ -1735,8 +1766,10 @@ export async function buildMiniFantasyPlayerHistoriesFromProcessedMatches(proces
     }
     if (!matchAggregate) continue;
 
-    const historicalDotOverlay = buildHistoricalDotOverlay(baseLive, processedMatchNo);
-    if (Object.keys(historicalDotOverlay).length) {
+    const historicalDotOverlay = Object.keys(matchAggregate?.bowlingDots || {}).length
+      ? null
+      : buildHistoricalDotOverlay(baseLive, processedMatchNo);
+    if (historicalDotOverlay && Object.keys(historicalDotOverlay).length) {
       matchAggregate.bowlingDots = historicalDotOverlay;
     }
 
@@ -1763,12 +1796,16 @@ function buildHistoricalAggregateOverlay(baseLive, processedMatchCount) {
   const currentAgg = historySnapshotAggregate(currentEntry);
   const previousAgg = historySnapshotAggregate(previousEntry);
   const overlay = createEmptyAggregates();
+  const playerAggregateKeys = ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'stumpings', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches'];
+  const displayNameMap = buildHistoricalPlayerDisplayNameMap(
+    ...playerAggregateKeys.flatMap((key) => [currentAgg[key], previousAgg[key]])
+  );
 
-  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'stumpings', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
-    overlay[key] = diffNumericMap(currentAgg[key], previousAgg[key]);
+  for (const key of playerAggregateKeys) {
+    overlay[key] = diffPlayerNumericMap(currentAgg[key], previousAgg[key], displayNameMap);
   }
   if (!Object.keys(overlay.bowlingDots || {}).length) {
-    overlay.bowlingDots = buildHistoricalDotOverlay(baseLive, processedMatchCount);
+    overlay.bowlingDots = buildHistoricalDotOverlay(baseLive, processedMatchCount, displayNameMap);
   }
 
   overlay.standings = diffNestedNumericMap(currentAgg.standings, previousAgg.standings);

@@ -375,6 +375,77 @@ test('scoreMiniFantasyEntry keeps completed fixture points for legacy alias play
   assert.equal(score.total_points, 76.5);
 });
 
+test('buildMiniFantasyFixturePointsIndex merges split precomputed alias histories for completed fixtures', () => {
+  const liveData = {
+    meta: {
+      miniFantasyPlayerHistories: {
+        'mohammad shami': {
+          player_name: 'Mohammad Shami',
+          match_points: [99, 22.5],
+          points_by_match_no: { 1: 99, 32: 22.5 },
+          matches_played: 2,
+          last_match_played_at_utc: '2026-04-22T14:00:00Z'
+        },
+        'mohammed shami': {
+          player_name: 'Mohammed Shami',
+          match_points: [23, 48, 14, 34, -5, 23, 50],
+          points_by_match_no: { 5: 23, 10: 48, 15: 14, 19: 34, 23: -5, 29: 23, 32: 50 },
+          matches_played: 7,
+          last_match_played_at_utc: '2026-04-22T14:00:00Z'
+        }
+      },
+      scoreHistory: [
+        {
+          processedMatchCount: 32
+        }
+      ],
+      cache: {
+        matchList: [
+          {
+            matchNo: 32,
+            status: 'Rajasthan Royals won by 40 runs',
+            teams: ['Rajasthan Royals', 'Lucknow Super Giants']
+          }
+        ]
+      }
+    }
+  };
+  const schedule = [
+    {
+      match_no: 32,
+      datetime_utc: '2026-04-22T14:00:00Z',
+      home_team: 'Rajasthan Royals',
+      away_team: 'Lucknow Super Giants'
+    }
+  ];
+  const squads = {
+    LSG: ['Mohammad Shami']
+  };
+
+  const pointsIndex = buildMiniFantasyFixturePointsIndex({
+    liveData,
+    schedule,
+    squads,
+    matchNo: 32
+  });
+  const shamiId = buildMiniFantasyPlayerId('LSG', 'Mohammad Shami');
+  const score = scoreMiniFantasyEntry({
+    entry: {
+      matchNo: 32,
+      selectedPlayerIds: [shamiId],
+      captainPlayerId: ''
+    },
+    liveData,
+    schedule,
+    squads
+  });
+
+  assert.equal(pointsIndex.get(shamiId), 72.5);
+  assert.equal(score.points_by_player_id[shamiId], 72.5);
+  assert.equal(score.scored_points_by_player_id[shamiId], 74.5);
+  assert.equal(score.total_points, 74.5);
+});
+
 test('buildMiniFantasyFixturePointsIndex does not collide same-initial same-surname players', () => {
   const schedule = [
     { match_no: 15, datetime_utc: '2026-04-09T14:00:00Z' },

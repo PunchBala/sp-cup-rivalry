@@ -185,6 +185,12 @@ const NAME_TOKEN_EXPANSIONS = Object.freeze({
 });
 
 const EXPLICIT_NAME_ALIASES = Object.freeze({
+  'mohammad shami': Object.freeze([
+    'mohammed shami'
+  ]),
+  'mohammed shami': Object.freeze([
+    'mohammad shami'
+  ]),
   'phil salt': Object.freeze([
     'philip salt'
   ]),
@@ -389,6 +395,76 @@ function mergeHistoryMatches(playerName, histories = []) {
     points_by_match_no: Object.fromEntries(orderedMatchNos.map((matchNo) => [matchNo, mergedPoints[matchNo]])),
     matches_played: orderedMatchNos.length,
     last_match_played_at_utc: lastMatchPlayedAtUtc
+  };
+}
+
+const HISTORY_KEY_ALIASES = Object.freeze({
+  'mohammed shami': 'mohammad shami',
+  'vaibhav sooryavanshi': 'vaibhav suryavanshi'
+});
+
+function canonicalHistoryKey(value) {
+  const normalized = normalizeName(value);
+  return HISTORY_KEY_ALIASES[normalized] || normalized;
+}
+
+function mergeOverlappingMatchPoints(existingPoints, incomingPoints) {
+  if (existingPoints == null) return roundTo(toNumber(incomingPoints, 0), 2);
+  if (incomingPoints == null) return roundTo(toNumber(existingPoints, 0), 2);
+
+  const existing = roundTo(toNumber(existingPoints, 0), 2);
+  const incoming = roundTo(toNumber(incomingPoints, 0), 2);
+
+  if (Math.abs(existing - incoming) < 0.01) return existing;
+  if (Math.abs(existing) < 0.01 || Math.abs(incoming) < 0.01) return Math.max(existing, incoming);
+  return roundTo(existing + incoming, 2);
+}
+
+function normalizeHistoryRecord(rawHistory = {}) {
+  return {
+    player_name: rawHistory.player_name || rawHistory.playerName || '',
+    match_points: Array.isArray(rawHistory.match_points)
+      ? rawHistory.match_points.map((points) => roundTo(toNumber(points, 0), 2))
+      : [],
+    points_by_match_no: Object.fromEntries(
+      Object.entries(rawHistory.points_by_match_no || {})
+        .map(([matchNo, points]) => [Number(matchNo), roundTo(toNumber(points, 0), 2)])
+        .filter(([matchNo]) => Number.isFinite(matchNo) && matchNo > 0)
+    ),
+    matches_played: Math.max(0, Math.trunc(toNumber(rawHistory.matches_played, 0))),
+    last_match_played_at_utc: rawHistory.last_match_played_at_utc || null
+  };
+}
+
+function mergeHistoryRecord(existingHistory = null, incomingHistory = {}) {
+  const base = existingHistory ? normalizeHistoryRecord(existingHistory) : null;
+  const incoming = normalizeHistoryRecord(incomingHistory);
+  if (!base) return incoming;
+
+  const mergedPointsByMatchNo = { ...(base.points_by_match_no || {}) };
+  Object.entries(incoming.points_by_match_no || {}).forEach(([matchNo, points]) => {
+    const numericMatchNo = Number(matchNo);
+    if (!Number.isFinite(numericMatchNo) || numericMatchNo <= 0) return;
+    mergedPointsByMatchNo[numericMatchNo] = mergeOverlappingMatchPoints(
+      mergedPointsByMatchNo[numericMatchNo],
+      points
+    );
+  });
+
+  const orderedMatchNos = Object.keys(mergedPointsByMatchNo).map(Number).sort((a, b) => a - b);
+  const baseName = normalizeWhitespace(base.player_name || '');
+  const incomingName = normalizeWhitespace(incoming.player_name || '');
+  const lastPlayedAt = [base.last_match_played_at_utc, incoming.last_match_played_at_utc]
+    .filter(Boolean)
+    .sort((a, b) => Date.parse(a) - Date.parse(b))
+    .pop() || null;
+
+  return {
+    player_name: incomingName.length > baseName.length ? incomingName : (baseName || incomingName),
+    match_points: orderedMatchNos.map((matchNo) => mergedPointsByMatchNo[matchNo]),
+    points_by_match_no: Object.fromEntries(orderedMatchNos.map((matchNo) => [matchNo, mergedPointsByMatchNo[matchNo]])),
+    matches_played: orderedMatchNos.length,
+    last_match_played_at_utc: lastPlayedAt
   };
 }
 
@@ -672,23 +748,15 @@ export function deriveCompletedMatchHistories(liveData = {}, schedule = []) {
       0
     );
     const histories = new Map();
-    let maxHistoryMatchNo = 0;
-    Object.entries(precomputedHistories).forEach(([canonicalKey, rawHistory]) => {
+    Object.entries(precomputedHistories).forEach(([fallbackKey, rawHistory]) => {
       if (!rawHistory || typeof rawHistory !== 'object') return;
-      const normalizedPointsByMatchNo = Object.fromEntries(
-        Object.entries(rawHistory.points_by_match_no || {}).map(([matchNo, points]) => [Number(matchNo), roundTo(toNumber(points, 0), 2)])
-      );
-      Object.keys(normalizedPointsByMatchNo).forEach((matchNo) => {
+      const canonicalKey = canonicalHistoryKey(rawHistory.player_name || rawHistory.playerName || fallbackKey);
+      histories.set(canonicalKey, mergeHistoryRecord(histories.get(canonicalKey), rawHistory));
+    });
+    let maxHistoryMatchNo = 0;
+    histories.forEach((history) => {
+      Object.keys(history?.points_by_match_no || {}).forEach((matchNo) => {
         maxHistoryMatchNo = Math.max(maxHistoryMatchNo, Math.trunc(toNumber(matchNo, 0)));
-      });
-      histories.set(canonicalKey, {
-        player_name: rawHistory.player_name || rawHistory.playerName || '',
-        match_points: Array.isArray(rawHistory.match_points)
-          ? rawHistory.match_points.map((points) => roundTo(toNumber(points, 0), 2))
-          : [],
-        points_by_match_no: normalizedPointsByMatchNo,
-        matches_played: Math.max(0, Math.trunc(toNumber(rawHistory.matches_played, 0))),
-        last_match_played_at_utc: rawHistory.last_match_played_at_utc || null
       });
     });
     const historiesAreFreshEnough = latestProcessedMatchCount <= 0 || maxHistoryMatchNo >= latestProcessedMatchCount;
@@ -702,7 +770,7 @@ export function deriveCompletedMatchHistories(liveData = {}, schedule = []) {
   let previousScores = {};
 
   function ensureHistory(playerName) {
-    const canonical = normalizeName(playerName);
+    const canonical = canonicalHistoryKey(playerName);
     if (!histories.has(canonical)) {
       histories.set(canonical, {
         player_name: playerName,
@@ -1155,13 +1223,14 @@ function buildMiniFantasyLiveDeltaHistoryMap({
     const matchDelta = currentPlayerMatches - previousPlayerMatches;
     if (matchDelta <= 0) return;
     const livePoints = roundTo(toNumber(currentScores[playerName], 0) - toNumber(previousScores[playerName], 0), 2);
-    liveDeltaHistories.set(normalizeName(playerName), {
+    const canonical = canonicalHistoryKey(playerName);
+    liveDeltaHistories.set(canonical, mergeHistoryRecord(liveDeltaHistories.get(canonical), {
       player_name: playerName,
       match_points: [livePoints],
       points_by_match_no: { [targetMatchNo]: livePoints },
       matches_played: matchDelta,
       last_match_played_at_utc: playedAt
-    });
+    }));
   });
 
   return liveDeltaHistories;

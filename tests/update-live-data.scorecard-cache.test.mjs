@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 
 import {
   buildCurrentProcessedMatchRefs,
+  buildMiniFantasyPlayerHistoriesFromProcessedMatches,
   endedUnprocessedMatches,
   canUseFreshScorecardCall,
   completedScorecardIntegrityIssues,
@@ -815,6 +816,99 @@ test('historical replay snapshots apply the 10-ball strike-rate gate and duck pe
   assert.equal(snapshot?.mvp?.values?.['Surya Kumar Yadav']?.score, 30);
   assert.equal(snapshot?.mvp?.values?.['Travis Head']?.score, -5);
   assert.equal(snapshot?.mvp?.values?.['Jitesh Sharma']?.score, 12);
+});
+
+test('historical mini fantasy replay canonicalizes split player aliases before diffing match overlays', async () => {
+  const baseLive = {
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 31,
+          snapshot: {
+            meta: {
+              aggregates: {
+                battingRuns: {
+                  'Mohammed Shami': 14
+                },
+                battingBalls: {
+                  'Mohammed Shami': 11
+                },
+                battingSixes: {
+                  'Mohammed Shami': 1
+                },
+                bowlingWickets: {
+                  'Mohammed Shami': 5
+                },
+                bowlingBalls: {
+                  'Mohammed Shami': 138
+                },
+                bowlingRunsConceded: {
+                  'Mohammed Shami': 186
+                },
+                bowlingDots: {
+                  'Mohammad Shami': 66
+                },
+                playerMatches: {
+                  'Mohammed Shami': 6
+                }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 32,
+          snapshot: {
+            meta: {
+              aggregates: {
+                battingRuns: {
+                  'Mohammed Shami': 20
+                },
+                battingBalls: {
+                  'Mohammed Shami': 15
+                },
+                battingSixes: {
+                  'Mohammed Shami': 2
+                },
+                bowlingWickets: {
+                  'Mohammed Shami': 7
+                },
+                bowlingBalls: {
+                  'Mohammed Shami': 162
+                },
+                bowlingRunsConceded: {
+                  'Mohammed Shami': 216
+                },
+                bowlingDots: {
+                  'Mohammad Shami': 81
+                },
+                playerMatches: {
+                  'Mohammed Shami': 7
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  const histories = await buildMiniFantasyPlayerHistoriesFromProcessedMatches(
+    Array.from({ length: 32 }, (_, index) => ({
+      id: `match-${index + 1}`,
+      match_no: index + 1,
+      dateTimeGMT: '2026-04-22T14:00:00Z'
+    })),
+    baseLive,
+    {
+      loadScorecard: async () => {
+        throw new Error('Missing cached scorecard for processed match');
+      }
+    }
+  );
+
+  assert.equal(histories['mohammad shami']?.points_by_match_no?.[32], 72.5);
+  assert.equal(histories['mohammad shami']?.matches_played, 1);
+  assert.equal(histories['mohammed shami'], undefined);
 });
 
 test('standings still update when scorecard omits the top-level score summary', async () => {
