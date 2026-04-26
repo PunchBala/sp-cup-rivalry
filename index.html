@@ -1501,7 +1501,6 @@
       { key:'purpleCap', label:'Purple cap', type:'top5' },
       { key:'mostDots', label:'Most dot balls', type:'top5' },
       { key:'mvp', label:'MVP', type:'top5' },
-      { key:'currentPricing', label:'Mini Fantasy current pricing', type:'stats' },
       { key:'uncappedMvp', label:'Uncapped MVP', type:'winner_better' },
       { key:'fairPlay', label:'Fair Play award', type:'winner_better' },
       { key:'highestScoreTeam', label:'Highest team score', type:'winner_better' },
@@ -1512,6 +1511,10 @@
       { key:'tableBottom', label:'Bottom of table', type:'winner_better' },
       { key:'leastMvp', label:'Least MVP', type:'better_rank_low' }
     ];
+    const NERD_ROOM_EXTRA_CATEGORIES = [
+      { key:'currentPricing', label:'Mini Fantasy current pricing', type:'stats' }
+    ];
+    const NERD_ROOM_CATEGORIES = [...CATEGORIES, ...NERD_ROOM_EXTRA_CATEGORIES];
 
     const BONUS_TOP_RANK_BETTER_PREDICTION_KEYS = new Set(['uncappedMvp','striker','bestBowlingFigures','bestBowlingStrikeRate','mostCatches']);
     const TEAM_CODE_TO_NAME = {
@@ -8004,13 +8007,13 @@ function titleBandScore(pick, live){
     function renderStatsTab(){
       const select = document.getElementById('statsCategorySelect');
       if (!select.dataset.bound) {
-        select.innerHTML = CATEGORIES.map(c => `<option value="${c.key}">${escapeHtml(c.label)}</option>`).join('');
+        select.innerHTML = NERD_ROOM_CATEGORIES.map(c => `<option value="${c.key}">${escapeHtml(c.label)}</option>`).join('');
         select.value = activeStatsKey;
         select.onchange = () => { activeStatsKey = select.value; renderStatsTab(); };
         select.dataset.bound = '1';
       }
       if (select.value !== activeStatsKey) select.value = activeStatsKey;
-      const category = CATEGORIES.find(c => c.key === activeStatsKey) || CATEGORIES[0];
+      const category = NERD_ROOM_CATEGORIES.find(c => c.key === activeStatsKey) || NERD_ROOM_CATEGORIES[0];
       const data = statsRowsFor(activeStatsKey);
       document.getElementById('statsSummary').textContent = data.summary || `Full ${category.label} board from live.json.`;
       document.getElementById('statsTable').innerHTML = `
