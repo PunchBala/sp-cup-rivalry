@@ -5,26 +5,35 @@ import path from 'node:path';
 
 import {
   average,
+  assignRankBucketPrices,
   calculateEligiblePercentiles,
   capPriceMovement,
+  computeMissedFixturePenalty,
   computeRecentAveragePoints,
   computeReliabilityFactor,
   generatePrices,
   mapPercentileToPrice,
+  roundToPriceIncrement,
   smoothPrice
 } from '../mini-fantasy/pricing-engine.js';
 
-function createJob(players) {
+function createJob(players, overrides = {}) {
   return {
     job_meta: {
       season: 'IPL 2026',
       as_of_utc: '2026-04-06T23:59:59Z',
-      price_min: 4,
+      price_min: 4.5,
       price_max: 10,
       recent_matches_window: 3,
-      max_daily_price_step: 1,
+      max_daily_price_step: 2,
+      price_increment: 0.5,
+      smoothing: {
+        old_price_weight: 0.4,
+        target_price_weight: 0.6
+      },
       default_initial_price: 6,
-      scoring_source: 'existing_mvp_points_formula_v1'
+      scoring_source: 'existing_mvp_points_formula_v1',
+      ...overrides
     },
     players
   };
@@ -33,16 +42,27 @@ function createJob(players) {
 test('helper functions stay deterministic around averages, reliability, smoothing, and caps', () => {
   assert.equal(average([]), 0);
   assert.equal(computeRecentAveragePoints([10, 20, 30, 40], 3), 30);
-  assert.equal(computeReliabilityFactor(1), 0.25);
+  assert.equal(computeReliabilityFactor(1), 0.5);
   assert.equal(computeReliabilityFactor(5), 1);
   assert.equal(mapPercentileToPrice(0), 4);
   assert.equal(mapPercentileToPrice(10), 4);
   assert.equal(mapPercentileToPrice(10.01), 5);
   assert.equal(mapPercentileToPrice(92), 9);
   assert.equal(mapPercentileToPrice(99), 10);
+  assert.equal(roundToPriceIncrement(9.74), 9.5);
+  assert.equal(roundToPriceIncrement(9.99, 0.5, 'down'), 9.5);
+  assert.equal(computeMissedFixturePenalty(1), 0);
+  assert.equal(computeMissedFixturePenalty(2), 0.5);
+  assert.equal(computeMissedFixturePenalty(4), 1.5);
+  assert.equal(computeMissedFixturePenalty(4, [
+    { minimum_streak: 2, penalty: 0.5 },
+    { minimum_streak: 4, penalty: 1.5 },
+    { minimum_streak: 3, penalty: 1 }
+  ]), 1.5);
   assert.equal(smoothPrice(8, 10), 9);
-  assert.equal(capPriceMovement(10, 8, 1, 4, 10), 9);
-  assert.equal(capPriceMovement(3, 5, 1, 4, 10), 4);
+  assert.equal(smoothPrice(10, 9.5), 9.5);
+  assert.equal(capPriceMovement(10, 8, 2, 4.5, 10), 10);
+  assert.equal(capPriceMovement(3, 5, 2, 4.5, 10), 4.5);
 });
 
 test('eligible percentile calculation gives ties the same percentile', () => {
@@ -55,6 +75,27 @@ test('eligible percentile calculation gives ties the same percentile', () => {
   assert.equal(percentiles.get('a'), 75);
   assert.equal(percentiles.get('b'), 75);
   assert.equal(percentiles.get('c'), 0);
+});
+
+test('assignRankBucketPrices follows exact bucket counts by sorted rank', () => {
+  const assigned = assignRankBucketPrices(
+    [
+      { player_id: 'a', adjusted_score: 90, adjusted_score_raw: 90 },
+      { player_id: 'b', adjusted_score: 80, adjusted_score_raw: 80 },
+      { player_id: 'c', adjusted_score: 70, adjusted_score_raw: 70 },
+      { player_id: 'd', adjusted_score: 60, adjusted_score_raw: 60 }
+    ],
+    [
+      { price: 10, slots: 1 },
+      { price: 9.5, slots: 1 },
+      { price: 7.5, slots: 2 }
+    ]
+  );
+
+  assert.equal(assigned.get('a'), 10);
+  assert.equal(assigned.get('b'), 9.5);
+  assert.equal(assigned.get('c'), 7.5);
+  assert.equal(assigned.get('d'), 7.5);
 });
 
 test('generatePrices applies ranking, smoothing, capping, inactive handling, and sorting', () => {
@@ -132,24 +173,32 @@ test('generatePrices applies ranking, smoothing, capping, inactive handling, and
         matches_played: 2,
         last_match_played_at_utc: '2026-04-03T18:30:00Z'
       }
-    ])
+    ], {
+      rank_price_buckets: [
+        { price: 10, slots: 1 },
+        { price: 8, slots: 1 },
+        { price: 7.5, slots: 1 },
+        { price: 6.5, slots: 1 },
+        { price: 6, slots: 1 }
+      ]
+    })
   );
 
   assert.deepEqual(output.summary, {
     total_players_received: 6,
     eligible_players_ranked: 5,
-    price_rises: 2,
+    price_rises: 4,
     price_drops: 0,
-    price_unchanged: 4
+    price_unchanged: 2
   });
 
   assert.deepEqual(
     output.players.map((player) => `${player.team}:${player.name}:${player.final_price}`),
     [
       'AAA:Alpha Star:9',
-      'AAA:Alpha Fringe:6',
-      'BBB:Beta Reliable:7',
-      'CCC:Gamma Mismatch:6',
+      'AAA:Alpha Fringe:7',
+      'BBB:Beta Reliable:7.5',
+      'CCC:Gamma Mismatch:6.5',
       'DDD:Delta Rookie:6',
       'EEE:Echo Inactive:6'
     ]
@@ -161,11 +210,12 @@ test('generatePrices applies ranking, smoothing, capping, inactive handling, and
   assert.equal(alphaStar.final_price, 9);
   assert.equal(alphaStar.price_change, 1);
   assert.equal(alphaStar.percentile, 100);
+  assert.equal(alphaStar.rank, 1);
 
   const alphaFringe = output.players.find((player) => player.player_id === 'alpha_fringe');
-  assert.equal(alphaFringe.reliability_factor, 0.25);
-  assert.equal(alphaFringe.adjusted_score, 22.5);
-  assert.equal(alphaFringe.final_price, 6);
+  assert.equal(alphaFringe.reliability_factor, 0.5);
+  assert.equal(alphaFringe.adjusted_score, 45);
+  assert.equal(alphaFringe.final_price, 7);
   assert.match(alphaFringe.calculation_notes.join(' '), /smoothing/i);
 
   const gammaMismatch = output.players.find((player) => player.player_id === 'gamma_mismatch');
@@ -175,7 +225,7 @@ test('generatePrices applies ranking, smoothing, capping, inactive handling, and
   const deltaRookie = output.players.find((player) => player.player_id === 'delta_rookie');
   assert.equal(deltaRookie.final_price, 6);
   assert.equal(deltaRookie.price_change, 0);
-  assert.match(deltaRookie.calculation_notes.join(' '), /No matches played; retained base price/i);
+  assert.match(deltaRookie.calculation_notes.join(' '), /Missing historical old_price/i);
 
   const echoInactive = output.players.find((player) => player.player_id === 'echo_inactive');
   assert.equal(echoInactive.percentile, 0);
@@ -222,7 +272,12 @@ test('generatePrices keeps equal adjusted scores on the same target price band',
         matches_played: 4,
         last_match_played_at_utc: '2026-04-06T18:30:00Z'
       }
-    ])
+    ], {
+      rank_price_buckets: [
+        { price: 8, slots: 2 },
+        { price: 5.5, slots: 1 }
+      ]
+    })
   );
 
   const tieA = output.players.find((player) => player.player_id === 'tie_a');
@@ -232,10 +287,10 @@ test('generatePrices keeps equal adjusted scores on the same target price band',
   assert.equal(tieA.percentile, tieB.percentile);
   assert.equal(tieA.target_price, tieB.target_price);
   assert.equal(tieA.target_price, 8);
-  assert.equal(tieC.target_price, 4);
+  assert.equal(tieC.target_price, 5.5);
 });
 
-test('generatePrices caps uncapped players at 9 credits even if their rank maps to 10', () => {
+test('generatePrices caps uncapped players at 9.5 credits even if their rank maps to 10', () => {
   const output = generatePrices(
     createJob([
       {
@@ -263,16 +318,21 @@ test('generatePrices caps uncapped players at 9 credits even if their rank maps 
         matches_played: 4,
         last_match_played_at_utc: '2026-04-06T18:30:00Z'
       }
-    ])
+    ], {
+      rank_price_buckets: [
+        { price: 10, slots: 1 },
+        { price: 9.5, slots: 1 }
+      ]
+    })
   );
 
   const sameer = output.players.find((player) => player.player_id === 'sameer_rizvi');
   assert.equal(sameer.is_uncapped, true);
-  assert.equal(sameer.target_price, 9);
-  assert.equal(sameer.smoothed_price, 9);
-  assert.equal(sameer.final_price, 9);
-  assert.equal(sameer.price_change, -1);
-  assert.match(sameer.calculation_notes.join(' '), /uncapped player price ceiling applied at 9 credits/i);
+  assert.equal(sameer.target_price, 9.5);
+  assert.equal(sameer.smoothed_price, 9.5);
+  assert.equal(sameer.final_price, 9.5);
+  assert.equal(sameer.price_change, -0.5);
+  assert.match(sameer.calculation_notes.join(' '), /uncapped player price ceiling applied at 9.5 credits/i);
 });
 
 test('generatePrices snaps recovered histories to the corrected target price', () => {
@@ -331,7 +391,7 @@ test('pricing example fixture returns stable JSON-shaped output', async () => {
   const raw = await fs.readFile(fixturePath, 'utf8');
   const output = generatePrices(JSON.parse(raw));
 
-  assert.equal(output.job_meta.engine_version, 'pricing_v1');
+  assert.equal(output.job_meta.engine_version, 'pricing_v2');
   assert.equal(output.summary.total_players_received, 4);
   assert.equal(Array.isArray(output.players), true);
   assert.equal(output.generated_at_utc, '2026-04-06T23:59:59Z');
