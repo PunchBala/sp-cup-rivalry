@@ -1501,6 +1501,7 @@
       { key:'purpleCap', label:'Purple cap', type:'top5' },
       { key:'mostDots', label:'Most dot balls', type:'top5' },
       { key:'mvp', label:'MVP', type:'top5' },
+      { key:'currentPricing', label:'Mini Fantasy current pricing', type:'stats' },
       { key:'uncappedMvp', label:'Uncapped MVP', type:'winner_better' },
       { key:'fairPlay', label:'Fair Play award', type:'winner_better' },
       { key:'highestScoreTeam', label:'Highest team score', type:'winner_better' },
@@ -7561,6 +7562,24 @@ function titleBandScore(pick, live){
       return `Runs ${obj.runs || 0} • 6s ${obj.sixes || 0} • Wkts ${obj.wickets || 0} • Dots ${obj.dotBalls || 0} • Catches ${obj.catches || 0}`;
     }
 
+    function miniFantasyRoleLabel(role){
+      const normalized = String(role || '').trim().replace(/_/g, ' ');
+      if (!normalized) return 'Role pending';
+      return normalized.replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
+    function formatMiniFantasyPrice(value){
+      const number = Number(value);
+      if (!Number.isFinite(number)) return '—';
+      return `${Number.isInteger(number) ? number : number.toFixed(1)} cr`;
+    }
+
+    function formatMiniFantasyPriceChange(value){
+      const number = Number(value);
+      if (!Number.isFinite(number) || number === 0) return 'No change today';
+      return `${number > 0 ? '+' : ''}${Number.isInteger(number) ? number : number.toFixed(1)} today`;
+    }
+
     function statsRowsFor(categoryKey){
       const live = LIVE_2026?.[categoryKey] || {};
       const agg = getAggregates();
@@ -7570,6 +7589,46 @@ function titleBandScore(pick, live){
       const rankMap = buildRankMap(categoryKey, ranking, live, LIVE_2026);
       const displayRank = (name, fallbackIndex) => rankMap.get(canonicalCompareName(name)) ?? fallbackIndex;
       const rows = [];
+
+      if (categoryKey === 'currentPricing') {
+        const priceBook = MINI_FANTASY_PRICE_BOOK && typeof MINI_FANTASY_PRICE_BOOK === 'object'
+          ? MINI_FANTASY_PRICE_BOOK
+          : { players: [], summary: {}, job_meta: {} };
+        const players = Array.isArray(priceBook.players) ? priceBook.players.slice() : [];
+        players.sort((a, b) => {
+          const rankA = Number.isFinite(Number(a?.rank)) ? Number(a.rank) : Number.POSITIVE_INFINITY;
+          const rankB = Number.isFinite(Number(b?.rank)) ? Number(b.rank) : Number.POSITIVE_INFINITY;
+          if (rankA !== rankB) return rankA - rankB;
+          const priceA = Number(a?.final_price || 0);
+          const priceB = Number(b?.final_price || 0);
+          if (priceA !== priceB) return priceB - priceA;
+          return String(a?.name || '').localeCompare(String(b?.name || ''));
+        });
+        players.forEach((player, idx) => {
+          const matchesPlayed = Number(player?.matches_played || 0);
+          const contextParts = [
+            String(player?.team || 'Team unknown'),
+            miniFantasyRoleLabel(player?.role),
+            matchesPlayed === 1 ? '1 match' : `${matchesPlayed} matches`
+          ];
+          if (Number.isFinite(Number(player?.last_match_points))) contextParts.push(`Last ${Number(player.last_match_points)} pts`);
+          contextParts.push(formatMiniFantasyPriceChange(player?.price_change));
+          if (player?.is_uncapped) contextParts.push('Uncapped');
+          rows.push({
+            rank: Number.isFinite(Number(player?.rank)) ? String(player.rank) : String(idx + 1),
+            name: String(player?.name || 'Unknown player'),
+            value: formatMiniFantasyPrice(player?.final_price),
+            context: contextParts.join(' • ')
+          });
+        });
+        const updatedAt = priceBook?.job_meta?.as_of_utc
+          ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(priceBook.job_meta.as_of_utc))
+          : null;
+        return {
+          summary: `Current Mini Fantasy price board for ${rows.length} players${updatedAt ? `, updated ${updatedAt}` : ''}.`,
+          rows
+        };
+      }
 
       if (categoryKey === 'titleWinner' || categoryKey === 'tableBottom') {
         const standings = agg.standings || {};

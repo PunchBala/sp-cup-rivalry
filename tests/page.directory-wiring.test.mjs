@@ -64,6 +64,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function renderMiniFantasyLockedViewer\(/);
   assert.match(html, /function renderMiniFantasyLastGame\(/);
   assert.match(html, /function renderMiniFantasyPicker\(/);
+  assert.match(html, /function formatMiniFantasyPrice\(/);
   assert.match(html, /function saveMiniFantasyEntry\(/);
   assert.match(html, /function usesHostedDuelsBackend\(/);
   assert.match(html, /function initializeDuelsApp\(/);
@@ -81,6 +82,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /Only email \+ password are needed here\./);
   assert.match(html, /How Duel works/);
   assert.match(html, /How Mini Fantasy works/);
+  assert.match(html, /Mini Fantasy current pricing/);
   assert.match(html, /Fixture-only scoring:/);
   assert.match(html, /Lineup total:/);
   assert.match(html, /scores 30\+ runs or faces 10\+ balls/);
