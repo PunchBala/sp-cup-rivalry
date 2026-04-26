@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-04-25T21:54:58.497Z",
+    "as_of_utc": "2026-04-26T11:26:31.930Z",
     "price_min": 4,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -18,8 +18,8 @@
     "total_players_received": 254,
     "eligible_players_ranked": 254,
     "price_rises": 0,
-    "price_drops": 0,
-    "price_unchanged": 254
+    "price_drops": 1,
+    "price_unchanged": 253
   },
   "players": [
     {
@@ -35,19 +35,20 @@
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 424.5,
-      "season_avg_points": 53.06,
-      "recent_avg_points": 49,
-      "last_match_points": 18,
-      "score_basis": 50.62,
+      "matches_played": 7,
+      "season_total_points": 381,
+      "season_avg_points": 54.43,
+      "recent_avg_points": 61,
+      "last_match_points": 54,
+      "score_basis": 58.37,
       "reliability_factor": 1,
-      "adjusted_score": 50.62,
-      "percentile": 91.7,
+      "adjusted_score": 58.37,
+      "percentile": 93.68,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Uncapped player price ceiling applied at 9 credits"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_ayush-mhatre",
@@ -63,19 +64,19 @@
       "final_price": 9,
       "price_change": 0,
       "matches_played": 6,
-      "season_total_points": 274,
-      "season_avg_points": 45.67,
+      "season_total_points": 279,
+      "season_avg_points": 46.5,
       "recent_avg_points": 60,
       "last_match_points": 48,
-      "score_basis": 54.27,
+      "score_basis": 54.6,
       "reliability_factor": 1,
-      "adjusted_score": 54.27,
-      "percentile": 94.07,
+      "adjusted_score": 54.6,
+      "percentile": 92.09,
       "calculation_notes": [
         "Used old_price for smoothing",
         "Uncapped player price ceiling applied at 9 credits"
       ],
-      "last_match_played_at_utc": "2026-04-18T14:00:00"
+      "last_match_played_at_utc": "2026-04-18T14:00:00Z"
     },
     {
       "player_id": "csk_jamie-overton",
@@ -90,19 +91,19 @@
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 381.5,
-      "season_avg_points": 54.5,
-      "recent_avg_points": 32.5,
-      "last_match_points": 7.5,
-      "score_basis": 41.3,
+      "matches_played": 6,
+      "season_total_points": 375.5,
+      "season_avg_points": 62.58,
+      "recent_avg_points": 45.5,
+      "last_match_points": 46.5,
+      "score_basis": 52.33,
       "reliability_factor": 1,
-      "adjusted_score": 41.3,
-      "percentile": 87.75,
+      "adjusted_score": 52.33,
+      "percentile": 90.91,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_sanju-samson",
@@ -131,7 +132,7 @@
         "Target price mapped from percentile 99.21",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_sarfaraz-khan",
@@ -142,7 +143,7 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 9,
+      "target_price": 8,
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
@@ -154,11 +155,13 @@
       "score_basis": 30.68,
       "reliability_factor": 1,
       "adjusted_score": 30.68,
-      "percentile": 81.03,
+      "percentile": 76.28,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 76.28",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_akeal-hosein",
@@ -169,25 +172,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 7,
+      "target_price": 9,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 4,
-      "season_total_points": 73.5,
-      "season_avg_points": 18.38,
-      "recent_avg_points": 18,
-      "last_match_points": 21,
-      "score_basis": 18.15,
-      "reliability_factor": 1,
-      "adjusted_score": 18.15,
-      "percentile": 62.85,
+      "matches_played": 3,
+      "season_total_points": 176,
+      "season_avg_points": 58.67,
+      "recent_avg_points": 58.67,
+      "last_match_points": 143,
+      "score_basis": 58.67,
+      "reliability_factor": 0.75,
+      "adjusted_score": 44,
+      "percentile": 86.96,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 62.85",
+        "Target price mapped from percentile 86.96",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_dewald-brevis",
@@ -210,13 +213,13 @@
       "score_basis": 34.5,
       "reliability_factor": 1,
       "adjusted_score": 34.5,
-      "percentile": 84.58,
+      "percentile": 80.24,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 84.58",
+        "Target price mapped from percentile 80.24",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_matt-henry",
@@ -231,21 +234,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 4,
-      "season_total_points": 55,
-      "season_avg_points": 13.75,
+      "matches_played": 3,
+      "season_total_points": 40,
+      "season_avg_points": 13.33,
       "recent_avg_points": 13.33,
       "last_match_points": -3,
-      "score_basis": 13.5,
-      "reliability_factor": 1,
-      "adjusted_score": 13.5,
-      "percentile": 55.34,
+      "score_basis": 13.33,
+      "reliability_factor": 0.75,
+      "adjusted_score": 10,
+      "percentile": 48.62,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 55.34",
+        "Target price mapped from percentile 48.62",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-05T00:00:00"
+      "last_match_played_at_utc": "2026-04-05T14:00:00Z"
     },
     {
       "player_id": "csk_noor-ahmad",
@@ -256,23 +259,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 9,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 195,
-      "season_avg_points": 24.38,
-      "recent_avg_points": 34.17,
-      "last_match_points": 13.5,
-      "score_basis": 30.25,
+      "matches_played": 7,
+      "season_total_points": 187.5,
+      "season_avg_points": 26.79,
+      "recent_avg_points": 49.17,
+      "last_match_points": 58.5,
+      "score_basis": 40.22,
       "reliability_factor": 1,
-      "adjusted_score": 30.25,
-      "percentile": 79.84,
+      "adjusted_score": 40.22,
+      "percentile": 84.19,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 84.19",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_shivam-dube",
@@ -287,19 +292,19 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 197,
-      "season_avg_points": 24.63,
+      "matches_played": 7,
+      "season_total_points": 194,
+      "season_avg_points": 27.71,
       "recent_avg_points": 19.67,
       "last_match_points": 5,
-      "score_basis": 21.65,
+      "score_basis": 22.89,
       "reliability_factor": 1,
-      "adjusted_score": 21.65,
-      "percentile": 68.38,
+      "adjusted_score": 22.89,
+      "percentile": 65.61,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_aman-khan",
@@ -322,7 +327,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -338,23 +343,25 @@
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
-      "target_price": 7,
+      "target_price": 8,
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 5,
-      "season_total_points": 104.5,
-      "season_avg_points": 20.9,
-      "recent_avg_points": 15,
-      "last_match_points": 9,
-      "score_basis": 17.36,
+      "matches_played": 4,
+      "season_total_points": 109,
+      "season_avg_points": 27.25,
+      "recent_avg_points": 27,
+      "last_match_points": 45,
+      "score_basis": 27.1,
       "reliability_factor": 1,
-      "adjusted_score": 17.36,
-      "percentile": 61.66,
+      "adjusted_score": 27.1,
+      "percentile": 71.94,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 71.94",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_kartik-sharma",
@@ -381,7 +388,7 @@
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_mukesh-choudhary",
@@ -396,19 +403,19 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 3,
-      "season_total_points": 60.5,
-      "season_avg_points": 20.17,
-      "recent_avg_points": 20.17,
-      "last_match_points": 16.5,
-      "score_basis": 20.17,
-      "reliability_factor": 0.75,
-      "adjusted_score": 15.13,
-      "percentile": 56.52,
+      "matches_played": 2,
+      "season_total_points": 81.5,
+      "season_avg_points": 40.75,
+      "recent_avg_points": 40.75,
+      "last_match_points": 46.5,
+      "score_basis": 40.75,
+      "reliability_factor": 0.5,
+      "adjusted_score": 20.38,
+      "percentile": 62.85,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_prashant-veer",
@@ -431,11 +438,11 @@
       "score_basis": 26.5,
       "reliability_factor": 0.5,
       "adjusted_score": 13.25,
-      "percentile": 54.55,
+      "percentile": 53.36,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-05T00:00:00"
+      "last_match_played_at_utc": "2026-04-05T14:00:00Z"
     },
     {
       "player_id": "csk_rahul-chahar",
@@ -450,21 +457,21 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 2,
-      "season_total_points": 9,
-      "season_avg_points": 4.5,
-      "recent_avg_points": 4.5,
+      "matches_played": 1,
+      "season_total_points": 3,
+      "season_avg_points": 3,
+      "recent_avg_points": 3,
       "last_match_points": 3,
-      "score_basis": 4.5,
-      "reliability_factor": 0.5,
-      "adjusted_score": 2.25,
-      "percentile": 39.72,
+      "score_basis": 3,
+      "reliability_factor": 0.25,
+      "adjusted_score": 0.75,
+      "percentile": 37.55,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 39.72",
+        "Target price mapped from percentile 37.55",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-03T00:00:00"
+      "last_match_played_at_utc": "2026-04-03T14:00:00Z"
     },
     {
       "player_id": "csk_ruturaj-gaikwad",
@@ -487,13 +494,13 @@
       "score_basis": 23.57,
       "reliability_factor": 1,
       "adjusted_score": 23.57,
-      "percentile": 70.36,
+      "percentile": 66.8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 70.36",
+        "Target price mapped from percentile 66.8",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "csk_khaleel-ahmed",
@@ -508,21 +515,21 @@
       "smoothed_price": 6,
       "final_price": 6,
       "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 112.5,
-      "season_avg_points": 18.75,
+      "matches_played": 5,
+      "season_total_points": 40,
+      "season_avg_points": 8,
       "recent_avg_points": 13.33,
       "last_match_points": 25,
-      "score_basis": 15.5,
+      "score_basis": 11.2,
       "reliability_factor": 1,
-      "adjusted_score": 15.5,
-      "percentile": 57.71,
+      "adjusted_score": 11.2,
+      "percentile": 50.99,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 57.71",
+        "Target price mapped from percentile 50.99",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-14T14:00:00"
+      "last_match_played_at_utc": "2026-04-14T14:00:00Z"
     },
     {
       "player_id": "csk_matthew-william-short",
@@ -537,21 +544,21 @@
       "smoothed_price": 6,
       "final_price": 6,
       "price_change": 0,
-      "matches_played": 3,
-      "season_total_points": 46.5,
-      "season_avg_points": 15.5,
-      "recent_avg_points": 15.5,
+      "matches_played": 2,
+      "season_total_points": 39,
+      "season_avg_points": 19.5,
+      "recent_avg_points": 19.5,
       "last_match_points": 37,
-      "score_basis": 15.5,
-      "reliability_factor": 0.75,
-      "adjusted_score": 11.63,
-      "percentile": 51.38,
+      "score_basis": 19.5,
+      "reliability_factor": 0.5,
+      "adjusted_score": 9.75,
+      "percentile": 47.43,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 51.38",
+        "Target price mapped from percentile 47.43",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-18T14:00:00"
+      "last_match_played_at_utc": "2026-04-18T14:00:00Z"
     },
     {
       "player_id": "csk_ms-dhoni",
@@ -574,7 +581,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -602,7 +609,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -630,7 +637,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -658,7 +665,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -686,7 +693,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -714,7 +721,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -748,7 +755,7 @@
         "Target price mapped from percentile 99.6",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "dc_nitish-rana",
@@ -763,21 +770,21 @@
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 239.5,
-      "season_avg_points": 39.92,
+      "matches_played": 5,
+      "season_total_points": 229,
+      "season_avg_points": 45.8,
       "recent_avg_points": 71.33,
       "last_match_points": 117,
-      "score_basis": 58.77,
+      "score_basis": 61.12,
       "reliability_factor": 1,
-      "adjusted_score": 58.77,
-      "percentile": 95.26,
+      "adjusted_score": 61.12,
+      "percentile": 95.65,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 95.26",
+        "Target price mapped from percentile 95.65",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "dc_tristan-stubbs",
@@ -800,13 +807,13 @@
       "score_basis": 57,
       "reliability_factor": 1,
       "adjusted_score": 57,
-      "percentile": 94.86,
+      "percentile": 93.28,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 94.86",
+        "Target price mapped from percentile 93.28",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-21T14:00:00"
+      "last_match_played_at_utc": "2026-04-21T14:00:00Z"
     },
     {
       "player_id": "dc_axar-patel",
@@ -817,25 +824,23 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 9,
+      "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 222.5,
-      "season_avg_points": 27.81,
-      "recent_avg_points": 32.5,
-      "last_match_points": 7.5,
-      "score_basis": 30.62,
+      "matches_played": 7,
+      "season_total_points": 189.5,
+      "season_avg_points": 27.07,
+      "recent_avg_points": 37.5,
+      "last_match_points": 22.5,
+      "score_basis": 33.33,
       "reliability_factor": 1,
-      "adjusted_score": 30.62,
-      "percentile": 80.63,
+      "adjusted_score": 33.33,
+      "percentile": 77.87,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 80.63",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "dc_david-miller",
@@ -851,20 +856,20 @@
       "final_price": 8,
       "price_change": 0,
       "matches_played": 7,
-      "season_total_points": 151,
-      "season_avg_points": 21.57,
-      "recent_avg_points": 16,
+      "season_total_points": 156,
+      "season_avg_points": 22.29,
+      "recent_avg_points": 17.67,
       "last_match_points": 3,
-      "score_basis": 18.23,
+      "score_basis": 19.52,
       "reliability_factor": 1,
-      "adjusted_score": 18.23,
-      "percentile": 63.24,
+      "adjusted_score": 19.52,
+      "percentile": 61.26,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 63.24",
+        "Target price mapped from percentile 61.26",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "dc_kuldeep-yadav",
@@ -875,25 +880,23 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 7,
+      "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 148.5,
-      "season_avg_points": 18.56,
-      "recent_avg_points": 16,
-      "last_match_points": 12,
-      "score_basis": 17.02,
+      "matches_played": 7,
+      "season_total_points": 148,
+      "season_avg_points": 21.14,
+      "recent_avg_points": 27.67,
+      "last_match_points": 47,
+      "score_basis": 25.06,
       "reliability_factor": 1,
-      "adjusted_score": 17.02,
-      "percentile": 60.47,
+      "adjusted_score": 25.06,
+      "percentile": 68.38,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 60.47",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "dc_lungisani-ngidi",
@@ -908,21 +911,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 217.5,
-      "season_avg_points": 31.07,
-      "recent_avg_points": 9.33,
-      "last_match_points": -10,
-      "score_basis": 18.03,
+      "matches_played": 6,
+      "season_total_points": 157,
+      "season_avg_points": 26.17,
+      "recent_avg_points": 12.67,
+      "last_match_points": 0,
+      "score_basis": 18.07,
       "reliability_factor": 1,
-      "adjusted_score": 18.03,
-      "percentile": 62.06,
+      "adjusted_score": 18.07,
+      "percentile": 58.5,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 62.06",
+        "Target price mapped from percentile 58.5",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-21T14:00:00"
+      "last_match_played_at_utc": "2026-04-21T14:00:00Z"
     },
     {
       "player_id": "dc_mukesh-kumar",
@@ -937,21 +940,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 193.5,
-      "season_avg_points": 24.19,
+      "matches_played": 7,
+      "season_total_points": 115.5,
+      "season_avg_points": 16.5,
       "recent_avg_points": 5.5,
-      "last_match_points": 1.5,
-      "score_basis": 12.98,
+      "last_match_points": -3.5,
+      "score_basis": 9.9,
       "reliability_factor": 1,
-      "adjusted_score": 12.98,
-      "percentile": 53.75,
+      "adjusted_score": 9.9,
+      "percentile": 48.22,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 53.75",
+        "Target price mapped from percentile 48.22",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "dc_pathum-nissanka",
@@ -974,13 +977,13 @@
       "score_basis": 16.92,
       "reliability_factor": 1,
       "adjusted_score": 16.92,
-      "percentile": 60.08,
+      "percentile": 57.31,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 60.08",
+        "Target price mapped from percentile 57.31",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "dc_sameer-rizvi",
@@ -996,18 +999,18 @@
       "final_price": 8,
       "price_change": 0,
       "matches_played": 7,
-      "season_total_points": 278,
-      "season_avg_points": 39.71,
+      "season_total_points": 283,
+      "season_avg_points": 40.43,
       "recent_avg_points": 21.67,
       "last_match_points": 8,
-      "score_basis": 28.89,
+      "score_basis": 29.17,
       "reliability_factor": 1,
-      "adjusted_score": 28.89,
-      "percentile": 78.66,
+      "adjusted_score": 29.17,
+      "percentile": 74.7,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "dc_ashutosh-sharma",
@@ -1030,11 +1033,11 @@
       "score_basis": 23.5,
       "reliability_factor": 0.5,
       "adjusted_score": 11.75,
-      "percentile": 52.17,
+      "percentile": 51.78,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-21T14:00:00"
+      "last_match_played_at_utc": "2026-04-21T14:00:00Z"
     },
     {
       "player_id": "dc_t-natarajan",
@@ -1049,19 +1052,19 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 146,
-      "season_avg_points": 18.25,
-      "recent_avg_points": 5.17,
-      "last_match_points": 7.5,
-      "score_basis": 10.4,
+      "matches_played": 7,
+      "season_total_points": 100.5,
+      "season_avg_points": 14.36,
+      "recent_avg_points": 3.5,
+      "last_match_points": 2.5,
+      "score_basis": 7.84,
       "reliability_factor": 1,
-      "adjusted_score": 10.4,
-      "percentile": 49.8,
+      "adjusted_score": 7.84,
+      "percentile": 45.06,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "dc_vipraj-nigam",
@@ -1076,19 +1079,19 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 5,
+      "matches_played": 4,
       "season_total_points": 51.5,
-      "season_avg_points": 10.3,
-      "recent_avg_points": 12.17,
-      "last_match_points": 4.5,
-      "score_basis": 11.42,
+      "season_avg_points": 12.88,
+      "recent_avg_points": 17.17,
+      "last_match_points": 19.5,
+      "score_basis": 15.45,
       "reliability_factor": 1,
-      "adjusted_score": 11.42,
-      "percentile": 50.99,
+      "adjusted_score": 15.45,
+      "percentile": 55.34,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "dc_abishek-porel",
@@ -1111,7 +1114,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1139,7 +1142,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1167,7 +1170,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1195,7 +1198,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1223,11 +1226,11 @@
       "score_basis": 6.5,
       "reliability_factor": 0.5,
       "adjusted_score": 3.25,
-      "percentile": 41.11,
+      "percentile": 39.92,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "dc_kyle-jamieson",
@@ -1250,7 +1253,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1278,7 +1281,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1306,7 +1309,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1334,7 +1337,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1362,7 +1365,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1390,7 +1393,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1410,21 +1413,21 @@
       "smoothed_price": 5,
       "final_price": 5,
       "price_change": 0,
-      "matches_played": 4,
-      "season_total_points": 14,
-      "season_avg_points": 3.5,
-      "recent_avg_points": 1.67,
-      "last_match_points": 6,
-      "score_basis": 2.4,
-      "reliability_factor": 1,
-      "adjusted_score": 2.4,
-      "percentile": 40.32,
+      "matches_played": 3,
+      "season_total_points": 4,
+      "season_avg_points": 1.33,
+      "recent_avg_points": 1.33,
+      "last_match_points": 0,
+      "score_basis": 1.33,
+      "reliability_factor": 0.75,
+      "adjusted_score": 1,
+      "percentile": 37.94,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 40.32",
+        "Target price mapped from percentile 37.94",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "gt_jos-buttler",
@@ -1447,11 +1450,11 @@
       "score_basis": 41.51,
       "reliability_factor": 1,
       "adjusted_score": 41.51,
-      "percentile": 88.14,
+      "percentile": 84.98,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "gt_kagiso-rabada",
@@ -1462,54 +1465,23 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 10,
+      "target_price": 9,
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 359,
-      "season_avg_points": 44.88,
-      "recent_avg_points": 59.83,
-      "last_match_points": 10.5,
-      "score_basis": 53.85,
+      "matches_played": 7,
+      "season_total_points": 268.5,
+      "season_avg_points": 38.36,
+      "recent_avg_points": 58.17,
+      "last_match_points": 5.5,
+      "score_basis": 50.25,
       "reliability_factor": 1,
-      "adjusted_score": 53.85,
-      "percentile": 93.28,
+      "adjusted_score": 50.25,
+      "percentile": 89.72,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 93.28",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
-    },
-    {
-      "player_id": "gt_prasidh-krishna",
-      "name": "Prasidh Krishna",
-      "team": "GT",
-      "role": "bowler",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
-      "target_price": 8,
-      "smoothed_price": 9,
-      "final_price": 9,
-      "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 360.5,
-      "season_avg_points": 45.06,
-      "recent_avg_points": 12.17,
-      "last_match_points": 1.5,
-      "score_basis": 25.33,
-      "reliability_factor": 1,
-      "adjusted_score": 25.33,
-      "percentile": 71.94,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 71.94",
-        "Applied smoothing against the target price"
-      ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "gt_sai-sudharsan",
@@ -1525,20 +1497,20 @@
       "final_price": 9,
       "price_change": 0,
       "matches_played": 7,
-      "season_total_points": 318,
-      "season_avg_points": 45.43,
-      "recent_avg_points": 58.67,
+      "season_total_points": 323,
+      "season_avg_points": 46.14,
+      "recent_avg_points": 60.33,
       "last_match_points": 153,
-      "score_basis": 53.37,
+      "score_basis": 54.65,
       "reliability_factor": 1,
-      "adjusted_score": 53.37,
-      "percentile": 92.89,
+      "adjusted_score": 54.65,
+      "percentile": 92.49,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 92.89",
+        "Target price mapped from percentile 92.49",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "gt_shubman-gill",
@@ -1561,13 +1533,13 @@
       "score_basis": 59.6,
       "reliability_factor": 1,
       "adjusted_score": 59.6,
-      "percentile": 96.05,
+      "percentile": 95.26,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 96.05",
+        "Target price mapped from percentile 95.26",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "gt_ashok-sharma",
@@ -1578,23 +1550,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 188.5,
-      "season_avg_points": 26.93,
+      "matches_played": 6,
+      "season_total_points": 114,
+      "season_avg_points": 19,
       "recent_avg_points": 23.67,
       "last_match_points": -4,
-      "score_basis": 24.97,
+      "score_basis": 21.8,
       "reliability_factor": 1,
-      "adjusted_score": 24.97,
-      "percentile": 71.54,
+      "adjusted_score": 21.8,
+      "percentile": 63.44,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 63.44",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-20T14:00:00"
+      "last_match_played_at_utc": "2026-04-20T14:00:00Z"
     },
     {
       "player_id": "gt_glenn-phillips",
@@ -1605,7 +1579,7 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
@@ -1617,11 +1591,13 @@
       "score_basis": 22.13,
       "reliability_factor": 1,
       "adjusted_score": 22.13,
-      "percentile": 68.77,
+      "percentile": 64.03,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 64.03",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-20T14:00:00"
+      "last_match_played_at_utc": "2026-04-20T14:00:00Z"
     },
     {
       "player_id": "gt_mohammed-siraj",
@@ -1632,25 +1608,52 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 9,
+      "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 260,
-      "season_avg_points": 32.5,
-      "recent_avg_points": 32.5,
-      "last_match_points": 13.5,
-      "score_basis": 32.5,
+      "matches_played": 7,
+      "season_total_points": 183.5,
+      "season_avg_points": 26.21,
+      "recent_avg_points": 39.17,
+      "last_match_points": 33.5,
+      "score_basis": 33.99,
       "reliability_factor": 1,
-      "adjusted_score": 32.5,
-      "percentile": 83.4,
+      "adjusted_score": 33.99,
+      "percentile": 79.45,
+      "calculation_notes": [
+        "Used old_price for smoothing"
+      ],
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
+    },
+    {
+      "player_id": "gt_prasidh-krishna",
+      "name": "Prasidh Krishna",
+      "team": "GT",
+      "role": "bowler",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 9,
+      "initial_price": 9,
+      "target_price": 7,
+      "smoothed_price": 8,
+      "final_price": 8,
+      "price_change": -1,
+      "matches_played": 7,
+      "season_total_points": 277.5,
+      "season_avg_points": 39.64,
+      "recent_avg_points": 10.5,
+      "last_match_points": -3.5,
+      "score_basis": 22.16,
+      "reliability_factor": 1,
+      "adjusted_score": 22.16,
+      "percentile": 64.43,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 83.4",
+        "Target price mapped from percentile 64.43",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "gt_rashid-khan",
@@ -1661,25 +1664,23 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 7,
+      "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 264.5,
-      "season_avg_points": 33.06,
-      "recent_avg_points": 10.5,
-      "last_match_points": 10.5,
-      "score_basis": 19.52,
+      "matches_played": 7,
+      "season_total_points": 222.5,
+      "season_avg_points": 31.79,
+      "recent_avg_points": 22.17,
+      "last_match_points": 45.5,
+      "score_basis": 26.02,
       "reliability_factor": 1,
-      "adjusted_score": 19.52,
-      "percentile": 64.43,
+      "adjusted_score": 26.02,
+      "percentile": 69.17,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 64.43",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "gt_shahrukh-khan",
@@ -1702,13 +1703,13 @@
       "score_basis": 10.2,
       "reliability_factor": 1,
       "adjusted_score": 10.2,
-      "percentile": 48.62,
+      "percentile": 49.01,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 48.62",
+        "Target price mapped from percentile 49.01",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "gt_washington-sundar",
@@ -1723,19 +1724,19 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 253,
-      "season_avg_points": 31.63,
+      "matches_played": 7,
+      "season_total_points": 241,
+      "season_avg_points": 34.43,
       "recent_avg_points": 26,
       "last_match_points": 34,
-      "score_basis": 28.25,
+      "score_basis": 29.37,
       "reliability_factor": 1,
-      "adjusted_score": 28.25,
-      "percentile": 77.87,
+      "adjusted_score": 29.37,
+      "percentile": 75.49,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "gt_jason-holder",
@@ -1746,25 +1747,23 @@
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
-      "target_price": 6,
+      "target_price": 7,
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
       "matches_played": 1,
-      "season_total_points": 12,
-      "season_avg_points": 12,
-      "recent_avg_points": 12,
-      "last_match_points": 12,
-      "score_basis": 12,
+      "season_total_points": 67,
+      "season_avg_points": 67,
+      "recent_avg_points": 67,
+      "last_match_points": 67,
+      "score_basis": 67,
       "reliability_factor": 0.25,
-      "adjusted_score": 3,
-      "percentile": 40.71,
+      "adjusted_score": 16.75,
+      "percentile": 56.92,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 40.71",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "gt_kumar-kushagra",
@@ -1787,13 +1786,13 @@
       "score_basis": 26,
       "reliability_factor": 0.25,
       "adjusted_score": 6.5,
-      "percentile": 43.08,
+      "percentile": 42.49,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 43.08",
+        "Target price mapped from percentile 42.49",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-04T00:00:00"
+      "last_match_played_at_utc": "2026-04-04T14:00:00Z"
     },
     {
       "player_id": "gt_rahul-tewatia",
@@ -1816,11 +1815,11 @@
       "score_basis": 9.73,
       "reliability_factor": 1,
       "adjusted_score": 9.73,
-      "percentile": 47.43,
+      "percentile": 47.04,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-20T14:00:00"
+      "last_match_played_at_utc": "2026-04-20T14:00:00Z"
     },
     {
       "player_id": "gt_anuj-rawat",
@@ -1843,7 +1842,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1871,7 +1870,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1899,7 +1898,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1927,7 +1926,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1955,7 +1954,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1983,7 +1982,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -1999,23 +1998,25 @@
       "pricing_eligible": true,
       "old_price": 6,
       "initial_price": 6,
-      "target_price": 6,
+      "target_price": 7,
       "smoothed_price": 6,
       "final_price": 6,
       "price_change": 0,
       "matches_played": 1,
-      "season_total_points": 6,
-      "season_avg_points": 6,
-      "recent_avg_points": 6,
-      "last_match_points": 6,
-      "score_basis": 6,
+      "season_total_points": 34,
+      "season_avg_points": 34,
+      "recent_avg_points": 34,
+      "last_match_points": 34,
+      "score_basis": 34,
       "reliability_factor": 0.25,
-      "adjusted_score": 1.5,
-      "percentile": 37.94,
+      "adjusted_score": 8.5,
+      "percentile": 45.45,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 45.45",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "gt_mohd-arshad-khan",
@@ -2038,7 +2039,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2066,7 +2067,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2094,7 +2095,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2122,7 +2123,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2150,13 +2151,13 @@
       "score_basis": 25.54,
       "reliability_factor": 1,
       "adjusted_score": 25.54,
-      "percentile": 72.53,
+      "percentile": 68.77,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 72.53",
+        "Target price mapped from percentile 68.77",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_blessing-muzarabani",
@@ -2167,23 +2168,25 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 9,
+      "target_price": 8,
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 3,
-      "season_total_points": 121.5,
-      "season_avg_points": 40.5,
-      "recent_avg_points": 40.5,
+      "matches_played": 2,
+      "season_total_points": 107,
+      "season_avg_points": 53.5,
+      "recent_avg_points": 53.5,
       "last_match_points": 107,
-      "score_basis": 40.5,
-      "reliability_factor": 0.75,
-      "adjusted_score": 30.38,
-      "percentile": 80.24,
+      "score_basis": 53.5,
+      "reliability_factor": 0.5,
+      "adjusted_score": 26.75,
+      "percentile": 70.75,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 70.75",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-02T00:00:00"
+      "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
     {
       "player_id": "kkr_ajinkya-rahane",
@@ -2199,20 +2202,20 @@
       "final_price": 8,
       "price_change": 0,
       "matches_played": 7,
-      "season_total_points": 194,
-      "season_avg_points": 27.71,
-      "recent_avg_points": 10,
+      "season_total_points": 199,
+      "season_avg_points": 28.43,
+      "recent_avg_points": 11.67,
       "last_match_points": 3,
-      "score_basis": 17.08,
+      "score_basis": 18.37,
       "reliability_factor": 1,
-      "adjusted_score": 17.08,
-      "percentile": 60.87,
+      "adjusted_score": 18.37,
+      "percentile": 59.68,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 60.87",
+        "Target price mapped from percentile 59.68",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_anukul-roy",
@@ -2227,19 +2230,19 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 178,
-      "season_avg_points": 25.43,
+      "matches_played": 6,
+      "season_total_points": 139,
+      "season_avg_points": 23.17,
       "recent_avg_points": 22.67,
       "last_match_points": 41,
-      "score_basis": 23.77,
+      "score_basis": 22.87,
       "reliability_factor": 1,
-      "adjusted_score": 23.77,
-      "percentile": 70.75,
+      "adjusted_score": 22.87,
+      "percentile": 65.22,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_cameron-green",
@@ -2254,21 +2257,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 256,
-      "season_avg_points": 32,
-      "recent_avg_points": 48.33,
+      "matches_played": 7,
+      "season_total_points": 248,
+      "season_avg_points": 35.43,
+      "recent_avg_points": 51.67,
       "last_match_points": 40,
-      "score_basis": 41.8,
+      "score_basis": 45.17,
       "reliability_factor": 1,
-      "adjusted_score": 41.8,
-      "percentile": 88.54,
+      "adjusted_score": 45.17,
+      "percentile": 87.75,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 88.54",
+        "Target price mapped from percentile 87.75",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_finn-allen",
@@ -2297,7 +2300,7 @@
         "Target price mapped from percentile 50.59",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-14T14:00:00"
+      "last_match_played_at_utc": "2026-04-14T14:00:00Z"
     },
     {
       "player_id": "kkr_kartik-tyagi",
@@ -2312,21 +2315,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 278.5,
-      "season_avg_points": 39.79,
+      "matches_played": 6,
+      "season_total_points": 202,
+      "season_avg_points": 33.67,
       "recent_avg_points": 48,
       "last_match_points": 80,
-      "score_basis": 44.72,
+      "score_basis": 42.27,
       "reliability_factor": 1,
-      "adjusted_score": 44.72,
-      "percentile": 90.12,
+      "adjusted_score": 42.27,
+      "percentile": 85.38,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 90.12",
+        "Target price mapped from percentile 85.38",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_ramandeep-singh",
@@ -2341,19 +2344,19 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 128.5,
-      "season_avg_points": 18.36,
+      "matches_played": 6,
+      "season_total_points": 127,
+      "season_avg_points": 21.17,
       "recent_avg_points": 32.33,
       "last_match_points": 8,
-      "score_basis": 26.74,
+      "score_basis": 27.87,
       "reliability_factor": 1,
-      "adjusted_score": 26.74,
-      "percentile": 75.49,
+      "adjusted_score": 27.87,
+      "percentile": 72.73,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_rinku-singh",
@@ -2376,11 +2379,11 @@
       "score_basis": 29.4,
       "reliability_factor": 1,
       "adjusted_score": 29.4,
-      "percentile": 79.05,
+      "percentile": 75.89,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_rovman-powell",
@@ -2403,13 +2406,13 @@
       "score_basis": 36.5,
       "reliability_factor": 1,
       "adjusted_score": 36.5,
-      "percentile": 85.77,
+      "percentile": 82.61,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 85.77",
+        "Target price mapped from percentile 82.61",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_sunil-narine",
@@ -2424,21 +2427,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 275.5,
-      "season_avg_points": 39.36,
+      "matches_played": 6,
+      "season_total_points": 184,
+      "season_avg_points": 30.67,
       "recent_avg_points": 40,
       "last_match_points": 45,
-      "score_basis": 39.74,
+      "score_basis": 36.27,
       "reliability_factor": 1,
-      "adjusted_score": 39.74,
-      "percentile": 87.35,
+      "adjusted_score": 36.27,
+      "percentile": 82.21,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 87.35",
+        "Target price mapped from percentile 82.21",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_vaibhav-arora",
@@ -2449,23 +2452,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 207.5,
-      "season_avg_points": 29.64,
+      "matches_played": 6,
+      "season_total_points": 134,
+      "season_avg_points": 22.33,
       "recent_avg_points": 14.33,
       "last_match_points": 0,
-      "score_basis": 20.45,
+      "score_basis": 17.53,
       "reliability_factor": 1,
-      "adjusted_score": 20.45,
-      "percentile": 66.01,
+      "adjusted_score": 17.53,
+      "percentile": 58.1,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 58.1",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_varun-chakaravarthy",
@@ -2476,25 +2481,23 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 9,
+      "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 166,
-      "season_avg_points": 27.67,
+      "matches_played": 5,
+      "season_total_points": 126,
+      "season_avg_points": 25.2,
       "recent_avg_points": 40,
       "last_match_points": 80,
-      "score_basis": 35.07,
+      "score_basis": 34.08,
       "reliability_factor": 1,
-      "adjusted_score": 35.07,
-      "percentile": 84.98,
+      "adjusted_score": 34.08,
+      "percentile": 79.84,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 84.98",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_manish-pandey",
@@ -2517,13 +2520,13 @@
       "score_basis": 8,
       "reliability_factor": 0.25,
       "adjusted_score": 2,
-      "percentile": 38.93,
+      "percentile": 38.54,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 38.93",
+        "Target price mapped from percentile 38.54",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-03-29T00:00:00"
+      "last_match_played_at_utc": "2026-03-29T14:00:00Z"
     },
     {
       "player_id": "kkr_tim-seifert",
@@ -2546,11 +2549,11 @@
       "score_basis": 19,
       "reliability_factor": 0.5,
       "adjusted_score": 9.5,
-      "percentile": 47.04,
+      "percentile": 46.64,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "kkr_daksh-kamra",
@@ -2573,7 +2576,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2601,7 +2604,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2629,7 +2632,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2657,7 +2660,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2685,7 +2688,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2713,7 +2716,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2741,7 +2744,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2769,7 +2772,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2797,7 +2800,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -2813,25 +2816,23 @@
       "pricing_eligible": true,
       "old_price": 5,
       "initial_price": 5,
-      "target_price": 6,
+      "target_price": 5,
       "smoothed_price": 5,
       "final_price": 5,
       "price_change": 0,
-      "matches_played": 2,
-      "season_total_points": 4,
-      "season_avg_points": 2,
-      "recent_avg_points": 2,
-      "last_match_points": -5,
-      "score_basis": 2,
-      "reliability_factor": 0.5,
-      "adjusted_score": 1,
-      "percentile": 37.15,
+      "matches_played": 1,
+      "season_total_points": 0,
+      "season_avg_points": 0,
+      "recent_avg_points": 0,
+      "last_match_points": 0,
+      "score_basis": 0,
+      "reliability_factor": 0.25,
+      "adjusted_score": 0,
+      "percentile": 18.38,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 37.15",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-09T14:00:00"
+      "last_match_played_at_utc": "2026-04-09T14:00:00Z"
     },
     {
       "player_id": "lsg_aiden-markram",
@@ -2846,21 +2847,21 @@
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 230,
-      "season_avg_points": 28.75,
-      "recent_avg_points": 24.33,
-      "last_match_points": -5,
-      "score_basis": 26.1,
+      "matches_played": 7,
+      "season_total_points": 229,
+      "season_avg_points": 32.71,
+      "recent_avg_points": 26,
+      "last_match_points": 0,
+      "score_basis": 28.68,
       "reliability_factor": 1,
-      "adjusted_score": 26.1,
-      "percentile": 74.7,
+      "adjusted_score": 28.68,
+      "percentile": 73.91,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 74.7",
+        "Target price mapped from percentile 73.91",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_prince-yadav",
@@ -2875,19 +2876,19 @@
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 342.5,
-      "season_avg_points": 42.81,
-      "recent_avg_points": 43.83,
-      "last_match_points": 19.5,
-      "score_basis": 43.42,
+      "matches_played": 7,
+      "season_total_points": 311.5,
+      "season_avg_points": 44.5,
+      "recent_avg_points": 60.5,
+      "last_match_points": 69.5,
+      "score_basis": 54.1,
       "reliability_factor": 1,
-      "adjusted_score": 43.42,
-      "percentile": 89.33,
+      "adjusted_score": 54.1,
+      "percentile": 91.7,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_avesh-khan",
@@ -2898,23 +2899,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 159.5,
-      "season_avg_points": 26.58,
-      "recent_avg_points": 17,
-      "last_match_points": -5,
-      "score_basis": 20.83,
+      "matches_played": 5,
+      "season_total_points": 112,
+      "season_avg_points": 22.4,
+      "recent_avg_points": 18.67,
+      "last_match_points": 0,
+      "score_basis": 20.16,
       "reliability_factor": 1,
-      "adjusted_score": 20.83,
-      "percentile": 66.8,
+      "adjusted_score": 20.16,
+      "percentile": 62.06,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 62.06",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-19T14:00:00"
+      "last_match_played_at_utc": "2026-04-19T14:00:00Z"
     },
     {
       "player_id": "lsg_ayush-badoni",
@@ -2930,18 +2933,18 @@
       "final_price": 8,
       "price_change": 0,
       "matches_played": 7,
-      "season_total_points": 166,
-      "season_avg_points": 23.71,
-      "recent_avg_points": 27.33,
-      "last_match_points": -5,
-      "score_basis": 25.88,
+      "season_total_points": 176,
+      "season_avg_points": 25.14,
+      "recent_avg_points": 29,
+      "last_match_points": 0,
+      "score_basis": 27.46,
       "reliability_factor": 1,
-      "adjusted_score": 25.88,
-      "percentile": 73.91,
+      "adjusted_score": 27.46,
+      "percentile": 72.33,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_m-siddharth",
@@ -2952,25 +2955,23 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 9,
+      "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 4,
-      "season_total_points": 124.5,
-      "season_avg_points": 31.13,
+      "matches_played": 3,
+      "season_total_points": 93,
+      "season_avg_points": 31,
       "recent_avg_points": 31,
       "last_match_points": 43,
-      "score_basis": 31.05,
-      "reliability_factor": 1,
-      "adjusted_score": 31.05,
-      "percentile": 82.21,
+      "score_basis": 31,
+      "reliability_factor": 0.75,
+      "adjusted_score": 23.25,
+      "percentile": 66.01,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 82.21",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-19T14:00:00"
+      "last_match_played_at_utc": "2026-04-19T14:00:00Z"
     },
     {
       "player_id": "lsg_mitchell-marsh",
@@ -2993,13 +2994,13 @@
       "score_basis": 50.48,
       "reliability_factor": 1,
       "adjusted_score": 50.48,
-      "percentile": 91.3,
+      "percentile": 90.12,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 91.3",
+        "Target price mapped from percentile 90.12",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_mohsin-khan",
@@ -3014,19 +3015,19 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 4,
-      "season_total_points": 98.5,
-      "season_avg_points": 24.63,
-      "recent_avg_points": 20.83,
-      "last_match_points": 16.5,
-      "score_basis": 22.35,
-      "reliability_factor": 1,
-      "adjusted_score": 22.35,
-      "percentile": 69.57,
+      "matches_played": 3,
+      "season_total_points": 113.5,
+      "season_avg_points": 37.83,
+      "recent_avg_points": 37.83,
+      "last_match_points": 67.5,
+      "score_basis": 37.83,
+      "reliability_factor": 0.75,
+      "adjusted_score": 28.37,
+      "percentile": 73.12,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_mukul-choudhary",
@@ -3049,11 +3050,11 @@
       "score_basis": 28.83,
       "reliability_factor": 1,
       "adjusted_score": 28.83,
-      "percentile": 78.26,
+      "percentile": 74.31,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_rishabh-pant",
@@ -3076,11 +3077,11 @@
       "score_basis": 27.06,
       "reliability_factor": 1,
       "adjusted_score": 27.06,
-      "percentile": 76.28,
+      "percentile": 71.54,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_abdul-samad",
@@ -3096,18 +3097,18 @@
       "final_price": 7,
       "price_change": 0,
       "matches_played": 5,
-      "season_total_points": 76,
-      "season_avg_points": 15.2,
-      "recent_avg_points": 3.33,
-      "last_match_points": -5,
-      "score_basis": 8.08,
+      "season_total_points": 81,
+      "season_avg_points": 16.2,
+      "recent_avg_points": 5,
+      "last_match_points": 0,
+      "score_basis": 9.48,
       "reliability_factor": 1,
-      "adjusted_score": 8.08,
-      "percentile": 45.45,
+      "adjusted_score": 9.48,
+      "percentile": 46.25,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-15T14:00:00"
+      "last_match_played_at_utc": "2026-04-15T14:00:00Z"
     },
     {
       "player_id": "lsg_akash-singh",
@@ -3130,7 +3131,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3150,19 +3151,19 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 124,
-      "season_avg_points": 20.67,
+      "matches_played": 5,
+      "season_total_points": 88,
+      "season_avg_points": 17.6,
       "recent_avg_points": 13.33,
       "last_match_points": 15,
-      "score_basis": 16.27,
+      "score_basis": 15.04,
       "reliability_factor": 1,
-      "adjusted_score": 16.27,
-      "percentile": 58.5,
+      "adjusted_score": 15.04,
+      "percentile": 54.55,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_george-linde",
@@ -3173,23 +3174,25 @@
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
-      "target_price": 7,
+      "target_price": 6,
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 3,
-      "season_total_points": 37,
-      "season_avg_points": 12.33,
-      "recent_avg_points": 12.33,
+      "matches_played": 2,
+      "season_total_points": 28,
+      "season_avg_points": 14,
+      "recent_avg_points": 14,
       "last_match_points": 7,
-      "score_basis": 12.33,
-      "reliability_factor": 0.75,
-      "adjusted_score": 9.25,
-      "percentile": 46.64,
+      "score_basis": 14,
+      "reliability_factor": 0.5,
+      "adjusted_score": 7,
+      "percentile": 44.27,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 44.27",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-15T14:00:00"
+      "last_match_played_at_utc": "2026-04-15T14:00:00Z"
     },
     {
       "player_id": "lsg_himmat-singh",
@@ -3212,13 +3215,13 @@
       "score_basis": 8.67,
       "reliability_factor": 0.75,
       "adjusted_score": 6.5,
-      "percentile": 43.48,
+      "percentile": 43.08,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 43.48",
+        "Target price mapped from percentile 43.08",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_mohammad-shami",
@@ -3233,21 +3236,21 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 258.5,
-      "season_avg_points": 32.31,
-      "recent_avg_points": 13.5,
-      "last_match_points": 22.5,
-      "score_basis": 21.02,
+      "matches_played": 7,
+      "season_total_points": 214.5,
+      "season_avg_points": 30.64,
+      "recent_avg_points": 31.83,
+      "last_match_points": 72.5,
+      "score_basis": 31.35,
       "reliability_factor": 1,
-      "adjusted_score": 21.02,
-      "percentile": 67.59,
+      "adjusted_score": 31.35,
+      "percentile": 77.08,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 67.59",
+        "Target price mapped from percentile 77.08",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_nicholas-pooran",
@@ -3270,11 +3273,11 @@
       "score_basis": 15.23,
       "reliability_factor": 1,
       "adjusted_score": 15.23,
-      "percentile": 56.92,
+      "percentile": 54.94,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_akshat-raghuwanshi",
@@ -3297,7 +3300,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3325,7 +3328,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3353,7 +3356,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3381,7 +3384,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3409,7 +3412,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3437,11 +3440,11 @@
       "score_basis": 9,
       "reliability_factor": 0.25,
       "adjusted_score": 2.25,
-      "percentile": 39.72,
+      "percentile": 39.53,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "lsg_naman-tiwari",
@@ -3464,7 +3467,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3492,7 +3495,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3520,7 +3523,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3536,25 +3539,23 @@
       "pricing_eligible": true,
       "old_price": 5,
       "initial_price": 5,
-      "target_price": 6,
+      "target_price": 5,
       "smoothed_price": 5,
       "final_price": 5,
       "price_change": 0,
-      "matches_played": 2,
-      "season_total_points": 5.5,
-      "season_avg_points": 2.75,
-      "recent_avg_points": 2.75,
-      "last_match_points": -5,
-      "score_basis": 2.75,
-      "reliability_factor": 0.5,
-      "adjusted_score": 1.38,
-      "percentile": 37.55,
+      "matches_played": 1,
+      "season_total_points": 0,
+      "season_avg_points": 0,
+      "recent_avg_points": 0,
+      "last_match_points": 0,
+      "score_basis": 0,
+      "reliability_factor": 0.25,
+      "adjusted_score": 0,
+      "percentile": 18.38,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 37.55",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-01T00:00:00"
+      "last_match_played_at_utc": "2026-04-01T14:00:00Z"
     },
     {
       "player_id": "mi_ashwani-kumar",
@@ -3569,19 +3570,19 @@
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 3,
-      "season_total_points": 150,
-      "season_avg_points": 50,
-      "recent_avg_points": 50,
-      "last_match_points": 12,
-      "score_basis": 50,
-      "reliability_factor": 0.75,
-      "adjusted_score": 37.5,
-      "percentile": 86.56,
+      "matches_played": 2,
+      "season_total_points": 170,
+      "season_avg_points": 85,
+      "recent_avg_points": 85,
+      "last_match_points": 53,
+      "score_basis": 85,
+      "reliability_factor": 0.5,
+      "adjusted_score": 42.5,
+      "percentile": 85.77,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_n-tilak-varma",
@@ -3604,13 +3605,13 @@
       "score_basis": 58.94,
       "reliability_factor": 1,
       "adjusted_score": 58.94,
-      "percentile": 95.65,
+      "percentile": 94.47,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 95.65",
+        "Target price mapped from percentile 94.47",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_quinton-de-kock",
@@ -3621,7 +3622,7 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 10,
+      "target_price": 9,
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
@@ -3633,13 +3634,11 @@
       "score_basis": 72,
       "reliability_factor": 0.75,
       "adjusted_score": 54,
-      "percentile": 93.68,
+      "percentile": 91.3,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 93.68",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_rohit-sharma",
@@ -3650,7 +3649,7 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 9,
+      "target_price": 8,
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
@@ -3662,11 +3661,13 @@
       "score_basis": 30.9,
       "reliability_factor": 1,
       "adjusted_score": 30.9,
-      "percentile": 81.82,
+      "percentile": 76.68,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 76.68",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-12T14:00:00"
+      "last_match_played_at_utc": "2026-04-12T14:00:00Z"
     },
     {
       "player_id": "mi_ryan-rickelton",
@@ -3689,13 +3690,13 @@
       "score_basis": 26.96,
       "reliability_factor": 1,
       "adjusted_score": 26.96,
-      "percentile": 75.89,
+      "percentile": 71.15,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 75.89",
+        "Target price mapped from percentile 71.15",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-16T14:00:00"
+      "last_match_played_at_utc": "2026-04-16T14:00:00Z"
     },
     {
       "player_id": "mi_allah-ghazanfar",
@@ -3710,21 +3711,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 169.5,
-      "season_avg_points": 28.25,
-      "recent_avg_points": 32.5,
-      "last_match_points": 10.5,
-      "score_basis": 30.8,
+      "matches_played": 5,
+      "season_total_points": 177.5,
+      "season_avg_points": 35.5,
+      "recent_avg_points": 47.5,
+      "last_match_points": 55.5,
+      "score_basis": 42.7,
       "reliability_factor": 1,
-      "adjusted_score": 30.8,
-      "percentile": 81.42,
+      "adjusted_score": 42.7,
+      "percentile": 86.17,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 81.42",
+        "Target price mapped from percentile 86.17",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_hardik-pandya",
@@ -3735,23 +3736,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 213,
-      "season_avg_points": 30.43,
-      "recent_avg_points": 15.67,
-      "last_match_points": 6,
-      "score_basis": 21.57,
+      "matches_played": 6,
+      "season_total_points": 176,
+      "season_avg_points": 29.33,
+      "recent_avg_points": 14.33,
+      "last_match_points": 2,
+      "score_basis": 20.33,
       "reliability_factor": 1,
-      "adjusted_score": 21.57,
-      "percentile": 67.98,
+      "adjusted_score": 20.33,
+      "percentile": 62.45,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 62.45",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_mitchell-santner",
@@ -3762,23 +3765,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 9,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 5,
-      "season_total_points": 161,
-      "season_avg_points": 32.2,
-      "recent_avg_points": 27.67,
-      "last_match_points": 12,
-      "score_basis": 29.48,
+      "matches_played": 4,
+      "season_total_points": 148,
+      "season_avg_points": 37,
+      "recent_avg_points": 35.33,
+      "last_match_points": 35,
+      "score_basis": 36,
       "reliability_factor": 1,
-      "adjusted_score": 29.48,
-      "percentile": 79.45,
+      "adjusted_score": 36,
+      "percentile": 81.82,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 81.82",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_naman-dhir",
@@ -3801,13 +3806,13 @@
       "score_basis": 44.03,
       "reliability_factor": 1,
       "adjusted_score": 44.03,
-      "percentile": 89.72,
+      "percentile": 87.35,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 89.72",
+        "Target price mapped from percentile 87.35",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_raghu-sharma",
@@ -3830,7 +3835,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -3850,21 +3855,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 146.5,
-      "season_avg_points": 20.93,
+      "matches_played": 6,
+      "season_total_points": 126,
+      "season_avg_points": 21,
       "recent_avg_points": 10.33,
       "last_match_points": 1,
-      "score_basis": 14.57,
+      "score_basis": 14.6,
       "reliability_factor": 1,
-      "adjusted_score": 14.57,
-      "percentile": 55.73,
+      "adjusted_score": 14.6,
+      "percentile": 54.15,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 55.73",
+        "Target price mapped from percentile 54.15",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_surya-kumar-yadav",
@@ -3875,23 +3880,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
       "matches_played": 7,
-      "season_total_points": 184,
-      "season_avg_points": 26.29,
-      "recent_avg_points": 16.67,
+      "season_total_points": 189,
+      "season_avg_points": 27,
+      "recent_avg_points": 18.33,
       "last_match_points": 36,
-      "score_basis": 20.52,
+      "score_basis": 21.8,
       "reliability_factor": 1,
-      "adjusted_score": 20.52,
-      "percentile": 66.4,
+      "adjusted_score": 21.8,
+      "percentile": 63.44,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 63.44",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_corbin-bosch",
@@ -3902,23 +3909,25 @@
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
-      "target_price": 7,
+      "target_price": 6,
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 2,
-      "season_total_points": 35,
-      "season_avg_points": 17.5,
-      "recent_avg_points": 17.5,
+      "matches_played": 1,
+      "season_total_points": 26,
+      "season_avg_points": 26,
+      "recent_avg_points": 26,
       "last_match_points": 26,
-      "score_basis": 17.5,
-      "reliability_factor": 0.5,
-      "adjusted_score": 8.75,
-      "percentile": 46.25,
+      "score_basis": 26,
+      "reliability_factor": 0.25,
+      "adjusted_score": 6.5,
+      "percentile": 42.49,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 42.49",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-04T00:00:00"
+      "last_match_played_at_utc": "2026-04-04T10:00:00Z"
     },
     {
       "player_id": "mi_deepak-chahar",
@@ -3929,23 +3938,25 @@
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
-      "target_price": 7,
+      "target_price": 6,
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 4,
-      "season_total_points": 47.5,
-      "season_avg_points": 11.88,
+      "matches_played": 3,
+      "season_total_points": 28,
+      "season_avg_points": 9.33,
       "recent_avg_points": 9.33,
       "last_match_points": 3,
-      "score_basis": 10.35,
-      "reliability_factor": 1,
-      "adjusted_score": 10.35,
-      "percentile": 49.41,
+      "score_basis": 9.33,
+      "reliability_factor": 0.75,
+      "adjusted_score": 7,
+      "percentile": 43.87,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 43.87",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-16T14:00:00"
+      "last_match_played_at_utc": "2026-04-16T14:00:00Z"
     },
     {
       "player_id": "mi_mayank-markande",
@@ -3960,21 +3971,21 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 4,
-      "season_total_points": 10.5,
-      "season_avg_points": 2.63,
-      "recent_avg_points": 1,
-      "last_match_points": -5,
-      "score_basis": 1.65,
-      "reliability_factor": 1,
-      "adjusted_score": 1.65,
-      "percentile": 38.34,
+      "matches_played": 3,
+      "season_total_points": 8,
+      "season_avg_points": 2.67,
+      "recent_avg_points": 2.67,
+      "last_match_points": 0,
+      "score_basis": 2.67,
+      "reliability_factor": 0.75,
+      "adjusted_score": 2,
+      "percentile": 39.13,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 38.34",
+        "Target price mapped from percentile 39.13",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-12T14:00:00"
+      "last_match_played_at_utc": "2026-04-12T14:00:00Z"
     },
     {
       "player_id": "mi_sherfane-rutherford",
@@ -3990,20 +4001,20 @@
       "final_price": 7,
       "price_change": 0,
       "matches_played": 7,
-      "season_total_points": 122,
-      "season_avg_points": 17.43,
-      "recent_avg_points": -1,
-      "last_match_points": -5,
-      "score_basis": 6.37,
+      "season_total_points": 127,
+      "season_avg_points": 18.14,
+      "recent_avg_points": 0.67,
+      "last_match_points": 0,
+      "score_basis": 7.66,
       "reliability_factor": 1,
-      "adjusted_score": 6.37,
-      "percentile": 42.69,
+      "adjusted_score": 7.66,
+      "percentile": 44.66,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 42.69",
+        "Target price mapped from percentile 44.66",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_atharva-ankolekar",
@@ -4026,7 +4037,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4046,21 +4057,21 @@
       "smoothed_price": 6,
       "final_price": 6,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 114.5,
-      "season_avg_points": 14.31,
-      "recent_avg_points": 12.67,
-      "last_match_points": 15,
-      "score_basis": 13.33,
+      "matches_played": 7,
+      "season_total_points": 75,
+      "season_avg_points": 10.71,
+      "recent_avg_points": 25,
+      "last_match_points": 47,
+      "score_basis": 19.28,
       "reliability_factor": 1,
-      "adjusted_score": 13.33,
-      "percentile": 54.94,
+      "adjusted_score": 19.28,
+      "percentile": 60.87,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 54.94",
+        "Target price mapped from percentile 60.87",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_krish-bhagat",
@@ -4071,25 +4082,23 @@
       "pricing_eligible": true,
       "old_price": 6,
       "initial_price": 6,
-      "target_price": 7,
+      "target_price": 6,
       "smoothed_price": 6,
       "final_price": 6,
       "price_change": 0,
-      "matches_played": 3,
-      "season_total_points": 32.5,
-      "season_avg_points": 10.83,
-      "recent_avg_points": 10.83,
-      "last_match_points": 7.5,
-      "score_basis": 10.83,
-      "reliability_factor": 0.75,
-      "adjusted_score": 8.12,
-      "percentile": 45.85,
+      "matches_played": 2,
+      "season_total_points": 20.5,
+      "season_avg_points": 10.25,
+      "recent_avg_points": 10.25,
+      "last_match_points": 4.5,
+      "score_basis": 10.25,
+      "reliability_factor": 0.5,
+      "adjusted_score": 5.13,
+      "percentile": 41.11,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 45.85",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_mohammad-izhar",
@@ -4112,7 +4121,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4140,11 +4149,11 @@
       "score_basis": 8,
       "reliability_factor": 0.25,
       "adjusted_score": 2,
-      "percentile": 38.93,
+      "percentile": 38.54,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-20T14:00:00"
+      "last_match_played_at_utc": "2026-04-20T14:00:00Z"
     },
     {
       "player_id": "mi_robin-minz",
@@ -4167,7 +4176,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4187,19 +4196,19 @@
       "smoothed_price": 6,
       "final_price": 6,
       "price_change": 0,
-      "matches_played": 4,
-      "season_total_points": 33,
-      "season_avg_points": 8.25,
+      "matches_played": 3,
+      "season_total_points": 15,
+      "season_avg_points": 5,
       "recent_avg_points": 5,
       "last_match_points": 15,
-      "score_basis": 6.3,
-      "reliability_factor": 1,
-      "adjusted_score": 6.3,
-      "percentile": 42.29,
+      "score_basis": 5,
+      "reliability_factor": 0.75,
+      "adjusted_score": 3.75,
+      "percentile": 40.32,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-12T14:00:00"
+      "last_match_played_at_utc": "2026-04-12T14:00:00Z"
     },
     {
       "player_id": "mi_will-jacks",
@@ -4222,7 +4231,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4238,25 +4247,25 @@
       "pricing_eligible": true,
       "old_price": 5,
       "initial_price": 5,
-      "target_price": 4,
+      "target_price": 6,
       "smoothed_price": 5,
       "final_price": 5,
       "price_change": 0,
       "matches_played": 2,
-      "season_total_points": -3,
-      "season_avg_points": -1.5,
-      "recent_avg_points": -1.5,
-      "last_match_points": -5,
-      "score_basis": -1.5,
+      "season_total_points": 2,
+      "season_avg_points": 1,
+      "recent_avg_points": 1,
+      "last_match_points": 0,
+      "score_basis": 1,
       "reliability_factor": 0.5,
-      "adjusted_score": -0.75,
-      "percentile": 0.4,
+      "adjusted_score": 0.5,
+      "percentile": 37.15,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 0.4",
+        "Target price mapped from percentile 37.15",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-23T14:00:00"
+      "last_match_played_at_utc": "2026-04-23T14:00:00Z"
     },
     {
       "player_id": "mi_mayank-rawat",
@@ -4279,11 +4288,11 @@
       "score_basis": 0,
       "reliability_factor": 0.25,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-16T14:00:00"
+      "last_match_played_at_utc": "2026-04-16T14:00:00Z"
     },
     {
       "player_id": "pbks_cooper-connolly",
@@ -4306,13 +4315,13 @@
       "score_basis": 54.93,
       "reliability_factor": 1,
       "adjusted_score": 54.93,
-      "percentile": 94.47,
+      "percentile": 92.89,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 94.47",
+        "Target price mapped from percentile 92.89",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_prabhsimran-singh",
@@ -4335,12 +4344,12 @@
       "score_basis": 67,
       "reliability_factor": 1,
       "adjusted_score": 67,
-      "percentile": 98.02,
+      "percentile": 97.63,
       "calculation_notes": [
         "Used old_price for smoothing",
         "Uncapped player price ceiling applied at 9 credits"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_priyansh-arya",
@@ -4363,12 +4372,12 @@
       "score_basis": 65.67,
       "reliability_factor": 1,
       "adjusted_score": 65.67,
-      "percentile": 97.63,
+      "percentile": 97.23,
       "calculation_notes": [
         "Used old_price for smoothing",
         "Uncapped player price ceiling applied at 9 credits"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_shreyas-iyer",
@@ -4397,7 +4406,7 @@
         "Target price mapped from percentile 98.42",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_arshdeep-singh",
@@ -4408,25 +4417,23 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 9,
+      "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 225,
-      "season_avg_points": 28.13,
-      "recent_avg_points": 33.17,
-      "last_match_points": 4.5,
-      "score_basis": 31.15,
+      "matches_played": 7,
+      "season_total_points": 168.5,
+      "season_avg_points": 24.07,
+      "recent_avg_points": 38.17,
+      "last_match_points": 19.5,
+      "score_basis": 32.53,
       "reliability_factor": 1,
-      "adjusted_score": 31.15,
-      "percentile": 82.61,
+      "adjusted_score": 32.53,
+      "percentile": 77.47,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 82.61",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_marco-jansen",
@@ -4437,23 +4444,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 195.5,
-      "season_avg_points": 27.93,
-      "recent_avg_points": 24.5,
-      "last_match_points": 10.5,
-      "score_basis": 25.87,
+      "matches_played": 6,
+      "season_total_points": 133.5,
+      "season_avg_points": 22.25,
+      "recent_avg_points": 22.83,
+      "last_match_points": 5.5,
+      "score_basis": 22.6,
       "reliability_factor": 1,
-      "adjusted_score": 25.87,
-      "percentile": 73.52,
+      "adjusted_score": 22.6,
+      "percentile": 64.82,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 64.82",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_nehal-wadhera",
@@ -4464,7 +4473,7 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
@@ -4476,11 +4485,13 @@
       "score_basis": 20.12,
       "reliability_factor": 1,
       "adjusted_score": 20.12,
-      "percentile": 65.61,
+      "percentile": 61.66,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 61.66",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_shashank-singh",
@@ -4495,19 +4506,19 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 174,
-      "season_avg_points": 24.86,
+      "matches_played": 6,
+      "season_total_points": 159,
+      "season_avg_points": 26.5,
       "recent_avg_points": 26,
       "last_match_points": 29,
-      "score_basis": 25.54,
+      "score_basis": 26.2,
       "reliability_factor": 1,
-      "adjusted_score": 25.54,
-      "percentile": 72.53,
+      "adjusted_score": 26.2,
+      "percentile": 70.36,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_vyshak-vijaykumar",
@@ -4522,21 +4533,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 179.5,
-      "season_avg_points": 25.64,
-      "recent_avg_points": 7.67,
-      "last_match_points": 6,
-      "score_basis": 14.86,
+      "matches_played": 6,
+      "season_total_points": 134,
+      "season_avg_points": 22.33,
+      "recent_avg_points": 7.33,
+      "last_match_points": 0,
+      "score_basis": 13.33,
       "reliability_factor": 1,
-      "adjusted_score": 14.86,
-      "percentile": 56.13,
+      "adjusted_score": 13.33,
+      "percentile": 53.75,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 56.13",
+        "Target price mapped from percentile 53.75",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_xavier-bartlett",
@@ -4551,21 +4562,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 191,
-      "season_avg_points": 23.88,
-      "recent_avg_points": 9.5,
-      "last_match_points": 1.5,
-      "score_basis": 15.25,
+      "matches_played": 7,
+      "season_total_points": 150.5,
+      "season_avg_points": 21.5,
+      "recent_avg_points": 14.5,
+      "last_match_points": 16.5,
+      "score_basis": 17.3,
       "reliability_factor": 1,
-      "adjusted_score": 15.25,
-      "percentile": 57.31,
+      "adjusted_score": 17.3,
+      "percentile": 57.71,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 57.31",
+        "Target price mapped from percentile 57.71",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_yuzvendra-chahal",
@@ -4580,21 +4591,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 130.5,
-      "season_avg_points": 18.64,
-      "recent_avg_points": 9.17,
-      "last_match_points": 4.5,
-      "score_basis": 12.96,
+      "matches_played": 6,
+      "season_total_points": 94.5,
+      "season_avg_points": 15.75,
+      "recent_avg_points": 7.5,
+      "last_match_points": -0.5,
+      "score_basis": 10.8,
       "reliability_factor": 1,
-      "adjusted_score": 12.96,
-      "percentile": 53.36,
+      "adjusted_score": 10.8,
+      "percentile": 50.2,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 53.36",
+        "Target price mapped from percentile 50.2",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_marcus-stoinis",
@@ -4609,19 +4620,19 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 67.5,
-      "season_avg_points": 11.25,
+      "matches_played": 5,
+      "season_total_points": 71,
+      "season_avg_points": 14.2,
       "recent_avg_points": 20.67,
       "last_match_points": 3,
-      "score_basis": 16.9,
+      "score_basis": 18.08,
       "reliability_factor": 1,
-      "adjusted_score": 16.9,
-      "percentile": 59.68,
+      "adjusted_score": 18.08,
+      "percentile": 59.09,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-04-25T10:00:00Z"
     },
     {
       "player_id": "pbks_azmatullah-omarzai",
@@ -4644,7 +4655,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4672,7 +4683,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4700,7 +4711,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4728,7 +4739,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4756,7 +4767,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4784,7 +4795,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4812,7 +4823,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4840,7 +4851,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4868,7 +4879,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4896,7 +4907,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4924,7 +4935,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4952,7 +4963,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -4980,7 +4991,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5001,18 +5012,18 @@
       "final_price": 10,
       "price_change": 0,
       "matches_played": 6,
-      "season_total_points": 305,
-      "season_avg_points": 50.83,
+      "season_total_points": 310,
+      "season_avg_points": 51.67,
       "recent_avg_points": 71.67,
       "last_match_points": 92,
-      "score_basis": 63.33,
+      "score_basis": 63.67,
       "reliability_factor": 1,
-      "adjusted_score": 63.33,
+      "adjusted_score": 63.67,
       "percentile": 96.44,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-18T10:00:00"
+      "last_match_played_at_utc": "2026-04-18T10:00:00Z"
     },
     {
       "player_id": "rcb_virat-kohli",
@@ -5035,11 +5046,11 @@
       "score_basis": 63.46,
       "reliability_factor": 1,
       "adjusted_score": 63.46,
-      "percentile": 96.84,
+      "percentile": 96.05,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_bhuvneshwar-kumar",
@@ -5055,20 +5066,20 @@
       "final_price": 9,
       "price_change": 0,
       "matches_played": 7,
-      "season_total_points": 326.5,
-      "season_avg_points": 46.64,
-      "recent_avg_points": 55.33,
-      "last_match_points": 9,
-      "score_basis": 51.85,
+      "season_total_points": 370.5,
+      "season_avg_points": 52.93,
+      "recent_avg_points": 62.67,
+      "last_match_points": 31,
+      "score_basis": 58.77,
       "reliability_factor": 1,
-      "adjusted_score": 51.85,
-      "percentile": 92.49,
+      "adjusted_score": 58.77,
+      "percentile": 94.07,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 92.49",
+        "Target price mapped from percentile 94.07",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_devdutt-padikkal",
@@ -5091,11 +5102,11 @@
       "score_basis": 48.33,
       "reliability_factor": 1,
       "adjusted_score": 48.33,
-      "percentile": 90.91,
+      "percentile": 88.93,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_jacob-duffy",
@@ -5106,25 +5117,23 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 8,
+      "target_price": 9,
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
       "matches_played": 3,
-      "season_total_points": 103,
-      "season_avg_points": 34.33,
-      "recent_avg_points": 34.33,
+      "season_total_points": 183,
+      "season_avg_points": 61,
+      "recent_avg_points": 61,
       "last_match_points": 23,
-      "score_basis": 34.33,
+      "score_basis": 61,
       "reliability_factor": 0.75,
-      "adjusted_score": 25.75,
-      "percentile": 73.12,
+      "adjusted_score": 45.75,
+      "percentile": 88.14,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 73.12",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-12T14:00:00"
+      "last_match_played_at_utc": "2026-04-12T14:00:00Z"
     },
     {
       "player_id": "rcb_rajat-patidar",
@@ -5147,11 +5156,11 @@
       "score_basis": 35.57,
       "reliability_factor": 1,
       "adjusted_score": 35.57,
-      "percentile": 85.38,
+      "percentile": 81.03,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_tim-david",
@@ -5167,20 +5176,20 @@
       "final_price": 9,
       "price_change": 0,
       "matches_played": 7,
-      "season_total_points": 235.5,
-      "season_avg_points": 33.64,
+      "season_total_points": 258.5,
+      "season_avg_points": 36.93,
       "recent_avg_points": 23,
       "last_match_points": 12,
-      "score_basis": 27.26,
+      "score_basis": 28.57,
       "reliability_factor": 1,
-      "adjusted_score": 27.26,
-      "percentile": 76.68,
+      "adjusted_score": 28.57,
+      "percentile": 73.52,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 76.68",
+        "Target price mapped from percentile 73.52",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_abhinandan-singh",
@@ -5191,25 +5200,23 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 7,
+      "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
       "matches_played": 3,
-      "season_total_points": 65.5,
-      "season_avg_points": 21.83,
-      "recent_avg_points": 21.83,
-      "last_match_points": -5,
-      "score_basis": 21.83,
+      "season_total_points": 93.5,
+      "season_avg_points": 31.17,
+      "recent_avg_points": 31.17,
+      "last_match_points": 0,
+      "score_basis": 31.17,
       "reliability_factor": 0.75,
-      "adjusted_score": 16.37,
-      "percentile": 58.89,
+      "adjusted_score": 23.38,
+      "percentile": 66.4,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 58.89",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-10T14:00:00"
+      "last_match_played_at_utc": "2026-04-10T14:00:00Z"
     },
     {
       "player_id": "rcb_krunal-pandya",
@@ -5225,20 +5232,20 @@
       "final_price": 8,
       "price_change": 0,
       "matches_played": 7,
-      "season_total_points": 251.5,
-      "season_avg_points": 35.93,
-      "recent_avg_points": 28.33,
-      "last_match_points": 6,
-      "score_basis": 31.37,
+      "season_total_points": 274.5,
+      "season_avg_points": 39.21,
+      "recent_avg_points": 37.67,
+      "last_match_points": 34,
+      "score_basis": 38.29,
       "reliability_factor": 1,
-      "adjusted_score": 31.37,
+      "adjusted_score": 38.29,
       "percentile": 83,
       "calculation_notes": [
         "Used old_price for smoothing",
         "Target price mapped from percentile 83",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_rasikh-dar",
@@ -5253,21 +5260,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 5,
-      "season_total_points": 187,
-      "season_avg_points": 37.4,
+      "matches_played": 4,
+      "season_total_points": 149.5,
+      "season_avg_points": 37.38,
       "recent_avg_points": 40.5,
       "last_match_points": 4.5,
-      "score_basis": 39.26,
+      "score_basis": 39.25,
       "reliability_factor": 1,
-      "adjusted_score": 39.26,
-      "percentile": 86.96,
+      "adjusted_score": 39.25,
+      "percentile": 83.4,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 86.96",
+        "Target price mapped from percentile 83.4",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_suyash-sharma",
@@ -5283,20 +5290,20 @@
       "final_price": 8,
       "price_change": 0,
       "matches_played": 6,
-      "season_total_points": 112,
-      "season_avg_points": 18.67,
-      "recent_avg_points": 0.83,
-      "last_match_points": 7.5,
-      "score_basis": 7.97,
+      "season_total_points": 157,
+      "season_avg_points": 26.17,
+      "recent_avg_points": 9.17,
+      "last_match_points": 27.5,
+      "score_basis": 15.97,
       "reliability_factor": 1,
-      "adjusted_score": 7.97,
-      "percentile": 45.06,
+      "adjusted_score": 15.97,
+      "percentile": 56.13,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 45.06",
+        "Target price mapped from percentile 56.13",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_jitesh-sharma",
@@ -5319,11 +5326,11 @@
       "score_basis": 19.08,
       "reliability_factor": 1,
       "adjusted_score": 19.08,
-      "percentile": 63.64,
+      "percentile": 60.47,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_josh-hazlewood",
@@ -5334,23 +5341,25 @@
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
-      "target_price": 7,
+      "target_price": 8,
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 5,
-      "season_total_points": 131,
-      "season_avg_points": 26.2,
-      "recent_avg_points": 14.83,
-      "last_match_points": 16.5,
-      "score_basis": 19.38,
+      "matches_played": 4,
+      "season_total_points": 115.5,
+      "season_avg_points": 28.88,
+      "recent_avg_points": 24.17,
+      "last_match_points": 44.5,
+      "score_basis": 26.05,
       "reliability_factor": 1,
-      "adjusted_score": 19.38,
-      "percentile": 64.03,
+      "adjusted_score": 26.05,
+      "percentile": 69.76,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 69.76",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_romario-shepherd",
@@ -5361,25 +5370,23 @@
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
-      "target_price": 6,
+      "target_price": 7,
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
       "matches_played": 7,
-      "season_total_points": 71,
-      "season_avg_points": 10.14,
+      "season_total_points": 138,
+      "season_avg_points": 19.71,
       "recent_avg_points": 5.67,
       "last_match_points": 0,
-      "score_basis": 7.46,
+      "score_basis": 11.29,
       "reliability_factor": 1,
-      "adjusted_score": 7.46,
-      "percentile": 44.66,
+      "adjusted_score": 11.29,
+      "percentile": 51.38,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 44.66",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_venkatesh-iyer",
@@ -5402,11 +5409,11 @@
       "score_basis": 41,
       "reliability_factor": 0.25,
       "adjusted_score": 10.25,
-      "percentile": 49.01,
+      "percentile": 49.41,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-10T14:00:00"
+      "last_match_played_at_utc": "2026-04-10T14:00:00Z"
     },
     {
       "player_id": "rcb_jacob-bethell",
@@ -5429,11 +5436,11 @@
       "score_basis": 12,
       "reliability_factor": 0.5,
       "adjusted_score": 6,
-      "percentile": 41.9,
+      "percentile": 41.5,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00Z"
     },
     {
       "player_id": "rcb_jordan-cox",
@@ -5456,7 +5463,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5484,7 +5491,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5512,7 +5519,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5540,7 +5547,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5568,7 +5575,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5596,7 +5603,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5624,7 +5631,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5652,7 +5659,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5680,7 +5687,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -5708,11 +5715,11 @@
       "score_basis": 42.8,
       "reliability_factor": 1,
       "adjusted_score": 42.8,
-      "percentile": 88.93,
+      "percentile": 86.56,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_jofra-archer",
@@ -5723,25 +5730,25 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 8,
+      "target_price": 10,
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 10,
-      "season_total_points": 330,
-      "season_avg_points": 33,
-      "recent_avg_points": 15,
-      "last_match_points": 9,
-      "score_basis": 22.2,
+      "matches_played": 8,
+      "season_total_points": 373,
+      "season_avg_points": 46.63,
+      "recent_avg_points": 67.67,
+      "last_match_points": 69.5,
+      "score_basis": 59.25,
       "reliability_factor": 1,
-      "adjusted_score": 22.2,
-      "percentile": 69.17,
+      "adjusted_score": 59.25,
+      "percentile": 94.86,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 69.17",
+        "Target price mapped from percentile 94.86",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_ravindra-jadeja",
@@ -5752,25 +5759,23 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 8,
+      "target_price": 9,
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 252.5,
-      "season_avg_points": 31.56,
-      "recent_avg_points": 24.5,
-      "last_match_points": 3,
-      "score_basis": 27.32,
+      "matches_played": 7,
+      "season_total_points": 289.5,
+      "season_avg_points": 41.36,
+      "recent_avg_points": 48.83,
+      "last_match_points": 7,
+      "score_basis": 45.84,
       "reliability_factor": 1,
-      "adjusted_score": 27.32,
-      "percentile": 77.08,
+      "adjusted_score": 45.84,
+      "percentile": 88.54,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 77.08",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_vaibhav-suryavanshi",
@@ -5786,19 +5791,19 @@
       "final_price": 9,
       "price_change": 0,
       "matches_played": 8,
-      "season_total_points": 519,
-      "season_avg_points": 64.88,
+      "season_total_points": 524,
+      "season_avg_points": 65.5,
       "recent_avg_points": 76,
       "last_match_points": 170,
-      "score_basis": 71.55,
+      "score_basis": 71.8,
       "reliability_factor": 1,
-      "adjusted_score": 71.55,
+      "adjusted_score": 71.8,
       "percentile": 98.81,
       "calculation_notes": [
         "Used old_price for smoothing",
         "Uncapped player price ceiling applied at 9 credits"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_yashasvi-jaiswal",
@@ -5809,7 +5814,7 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 9,
+      "target_price": 8,
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
@@ -5821,11 +5826,13 @@
       "score_basis": 33.9,
       "reliability_factor": 1,
       "adjusted_score": 33.9,
-      "percentile": 84.19,
+      "percentile": 78.85,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 78.85",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_brijesh-sharma",
@@ -5836,25 +5843,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 7,
+      "target_price": 9,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 126.5,
-      "season_avg_points": 18.07,
-      "recent_avg_points": 7.5,
-      "last_match_points": 10.5,
-      "score_basis": 11.73,
+      "matches_played": 5,
+      "season_total_points": 179.5,
+      "season_avg_points": 35.9,
+      "recent_avg_points": 34.5,
+      "last_match_points": 47,
+      "score_basis": 35.06,
       "reliability_factor": 1,
-      "adjusted_score": 11.73,
-      "percentile": 51.78,
+      "adjusted_score": 35.06,
+      "percentile": 80.63,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 51.78",
+        "Target price mapped from percentile 80.63",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_donovan-ferreira",
@@ -5865,25 +5872,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 7,
+      "target_price": 9,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
       "matches_played": 6,
-      "season_total_points": 153.5,
-      "season_avg_points": 25.58,
-      "recent_avg_points": 15.5,
-      "last_match_points": 1.5,
-      "score_basis": 19.53,
+      "season_total_points": 228.5,
+      "season_avg_points": 38.08,
+      "recent_avg_points": 40.5,
+      "last_match_points": 76.5,
+      "score_basis": 39.53,
       "reliability_factor": 1,
-      "adjusted_score": 19.53,
-      "percentile": 64.82,
+      "adjusted_score": 39.53,
+      "percentile": 83.79,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 64.82",
+        "Target price mapped from percentile 83.79",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_nandre-burger",
@@ -5894,25 +5901,23 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 7,
+      "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 10,
-      "season_total_points": 231,
-      "season_avg_points": 23.1,
-      "recent_avg_points": 12,
-      "last_match_points": 3,
-      "score_basis": 16.44,
+      "matches_played": 8,
+      "season_total_points": 201,
+      "season_avg_points": 25.13,
+      "recent_avg_points": 32,
+      "last_match_points": 8.5,
+      "score_basis": 29.25,
       "reliability_factor": 1,
-      "adjusted_score": 16.44,
-      "percentile": 59.29,
+      "adjusted_score": 29.25,
+      "percentile": 75.1,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 59.29",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_ravi-bishnoi",
@@ -5923,25 +5928,23 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 7,
+      "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 9,
-      "season_total_points": 294,
-      "season_avg_points": 32.67,
-      "recent_avg_points": 6.83,
-      "last_match_points": 1.5,
-      "score_basis": 17.17,
+      "matches_played": 8,
+      "season_total_points": 274.5,
+      "season_avg_points": 34.31,
+      "recent_avg_points": 16.83,
+      "last_match_points": 9.5,
+      "score_basis": 23.82,
       "reliability_factor": 1,
-      "adjusted_score": 17.17,
-      "percentile": 61.26,
+      "adjusted_score": 23.82,
+      "percentile": 67.59,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 61.26",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_riyan-parag",
@@ -5956,21 +5959,21 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 9,
-      "season_total_points": 172.5,
-      "season_avg_points": 19.17,
+      "matches_played": 8,
+      "season_total_points": 165,
+      "season_avg_points": 20.63,
       "recent_avg_points": 17.33,
       "last_match_points": 7,
-      "score_basis": 18.07,
+      "score_basis": 18.65,
       "reliability_factor": 1,
-      "adjusted_score": 18.07,
-      "percentile": 62.45,
+      "adjusted_score": 18.65,
+      "percentile": 60.08,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 62.45",
+        "Target price mapped from percentile 60.08",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_sandeep-sharma",
@@ -5981,23 +5984,25 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
+      "target_price": 7,
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 124.5,
-      "season_avg_points": 20.75,
+      "matches_played": 5,
+      "season_total_points": 81,
+      "season_avg_points": 16.2,
       "recent_avg_points": 19.33,
       "last_match_points": 15,
-      "score_basis": 19.9,
+      "score_basis": 18.08,
       "reliability_factor": 1,
-      "adjusted_score": 19.9,
-      "percentile": 65.22,
+      "adjusted_score": 18.08,
+      "percentile": 59.09,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 59.09",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-13T14:00:00"
+      "last_match_played_at_utc": "2026-04-13T14:00:00Z"
     },
     {
       "player_id": "rr_shimron-hetmyer",
@@ -6020,13 +6025,13 @@
       "score_basis": 16.2,
       "reliability_factor": 1,
       "adjusted_score": 16.2,
-      "percentile": 58.1,
+      "percentile": 56.52,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 58.1",
+        "Target price mapped from percentile 56.52",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_tushar-deshpande",
@@ -6041,19 +6046,19 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 130,
-      "season_avg_points": 21.67,
-      "recent_avg_points": 20.5,
-      "last_match_points": 3,
-      "score_basis": 20.97,
+      "matches_played": 4,
+      "season_total_points": 99.5,
+      "season_avg_points": 24.88,
+      "recent_avg_points": 23.83,
+      "last_match_points": 2.5,
+      "score_basis": 24.25,
       "reliability_factor": 1,
-      "adjusted_score": 20.97,
-      "percentile": 67.19,
+      "adjusted_score": 24.25,
+      "percentile": 67.98,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "rr_yash-raj-punja",
@@ -6064,23 +6069,25 @@
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
-      "target_price": 7,
+      "target_price": 6,
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 2,
-      "season_total_points": 40,
-      "season_avg_points": 20,
-      "recent_avg_points": 20,
+      "matches_played": 1,
+      "season_total_points": 25,
+      "season_avg_points": 25,
+      "recent_avg_points": 25,
       "last_match_points": 25,
-      "score_basis": 20,
-      "reliability_factor": 0.5,
-      "adjusted_score": 10,
-      "percentile": 48.22,
+      "score_basis": 25,
+      "reliability_factor": 0.25,
+      "adjusted_score": 6.25,
+      "percentile": 41.9,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 41.9",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-19T10:00:00"
+      "last_match_played_at_utc": "2026-04-19T10:00:00Z"
     },
     {
       "player_id": "rr_adam-milne",
@@ -6103,7 +6110,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6131,7 +6138,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6159,7 +6166,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6187,7 +6194,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6215,7 +6222,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6243,11 +6250,11 @@
       "score_basis": 27,
       "reliability_factor": 0.25,
       "adjusted_score": 6.75,
-      "percentile": 43.87,
+      "percentile": 43.48,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "rr_sushant-mishra",
@@ -6270,7 +6277,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6298,7 +6305,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6326,7 +6333,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6354,11 +6361,11 @@
       "score_basis": 0,
       "reliability_factor": 0.25,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-22T14:00:00"
+      "last_match_played_at_utc": "2026-04-22T14:00:00Z"
     },
     {
       "player_id": "rr_lhuan-dre-pretorious",
@@ -6369,23 +6376,25 @@
       "pricing_eligible": true,
       "old_price": 4,
       "initial_price": 4,
-      "target_price": 4,
+      "target_price": 5,
       "smoothed_price": 4,
       "final_price": 4,
       "price_change": 0,
       "matches_played": 1,
-      "season_total_points": -5,
-      "season_avg_points": -5,
-      "recent_avg_points": -5,
-      "last_match_points": -5,
-      "score_basis": -5,
+      "season_total_points": 0,
+      "season_avg_points": 0,
+      "recent_avg_points": 0,
+      "last_match_points": 0,
+      "score_basis": 0,
       "reliability_factor": 0.25,
-      "adjusted_score": -1.25,
-      "percentile": 0,
+      "adjusted_score": 0,
+      "percentile": 18.38,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price mapped from percentile 18.38",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-13T14:00:00"
+      "last_match_played_at_utc": "2026-04-13T14:00:00Z"
     },
     {
       "player_id": "srh_heinrich-klaasen",
@@ -6408,11 +6417,11 @@
       "score_basis": 64.9,
       "reliability_factor": 1,
       "adjusted_score": 64.9,
-      "percentile": 97.23,
+      "percentile": 96.84,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_nitish-kumar-reddy",
@@ -6427,21 +6436,21 @@
       "smoothed_price": 10,
       "final_price": 10,
       "price_change": 0,
-      "matches_played": 9,
-      "season_total_points": 437.5,
-      "season_avg_points": 48.61,
-      "recent_avg_points": 29,
-      "last_match_points": 78,
-      "score_basis": 36.84,
+      "matches_played": 8,
+      "season_total_points": 438.5,
+      "season_avg_points": 54.81,
+      "recent_avg_points": 50.33,
+      "last_match_points": 84,
+      "score_basis": 52.12,
       "reliability_factor": 1,
-      "adjusted_score": 36.84,
-      "percentile": 86.17,
+      "adjusted_score": 52.12,
+      "percentile": 90.51,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 86.17",
+        "Target price mapped from percentile 90.51",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_abhishek-sharma",
@@ -6457,20 +6466,20 @@
       "final_price": 9,
       "price_change": 0,
       "matches_played": 8,
-      "season_total_points": 549,
-      "season_avg_points": 68.63,
+      "season_total_points": 563,
+      "season_avg_points": 70.38,
       "recent_avg_points": 125.33,
       "last_match_points": 77,
-      "score_basis": 102.65,
+      "score_basis": 103.35,
       "reliability_factor": 1,
-      "adjusted_score": 102.65,
+      "adjusted_score": 103.35,
       "percentile": 100,
       "calculation_notes": [
         "Used old_price for smoothing",
         "Target price mapped from percentile 100",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_eshan-malinga",
@@ -6485,21 +6494,21 @@
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 9,
+      "matches_played": 8,
       "season_total_points": 404.5,
-      "season_avg_points": 44.94,
-      "recent_avg_points": 56.17,
-      "last_match_points": 40,
-      "score_basis": 51.68,
+      "season_avg_points": 50.56,
+      "recent_avg_points": 80.83,
+      "last_match_points": 56.5,
+      "score_basis": 68.72,
       "reliability_factor": 1,
-      "adjusted_score": 51.68,
-      "percentile": 92.09,
+      "adjusted_score": 68.72,
+      "percentile": 98.02,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 92.09",
+        "Target price mapped from percentile 98.02",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_harsh-dubey",
@@ -6515,18 +6524,18 @@
       "final_price": 9,
       "price_change": 0,
       "matches_played": 6,
-      "season_total_points": 214.5,
-      "season_avg_points": 35.75,
-      "recent_avg_points": 31,
+      "season_total_points": 245.5,
+      "season_avg_points": 40.92,
+      "recent_avg_points": 32.67,
       "last_match_points": 77,
-      "score_basis": 32.9,
+      "score_basis": 35.97,
       "reliability_factor": 1,
-      "adjusted_score": 32.9,
-      "percentile": 83.79,
+      "adjusted_score": 35.97,
+      "percentile": 81.42,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-21T14:00:00"
+      "last_match_played_at_utc": "2026-04-21T14:00:00Z"
     },
     {
       "player_id": "srh_ishan-kishan",
@@ -6542,18 +6551,18 @@
       "final_price": 9,
       "price_change": 0,
       "matches_played": 8,
-      "season_total_points": 442,
-      "season_avg_points": 55.25,
-      "recent_avg_points": 42.67,
+      "season_total_points": 447,
+      "season_avg_points": 55.88,
+      "recent_avg_points": 44.33,
       "last_match_points": 98,
-      "score_basis": 47.7,
+      "score_basis": 48.95,
       "reliability_factor": 1,
-      "adjusted_score": 47.7,
-      "percentile": 90.51,
+      "adjusted_score": 48.95,
+      "percentile": 89.33,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_jaydev-unadkat",
@@ -6569,20 +6578,20 @@
       "final_price": 9,
       "price_change": 0,
       "matches_played": 4,
-      "season_total_points": 114.5,
-      "season_avg_points": 28.63,
-      "recent_avg_points": 26.67,
-      "last_match_points": -5,
-      "score_basis": 27.45,
+      "season_total_points": 156.5,
+      "season_avg_points": 39.13,
+      "recent_avg_points": 30,
+      "last_match_points": 0,
+      "score_basis": 33.65,
       "reliability_factor": 1,
-      "adjusted_score": 27.45,
-      "percentile": 77.47,
+      "adjusted_score": 33.65,
+      "percentile": 78.26,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 77.47",
+        "Target price mapped from percentile 78.26",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-11T10:00:00"
+      "last_match_played_at_utc": "2026-04-11T10:00:00Z"
     },
     {
       "player_id": "srh_praful-hinge",
@@ -6593,25 +6602,23 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 8,
+      "target_price": 9,
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 5,
-      "season_total_points": 195,
-      "season_avg_points": 39,
-      "recent_avg_points": 14.5,
-      "last_match_points": 15,
-      "score_basis": 24.3,
-      "reliability_factor": 1,
-      "adjusted_score": 24.3,
-      "percentile": 71.15,
+      "matches_played": 3,
+      "season_total_points": 163.5,
+      "season_avg_points": 54.5,
+      "recent_avg_points": 54.5,
+      "last_match_points": 28.5,
+      "score_basis": 54.5,
+      "reliability_factor": 0.75,
+      "adjusted_score": 40.88,
+      "percentile": 84.58,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 71.15",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_sakib-hussain",
@@ -6626,21 +6633,21 @@
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 231.5,
-      "season_avg_points": 38.58,
-      "recent_avg_points": 18,
-      "last_match_points": 15,
-      "score_basis": 26.23,
+      "matches_played": 4,
+      "season_total_points": 191,
+      "season_avg_points": 47.75,
+      "recent_avg_points": 24.67,
+      "last_match_points": 24,
+      "score_basis": 33.9,
       "reliability_factor": 1,
-      "adjusted_score": 26.23,
-      "percentile": 75.1,
+      "adjusted_score": 33.9,
+      "percentile": 78.85,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 75.1",
+        "Target price mapped from percentile 78.85",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_travis-head",
@@ -6663,13 +6670,13 @@
       "score_basis": 26.05,
       "reliability_factor": 1,
       "adjusted_score": 26.05,
-      "percentile": 74.31,
+      "percentile": 69.76,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 74.31",
+        "Target price mapped from percentile 69.76",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_aniket-verma",
@@ -6692,13 +6699,13 @@
       "score_basis": 11.95,
       "reliability_factor": 1,
       "adjusted_score": 11.95,
-      "percentile": 52.57,
+      "percentile": 52.17,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 52.57",
+        "Target price mapped from percentile 52.17",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_liam-livingstone",
@@ -6721,13 +6728,13 @@
       "score_basis": 17.33,
       "reliability_factor": 0.75,
       "adjusted_score": 13,
-      "percentile": 54.15,
+      "percentile": 52.96,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 54.15",
+        "Target price mapped from percentile 52.96",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-21T14:00:00"
+      "last_match_played_at_utc": "2026-04-21T14:00:00Z"
     },
     {
       "player_id": "srh_david-payne",
@@ -6738,25 +6745,23 @@
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
-      "target_price": 6,
+      "target_price": 7,
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
       "matches_played": 2,
-      "season_total_points": 2.5,
-      "season_avg_points": 1.25,
-      "recent_avg_points": 1.25,
-      "last_match_points": -5,
-      "score_basis": 1.25,
+      "season_total_points": 48.5,
+      "season_avg_points": 24.25,
+      "recent_avg_points": 24.25,
+      "last_match_points": 0,
+      "score_basis": 24.25,
       "reliability_factor": 0.5,
-      "adjusted_score": 0.63,
-      "percentile": 36.76,
+      "adjusted_score": 12.13,
+      "percentile": 52.57,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 36.76",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-02T00:00:00"
+      "last_match_played_at_utc": "2026-04-02T14:00:00Z"
     },
     {
       "player_id": "srh_harshal-patel",
@@ -6772,20 +6777,20 @@
       "final_price": 7,
       "price_change": 0,
       "matches_played": 3,
-      "season_total_points": 23.5,
-      "season_avg_points": 7.83,
-      "recent_avg_points": 7.83,
-      "last_match_points": -5,
-      "score_basis": 7.83,
+      "season_total_points": 18.5,
+      "season_avg_points": 6.17,
+      "recent_avg_points": 6.17,
+      "last_match_points": 0,
+      "score_basis": 6.17,
       "reliability_factor": 0.75,
-      "adjusted_score": 5.87,
-      "percentile": 41.5,
+      "adjusted_score": 4.63,
+      "percentile": 40.71,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 41.5",
+        "Target price mapped from percentile 40.71",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-11T10:00:00"
+      "last_match_played_at_utc": "2026-04-11T10:00:00Z"
     },
     {
       "player_id": "srh_salil-arora",
@@ -6801,20 +6806,20 @@
       "final_price": 7,
       "price_change": 0,
       "matches_played": 6,
-      "season_total_points": 100,
-      "season_avg_points": 16.67,
+      "season_total_points": 105,
+      "season_avg_points": 17.5,
       "recent_avg_points": 27.67,
       "last_match_points": 10,
-      "score_basis": 23.27,
+      "score_basis": 23.6,
       "reliability_factor": 1,
-      "adjusted_score": 23.27,
-      "percentile": 69.96,
+      "adjusted_score": 23.6,
+      "percentile": 67.19,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 69.96",
+        "Target price mapped from percentile 67.19",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_shivang-kumar",
@@ -6825,25 +6830,23 @@
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
-      "target_price": 6,
+      "target_price": 7,
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 9,
-      "season_total_points": 184,
-      "season_avg_points": 20.44,
-      "recent_avg_points": -1.83,
-      "last_match_points": -5,
-      "score_basis": 7.08,
+      "matches_played": 7,
+      "season_total_points": 136.5,
+      "season_avg_points": 19.5,
+      "recent_avg_points": 12.83,
+      "last_match_points": -0.5,
+      "score_basis": 15.5,
       "reliability_factor": 1,
-      "adjusted_score": 7.08,
-      "percentile": 44.27,
+      "adjusted_score": 15.5,
+      "percentile": 55.73,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price mapped from percentile 44.27",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_amit-kumar",
@@ -6866,7 +6869,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6894,7 +6897,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6914,21 +6917,21 @@
       "smoothed_price": 6,
       "final_price": 6,
       "price_change": 0,
-      "matches_played": 2,
-      "season_total_points": 48,
-      "season_avg_points": 24,
-      "recent_avg_points": 24,
+      "matches_played": 1,
+      "season_total_points": 36,
+      "season_avg_points": 36,
+      "recent_avg_points": 36,
       "last_match_points": 36,
-      "score_basis": 24,
-      "reliability_factor": 0.5,
-      "adjusted_score": 12,
-      "percentile": 52.96,
+      "score_basis": 36,
+      "reliability_factor": 0.25,
+      "adjusted_score": 9,
+      "percentile": 45.85,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 52.96",
+        "Target price mapped from percentile 45.85",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-21T14:00:00"
+      "last_match_played_at_utc": "2026-04-21T14:00:00Z"
     },
     {
       "player_id": "srh_gerald-coetzee",
@@ -6951,7 +6954,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -6979,7 +6982,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -7007,7 +7010,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -7035,7 +7038,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -7055,21 +7058,21 @@
       "smoothed_price": 6,
       "final_price": 6,
       "price_change": 0,
-      "matches_played": 2,
+      "matches_played": 1,
       "season_total_points": 43,
-      "season_avg_points": 21.5,
-      "recent_avg_points": 21.5,
-      "last_match_points": 25,
-      "score_basis": 21.5,
-      "reliability_factor": 0.5,
+      "season_avg_points": 43,
+      "recent_avg_points": 43,
+      "last_match_points": 43,
+      "score_basis": 43,
+      "reliability_factor": 0.25,
       "adjusted_score": 10.75,
-      "percentile": 50.2,
+      "percentile": 49.8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price mapped from percentile 50.2",
+        "Target price mapped from percentile 49.8",
         "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-25T14:00:00"
+      "last_match_played_at_utc": "2026-04-25T14:00:00Z"
     },
     {
       "player_id": "srh_shivam-mavi",
@@ -7092,7 +7095,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -7120,7 +7123,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -7148,7 +7151,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.58,
+      "percentile": 18.38,
       "calculation_notes": [
         "Used old_price for smoothing",
         "No matches played; retained base price"
@@ -7156,5 +7159,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-04-25T21:54:58.497Z"
+  "generated_at_utc": "2026-04-26T11:26:31.930Z"
 }
