@@ -774,6 +774,51 @@ test('standings award one point each for no-result matches', async () => {
   assert.equal(pbks.points, 1);
 });
 
+test('standings treat super-over-decided ties as wins and losses, not no-results', async () => {
+  const rebuilt = await rebuildHistoricalState(
+    ['match-38'],
+    {
+      meta: {
+        scoreHistory: [{ processedMatchCount: 0, fetchedAt: '2026-04-01T00:00:00.000Z' }]
+      }
+    },
+    {
+      includeHistory: true,
+      loadScorecard: async () => ({
+        data: makeFinalScorecard({
+          teams: ['Lucknow Super Giants', 'Kolkata Knight Riders'],
+          winner: 'No Winner',
+          status: 'Match tied (Kolkata Knight Riders won the Super Over)',
+          batter: 'Rinku Singh',
+          bowler: 'Avesh Khan',
+          catcher: 'Andre Russell',
+          runs: 52,
+          balls: 29,
+          sixes: 3,
+          wickets: 2,
+          concededRuns: 28,
+          overs: '4',
+          scoreA: 155,
+          scoreB: 155
+        }),
+        source: 'cache'
+      })
+    }
+  );
+
+  const lsg = rebuilt.aggregates.standings['Lucknow Super Giants'];
+  const kkr = rebuilt.aggregates.standings['Kolkata Knight Riders'];
+
+  assert.equal(kkr.played, 1);
+  assert.equal(lsg.played, 1);
+  assert.equal(kkr.wins, 1);
+  assert.equal(kkr.points, 2);
+  assert.equal(kkr.noResult, 0);
+  assert.equal(lsg.losses, 1);
+  assert.equal(lsg.points, 0);
+  assert.equal(lsg.noResult, 0);
+});
+
 test('historical replay snapshots apply the 10-ball strike-rate gate and duck penalty in MVP scoring', async () => {
   const rebuilt = await rebuildHistoricalState(
     ['match-14'],

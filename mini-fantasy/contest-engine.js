@@ -1423,6 +1423,27 @@ function isMiniFantasyNoResultStatus(statusText = '') {
   return status.includes('no result') || status.includes('abandon') || status.includes('abandoned') || status.includes('washout');
 }
 
+function resolveMiniFantasyStatusWinner(cachedMatch = null, fixture = null) {
+  const candidateTeams = [
+    ...(Array.isArray(cachedMatch?.teams) ? cachedMatch.teams : []),
+    fixture?.home_team,
+    fixture?.away_team
+  ]
+    .map((team) => normalizeWhitespace(team))
+    .filter(Boolean);
+  const status = normalizeWhitespace(cachedMatch?.status || '');
+  if (!status) return '';
+  const lowerStatus = status.toLowerCase();
+  return [...new Set(candidateTeams)]
+    .sort((a, b) => b.length - a.length)
+    .find((team) => {
+      const lowerTeam = team.toLowerCase();
+      const teamIndex = lowerStatus.indexOf(lowerTeam);
+      if (teamIndex === -1) return false;
+      return /\bwon\b/.test(lowerStatus.slice(teamIndex));
+    }) || '';
+}
+
 export function getMiniFantasyWinningTeamCode({
   liveData = {},
   schedule = [],
@@ -1435,7 +1456,11 @@ export function getMiniFantasyWinningTeamCode({
   const fixture = (Array.isArray(schedule) ? schedule : []).find((item) => Number(item?.match_no || 0) === targetMatchNo) || null;
   const status = normalizeWhitespace(cachedMatch?.status || '');
   if (!status || /^match starts\b/i.test(status) || /^live\b/i.test(status)) return '';
-  if (isMiniFantasyNoResultStatus(status) || /tied|tie\b/i.test(status)) return '';
+  if (isMiniFantasyNoResultStatus(status)) return '';
+
+  const statusWinner = resolveMiniFantasyStatusWinner(cachedMatch, fixture);
+  if (statusWinner) return resolveFixtureTeamCode(statusWinner);
+  if (/tied|tie\b/i.test(status)) return '';
 
   const candidateTeams = [
     ...(Array.isArray(cachedMatch?.teams) ? cachedMatch.teams : []),

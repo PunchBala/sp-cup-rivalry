@@ -302,6 +302,31 @@ function scoreLinesForScorecard(scorecardData, inningsBlocks) {
   return safeArray(inningsBlocks).map((innings) => deriveScoreLineFromInnings(innings)).filter(Boolean);
 }
 
+function resolveScorecardWinner(scorecardData, candidateTeams = []) {
+  const teams = [
+    ...safeArray(scorecardData?.teams),
+    ...safeArray(candidateTeams)
+  ]
+    .map((team) => normalizeName(team))
+    .filter(Boolean);
+  const uniqueTeams = [...new Set(teams)];
+  const explicitWinner = normalizeName(scorecardData?.matchWinner || '');
+  if (explicitWinner && uniqueTeams.includes(explicitWinner)) return explicitWinner;
+
+  const status = normalizeName(scorecardData?.status || '');
+  if (!status) return explicitWinner;
+  const lowerStatus = status.toLowerCase();
+  const statusWinner = uniqueTeams
+    .sort((a, b) => b.length - a.length)
+    .find((team) => {
+      const lowerTeam = team.toLowerCase();
+      const teamIndex = lowerStatus.indexOf(lowerTeam);
+      if (teamIndex === -1) return false;
+      return /\bwon\b/.test(lowerStatus.slice(teamIndex));
+    });
+  return statusWinner || explicitWinner;
+}
+
 function isNoResultStatus(scorecardData, winner, teamA, teamB) {
   if (winner === teamA || winner === teamB) return false;
   const status = normalizeName(scorecardData?.status).toLowerCase();
@@ -528,10 +553,11 @@ function topLevelScoreInningsCount(scorecard) {
 }
 
 function isNoResultScorecard(scorecard) {
-  const winnerText = normalizeName(scorecard?.matchWinner || '').toLowerCase();
+  const winnerText = normalizeName(resolveScorecardWinner(scorecard) || '').toLowerCase();
+  const rawWinnerText = normalizeName(scorecard?.matchWinner || '').toLowerCase();
   const status = normalizeName(scorecard?.status || '').toLowerCase();
   return (
-    winnerText === 'no winner' ||
+    (!winnerText && rawWinnerText === 'no winner') ||
     status.includes('no result') ||
     status.includes('abandon') ||
     status.includes('abandoned') ||
@@ -1521,7 +1547,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
       }
     }
 
-    const winner = normalizeName(scorecardData.matchWinner);
+    const winner = resolveScorecardWinner(scorecardData, [teamA, teamB]);
     if (winner === teamA) {
       standingA.wins += 1;
       standingA.points += 2;

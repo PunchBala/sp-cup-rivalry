@@ -14,6 +14,7 @@ import {
   generateMiniFantasyPriceBook,
   getMiniFantasyFixtureOpenAtUtc,
   getMiniFantasyOpenFixtures,
+  getMiniFantasyWinningTeamCode,
   resolvePlayerHistory,
   serializeMiniFantasyLeaderboardRows,
   scoreMiniFantasyEntry,
@@ -78,6 +79,34 @@ test('deriveCompletedMatchHistories keeps zero-point appearances when playerMatc
   assert.equal(histories.get('player a')?.matches_played, 2);
   assert.deepEqual(histories.get('player b')?.match_points, [5]);
   assert.deepEqual(histories.get('player c')?.match_points, [60]);
+});
+
+test('getMiniFantasyWinningTeamCode treats super-over-decided ties as real winners', () => {
+  const liveData = {
+    meta: {
+      cache: {
+        matchList: [
+          {
+            matchNo: 38,
+            status: 'Match tied (Kolkata Knight Riders won the Super Over)',
+            teams: ['Lucknow Super Giants', 'Kolkata Knight Riders']
+          }
+        ]
+      }
+    }
+  };
+  const schedule = [
+    {
+      match_no: 38,
+      home_team: 'Lucknow Super Giants',
+      away_team: 'Kolkata Knight Riders'
+    }
+  ];
+
+  assert.equal(
+    getMiniFantasyWinningTeamCode({ liveData, schedule, matchNo: 38 }),
+    'KKR'
+  );
 });
 
 test('deriveCompletedMatchHistories ignores stale precomputed histories when scoreHistory has newer completed matches', () => {
