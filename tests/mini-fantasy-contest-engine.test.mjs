@@ -1083,6 +1083,85 @@ test('generateMiniFantasyPriceBook penalizes players who keep missing team fixtu
   assert.match(missedBench.calculation_notes.join(' '), /missed-fixture penalty/i);
 });
 
+test('generateMiniFantasyPriceBook skips no-result fixtures when counting missed streaks', () => {
+  const liveData = {
+    fetchedAt: '2026-04-10T00:10:00Z',
+    meta: {
+      cache: {
+        matchList: [
+          {
+            matchNo: 15,
+            status: 'No result (due to rain)',
+            teams: ['Kolkata Knight Riders', 'Delhi Capitals']
+          }
+        ]
+      },
+      scoreHistory: [
+        {
+          processedMatchCount: 14,
+          snapshot: {
+            meta: { aggregates: { playerMatches: { 'Active Star': 1 } } },
+            mvp: { values: { 'Active Star': { score: 50 } } }
+          }
+        },
+        {
+          processedMatchCount: 15,
+          snapshot: {
+            meta: { aggregates: { playerMatches: { 'Active Star': 1 } } },
+            mvp: { values: { 'Active Star': { score: 50 } } }
+          }
+        },
+        {
+          processedMatchCount: 16,
+          snapshot: {
+            meta: { aggregates: { playerMatches: { 'Active Star': 2 } } },
+            mvp: { values: { 'Active Star': { score: 105 } } }
+          }
+        }
+      ]
+    }
+  };
+  const schedule = [
+    { match_no: 14, datetime_utc: '2026-04-08T14:00:00Z', home_team: 'Kolkata Knight Riders', away_team: 'Mumbai Indians' },
+    { match_no: 15, datetime_utc: '2026-04-09T14:00:00Z', home_team: 'Kolkata Knight Riders', away_team: 'Delhi Capitals' },
+    { match_no: 16, datetime_utc: '2026-04-10T14:00:00Z', home_team: 'Lucknow Super Giants', away_team: 'Kolkata Knight Riders' }
+  ];
+  const squads = {
+    KKR: ['Active Star', 'Missed Bench']
+  };
+  const teamRoles = {
+    teams: {
+      KKR: {
+        players: {
+          'Active Star': 'batter',
+          'Missed Bench': 'batter'
+        }
+      }
+    }
+  };
+
+  const priceBook = generateMiniFantasyPriceBook({
+    liveData,
+    schedule,
+    squads,
+    teamRoles,
+    asOfUtc: '2026-04-10T00:10:00Z',
+    jobMeta: {
+      rank_price_buckets: [
+        { price: 10, slots: 1 },
+        { price: 6, slots: 1 }
+      ]
+    }
+  });
+
+  const missedBench = priceBook.players.find((player) => player.player_id === buildMiniFantasyPlayerId('KKR', 'Missed Bench'));
+  assert.equal(missedBench.matches_played, 0);
+  assert.equal(missedBench.missed_fixture_streak, 2);
+  assert.equal(missedBench.target_price, 5.5);
+  assert.equal(missedBench.final_price, 5.5);
+  assert.match(missedBench.calculation_notes.join(' '), /missed-fixture penalty/i);
+});
+
 test('generateMiniFantasyPriceBook keeps alias-matched LSG bowlers from falling back to blank stats', () => {
   const liveData = {
     fetchedAt: '2026-04-08T00:10:00Z',

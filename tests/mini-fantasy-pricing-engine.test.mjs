@@ -54,6 +54,11 @@ test('helper functions stay deterministic around averages, reliability, smoothin
   assert.equal(computeMissedFixturePenalty(1), 0);
   assert.equal(computeMissedFixturePenalty(2), 0.5);
   assert.equal(computeMissedFixturePenalty(4), 1.5);
+  assert.equal(computeMissedFixturePenalty(4, [
+    { minimum_streak: 2, penalty: 0.5 },
+    { minimum_streak: 4, penalty: 1.5 },
+    { minimum_streak: 3, penalty: 1 }
+  ]), 1.5);
   assert.equal(smoothPrice(8, 10), 9);
   assert.equal(smoothPrice(10, 9.5), 9.5);
   assert.equal(capPriceMovement(10, 8, 2, 4.5, 10), 10);

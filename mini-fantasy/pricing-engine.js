@@ -264,7 +264,8 @@ export function assignRankBucketPrices(players, buckets = DEFAULT_RANK_PRICE_BUC
 export function computeMissedFixturePenalty(missedFixtureStreak, penalties = DEFAULT_MISSED_FIXTURE_PENALTIES) {
   const normalizedStreak = Number.isFinite(missedFixtureStreak) ? Math.max(0, Math.trunc(missedFixtureStreak)) : 0;
   const matchingPenalty = (Array.isArray(penalties) ? penalties : [])
-    .find((rule) => normalizedStreak >= Number(rule?.minimum_streak || 0));
+    .filter((rule) => normalizedStreak >= Number(rule?.minimum_streak || 0))
+    .sort((left, right) => Number(right?.minimum_streak || 0) - Number(left?.minimum_streak || 0))[0];
   return matchingPenalty ? Number(matchingPenalty.penalty || 0) : 0;
 }
 

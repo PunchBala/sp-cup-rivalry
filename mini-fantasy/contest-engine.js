@@ -855,11 +855,23 @@ function getLatestCompletedMiniFantasyMatchNo(liveData = {}, historyMap = new Ma
   return Math.max(latestScoreHistoryMatchNo, latestHistoryMatchNo, 0);
 }
 
-function buildTeamCompletedFixtureMap(schedule = [], latestCompletedMatchNo = 0) {
+function buildMiniFantasyNoResultMatchSet(liveData = {}) {
+  const noResultMatchNos = new Set();
+  cachedMiniFantasyMatchList(liveData).forEach((match) => {
+    const matchNo = Math.trunc(toNumber(match?.matchNo, 0));
+    if (matchNo > 0 && isMiniFantasyNoResultStatus(match?.status || '')) {
+      noResultMatchNos.add(matchNo);
+    }
+  });
+  return noResultMatchNos;
+}
+
+function buildTeamCompletedFixtureMap(schedule = [], latestCompletedMatchNo = 0, liveData = {}) {
   const teamFixtureMap = new Map();
+  const noResultMatchNos = buildMiniFantasyNoResultMatchSet(liveData);
   (Array.isArray(schedule) ? schedule : []).forEach((fixture) => {
     const matchNo = Math.trunc(toNumber(fixture?.match_no, 0));
-    if (matchNo <= 0 || matchNo > latestCompletedMatchNo) return;
+    if (matchNo <= 0 || matchNo > latestCompletedMatchNo || noResultMatchNos.has(matchNo)) return;
     const teamCodes = [
       fixture?.home_team_code || resolveFixtureTeamCode(fixture?.home_team),
       fixture?.away_team_code || resolveFixtureTeamCode(fixture?.away_team)
@@ -958,7 +970,7 @@ export function buildPricingJobFromLiveData({
     const previousPrices = buildPreviousPriceMap(previousPriceBook);
     const historyMap = deriveCompletedMatchHistories(liveData, schedule);
     const latestCompletedMatchNo = getLatestCompletedMiniFantasyMatchNo(liveData, historyMap);
-    const teamCompletedFixtureMap = buildTeamCompletedFixtureMap(schedule, latestCompletedMatchNo);
+    const teamCompletedFixtureMap = buildTeamCompletedFixtureMap(schedule, latestCompletedMatchNo, liveData);
 
   const players = [];
   Object.entries(squads || {}).forEach(([teamCode, squadPlayers]) => {
