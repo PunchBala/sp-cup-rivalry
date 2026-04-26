@@ -5171,6 +5171,7 @@ function titleBandScore(pick, live){
         const storedRemote = upsertRemoteBundle(syncBundleDerivedState(remoteBundle), BASE_ROOM || ACTIVE_ROOM);
         refreshMergedRoom(storedRemote?.duelRecord?.id || duelId);
         requestedDuelMissing = false;
+        activeId = storedRemote?.duelRecord?.id || duelId;
         activeView = 'warroom';
         setActiveDrawer('manage');
         setRequestedDuelIdInUrl(storedRemote?.duelRecord?.id || duelId);
@@ -5216,6 +5217,7 @@ function titleBandScore(pick, live){
       const stored = upsertCustomBundle(syncBundleDerivedState(bundle), BASE_ROOM || ACTIVE_ROOM);
       refreshMergedRoom(stored?.duelRecord?.id || duelId);
       requestedDuelMissing = false;
+      activeId = stored?.duelRecord?.id || duelId;
       activeView = 'warroom';
       setActiveDrawer('manage');
       setRequestedDuelIdInUrl(stored?.duelRecord?.id || duelId);
@@ -5270,6 +5272,7 @@ function titleBandScore(pick, live){
         })), BASE_ROOM || ACTIVE_ROOM);
         refreshMergedRoom(storedRemote?.duelRecord?.id || activeId);
         requestedDuelMissing = false;
+        activeId = storedRemote?.duelRecord?.id || activeId;
         setActiveDrawer('manage');
         setRequestedDuelIdInUrl(storedRemote?.duelRecord?.id || activeId);
         setStudioNotice('good', {
@@ -5288,6 +5291,7 @@ function titleBandScore(pick, live){
       const stored = upsertCustomBundle(syncBundleDerivedState(bundle), BASE_ROOM || ACTIVE_ROOM);
       refreshMergedRoom(stored?.duelRecord?.id || activeId);
       requestedDuelMissing = false;
+      activeId = stored?.duelRecord?.id || activeId;
       setActiveDrawer('manage');
       setRequestedDuelIdInUrl(stored?.duelRecord?.id || activeId);
       setStudioNotice('good', {
