@@ -1,12 +1,18 @@
-const RECENT_AVERAGE_WEIGHT = 0.6;
-const SEASON_AVERAGE_WEIGHT = 0.4;
-const BASE_PRICE_WEIGHT = 0.7;
-const TARGET_PRICE_WEIGHT = 0.3;
-const FULL_CONFIDENCE_MATCHES = 4;
+const RECENT_AVERAGE_WEIGHT = 2 / 3;
+const SEASON_AVERAGE_WEIGHT = 1 / 3;
+const BASE_PRICE_WEIGHT = 0.4;
+const TARGET_PRICE_WEIGHT = 0.6;
+const FULL_CONFIDENCE_MATCHES = 2;
 const TIE_EPSILON = 1e-9;
-export const UNCAPPED_PLAYER_PRICE_MAX = 9;
+const PRICE_INCREMENT = 0.5;
+export const UNCAPPED_PLAYER_PRICE_MAX = 9.5;
+export const DEFAULT_MISSED_FIXTURE_PENALTIES = Object.freeze([
+  { minimum_streak: 4, penalty: 1.5 },
+  { minimum_streak: 3, penalty: 1 },
+  { minimum_streak: 2, penalty: 0.5 }
+]);
 
-export const ENGINE_VERSION = 'pricing_v1';
+export const ENGINE_VERSION = 'pricing_v2';
 
 export const DEFAULT_PERCENTILE_PRICE_BANDS = Object.freeze([
   { gt: 0, lte: 10, price: 4 },
@@ -18,14 +24,29 @@ export const DEFAULT_PERCENTILE_PRICE_BANDS = Object.freeze([
   { gt: 92, lte: 100, price: 10 }
 ]);
 
+export const DEFAULT_RANK_PRICE_BUCKETS = Object.freeze([
+  { price: 10, slots: 5 },
+  { price: 9.5, slots: 8 },
+  { price: 9, slots: 14 },
+  { price: 8.5, slots: 20 },
+  { price: 8, slots: 28 },
+  { price: 7.5, slots: 36 },
+  { price: 7, slots: 42 },
+  { price: 6.5, slots: 38 },
+  { price: 6, slots: 28 },
+  { price: 5.5, slots: 18 },
+  { price: 5, slots: 11 },
+  { price: 4.5, slots: 6 }
+]);
+
 export const PRICING_ENGINE_CONFIG_V1 = Object.freeze({
   engine_version: ENGINE_VERSION,
   rules: {
-    price_min: 4,
+    price_min: 4.5,
     price_max: 10,
     uncapped_price_max: UNCAPPED_PLAYER_PRICE_MAX,
     recent_matches_window: 3,
-    max_daily_price_step: 1,
+    max_daily_price_step: 2,
     default_initial_price: 6,
     score_basis_weights: {
       recent_avg_points: RECENT_AVERAGE_WEIGHT,
@@ -38,11 +59,13 @@ export const PRICING_ENGINE_CONFIG_V1 = Object.freeze({
     smoothing: {
       old_price_weight: BASE_PRICE_WEIGHT,
       target_price_weight: TARGET_PRICE_WEIGHT,
-      rounding: 'nearest_integer'
+      rounding: 'nearest_half_step_with_downward_floor_on_price_drop'
     },
     percentile_price_bands: DEFAULT_PERCENTILE_PRICE_BANDS,
+    rank_price_buckets: DEFAULT_RANK_PRICE_BUCKETS,
+    missed_fixture_penalties: DEFAULT_MISSED_FIXTURE_PENALTIES,
     special_cases: {
-      no_matches_played: 'retain_base_price',
+      no_matches_played: 'rank_and_smooth',
       not_pricing_eligible: 'retain_base_price',
       missing_old_price: 'fallback_to_initial_or_default'
     }
@@ -56,6 +79,18 @@ export function clamp(value, minimum, maximum) {
 export function roundTo(value, decimals = 2) {
   const factor = 10 ** decimals;
   return Math.round((value + Number.EPSILON) * factor) / factor;
+}
+
+export function roundToPriceIncrement(value, increment = PRICE_INCREMENT, mode = 'nearest') {
+  const normalizedIncrement = Number.isFinite(increment) && increment > 0 ? increment : PRICE_INCREMENT;
+  const scaled = value / normalizedIncrement;
+  const roundedScaled =
+    mode === 'down'
+      ? Math.floor(scaled + Number.EPSILON)
+      : mode === 'up'
+      ? Math.ceil(scaled - Number.EPSILON)
+      : Math.round(scaled);
+  return roundTo(roundedScaled * normalizedIncrement, 2);
 }
 
 export function average(values) {
@@ -122,20 +157,20 @@ export function computeAdjustedScore(scoreBasis, reliabilityFactor) {
 export function resolveBasePrice(player, defaultInitialPrice) {
   if (Number.isFinite(player.old_price)) {
     return {
-      basePrice: Math.round(player.old_price),
+      basePrice: roundToPriceIncrement(player.old_price),
       note: 'Used old_price for smoothing'
     };
   }
 
   if (Number.isFinite(player.initial_price)) {
     return {
-      basePrice: Math.round(player.initial_price),
+      basePrice: roundToPriceIncrement(player.initial_price),
       note: 'Missing old_price; used initial_price as base'
     };
   }
 
   return {
-    basePrice: Math.round(defaultInitialPrice),
+    basePrice: roundToPriceIncrement(defaultInitialPrice),
     note: 'Missing old_price and initial_price; used default initial price'
   };
 }
@@ -153,8 +188,94 @@ export function mapPercentileToPrice(percentile, bands = DEFAULT_PERCENTILE_PRIC
   return matchingBand ? matchingBand.price : bands[bands.length - 1].price;
 }
 
-export function smoothPrice(basePrice, targetPrice) {
-  return Math.round(BASE_PRICE_WEIGHT * basePrice + TARGET_PRICE_WEIGHT * targetPrice);
+export function allocateRankBucketCounts(totalPlayers, buckets = DEFAULT_RANK_PRICE_BUCKETS) {
+  if (!Number.isFinite(totalPlayers) || totalPlayers <= 0) {
+    return [];
+  }
+
+  const normalizedBuckets = Array.isArray(buckets)
+    ? buckets
+        .map((bucket, index) => ({
+          index,
+          price: Number(bucket?.price),
+          slots: Number(bucket?.slots)
+        }))
+        .filter((bucket) => Number.isFinite(bucket.price) && Number.isFinite(bucket.slots) && bucket.slots > 0)
+    : [];
+
+  if (!normalizedBuckets.length) {
+    return [];
+  }
+
+  const totalSlots = normalizedBuckets.reduce((sum, bucket) => sum + bucket.slots, 0);
+  const provisional = normalizedBuckets.map((bucket) => {
+    const rawCount = (bucket.slots / totalSlots) * totalPlayers;
+    const floorCount = Math.floor(rawCount);
+    return {
+      ...bucket,
+      rawCount,
+      count: floorCount,
+      remainder: rawCount - floorCount
+    };
+  });
+
+  let remaining = totalPlayers - provisional.reduce((sum, bucket) => sum + bucket.count, 0);
+  provisional
+    .slice()
+    .sort((left, right) => {
+      if (Math.abs(right.remainder - left.remainder) > TIE_EPSILON) {
+        return right.remainder - left.remainder;
+      }
+      return left.index - right.index;
+    })
+    .forEach((bucket) => {
+      if (remaining <= 0) return;
+      provisional[bucket.index].count += 1;
+      remaining -= 1;
+    });
+
+  return provisional.map(({ price, count }) => ({ price, count })).filter((bucket) => bucket.count > 0);
+}
+
+export function assignRankBucketPrices(players, buckets = DEFAULT_RANK_PRICE_BUCKETS) {
+  const rankingPool = Array.isArray(players)
+    ? players
+        .map((player) => ({
+          player_id: player.player_id,
+          adjusted_score: roundTo(player.adjusted_score_raw ?? player.adjusted_score ?? 0, 6)
+        }))
+        .sort((left, right) => {
+          if (Math.abs(right.adjusted_score - left.adjusted_score) > TIE_EPSILON) {
+            return right.adjusted_score - left.adjusted_score;
+          }
+          return left.player_id.localeCompare(right.player_id);
+        })
+    : [];
+
+  const allocatedBuckets = allocateRankBucketCounts(rankingPool.length, buckets);
+  const priceSequence = allocatedBuckets.flatMap((bucket) => Array.from({ length: bucket.count }, () => bucket.price));
+  const assignedPrices = new Map();
+  rankingPool.forEach((player, index) => {
+    assignedPrices.set(player.player_id, priceSequence[index] ?? allocatedBuckets[allocatedBuckets.length - 1]?.price ?? PRICING_ENGINE_CONFIG_V1.rules.price_min);
+  });
+  return assignedPrices;
+}
+
+export function computeMissedFixturePenalty(missedFixtureStreak, penalties = DEFAULT_MISSED_FIXTURE_PENALTIES) {
+  const normalizedStreak = Number.isFinite(missedFixtureStreak) ? Math.max(0, Math.trunc(missedFixtureStreak)) : 0;
+  const matchingPenalty = (Array.isArray(penalties) ? penalties : [])
+    .filter((rule) => normalizedStreak >= Number(rule?.minimum_streak || 0))
+    .sort((left, right) => Number(right?.minimum_streak || 0) - Number(left?.minimum_streak || 0))[0];
+  return matchingPenalty ? Number(matchingPenalty.penalty || 0) : 0;
+}
+
+export function smoothPrice(basePrice, targetPrice, options = {}) {
+  const oldPriceWeight = Number.isFinite(options.old_price_weight) ? options.old_price_weight : BASE_PRICE_WEIGHT;
+  const targetPriceWeight = Number.isFinite(options.target_price_weight) ? options.target_price_weight : TARGET_PRICE_WEIGHT;
+  const increment = Number.isFinite(options.increment) ? options.increment : PRICE_INCREMENT;
+  const weightedPrice = oldPriceWeight * basePrice + targetPriceWeight * targetPrice;
+  const roundingMode = targetPrice < basePrice ? 'down' : 'nearest';
+  return roundToPriceIncrement(weightedPrice, increment, roundingMode);
 }
 
 export function capPriceMovement(candidatePrice, basePrice, maxDailyStep, priceMin, priceMax) {
@@ -245,17 +366,16 @@ function createCalculationNotes(player, derived, targetPrice, smoothedPrice, fin
     return notes;
   }
 
-  if (derived.effectiveMatchesPlayed === 0) {
-    notes.push('No matches played; retained base price');
-    return notes;
-  }
-
   if (derived.recoveredHistory) {
     notes.push('Recovered real match history from a previously blank price; used the corrected target price immediately');
   }
 
   if (targetPrice !== derived.basePrice) {
-    notes.push(`Target price mapped from percentile ${roundTo(derived.percentile, 2)}`);
+    notes.push(`Target price assigned from rank bucket at rank ${derived.rank}`);
+  }
+
+  if (derived.missedFixturePenalty > 0) {
+    notes.push(`Applied ${derived.missedFixturePenalty}-credit missed-fixture penalty after ${derived.missedFixtureStreak} consecutive misses`);
   }
 
   if (smoothedPrice !== targetPrice) {
@@ -294,6 +414,7 @@ function derivePlayerInputs(player, jobMeta) {
     basePrice,
     maxDailyPriceStep: jobMeta.max_daily_price_step,
     recoveredHistory: Boolean(player.recovered_history) && effectiveMatchesPlayed > 0,
+    missedFixtureStreak: Number.isFinite(player.missed_fixture_streak) ? Math.max(0, Math.trunc(player.missed_fixture_streak)) : 0,
     matchPoints,
     seasonAveragePoints,
     recentAveragePoints,
@@ -317,29 +438,51 @@ export function generatePrices(input) {
       adjusted_score_raw: entry.adjustedScoreRaw
     }));
   const percentiles = calculateEligiblePercentiles(eligibleRankingPool);
+  const rankBucketPrices = assignRankBucketPrices(
+    eligibleRankingPool,
+    input.job_meta.rank_price_buckets || DEFAULT_RANK_PRICE_BUCKETS
+  );
+  const rankByPlayerId = new Map();
+  let rankCounter = 1;
+  rankBucketPrices.forEach((_price, playerId) => {
+    rankByPlayerId.set(playerId, rankCounter);
+    rankCounter += 1;
+  });
 
   const players = derivedPlayers
     .map((entry) => {
       const playerPriceMax = resolvePlayerPriceMax(entry.player, input.job_meta.price_max);
       const percentile = entry.player.pricing_eligible ? percentiles.get(entry.player.player_id) ?? 0 : 0;
+      const rank = entry.player.pricing_eligible
+        ? rankByPlayerId.get(entry.player.player_id) ?? 0
+        : 0;
       const rawTargetPrice = entry.player.pricing_eligible
-        ? mapPercentileToPrice(percentile)
+        ? rankBucketPrices.get(entry.player.player_id) ?? entry.basePrice
         : entry.basePrice;
-      const targetPrice = clamp(rawTargetPrice, input.job_meta.price_min, playerPriceMax);
+        const missedFixturePenalty = entry.player.pricing_eligible
+          ? computeMissedFixturePenalty(
+              entry.missedFixtureStreak,
+              input.job_meta.missed_fixture_penalties || DEFAULT_MISSED_FIXTURE_PENALTIES
+            )
+          : 0;
+      const targetPrice = clamp(rawTargetPrice - missedFixturePenalty, input.job_meta.price_min, playerPriceMax);
 
-      // Keep brand-new or inactive players stable until they have usable ranked history.
       const rawSmoothedPrice =
         entry.recoveredHistory
           ? targetPrice
-          : entry.player.pricing_eligible && entry.effectiveMatchesPlayed > 0
-          ? smoothPrice(entry.basePrice, targetPrice)
+          : entry.player.pricing_eligible
+          ? smoothPrice(entry.basePrice, targetPrice, {
+              old_price_weight: input.job_meta.smoothing?.old_price_weight ?? BASE_PRICE_WEIGHT,
+              target_price_weight: input.job_meta.smoothing?.target_price_weight ?? TARGET_PRICE_WEIGHT,
+              increment: input.job_meta.price_increment ?? PRICE_INCREMENT
+            })
           : entry.basePrice;
       const smoothedPrice = clamp(rawSmoothedPrice, input.job_meta.price_min, playerPriceMax);
 
       const finalPrice =
         entry.recoveredHistory
           ? clamp(targetPrice, input.job_meta.price_min, playerPriceMax)
-          : entry.player.pricing_eligible && entry.effectiveMatchesPlayed > 0
+          : entry.player.pricing_eligible
           ? capPriceMovement(
               smoothedPrice,
               entry.basePrice,
@@ -349,13 +492,27 @@ export function generatePrices(input) {
             )
           : clamp(entry.basePrice, input.job_meta.price_min, playerPriceMax);
 
-      const priceChange = entry.player.old_price == null ? 0 : finalPrice - Math.round(entry.player.old_price);
+      const priceChange = entry.player.old_price == null
+        ? 0
+        : roundTo(finalPrice - roundToPriceIncrement(entry.player.old_price, input.job_meta.price_increment ?? PRICE_INCREMENT), 2);
       const uncappedCapApplied = Boolean(entry.player.is_uncapped) && (
         rawTargetPrice > playerPriceMax ||
         rawSmoothedPrice > playerPriceMax ||
         entry.basePrice > playerPriceMax
       );
-      const calculationNotes = createCalculationNotes(entry.player, { ...entry, percentile }, targetPrice, smoothedPrice, finalPrice, uncappedCapApplied);
+      const calculationNotes = createCalculationNotes(
+        entry.player,
+        {
+          ...entry,
+          percentile,
+          rank,
+          missedFixturePenalty
+        },
+        targetPrice,
+        smoothedPrice,
+        finalPrice,
+        uncappedCapApplied
+      );
 
       return {
         player_id: entry.player.player_id,
@@ -379,6 +536,8 @@ export function generatePrices(input) {
         reliability_factor: entry.reliabilityFactor,
         adjusted_score: entry.adjustedScore,
         percentile,
+        rank,
+        missed_fixture_streak: entry.missedFixtureStreak,
         calculation_notes: calculationNotes,
         last_match_played_at_utc: entry.player.last_match_played_at_utc
       };
