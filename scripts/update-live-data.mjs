@@ -1332,14 +1332,28 @@ function parseTeamFromInningName(inningName, knownTeams = []) {
 }
 
 function parseMatchNoFromText(value) {
+  const directKey = String(value || '').trim().match(/^match:(\d+)$/i);
+  const directNo = Number(directKey?.[1] || 0);
+  if (Number.isFinite(directNo) && directNo > 0) return directNo;
   const match = String(value || '').match(/(?:^|,\s*)(\d+)(?:st|nd|rd|th)\s+match\b/i);
   const matchNo = Number(match?.[1] || 0);
   return Number.isFinite(matchNo) && matchNo > 0 ? matchNo : null;
 }
 
+function matchNoForMatch(match) {
+  const matchNo = Number(
+    match?.matchNo
+      || match?.match_no
+      || parseMatchNoFromText(match?.name)
+      || parseMatchNoFromText(match?.fixture)
+      || 0
+  );
+  return Number.isFinite(matchNo) && matchNo > 0 ? matchNo : null;
+}
+
 export function matchKeyForMatch(match) {
-  const matchNo = Number(match?.matchNo || parseMatchNoFromText(match?.name) || 0);
-  if (Number.isFinite(matchNo) && matchNo > 0) return `match:${matchNo}`;
+  const matchNo = matchNoForMatch(match);
+  if (matchNo) return `match:${matchNo}`;
 
   const teams = safeArray(match?.teams)
     .map((team) => normalizeName(team))
@@ -1353,8 +1367,8 @@ export function matchKeyForMatch(match) {
 function compareMatchesChronologically(a, b) {
   const dateDiff = Date.parse(a?.dateTimeGMT || 0) - Date.parse(b?.dateTimeGMT || 0);
   if (dateDiff) return dateDiff;
-  const aMatchNo = Number(a?.matchNo || parseMatchNoFromText(a?.name) || 0);
-  const bMatchNo = Number(b?.matchNo || parseMatchNoFromText(b?.name) || 0);
+  const aMatchNo = Number(matchNoForMatch(a) || 0);
+  const bMatchNo = Number(matchNoForMatch(b) || 0);
   if (aMatchNo !== bMatchNo) return aMatchNo - bMatchNo;
   return String(a?.name || '').localeCompare(String(b?.name || ''));
 }
@@ -1668,10 +1682,86 @@ function resolveHistoricalCumulativeDots(baseLive, processedMatchCountValue) {
   return {};
 }
 
-function buildHistoricalDotOverlay(baseLive, processedMatchCountValue, displayNameMap = null) {
+function historyEntryFetchedAtMs(entry) {
+  const fetchedMs = Date.parse(entry?.fetchedAt || '');
+  return Number.isFinite(fetchedMs) ? fetchedMs : Number.NaN;
+}
+
+function resolveHistoricalCumulativeDotsBeforeCutoff(baseLive, processedMatchCountValue, cutoffMs) {
+  const processedCount = Number(processedMatchCountValue || 0);
+  if (processedCount <= 0 || !Number.isFinite(cutoffMs)) return {};
+
+  const scoreHistory = safeArray(baseLive?.meta?.scoreHistory);
+  const byCount = new Map(scoreHistory.map((entry) => [historyEntryCount(entry), entry]));
+  for (let cursor = processedCount; cursor >= 0; cursor -= 1) {
+    const entry = byCount.get(cursor);
+    if (!entry) continue;
+    const fetchedMs = historyEntryFetchedAtMs(entry);
+    if (Number.isFinite(fetchedMs) && fetchedMs >= cutoffMs) continue;
+    const values = historicalSnapshotDotsValues(entry);
+    if (Object.keys(values).length) return values;
+  }
+
+  return {};
+}
+
+function aggregateParticipantSet(matchAggregate = {}) {
+  const participantKeys = [
+    'playerMatches',
+    'battingRuns',
+    'battingBalls',
+    'battingSixes',
+    'bowlingWickets',
+    'bowlingBalls',
+    'bowlingRunsConceded',
+    'catches',
+    'stumpings',
+    'battingFifties',
+    'battingHundreds',
+    'battingImpact30s',
+    'battingDucks',
+    'bowling3w',
+    'bowling4w',
+    'bowling5w'
+  ];
+  const participants = new Set();
+  participantKeys.forEach((key) => {
+    Object.keys(matchAggregate?.[key] || {}).forEach((name) => {
+      if (name) participants.add(name);
+    });
+  });
+  return participants;
+}
+
+function buildHistoricalDotOverlay(baseLive, processedMatchCountValue, { displayNameMap = null, processedRefs = null, matchAggregate = null } = {}) {
   const currentDots = resolveHistoricalCumulativeDots(baseLive, processedMatchCountValue);
-  const previousDots = resolveHistoricalCumulativeDots(baseLive, Number(processedMatchCountValue || 0) - 1);
-  return diffPlayerNumericMap(currentDots, previousDots, displayNameMap);
+  let previousDots = resolveHistoricalCumulativeDots(baseLive, Number(processedMatchCountValue || 0) - 1);
+  const processedRef = safeArray(processedRefs)[Number(processedMatchCountValue || 0) - 1] || null;
+  const matchStartMs = Date.parse(
+    processedRef?.dateTimeGMT
+      || processedRef?.dateTime
+      || processedRef?.datetime_utc
+      || processedRef?.starts_at_utc
+      || ''
+  );
+  if (Number.isFinite(matchStartMs)) {
+    const preMatchDots = resolveHistoricalCumulativeDotsBeforeCutoff(
+      baseLive,
+      Number(processedMatchCountValue || 0) - 1,
+      matchStartMs
+    );
+    if (Object.keys(preMatchDots).length) {
+      previousDots = preMatchDots;
+    }
+  }
+  let overlay = diffPlayerNumericMap(currentDots, previousDots, displayNameMap);
+  if (matchAggregate) {
+    const participants = aggregateParticipantSet(matchAggregate);
+    overlay = Object.fromEntries(
+      Object.entries(overlay).filter(([player]) => participants.has(player))
+    );
+  }
+  return overlay;
 }
 
 function createMostDotsPayloadFromValues(values = {}, source = null) {
@@ -1762,13 +1852,13 @@ export async function buildMiniFantasyPlayerHistoriesFromProcessedMatches(proces
     }
 
     if (!matchAggregate) {
-      matchAggregate = buildHistoricalAggregateOverlay(baseLive, processedMatchNo);
+      matchAggregate = buildHistoricalAggregateOverlay(baseLive, processedMatchNo, processedRefs);
     }
     if (!matchAggregate) continue;
 
     const historicalDotOverlay = Object.keys(matchAggregate?.bowlingDots || {}).length
       ? null
-      : buildHistoricalDotOverlay(baseLive, processedMatchNo);
+      : buildHistoricalDotOverlay(baseLive, processedMatchNo, { processedRefs, matchAggregate });
     if (historicalDotOverlay && Object.keys(historicalDotOverlay).length) {
       matchAggregate.bowlingDots = historicalDotOverlay;
     }
@@ -1784,7 +1874,7 @@ export async function buildMiniFantasyPlayerHistoriesFromProcessedMatches(proces
   return histories;
 }
 
-function buildHistoricalAggregateOverlay(baseLive, processedMatchCount) {
+function buildHistoricalAggregateOverlay(baseLive, processedMatchCount, processedRefs = null) {
   const scoreHistory = safeArray(baseLive?.meta?.scoreHistory);
   if (!scoreHistory.length || processedMatchCount <= 0) return null;
 
@@ -1804,9 +1894,11 @@ function buildHistoricalAggregateOverlay(baseLive, processedMatchCount) {
   for (const key of playerAggregateKeys) {
     overlay[key] = diffPlayerNumericMap(currentAgg[key], previousAgg[key], displayNameMap);
   }
-  if (!Object.keys(overlay.bowlingDots || {}).length) {
-    overlay.bowlingDots = buildHistoricalDotOverlay(baseLive, processedMatchCount, displayNameMap);
-  }
+  overlay.bowlingDots = buildHistoricalDotOverlay(baseLive, processedMatchCount, {
+    displayNameMap,
+    processedRefs,
+    matchAggregate: overlay
+  });
 
   overlay.standings = diffNestedNumericMap(currentAgg.standings, previousAgg.standings);
 

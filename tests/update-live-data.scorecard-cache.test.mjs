@@ -536,6 +536,35 @@ test('current processed refs rebuild includes matches added after the initial pr
   assert.equal(currentProcessedRefs[1].matchKey, 'match:2');
 });
 
+test('current processed refs rebuild reattaches stored match:number keys to schedule rows', () => {
+  const matchList = [
+    {
+      id: 'uuid-35',
+      match_no: 35,
+      fixture: 'Mumbai Indians vs Chennai Super Kings',
+      datetime_utc: '2026-04-25T10:00:00Z'
+    },
+    {
+      id: 'uuid-36',
+      match_no: 36,
+      fixture: 'Sunrisers Hyderabad vs Rajasthan Royals',
+      datetime_utc: '2026-04-25T14:00:00Z'
+    }
+  ];
+  const live = {
+    meta: {
+      processedMatchIds: ['legacy-35', 'legacy-36'],
+      processedMatchKeys: ['match:35', 'match:36']
+    }
+  };
+
+  const currentProcessedRefs = buildCurrentProcessedMatchRefs(live, matchList);
+
+  assert.deepEqual(currentProcessedRefs.map((match) => match.id), ['uuid-35', 'uuid-36']);
+  assert.equal(currentProcessedRefs[1].datetime_utc, '2026-04-25T14:00:00Z');
+  assert.equal(currentProcessedRefs[1].match_no, 36);
+});
+
 test('repairs missing score-history checkpoints from the nearest earlier snapshot', async () => {
   const scorecards = {
     'match-1': makeFinalScorecard({
@@ -909,6 +938,146 @@ test('historical mini fantasy replay canonicalizes split player aliases before d
   assert.equal(histories['mohammad shami']?.points_by_match_no?.[32], 72.5);
   assert.equal(histories['mohammad shami']?.matches_played, 1);
   assert.equal(histories['mohammed shami'], undefined);
+});
+
+test('historical mini fantasy replay ignores contaminated pre-match dot snapshots', async () => {
+  const baseLive = {
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 34,
+          fetchedAt: '2026-04-24T20:10:46.839Z',
+          snapshot: {
+            meta: {
+              aggregates: {
+                battingRuns: {},
+                battingBalls: {},
+                battingSixes: {},
+                bowlingWickets: {},
+                bowlingBalls: {},
+                bowlingRunsConceded: {},
+                bowlingDots: {},
+                catches: {},
+                stumpings: {},
+                battingFifties: {},
+                battingHundreds: {},
+                battingImpact30s: {},
+                battingDucks: {},
+                bowling3w: {},
+                bowling4w: {},
+                bowling5w: {},
+                playerMatches: {}
+              }
+            },
+            mostDots: {
+              values: {
+                'Jofra Archer': 75,
+                'Nandre Burger': 65
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 35,
+          fetchedAt: '2026-04-25T17:11:39.861Z',
+          snapshot: {
+            meta: {
+              aggregates: {
+                battingRuns: {},
+                battingBalls: {},
+                battingSixes: {},
+                bowlingWickets: {},
+                bowlingBalls: {},
+                bowlingRunsConceded: {},
+                bowlingDots: {},
+                catches: {},
+                stumpings: {},
+                battingFifties: {},
+                battingHundreds: {},
+                battingImpact30s: {},
+                battingDucks: {},
+                bowling3w: {},
+                bowling4w: {},
+                bowling5w: {},
+                playerMatches: {}
+              }
+            },
+            mostDots: {
+              values: {
+                'Jofra Archer': 82,
+                'Nandre Burger': 72,
+                'Pat Cummins': 12
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 36,
+          fetchedAt: '2026-04-25T21:54:58.497Z',
+          snapshot: {
+            meta: {
+              aggregates: {
+                battingRuns: {},
+                battingBalls: {},
+                battingSixes: {},
+                bowlingWickets: {
+                  'Pat Cummins': 1
+                },
+                bowlingBalls: {
+                  'Pat Cummins': 24
+                },
+                bowlingRunsConceded: {
+                  'Pat Cummins': 27
+                },
+                bowlingDots: {},
+                catches: {},
+                stumpings: {},
+                battingFifties: {},
+                battingHundreds: {},
+                battingImpact30s: {},
+                battingDucks: {},
+                bowling3w: {},
+                bowling4w: {},
+                bowling5w: {},
+                playerMatches: {
+                  'Pat Cummins': 1
+                }
+              }
+            },
+            mostDots: {
+              values: {
+                'Jofra Archer': 88,
+                'Nandre Burger': 74,
+                'Pat Cummins': 12
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  const histories = await buildMiniFantasyPlayerHistoriesFromProcessedMatches(
+    Array.from({ length: 36 }, (_, index) => ({
+      id: `match-${index + 1}`,
+      match_no: index + 1,
+      dateTimeGMT: index === 34
+        ? '2026-04-25T14:00:00Z'
+        : index === 35
+          ? '2026-04-25T10:00:00Z'
+          : '2026-04-20T14:00:00Z'
+    })),
+    baseLive,
+    {
+      loadScorecard: async () => {
+        throw new Error('Missing cached scorecard for processed match');
+      }
+    }
+  );
+
+  assert.equal(histories['pat cummins']?.points_by_match_no?.[35], undefined);
+  assert.equal(histories['pat cummins']?.points_by_match_no?.[36], 43);
+  assert.equal(histories['pat cummins']?.matches_played, 1);
 });
 
 test('standings still update when scorecard omits the top-level score summary', async () => {
