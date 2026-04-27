@@ -17,6 +17,7 @@ function extractBlock(source, startNeedle, endNeedle) {
 test('page runtime keeps player aliases wired ahead of team aliases', () => {
   const source = fs.readFileSync(INDEX_PATH, 'utf8');
   const playerAliases = extractBlock(source, 'const PLAYER_NAME_ALIASES = {', 'function normalizeName');
+  assert.match(playerAliases, /"auqib nabi dar":\s*"auqib nabi"/i);
   assert.match(playerAliases, /"suryavanshi":\s*"vaibhav suryavanshi"/i);
   assert.match(playerAliases, /"vaibhav sooryavanshi":\s*"vaibhav suryavanshi"/i);
   assert.match(playerAliases, /"v suryavanshi":\s*"vaibhav suryavanshi"/i);

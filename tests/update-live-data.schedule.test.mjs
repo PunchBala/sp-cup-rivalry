@@ -71,6 +71,7 @@ test('force refresh bypasses the scheduled bucket gate for manual workflow runs'
 });
 
 test('uncapped MVP player-pool key normalizer handles provider spelling variants', () => {
+  assert.equal(canonicalPlayerPoolKey('Auqib Nabi Dar'), 'auqib nabi');
   assert.equal(canonicalPlayerPoolKey('Vaibhav Sooryavanshi'), 'vaibhav suryavanshi');
   assert.equal(canonicalPlayerPoolKey('Vaibhav Suryavanshi'), 'vaibhav suryavanshi');
 });

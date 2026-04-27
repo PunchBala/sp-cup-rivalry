@@ -196,6 +196,12 @@ const NAME_TOKEN_EXPANSIONS = Object.freeze({
 });
 
 const EXPLICIT_NAME_ALIASES = Object.freeze({
+  'auqib nabi': Object.freeze([
+    'auqib nabi dar'
+  ]),
+  'auqib nabi dar': Object.freeze([
+    'auqib nabi'
+  ]),
   'mohammad shami': Object.freeze([
     'mohammed shami'
   ]),
@@ -410,6 +416,7 @@ function mergeHistoryMatches(playerName, histories = []) {
 }
 
 const HISTORY_KEY_ALIASES = Object.freeze({
+  'auqib nabi dar': 'auqib nabi',
   'mohammed shami': 'mohammad shami',
   'vaibhav sooryavanshi': 'vaibhav suryavanshi'
 });
@@ -417,6 +424,24 @@ const HISTORY_KEY_ALIASES = Object.freeze({
 function canonicalHistoryKey(value) {
   const normalized = normalizeName(value);
   return HISTORY_KEY_ALIASES[normalized] || normalized;
+}
+
+function mergeCanonicalSnapshotScore(existingScore, incomingScore) {
+  if (existingScore == null) return roundTo(toNumber(incomingScore, 0), 2);
+  if (incomingScore == null) return roundTo(toNumber(existingScore, 0), 2);
+
+  const existing = roundTo(toNumber(existingScore, 0), 2);
+  const incoming = roundTo(toNumber(incomingScore, 0), 2);
+  if (Math.abs(existing) < 0.01) return incoming;
+  if (Math.abs(incoming) < 0.01) return existing;
+
+  if (existing < 0 && incoming < 0) {
+    return Math.min(existing, incoming);
+  }
+  if (existing > 0 && incoming > 0) {
+    return Math.max(existing, incoming);
+  }
+  return Math.abs(existing) >= Math.abs(incoming) ? existing : incoming;
 }
 
 function mergeOverlappingMatchPoints(existingPoints, incomingPoints) {
@@ -800,11 +825,8 @@ export function deriveCompletedMatchHistories(liveData = {}, schedule = []) {
 
   ordered.forEach((entry) => {
     const snapshot = entry?.snapshot || {};
-    const currentPlayerMatches = snapshot?.meta?.aggregates?.playerMatches || {};
-    const currentScoreValues = snapshot?.mvp?.values || {};
-    const scoreLookup = Object.fromEntries(
-      Object.entries(currentScoreValues).map(([playerName, payload]) => [playerName, toNumber(payload?.score, 0)])
-    );
+    const currentPlayerMatches = snapshotPlayerMatches(snapshot);
+    const scoreLookup = snapshotMvpScoreLookup(snapshot);
     const allNames = new Set([
       ...Object.keys(previousPlayerMatches),
       ...Object.keys(currentPlayerMatches),
@@ -1272,14 +1294,25 @@ function latestCompletedScoreHistoryEntry(liveData = {}) {
 }
 
 function snapshotPlayerMatches(snapshot = {}) {
-  return snapshot?.meta?.aggregates?.playerMatches || {};
+  const rawMatches = snapshot?.meta?.aggregates?.playerMatches || {};
+  return Object.entries(rawMatches).reduce((canonicalized, [playerName, matches]) => {
+    const canonical = canonicalHistoryKey(playerName);
+    const numericMatches = Math.max(0, Math.trunc(toNumber(matches, 0)));
+    canonicalized[canonical] = Math.max(
+      Math.max(0, Math.trunc(toNumber(canonicalized[canonical], 0))),
+      numericMatches
+    );
+    return canonicalized;
+  }, {});
 }
 
 function snapshotMvpScoreLookup(snapshot = {}) {
   const currentScoreValues = snapshot?.mvp?.values || {};
-  return Object.fromEntries(
-    Object.entries(currentScoreValues).map(([playerName, payload]) => [playerName, toNumber(payload?.score, 0)])
-  );
+  return Object.entries(currentScoreValues).reduce((canonicalized, [playerName, payload]) => {
+    const canonical = canonicalHistoryKey(playerName);
+    canonicalized[canonical] = mergeCanonicalSnapshotScore(canonicalized[canonical], payload?.score);
+    return canonicalized;
+  }, {});
 }
 
 function hasFixturePoints(pointsByMatchNo = {}, matchNo = null) {

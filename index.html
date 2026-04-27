@@ -2413,6 +2413,7 @@
           "ashwani kumar": "ashwani kumar",
           "atharva ankolekar": "atharva ankolekar",
           "auqib nabi": "auqib nabi",
+          "auqib nabi dar": "auqib nabi",
           "avesh khan": "avesh khan",
           "avinash": "pyla avinash",
           "axar patel": "axar patel",
@@ -3052,6 +3053,79 @@
     function canonicalCompareName(v){
       const normalized = normalizeName(v);
       return PLAYER_NAME_ALIASES[normalized] || TEAM_NAME_ALIASES[normalized] || normalized;
+    }
+    function formatCanonicalPlayerDisplayName(key){
+      return String(key || '')
+        .split(' ')
+        .filter(Boolean)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+    }
+    function canonicalizeKnownPlayerAliasLabel(value){
+      const raw = String(value || '').trim();
+      const normalized = normalizeName(value);
+      const canonical = PLAYER_NAME_ALIASES[normalized];
+      if (canonical && canonical !== normalized) return formatCanonicalPlayerDisplayName(canonical);
+      return raw;
+    }
+    function isPlainObject(value){
+      return !!value && typeof value === 'object' && !Array.isArray(value);
+    }
+    function mergeKnownPlayerAliasValues(existing, incoming, fieldPath = ''){
+      if (existing === undefined || existing === null) return incoming;
+      if (incoming === undefined || incoming === null) return existing;
+      if (Array.isArray(existing) && Array.isArray(incoming)) return repairKnownLivePlayerAliasesDeep([...existing, ...incoming]);
+      if (isPlainObject(existing) && isPlainObject(incoming)) {
+        const merged = { ...existing };
+        Object.entries(incoming).forEach(([key, value]) => {
+          const nextPath = fieldPath ? `${fieldPath}.${key}` : key;
+          merged[key] = Object.prototype.hasOwnProperty.call(merged, key)
+            ? mergeKnownPlayerAliasValues(merged[key], value, nextPath)
+            : value;
+        });
+        return merged;
+      }
+      if (typeof existing === 'number' && typeof incoming === 'number') {
+        if (fieldPath === 'matches') return Math.max(existing, incoming);
+        if (fieldPath === 'battingStrikeRate' || fieldPath === 'economy') return existing;
+        return existing + incoming;
+      }
+      if ((fieldPath === 'battingStrikeRate' || fieldPath === 'economy') && typeof incoming === 'number') {
+        return typeof existing === 'number' ? existing : incoming;
+      }
+      if (typeof existing === 'string' && typeof incoming === 'string') return existing || incoming;
+      return existing;
+    }
+    function repairKnownLivePlayerAliasesDeep(value){
+      if (Array.isArray(value)) {
+        const transformed = value.map(item => repairKnownLivePlayerAliasesDeep(item));
+        if (transformed.every(item => typeof item === 'string')) {
+          const seen = new Set();
+          const deduped = [];
+          transformed.forEach((item) => {
+            const output = canonicalizeKnownPlayerAliasLabel(item);
+            const seenKey = canonicalCompareName(item);
+            if (seen.has(seenKey)) return;
+            seen.add(seenKey);
+            deduped.push(output);
+          });
+          return deduped;
+        }
+        return transformed;
+      }
+      if (!isPlainObject(value)) return typeof value === 'string' ? canonicalizeKnownPlayerAliasLabel(value) : value;
+      const result = {};
+      Object.entries(value).forEach(([rawKey, rawValue]) => {
+        const normalizedKey = normalizeName(rawKey);
+        const canonicalKey = PLAYER_NAME_ALIASES[normalizedKey] && PLAYER_NAME_ALIASES[normalizedKey] !== normalizedKey
+          ? formatCanonicalPlayerDisplayName(PLAYER_NAME_ALIASES[normalizedKey])
+          : rawKey;
+        const nextValue = repairKnownLivePlayerAliasesDeep(rawValue);
+        result[canonicalKey] = Object.prototype.hasOwnProperty.call(result, canonicalKey)
+          ? mergeKnownPlayerAliasValues(result[canonicalKey], nextValue, canonicalKey)
+          : nextValue;
+      });
+      return result;
     }
 
     const UNCAPPED_MVP_PLAYER_KEYS = new Set(UNCAPPED_MVP_PLAYERS.map((name) => canonicalCompareName(name)));
@@ -9781,7 +9855,7 @@ function titleBandScore(pick, live){
     }
 
     function normalizeFetchedLiveData(data){
-      const normalized = { ...data };
+      const normalized = repairKnownLivePlayerAliasesDeep({ ...data });
 
       if (normalized.highestScoreTeam && !normalized.highestScoreTeam.winner) {
         const ranking = Array.isArray(normalized.highestScoreTeam.ranking) ? normalized.highestScoreTeam.ranking : [];

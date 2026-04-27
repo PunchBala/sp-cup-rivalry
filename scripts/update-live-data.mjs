@@ -68,7 +68,8 @@ const UNCAPPED_MVP_PLAYERS = [
 const PLAYER_KEY_ALIASES = {
   // Keep this tiny. Only canonicalize genuinely recurring data-provider variants.
   'vaibhav sooryavanshi': 'vaibhav suryavanshi',
-  'mohammed shami': 'mohammad shami'
+  'mohammed shami': 'mohammad shami',
+  'auqib nabi dar': 'auqib nabi'
 };
 const UNCAPPED_MVP_PLAYER_KEYS = new Set(UNCAPPED_MVP_PLAYERS.map((name) => canonicalPlayerPoolKey(name)));
 
@@ -222,6 +223,92 @@ function normalizePlayerKey(name) { return normalizeName(name).toLowerCase().rep
 export function canonicalPlayerPoolKey(name) {
   const normalized = normalizePlayerKey(name);
   return PLAYER_KEY_ALIASES[normalized] || normalized;
+}
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+function formatCanonicalPlayerDisplayName(key) {
+  return normalizeName(key)
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+function canonicalizeKnownPlayerAliasLabel(value) {
+  const normalized = normalizePlayerKey(value);
+  const canonical = PLAYER_KEY_ALIASES[normalized];
+  if (!canonical || canonical === normalized) return normalizeName(value);
+  return formatCanonicalPlayerDisplayName(canonical);
+}
+function mergeKnownPlayerAliasValues(existing, incoming, fieldPath = '') {
+  if (existing === undefined || existing === null) return incoming;
+  if (incoming === undefined || incoming === null) return existing;
+
+  if (Array.isArray(existing) && Array.isArray(incoming)) {
+    return repairKnownLivePlayerAliasesDeep([...existing, ...incoming]);
+  }
+
+  if (isPlainObject(existing) && isPlainObject(incoming)) {
+    const merged = { ...existing };
+    for (const [key, value] of Object.entries(incoming)) {
+      const nextPath = fieldPath ? `${fieldPath}.${key}` : key;
+      merged[key] = Object.prototype.hasOwnProperty.call(merged, key)
+        ? mergeKnownPlayerAliasValues(merged[key], value, nextPath)
+        : value;
+    }
+    return merged;
+  }
+
+  if (typeof existing === 'number' && typeof incoming === 'number') {
+    if (fieldPath === 'matches') return Math.max(existing, incoming);
+    if (fieldPath === 'battingStrikeRate' || fieldPath === 'economy') return existing;
+    return existing + incoming;
+  }
+
+  if ((fieldPath === 'battingStrikeRate' || fieldPath === 'economy') && typeof incoming === 'number') {
+    return typeof existing === 'number' ? existing : incoming;
+  }
+
+  if (typeof existing === 'string' && typeof incoming === 'string') {
+    return existing || incoming;
+  }
+
+  return existing;
+}
+export function repairKnownLivePlayerAliasesDeep(value) {
+  if (Array.isArray(value)) {
+    const transformed = value.map((item) => repairKnownLivePlayerAliasesDeep(item));
+    if (transformed.every((item) => typeof item === 'string')) {
+      const seen = new Set();
+      const deduped = [];
+      transformed.forEach((item) => {
+        const output = canonicalizeKnownPlayerAliasLabel(item);
+        const seenKey = canonicalPlayerPoolKey(item);
+        if (seen.has(seenKey)) return;
+        seen.add(seenKey);
+        deduped.push(output);
+      });
+      return deduped;
+    }
+    return transformed;
+  }
+
+  if (!isPlainObject(value)) {
+    return typeof value === 'string' ? canonicalizeKnownPlayerAliasLabel(value) : value;
+  }
+
+  const result = {};
+  for (const [rawKey, rawValue] of Object.entries(value)) {
+    const normalizedKey = normalizePlayerKey(rawKey);
+    const canonicalKey = PLAYER_KEY_ALIASES[normalizedKey] && PLAYER_KEY_ALIASES[normalizedKey] !== normalizedKey
+      ? formatCanonicalPlayerDisplayName(PLAYER_KEY_ALIASES[normalizedKey])
+      : rawKey;
+    const nextValue = repairKnownLivePlayerAliasesDeep(rawValue);
+    result[canonicalKey] = Object.prototype.hasOwnProperty.call(result, canonicalKey)
+      ? mergeKnownPlayerAliasValues(result[canonicalKey], nextValue, canonicalKey)
+      : nextValue;
+  }
+  return result;
 }
 function minutesSince(iso, currentMs = Date.now()) { return iso ? (currentMs - Date.parse(iso)) / 60000 : Infinity; }
 
@@ -476,7 +563,7 @@ async function ensureDataDir() {
 
 async function readExistingLive() {
   try {
-    const parsed = JSON.parse(await fs.readFile(DATA_FILE, 'utf8'));
+    const parsed = repairKnownLivePlayerAliasesDeep(JSON.parse(await fs.readFile(DATA_FILE, 'utf8')));
     const fresh = createEmptyLive();
     return {
       ...fresh,

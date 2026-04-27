@@ -204,6 +204,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Vaibhav Sooryavanshi': 1,
                   'Suryakumar Yadav': 1,
                   'AM Ghazanfar': 1,
+                  'Auqib Nabi Dar': 1,
                   'Philip Salt': 1,
                   'Lungi Ngidi': 1,
                   'Lhuan-dre Pretorius': 1
@@ -220,6 +221,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Vaibhav Sooryavanshi': { score: 52 },
                 'Suryakumar Yadav': { score: 33 },
                 'AM Ghazanfar': { score: 44 },
+                'Auqib Nabi Dar': { score: 14 },
                 'Philip Salt': { score: 49 },
                 'Lungi Ngidi': { score: 28 },
                 'Lhuan-dre Pretorius': { score: 35 }
@@ -241,6 +243,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                   'Vaibhav Sooryavanshi': 1,
                   'Suryakumar Yadav': 2,
                   'AM Ghazanfar': 2,
+                  'Auqib Nabi': 2,
                   'Philip Salt': 2,
                   'Lungisani Ngidi': 1,
                   'Lungi Ngidi': 1,
@@ -258,6 +261,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
                 'Vaibhav Sooryavanshi': { score: 52 },
                 'Suryakumar Yadav': { score: 83 },
                 'AM Ghazanfar': { score: 96 },
+                'Auqib Nabi': { score: 23 },
                 'Philip Salt': { score: 67 },
                 'Lungisani Ngidi': { score: 51 },
                 'Lungi Ngidi': { score: 79 },
@@ -283,6 +287,7 @@ test('resolvePlayerHistory matches safe alias variations used by squad lists', (
   assert.deepEqual(resolvePlayerHistory('Vaibhav Suryavanshi', histories)?.match_points, [52]);
   assert.deepEqual(resolvePlayerHistory('Surya Kumar Yadav', histories)?.match_points, [33, 50]);
   assert.deepEqual(resolvePlayerHistory('Allah Ghazanfar', histories)?.match_points, [44, 52]);
+  assert.deepEqual(resolvePlayerHistory('Auqib Nabi', histories)?.match_points, [14, 9]);
   assert.deepEqual(resolvePlayerHistory('Phil Salt', histories)?.match_points, [49, 18]);
   assert.deepEqual(resolvePlayerHistory('Lungisani Ngidi', histories)?.match_points, [28, 51]);
   assert.deepEqual(resolvePlayerHistory('Lhuan-dre Pretorious', histories)?.match_points, [35, 45]);

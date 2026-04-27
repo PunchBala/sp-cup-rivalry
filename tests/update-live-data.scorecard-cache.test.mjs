@@ -17,6 +17,7 @@ import {
   isIncompleteCompletedScorecardError,
   matchKeyForMatch,
   readCachedScorecard,
+  repairKnownLivePlayerAliasesDeep,
   repairScoreHistoryGaps,
   rebuildHistoricalState,
   writeCachedScorecard
@@ -983,6 +984,60 @@ test('historical mini fantasy replay canonicalizes split player aliases before d
   assert.equal(histories['mohammad shami']?.points_by_match_no?.[32], 72.5);
   assert.equal(histories['mohammad shami']?.matches_played, 1);
   assert.equal(histories['mohammed shami'], undefined);
+});
+
+test('live alias repair merges split Auqib Nabi keys from cached snapshots', () => {
+  const repaired = repairKnownLivePlayerAliasesDeep({
+    mvp: {
+      ranking: ['Auqib Nabi', 'Auqib Nabi Dar'],
+      values: {
+        'Auqib Nabi': {
+          score: 15,
+          runs: 0,
+          dotBalls: 10,
+          matches: 0,
+          battingStrikeRate: null,
+          economy: null,
+          bonuses: { economy: 0 }
+        },
+        'Auqib Nabi Dar': {
+          score: -1,
+          runs: 4,
+          dotBalls: 0,
+          matches: 3,
+          battingStrikeRate: 200,
+          economy: 13.43,
+          bonuses: { economy: -5 }
+        }
+      }
+    },
+    mostDots: {
+      ranking: ['Auqib Nabi'],
+      values: {
+        'Auqib Nabi': 10
+      }
+    },
+    meta: {
+      aggregates: {
+        battingRuns: { 'Auqib Nabi Dar': 4 },
+        bowlingDots: { 'Auqib Nabi': 10 },
+        playerMatches: { 'Auqib Nabi Dar': 3 }
+      }
+    }
+  });
+
+  assert.deepEqual(repaired.mvp.ranking, ['Auqib Nabi']);
+  assert.equal(repaired.mvp.values['Auqib Nabi']?.score, 14);
+  assert.equal(repaired.mvp.values['Auqib Nabi']?.runs, 4);
+  assert.equal(repaired.mvp.values['Auqib Nabi']?.dotBalls, 10);
+  assert.equal(repaired.mvp.values['Auqib Nabi']?.matches, 3);
+  assert.equal(repaired.mvp.values['Auqib Nabi']?.battingStrikeRate, 200);
+  assert.equal(repaired.mvp.values['Auqib Nabi']?.economy, 13.43);
+  assert.equal(repaired.mvp.values['Auqib Nabi']?.bonuses?.economy, -5);
+  assert.equal(repaired.mvp.values['Auqib Nabi Dar'], undefined);
+  assert.equal(repaired.meta.aggregates.battingRuns['Auqib Nabi'], 4);
+  assert.equal(repaired.meta.aggregates.bowlingDots['Auqib Nabi'], 10);
+  assert.equal(repaired.meta.aggregates.playerMatches['Auqib Nabi'], 3);
 });
 
 test('historical mini fantasy replay ignores contaminated pre-match dot snapshots', async () => {
