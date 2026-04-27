@@ -24,7 +24,7 @@ The app is hosted as a static site, with live cricket data refreshed into `data/
 - later fixtures open from the day before
 - saved entries freeze their own fixture price snapshot
 - a global leaderboard ranks users by Mini Fantasy points
-- uncapped players are capped at `9` credits even if hot form would otherwise push them to `10`
+- uncapped players are capped at `9.5` credits even if hot form would otherwise push them to `10`
 
 Mini Fantasy stays isolated from duel scoring and duel UI at the data/model layer.
 

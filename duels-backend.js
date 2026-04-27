@@ -64,6 +64,12 @@
     return JSON.parse(JSON.stringify(value));
   }
 
+  function roundCreditAmount(value) {
+    const numeric = Number(value || 0);
+    if (!Number.isFinite(numeric)) return 0;
+    return Math.round(numeric * 100) / 100;
+  }
+
   function readStoredJson(key, fallback = null) {
     try {
       const raw = window.localStorage.getItem(key);
@@ -428,7 +434,7 @@ function normalizeMiniFantasyEntryRow(row) {
         selectedPlayerIds: Array.isArray(row.selected_player_ids) ? row.selected_player_ids.filter(Boolean) : [],
         captainPlayerId: normalizeWhitespace(row.captain_player_id || '') || null,
         priceSnapshot: cloneJson(row.price_snapshot || {}),
-        spentCredits: Number(row.spent_credits || 0) || 0,
+        spentCredits: roundCreditAmount(row.spent_credits || 0),
         savedAt: row.saved_at || null,
         createdAt: row.created_at || null,
         updatedAt: row.updated_at || null
@@ -948,7 +954,7 @@ function normalizeMiniFantasyEntryRow(row) {
             selected_player_ids: cloneJson(entry?.selectedPlayerIds || []),
             captain_player_id: normalizeWhitespace(entry?.captainPlayerId || '') || null,
             price_snapshot: cloneJson(entry?.priceSnapshot || {}),
-            spent_credits: Number(entry?.spentCredits || 0) || 0,
+            spent_credits: roundCreditAmount(entry?.spentCredits || 0),
             saved_at: entry?.savedAt || new Date().toISOString()
           },
           accessToken: activeSession.access_token,

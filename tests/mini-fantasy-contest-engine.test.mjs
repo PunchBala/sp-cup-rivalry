@@ -670,6 +670,22 @@ test('validateMiniFantasyEntry enforces budget, team split, and role minimums', 
   assert.equal(valid.total_cost, 30);
   assert.equal(valid.budget_remaining, MINI_FANTASY_BUDGET - 30);
 
+  const halfCreditValid = validateMiniFantasyEntry({
+    fixture,
+    selectedPlayerIds: ['dc_a', 'dc_b', 'gt_a', 'gt_b'],
+    captainPlayerId: 'dc_a',
+    playerPool: [
+      ...pool.filter((player) => player.player_id !== 'dc_a' && player.player_id !== 'dc_b' && player.player_id !== 'gt_a' && player.player_id !== 'gt_b'),
+      { player_id: 'dc_a', name: 'DC Batter', team: 'DC', role: 'batter', final_price: 8.5, pricing_eligible: true },
+      { player_id: 'dc_b', name: 'DC Bowler', team: 'DC', role: 'bowler', final_price: 7.5, pricing_eligible: true },
+      { player_id: 'gt_a', name: 'GT All-rounder', team: 'GT', role: 'all_rounder', final_price: 8.5, pricing_eligible: true },
+      { player_id: 'gt_b', name: 'GT Keeper', team: 'GT', role: 'wicket_keeper', final_price: 6, pricing_eligible: true }
+    ]
+  });
+  assert.equal(halfCreditValid.valid, true);
+  assert.equal(halfCreditValid.total_cost, 30.5);
+  assert.equal(halfCreditValid.budget_remaining, 0.5);
+
   const invalid = validateMiniFantasyEntry({
     fixture,
     selectedPlayerIds: ['dc_b', 'dc_c', 'gt_a', 'gt_c'],

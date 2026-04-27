@@ -86,6 +86,7 @@ That refresh keeps:
 - `mini_fantasy_leaderboard_rows` present
 - latest insert/update lock policies in place
 - public read policy in place for the leaderboard
+- `mini_fantasy_entries.spent_credits` upgraded to `numeric(5,2)` so half-credit teams like `30.5` save correctly
 
 ## Optional leaderboard publishing
 

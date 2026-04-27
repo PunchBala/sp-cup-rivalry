@@ -56,7 +56,7 @@ create table if not exists public.mini_fantasy_entries (
   selected_player_ids jsonb not null default '[]'::jsonb,
   captain_player_id text,
   price_snapshot jsonb not null default '{}'::jsonb,
-  spent_credits integer not null default 0,
+  spent_credits numeric(5,2) not null default 0,
   saved_at timestamptz not null default timezone('utc', now()),
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now()),
@@ -74,6 +74,13 @@ create table if not exists public.mini_fantasy_daily_bonus_claims (
   created_at timestamptz not null default timezone('utc', now()),
   unique (user_id, season, bonus_date_ist)
 );
+
+alter table public.mini_fantasy_entries
+  alter column spent_credits type numeric(5,2)
+  using round(spent_credits::numeric, 2);
+
+alter table public.mini_fantasy_entries
+  alter column spent_credits set default 0;
 
 create table if not exists public.mini_fantasy_leaderboard_rows (
   id uuid primary key default gen_random_uuid(),
