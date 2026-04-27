@@ -930,6 +930,7 @@
     .fantasy-picker-badge.current{border-color:rgba(95,240,200,.28);background:rgba(95,240,200,.14);color:#c6ffe9}
     .fantasy-picker-badge.availability-available{border-color:rgba(95,240,200,.28);background:rgba(95,240,200,.12);color:#c6ffe9}
     .fantasy-picker-badge.availability-doubtful{border-color:rgba(255,200,87,.32);background:rgba(255,200,87,.14);color:#ffe2a8}
+    .fantasy-picker-badge.availability-ruled_out,
     .fantasy-picker-badge.availability-unavailable,
     .fantasy-picker-badge.availability-replaced{border-color:rgba(255,118,118,.34);background:rgba(255,118,118,.12);color:#ffc7c7}
     .fantasy-picker-captain-btn{
@@ -8251,8 +8252,7 @@ function titleBandScore(pick, live){
       const status = String(player?.availabilityStatus || '').toLowerCase();
       if (!status) return '';
       if (status === 'doubtful') return 'Doubtful';
-      if (status === 'unavailable') return 'Unavailable';
-      if (status === 'replaced') return 'Replaced';
+      if (status === 'ruled_out' || status === 'unavailable' || status === 'replaced') return 'Ruled out';
       return status.charAt(0).toUpperCase() + status.slice(1);
     }
 

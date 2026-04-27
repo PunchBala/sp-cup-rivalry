@@ -106,8 +106,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /data-mini-picker-value=/);
   assert.match(html, /availability-available/);
   assert.match(html, /availability-doubtful/);
-  assert.match(html, /availability-unavailable/);
-  assert.match(html, /availability-replaced/);
+  assert.match(html, /availability-ruled_out/);
   assert.match(html, /const savedScroll = scrollEl \? scrollEl\.scrollTop : 0/);
   assert.match(html, /scrollElAfter\) scrollElAfter\.scrollTop = savedScroll/);
   assert.match(html, /window\.history\.replaceState/);

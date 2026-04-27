@@ -14,7 +14,7 @@ test('player availability directory uses supported statuses and references known
     readJson('ipl_2026_player_availability.json')
   ]);
 
-  const supportedStatuses = new Set(['available', 'doubtful', 'unavailable', 'replaced']);
+  const supportedStatuses = new Set(['available', 'doubtful', 'ruled_out']);
 
   Object.entries(availability).forEach(([teamCode, players]) => {
     const squad = new Set(Array.isArray(squads[teamCode]) ? squads[teamCode] : []);
@@ -39,10 +39,11 @@ test('replacement players added for mini fantasy have role coverage', async () =
 
   const expectedRoles = {
     CSK: ['Spencer Johnson'],
-    GT: ['Kulwant Khejroliya'],
+    DC: ['Rehan Ahmed'],
+    GT: ['Kulwant Khejroliya', 'Connor Esterhuizen'],
     KKR: ['Navdeep Saini', 'Saurabh Dubey', 'Blessing Muzarabani'],
     LSG: ['George Linde'],
-    MI: ['Krish Bhagat'],
+    MI: ['Krish Bhagat', 'Keshav Maharaj'],
     RR: ['Dasun Shanaka'],
     SRH: ['Dilshan Madushanka', 'David Payne', 'Gerald Coetzee']
   };
