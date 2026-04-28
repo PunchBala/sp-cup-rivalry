@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-04-28T20:57:25.259Z",
+    "as_of_utc": "2026-04-28T21:52:49.796Z",
     "price_min": 4.5,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -86,9 +86,9 @@
   "summary": {
     "total_players_received": 257,
     "eligible_players_ranked": 257,
-    "price_rises": 4,
+    "price_rises": 0,
     "price_drops": 0,
-    "price_unchanged": 253
+    "price_unchanged": 257
   },
   "players": [
     {
@@ -4785,12 +4785,12 @@
       "role": "all_rounder",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 8,
-      "initial_price": 8,
+      "old_price": 8.5,
+      "initial_price": 8.5,
       "target_price": 8.5,
       "smoothed_price": 8.5,
       "final_price": 8.5,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 6,
       "season_total_points": 155,
       "season_avg_points": 25.83,
@@ -4803,8 +4803,7 @@
       "rank": 44,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 44"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-28T14:00:00"
     },
@@ -4844,12 +4843,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 7,
       "season_total_points": 157,
       "season_avg_points": 22.43,
@@ -4862,8 +4861,7 @@
       "rank": 68,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 68"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-28T14:00:00"
     },
@@ -6376,12 +6374,12 @@
       "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 2,
       "season_total_points": 78,
       "season_avg_points": 39,
@@ -6394,8 +6392,7 @@
       "rank": 48,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 48"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-28T14:00:00"
     },
@@ -6406,12 +6403,12 @@
       "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 2,
       "season_total_points": 60,
       "season_avg_points": 30,
@@ -6424,8 +6421,7 @@
       "rank": 60,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 60"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-28T14:00:00"
     },
@@ -7671,5 +7667,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-04-28T20:57:25.259Z"
+  "generated_at_utc": "2026-04-28T21:52:49.796Z"
 }
