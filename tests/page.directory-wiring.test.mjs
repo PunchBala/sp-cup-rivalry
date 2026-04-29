@@ -32,6 +32,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /duels-backend\.config\.js/);
   assert.match(html, /duels-backend\.js/);
   assert.match(html, /mini-fantasy\/contest-engine\.js/);
+  assert.match(html, /data\/mini_fantasy_open_fixture_price_snapshots\.json/);
   assert.match(html, /ipl_2026_player_availability\.json/);
   assert.match(html, /function sortedDirectoryDuels\(/);
     assert.match(html, /function buildDuelShareUrl\(/);
@@ -56,6 +57,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function syncMiniFantasyEntries\(/);
   assert.match(html, /function upsertRemoteMiniFantasyEntry\(/);
   assert.match(html, /function loadPlayerAvailabilityData\(/);
+  assert.match(html, /function loadMiniFantasyOpenFixturePriceSnapshots\(/);
   assert.match(html, /function miniFantasyAvailabilityBadgeLabel\(/);
   assert.match(html, /function renderMiniFantasySection\(/);
   assert.match(html, /function renderMiniFantasyFixtures\(/);

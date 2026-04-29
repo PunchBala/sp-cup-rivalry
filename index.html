@@ -1466,6 +1466,7 @@
     let IPL_PLAYER_AVAILABILITY = {};
     let IPL_TEAM_ROLES = {};
     let MINI_FANTASY_PRICE_BOOK = null;
+    let MINI_FANTASY_OPEN_FIXTURE_PRICE_SNAPSHOTS = null;
     let MINI_FANTASY_NOTICE = null;
     let MINI_FANTASY_DRAFTS = {};
     let MINI_FANTASY_ACTIVE_MATCH_NO = null;
@@ -4129,6 +4130,22 @@ function titleBandScore(pick, live){
           console.error('Mini Fantasy price book fallback generation failed', fallbackError);
           MINI_FANTASY_PRICE_BOOK = { players: [], summary: { total_players_received: 0, eligible_players_ranked: 0, price_rises: 0, price_drops: 0, price_unchanged: 0 } };
         }
+      }
+    }
+
+    async function loadMiniFantasyOpenFixturePriceSnapshots(){
+      try {
+        const cacheBust = `t=${Date.now()}`;
+        const res = await fetch(`data/mini_fantasy_open_fixture_price_snapshots.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        MINI_FANTASY_OPEN_FIXTURE_PRICE_SNAPSHOTS = data && typeof data === 'object' && !Array.isArray(data) ? data : { fixtures: [] };
+      } catch (err) {
+        console.warn('Mini Fantasy open fixture snapshot fetch failed, falling back to live market only', err);
+        MINI_FANTASY_OPEN_FIXTURE_PRICE_SNAPSHOTS = { fixtures: [] };
       }
     }
 
@@ -8233,8 +8250,11 @@ function titleBandScore(pick, live){
         teamRoles: IPL_TEAM_ROLES
       });
       const savedEntry = findMiniFantasyEntryForMatch(fixture.match_no);
+      const openFixtureSnapshot = !savedEntry ? findMiniFantasyOpenFixturePriceSnapshot(fixture.match_no) : null;
       const resolvedPool = savedEntry?.priceSnapshot && Object.keys(savedEntry.priceSnapshot).length
         ? applyPriceSnapshotToPool(basePool, savedEntry.priceSnapshot)
+        : openFixtureSnapshot?.priceSnapshot && Object.keys(openFixtureSnapshot.priceSnapshot).length
+          ? applyPriceSnapshotToPool(basePool, openFixtureSnapshot.priceSnapshot)
         : basePool;
       return resolvedPool.map((player) => {
         const availabilityMeta = IPL_PLAYER_AVAILABILITY?.[String(player.team || '').toUpperCase()]?.[normalizeName(player.name)] || null;
@@ -8258,6 +8278,20 @@ function titleBandScore(pick, live){
 
     function nextMiniFantasyOpeningFixture(){
       return miniFantasyAvailabilityRows().find((fixture) => fixture.availability_status === 'upcoming') || null;
+    }
+
+    function findMiniFantasyOpenFixturePriceSnapshot(matchNo){
+      const target = Number(matchNo || 0) || null;
+      if (!target) return null;
+      const fixtures = Array.isArray(MINI_FANTASY_OPEN_FIXTURE_PRICE_SNAPSHOTS?.fixtures)
+        ? MINI_FANTASY_OPEN_FIXTURE_PRICE_SNAPSHOTS.fixtures
+        : [];
+      const snapshot = fixtures.find((fixture) => Number(fixture?.match_no || 0) === target) || null;
+      if (!snapshot) return null;
+      return {
+        ...snapshot,
+        priceSnapshot: snapshot.priceSnapshot || snapshot.price_snapshot || {}
+      };
     }
 
     function miniFantasyFixtureByMatchNo(matchNo){
@@ -9945,6 +9979,7 @@ function titleBandScore(pick, live){
       await loadTeamRolesData().catch(() => {});
       await loadLiveData();
       await loadMiniFantasyPriceBook();
+      await loadMiniFantasyOpenFixturePriceSnapshots();
       render();
       setTimeout(() => {
         if (activeView === 'fantasy') {

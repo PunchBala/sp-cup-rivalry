@@ -18,6 +18,7 @@ import {
 
 export const MINI_FANTASY_ENGINE_VERSION = 'mini_fantasy_v1';
 export const MINI_FANTASY_PRICE_BOOK_VERSION = 'mini_fantasy_price_book_v1';
+export const MINI_FANTASY_OPEN_FIXTURE_PRICE_SNAPSHOT_VERSION = 'mini_fantasy_open_fixture_prices_v1';
 export const MINI_FANTASY_SEASON = 'IPL 2026';
 export const MINI_FANTASY_LAUNCH_AT_UTC = '2026-04-06T00:00:00Z';
 export const MINI_FANTASY_FIRST_OPEN_MATCH_NO = 14;
@@ -1058,6 +1059,81 @@ export function generateMiniFantasyPriceBook(options = {}) {
     summary: output.summary,
     players: output.players,
     generated_at_utc: output.generated_at_utc
+  };
+}
+
+function mergeOpenFixturePriceSnapshot(previousSnapshot = {}, currentSnapshot = {}) {
+  const merged = {};
+  Object.entries(currentSnapshot && typeof currentSnapshot === 'object' ? currentSnapshot : {}).forEach(([playerId, currentMeta]) => {
+    const previousMeta = previousSnapshot && typeof previousSnapshot === 'object' ? previousSnapshot[playerId] : null;
+    merged[playerId] = previousMeta
+      ? {
+          ...currentMeta,
+          final_price: Number.isFinite(Number(previousMeta.final_price)) ? Number(previousMeta.final_price) : currentMeta.final_price,
+          is_uncapped: previousMeta.is_uncapped ?? currentMeta.is_uncapped,
+          pricing_eligible: previousMeta.pricing_eligible ?? currentMeta.pricing_eligible
+        }
+      : currentMeta;
+  });
+  return merged;
+}
+
+export function generateMiniFantasyOpenFixturePriceSnapshots(options = {}) {
+  const {
+    schedule = [],
+    squads = {},
+    teamRoles = {},
+    priceBook = null,
+    previousSnapshots = null,
+    asOfUtc = new Date().toISOString(),
+    season = MINI_FANTASY_SEASON
+  } = options;
+
+  const now = new Date(asOfUtc);
+  const availability = getMiniFantasyFixtureAvailability(schedule, now, {
+    launch_at_utc: MINI_FANTASY_LAUNCH_AT_UTC,
+    first_open_match_no: MINI_FANTASY_FIRST_OPEN_MATCH_NO,
+    first_match_open_at_utc: MINI_FANTASY_FIRST_MATCH_OPEN_AT_UTC
+  });
+  const previousFixtureMap = new Map(
+    (Array.isArray(previousSnapshots?.fixtures) ? previousSnapshots.fixtures : [])
+      .map((fixture) => [Number(fixture?.match_no || 0), fixture])
+      .filter(([matchNo]) => Number.isFinite(matchNo) && matchNo > 0)
+  );
+
+  return {
+    version: MINI_FANTASY_OPEN_FIXTURE_PRICE_SNAPSHOT_VERSION,
+    season,
+    generated_at_utc: asOfUtc,
+    source_price_book_generated_at_utc: priceBook?.generated_at_utc || null,
+    fixtures: availability.fixtures.map((fixture) => {
+      const matchNo = Number(fixture.match_no || 0);
+      const existing = previousFixtureMap.get(matchNo) || null;
+      const currentPool = buildFixturePlayerPool({
+        fixture,
+        priceBook,
+        squads,
+        teamRoles
+      });
+      const currentSnapshot = buildEntryPriceSnapshot(currentPool);
+      const priceSnapshot = existing?.price_snapshot
+        ? mergeOpenFixturePriceSnapshot(existing.price_snapshot, currentSnapshot)
+        : currentSnapshot;
+
+      return {
+        season,
+        match_no: matchNo,
+        fixture_label: fixture.fixture || `${fixture.home_team} vs ${fixture.away_team}`,
+        home_team_code: fixture.home_team_code || resolveFixtureTeamCode(fixture.home_team),
+        away_team_code: fixture.away_team_code || resolveFixtureTeamCode(fixture.away_team),
+        opens_at_utc: fixture.opens_at_utc || getMiniFantasyFixtureOpenAtUtc(fixture),
+        locks_at_utc: fixture.locks_at_utc || null,
+        snapshot_created_at_utc: existing?.snapshot_created_at_utc || asOfUtc,
+        source_price_book_generated_at_utc: existing?.source_price_book_generated_at_utc || priceBook?.generated_at_utc || asOfUtc,
+        player_count: Object.keys(priceSnapshot).length,
+        price_snapshot: priceSnapshot
+      };
+    })
   };
 }
 

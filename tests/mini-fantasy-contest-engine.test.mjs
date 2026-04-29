@@ -9,6 +9,7 @@ import {
   buildMiniFantasyPlayerPointsIndex,
   buildMiniFantasyPlayerId,
   buildFixturePlayerPool,
+  generateMiniFantasyOpenFixturePriceSnapshots,
   calculateMiniFantasyMissedLockPoints,
   deriveCompletedMatchHistories,
   generateMiniFantasyPriceBook,
@@ -578,6 +579,143 @@ test('getMiniFantasyFixtureOpenAtUtc honors an explicit fixture override without
     getMiniFantasyFixtureOpenAtUtc({ match_no: 40, datetime_utc: '2026-04-28T14:00:00Z' }),
     '2026-04-27T00:00:00.000Z'
   );
+});
+
+test('generateMiniFantasyOpenFixturePriceSnapshots preserves already-open fixture prices across later global refreshes', () => {
+  const schedule = [
+    {
+      match_no: 39,
+      datetime_utc: '2026-04-27T14:00:00Z',
+      home_team: 'Royal Challengers Bengaluru',
+      away_team: 'Delhi Capitals',
+      mini_fantasy_opens_at_utc: '2026-04-26T15:00:00Z'
+    },
+    {
+      match_no: 40,
+      datetime_utc: '2026-04-28T14:00:00Z',
+      home_team: 'Rajasthan Royals',
+      away_team: 'Punjab Kings',
+      mini_fantasy_opens_at_utc: '2026-04-27T11:00:00Z'
+    }
+  ];
+  const squads = {
+    RCB: ['Virat Kohli'],
+    DC: ['KL Rahul'],
+    RR: ['Vaibhav Suryavanshi'],
+    PBKS: ['Shreyas Iyer']
+  };
+  const teamRoles = {
+    teams: {
+      RCB: { players: { 'Virat Kohli': 'batter' } },
+      DC: { players: { 'KL Rahul': 'wicket_keeper' } },
+      RR: { players: { 'Vaibhav Suryavanshi': 'batter' } },
+      PBKS: { players: { 'Shreyas Iyer': 'batter' } }
+    }
+  };
+  const initialPriceBook = {
+    generated_at_utc: '2026-04-26T15:05:00Z',
+    players: [
+      { player_id: buildMiniFantasyPlayerId('RCB', 'Virat Kohli'), final_price: 9 },
+      { player_id: buildMiniFantasyPlayerId('DC', 'KL Rahul'), final_price: 8.5 },
+      { player_id: buildMiniFantasyPlayerId('RR', 'Vaibhav Suryavanshi'), final_price: 9 },
+      { player_id: buildMiniFantasyPlayerId('PBKS', 'Shreyas Iyer'), final_price: 9 }
+    ]
+  };
+
+  const initialSnapshots = generateMiniFantasyOpenFixturePriceSnapshots({
+    schedule,
+    squads,
+    teamRoles,
+    priceBook: initialPriceBook,
+    asOfUtc: '2026-04-27T08:00:00Z'
+  });
+
+  const refreshedPriceBook = {
+    generated_at_utc: '2026-04-27T18:00:00Z',
+    players: [
+      { player_id: buildMiniFantasyPlayerId('RCB', 'Virat Kohli'), final_price: 9.5 },
+      { player_id: buildMiniFantasyPlayerId('DC', 'KL Rahul'), final_price: 9.5 },
+      { player_id: buildMiniFantasyPlayerId('RR', 'Vaibhav Suryavanshi'), final_price: 8.5 },
+      { player_id: buildMiniFantasyPlayerId('PBKS', 'Shreyas Iyer'), final_price: 9.5 }
+    ]
+  };
+
+  const refreshedSnapshots = generateMiniFantasyOpenFixturePriceSnapshots({
+    schedule,
+    squads,
+    teamRoles,
+    priceBook: refreshedPriceBook,
+    previousSnapshots: initialSnapshots,
+    asOfUtc: '2026-04-27T12:00:00Z'
+  });
+
+  const byMatch = new Map(refreshedSnapshots.fixtures.map((fixture) => [fixture.match_no, fixture]));
+  assert.equal(byMatch.get(39).price_snapshot[buildMiniFantasyPlayerId('RCB', 'Virat Kohli')].final_price, 9);
+  assert.equal(byMatch.get(39).price_snapshot[buildMiniFantasyPlayerId('DC', 'KL Rahul')].final_price, 8.5);
+  assert.equal(byMatch.get(40).price_snapshot[buildMiniFantasyPlayerId('RR', 'Vaibhav Suryavanshi')].final_price, 8.5);
+  assert.equal(byMatch.get(40).price_snapshot[buildMiniFantasyPlayerId('PBKS', 'Shreyas Iyer')].final_price, 9.5);
+});
+
+test('generateMiniFantasyOpenFixturePriceSnapshots adds newly available fixture players without repricing existing open ones', () => {
+  const schedule = [
+    {
+      match_no: 39,
+      datetime_utc: '2026-04-27T14:00:00Z',
+      home_team: 'Royal Challengers Bengaluru',
+      away_team: 'Delhi Capitals',
+      mini_fantasy_opens_at_utc: '2026-04-26T15:00:00Z'
+    }
+  ];
+  const initialSquads = {
+    RCB: ['Virat Kohli'],
+    DC: ['KL Rahul']
+  };
+  const refreshedSquads = {
+    RCB: ['Virat Kohli', 'Jacob Bethell'],
+    DC: ['KL Rahul']
+  };
+  const teamRoles = {
+    teams: {
+      RCB: { players: { 'Virat Kohli': 'batter', 'Jacob Bethell': 'all_rounder' } },
+      DC: { players: { 'KL Rahul': 'wicket_keeper' } }
+    }
+  };
+  const initialPriceBook = {
+    generated_at_utc: '2026-04-26T15:05:00Z',
+    players: [
+      { player_id: buildMiniFantasyPlayerId('RCB', 'Virat Kohli'), final_price: 9 },
+      { player_id: buildMiniFantasyPlayerId('DC', 'KL Rahul'), final_price: 8.5 }
+    ]
+  };
+  const initialSnapshots = generateMiniFantasyOpenFixturePriceSnapshots({
+    schedule,
+    squads: initialSquads,
+    teamRoles,
+    priceBook: initialPriceBook,
+    asOfUtc: '2026-04-27T08:00:00Z'
+  });
+  const refreshedPriceBook = {
+    generated_at_utc: '2026-04-27T18:00:00Z',
+    players: [
+      { player_id: buildMiniFantasyPlayerId('RCB', 'Virat Kohli'), final_price: 9.5 },
+      { player_id: buildMiniFantasyPlayerId('RCB', 'Jacob Bethell'), final_price: 7.5 },
+      { player_id: buildMiniFantasyPlayerId('DC', 'KL Rahul'), final_price: 9.5 }
+    ]
+  };
+
+  const refreshedSnapshots = generateMiniFantasyOpenFixturePriceSnapshots({
+    schedule,
+    squads: refreshedSquads,
+    teamRoles,
+    priceBook: refreshedPriceBook,
+    previousSnapshots: initialSnapshots,
+    asOfUtc: '2026-04-27T10:00:00Z'
+  });
+
+  const snapshot = refreshedSnapshots.fixtures[0].price_snapshot;
+  assert.equal(snapshot[buildMiniFantasyPlayerId('RCB', 'Virat Kohli')].final_price, 9);
+  assert.equal(snapshot[buildMiniFantasyPlayerId('DC', 'KL Rahul')].final_price, 8.5);
+  assert.equal(snapshot[buildMiniFantasyPlayerId('RCB', 'Jacob Bethell')].final_price, 7.5);
 });
 
 test('buildMiniFantasyFixturePointsIndex derives live match points from the current snapshot delta', () => {
