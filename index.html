@@ -1390,6 +1390,7 @@
       applyPriceSnapshotToPool,
       buildMiniFantasyFixturePointsIndex,
       buildMiniFantasyLeaderboard,
+      buildMiniFantasyEntryAuditLog,
       buildEntryPriceSnapshot,
       formatDateKeyInTimeZone,
       buildFixturePlayerPool,
@@ -8386,71 +8387,130 @@ function titleBandScore(pick, live){
       return Number.isInteger(amount) ? String(amount) : amount.toFixed(1);
     }
 
-      function describeMiniFantasyEntry(entry, fixturePointsIndex = new Map()){
-        if (!entry) {
-          return {
-            totalPoints: 0,
-            pointsByPlayerId: {},
-            scoredPointsByPlayerId: {},
-            players: [],
-            captain: null,
-            bestPick: null,
-            summary: 'No team was locked for this fixture.',
-            isNoResult: false
-          };
-        }
-        const playerPool = miniFantasyEntryPlayerPool(entry);
-        const poolById = new Map(playerPool.map((player) => [player.player_id, player]));
-        const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds)
-          ? entry.selectedPlayerIds.filter(Boolean)
-          : (Array.isArray(entry.selected_player_ids) ? entry.selected_player_ids.filter(Boolean) : []);
-        const captainPlayerId = normalizeTextValue(entry.captainPlayerId || entry.captain_player_id || '');
-        const score = scoreMiniFantasyEntry({
-          entry,
-          liveData: LIVE_2026,
-          schedule: LEAGUE_STAGE_SCHEDULE,
-          squads: IPL_SQUADS
-        });
-        const pointsByPlayerId = score.points_by_player_id || Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Number(fixturePointsIndex.get(playerId) || 0)]));
-        const scoredPointsByPlayerId = score.scored_points_by_player_id || {};
-        const appearanceBonusByPlayerId = score.appearance_bonus_by_player_id || {};
-        const winnerBonusByPlayerId = score.winner_bonus_by_player_id || {};
-        const totalPoints = Number(score.total_points || 0) || 0;
-        const players = selectedPlayerIds.map((playerId) => {
-          const player = poolById.get(playerId) || null;
-          const isCaptain = captainPlayerId === playerId;
-          const rawPoints = Number(pointsByPlayerId[playerId] || 0);
-          const scoredPoints = Number(scoredPointsByPlayerId[playerId] ?? rawPoints) || 0;
-          return {
-            playerId,
-            name: player?.name || fallbackMiniFantasyPlayerName(playerId),
-            team: player?.team || '',
-            role: player?.role || '',
-            price: Number(player?.final_price || 0) || 0,
-            points: rawPoints,
-            appearanceBonus: Number(appearanceBonusByPlayerId[playerId] || 0) || 0,
-            winnerBonus: Number(winnerBonusByPlayerId[playerId] || 0) || 0,
-            scoredPoints,
-            isCaptain
-          };
-        });
-        const captain = players.find((player) => player.isCaptain) || null;
-        const bestPick = [...players].sort((a, b) => b.scoredPoints - a.scoredPoints || a.name.localeCompare(b.name))[0] || null;
+    function formatMiniFantasyAuditTimestamp(value){
+      const timestamp = normalizeTextValue(value || '');
+      if (!timestamp) return 'Unknown save time';
+      const date = new Date(timestamp);
+      if (Number.isNaN(date.getTime())) return timestamp;
+      return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+    }
+
+    function formatMiniFantasyAuditBreakdown(player){
+      if (!player) return '';
+      const parts = [`${formatMiniFantasyPoints(player.points)} base`];
+      if (Number(player.appearanceBonus || 0)) parts.push(`${formatMiniFantasyPoints(player.appearanceBonus)} appearance`);
+      if (Number(player.winnerBonus || 0)) parts.push(`${formatMiniFantasyPoints(player.winnerBonus)} winner`);
+      const eligiblePoints = Number(player.eligiblePoints ?? player.points ?? 0) || 0;
+      const scoredPoints = Number(player.scoredPoints ?? eligiblePoints) || 0;
+      const baseLine = `${parts.join(' + ')} = ${formatMiniFantasyPoints(eligiblePoints)}`;
+      if (player.isCaptain && Number(player.captainMultiplier || 0) > 1) {
+        return `${baseLine}, x${formatMiniFantasyPoints(player.captainMultiplier)} captain -> ${formatMiniFantasyPoints(scoredPoints)}`;
+      }
+      return baseLine;
+    }
+
+    function describeMiniFantasyAuditLog(auditLog){
+      if (!auditLog || typeof auditLog !== 'object') return null;
+      const players = (Array.isArray(auditLog.players) ? auditLog.players : []).map((player) => ({
+        playerId: normalizeTextValue(player?.player_id || player?.playerId || ''),
+        name: normalizeTextValue(player?.name || fallbackMiniFantasyPlayerName(player?.player_id || player?.playerId || '')) || fallbackMiniFantasyPlayerName(player?.player_id || player?.playerId || ''),
+        team: normalizeTextValue(player?.team || ''),
+        role: normalizeTextValue(player?.role || ''),
+        price: Number(player?.price ?? player?.final_price ?? 0) || 0,
+        points: Number(player?.points || 0) || 0,
+        appearanceBonus: Number(player?.appearance_bonus ?? player?.appearanceBonus ?? 0) || 0,
+        winnerBonus: Number(player?.winner_bonus ?? player?.winnerBonus ?? 0) || 0,
+        eligiblePoints: Number(player?.eligible_points ?? player?.eligiblePoints ?? 0) || 0,
+        captainMultiplier: Number(player?.captain_multiplier ?? player?.captainMultiplier ?? (player?.is_captain || player?.isCaptain ? 1.5 : 1)) || 1,
+        scoredPoints: Number(player?.scored_points ?? player?.scoredPoints ?? 0) || 0,
+        isCaptain: Boolean(player?.is_captain ?? player?.isCaptain)
+      }));
+      const pointsByPlayerId = Object.fromEntries(players.map((player) => [player.playerId, player.points]));
+      const scoredPointsByPlayerId = Object.fromEntries(players.map((player) => [player.playerId, player.scoredPoints]));
+      const captainPlayerId = normalizeTextValue(auditLog.captain_player_id || auditLog.captainPlayerId || '');
+      const captain = players.find((player) => player.isCaptain || player.playerId === captainPlayerId) || null;
+      const bestPickPlayerId = normalizeTextValue(auditLog.best_pick_player_id || auditLog.bestPickPlayerId || '');
+      const bestPick = players.find((player) => player.playerId === bestPickPlayerId)
+        || [...players].sort((a, b) => b.scoredPoints - a.scoredPoints || a.name.localeCompare(b.name))[0]
+        || null;
+      return {
+        totalPoints: Number(auditLog.total_points || auditLog.totalPoints || 0) || 0,
+        pointsByPlayerId,
+        scoredPointsByPlayerId,
+        players,
+        captain,
+        bestPick,
+        spentCredits: Number(auditLog.spent_credits ?? auditLog.spentCredits ?? 0) || 0,
+        savedAt: normalizeTextValue(auditLog.saved_at || auditLog.savedAt || '') || null,
+        appearanceBonusPoints: Number(auditLog.appearance_bonus_points || auditLog.appearanceBonusPoints || 0) || 0,
+        winnerBonusPoints: Number(auditLog.winner_bonus_points || auditLog.winnerBonusPoints || 0) || 0,
+        summary: auditLog.is_no_result || auditLog.isNoResult
+          ? 'This fixture ended with no result, so no Mini Fantasy points were awarded.'
+          : captain
+            ? `${captain.name} carries the captain armband.`
+            : 'Captain is not set on this saved team.',
+        isNoResult: Boolean(auditLog.is_no_result ?? auditLog.isNoResult),
+        auditLog
+      };
+    }
+
+    function describeMiniFantasyEntry(entry, fixturePointsIndex = new Map()){
+      if (!entry) {
         return {
-          totalPoints,
-          pointsByPlayerId,
-          scoredPointsByPlayerId,
-          players,
-          captain,
-          bestPick,
-          summary: score.is_no_result
-            ? 'This fixture ended with no result, so no Mini Fantasy points were awarded.'
-            : captain
-              ? `${captain.name} carries the captain armband.`
-              : 'Captain is not set on this saved team.',
-          isNoResult: Boolean(score.is_no_result)
+          totalPoints: 0,
+          pointsByPlayerId: {},
+          scoredPointsByPlayerId: {},
+          players: [],
+          captain: null,
+          bestPick: null,
+          spentCredits: 0,
+          savedAt: null,
+          appearanceBonusPoints: 0,
+          winnerBonusPoints: 0,
+          summary: 'No team was locked for this fixture.',
+          isNoResult: false,
+          auditLog: null
         };
       }
+      const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds)
+        ? entry.selectedPlayerIds.filter(Boolean)
+        : (Array.isArray(entry.selected_player_ids) ? entry.selected_player_ids.filter(Boolean) : []);
+      const score = scoreMiniFantasyEntry({
+        entry,
+        liveData: LIVE_2026,
+        schedule: LEAGUE_STAGE_SCHEDULE,
+        squads: IPL_SQUADS
+      });
+      const pointsByPlayerId = score.points_by_player_id || Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Number(fixturePointsIndex.get(playerId) || 0)]));
+      const auditLog = buildMiniFantasyEntryAuditLog({
+        entry: {
+          ...entry,
+          selectedPlayerIds,
+          spentCredits: entry.spentCredits ?? entry.spent_credits ?? 0
+        },
+        score: {
+          ...score,
+          points_by_player_id: pointsByPlayerId
+        }
+      });
+      return describeMiniFantasyAuditLog(auditLog) || {
+        totalPoints: Number(score.total_points || 0) || 0,
+        pointsByPlayerId,
+        scoredPointsByPlayerId: score.scored_points_by_player_id || {},
+        players: [],
+        captain: null,
+        bestPick: null,
+        spentCredits: Number(entry.spentCredits ?? entry.spent_credits ?? 0) || 0,
+        savedAt: normalizeTextValue(entry.savedAt || entry.saved_at || entry.updatedAt || entry.updated_at || '') || null,
+        appearanceBonusPoints: Number(score.appearance_bonus_points || 0) || 0,
+        winnerBonusPoints: Number(score.winner_bonus_points || 0) || 0,
+        summary: score.is_no_result
+          ? 'This fixture ended with no result, so no Mini Fantasy points were awarded.'
+          : 'Captain is not set on this saved team.',
+        isNoResult: Boolean(score.is_no_result),
+        auditLog
+      };
+    }
 
     function currentUserLatestMiniFantasyEntry(){
       return currentMiniFantasyEntries()
@@ -8520,6 +8580,7 @@ function titleBandScore(pick, live){
         const fixtureEntry = entryByOwner.get(ownerHandle) || null;
         const matchSummary = (Array.isArray(row.matches) ? row.matches : []).find((item) => Number(item?.match_no || 0) === matchNo) || null;
         const detail = fixtureEntry ? describeMiniFantasyEntry(fixtureEntry, pointsIndex) : null;
+        const fallbackDetail = !fixtureEntry && matchSummary?.audit_log ? describeMiniFantasyAuditLog(matchSummary.audit_log) : null;
         let fixtureStatus = fixtureEntry ? stage : 'did_not_lock';
         let fixturePoints = detail ? detail.totalPoints : 0;
         let fixturePlayers = detail ? detail.players : [];
@@ -8527,14 +8588,24 @@ function titleBandScore(pick, live){
         let fixtureSummary = detail ? detail.summary : 'No team was locked for this fixture.';
         let fixtureBestPick = detail ? detail.bestPick : null;
         let fixtureIsNoResult = detail ? Boolean(detail.isNoResult) : false;
+        let fixtureSpentCredits = detail ? detail.spentCredits : 0;
+        let fixtureSavedAt = detail ? detail.savedAt : null;
+        let fixtureAppearanceBonusPoints = detail ? detail.appearanceBonusPoints : 0;
+        let fixtureWinnerBonusPoints = detail ? detail.winnerBonusPoints : 0;
+        let fixtureAuditLog = detail ? detail.auditLog : null;
         if (!fixtureEntry && stage === 'final' && matchSummary) {
           fixtureStatus = normalizeTextValue(matchSummary.source || 'did_not_lock') || 'did_not_lock';
-          fixturePoints = Number(matchSummary.total_points || 0) || 0;
-          fixturePlayers = [];
-          fixtureCaptain = null;
-          fixtureSummary = normalizeTextValue(matchSummary.summary || 'No team was locked for this fixture.');
-          fixtureBestPick = null;
-          fixtureIsNoResult = Boolean(matchSummary.is_no_result);
+          fixturePoints = fallbackDetail ? fallbackDetail.totalPoints : (Number(matchSummary.total_points || 0) || 0);
+          fixturePlayers = fallbackDetail ? fallbackDetail.players : [];
+          fixtureCaptain = fallbackDetail ? fallbackDetail.captain : null;
+          fixtureSummary = fallbackDetail ? fallbackDetail.summary : normalizeTextValue(matchSummary.summary || 'No team was locked for this fixture.');
+          fixtureBestPick = fallbackDetail ? fallbackDetail.bestPick : null;
+          fixtureIsNoResult = fallbackDetail ? Boolean(fallbackDetail.isNoResult) : Boolean(matchSummary.is_no_result);
+          fixtureSpentCredits = fallbackDetail ? fallbackDetail.spentCredits : (Number(matchSummary.spent_credits || 0) || 0);
+          fixtureSavedAt = fallbackDetail ? fallbackDetail.savedAt : (normalizeTextValue(matchSummary.saved_at || '') || null);
+          fixtureAppearanceBonusPoints = fallbackDetail ? fallbackDetail.appearanceBonusPoints : 0;
+          fixtureWinnerBonusPoints = fallbackDetail ? fallbackDetail.winnerBonusPoints : 0;
+          fixtureAuditLog = fallbackDetail ? fallbackDetail.auditLog : null;
         }
         return {
           ...row,
@@ -8546,7 +8617,12 @@ function titleBandScore(pick, live){
           fixtureCaptain,
           fixtureSummary,
           fixtureBestPick,
-          fixtureIsNoResult
+          fixtureIsNoResult,
+          fixtureSpentCredits,
+          fixtureSavedAt,
+          fixtureAppearanceBonusPoints,
+          fixtureWinnerBonusPoints,
+          fixtureAuditLog
         };
       });
 
@@ -9323,6 +9399,16 @@ function titleBandScore(pick, live){
       const storyCards = buildMiniFantasyStoryCards(board, selectedRow);
       const fixtureOptions = miniFantasyRecentFixtureOptions(Array.isArray(board.rows) ? board.rows.length : 0);
       const activeOption = fixtureOptions.find((option) => option.isActive) || null;
+      const hasAuditLog = selectedRow.fixtureStatus === 'locked_entry' && (selectedRow.fixtureSavedAt || Number(selectedRow.fixtureSpentCredits || 0) > 0 || detailPlayers.length);
+      const auditNote = hasAuditLog
+        ? [
+            selectedRow.fixtureSavedAt ? `Saved ${formatMiniFantasyAuditTimestamp(selectedRow.fixtureSavedAt)}.` : '',
+            Number(selectedRow.fixtureSpentCredits || 0) > 0 ? `Spent ${formatMiniFantasyPrice(selectedRow.fixtureSpentCredits)} of ${formatMiniFantasyPrice(MINI_FANTASY_BUDGET)}.` : '',
+            !selectedRow.fixtureIsNoResult
+              ? `Bonuses included: ${formatMiniFantasyPoints(selectedRow.fixtureAppearanceBonusPoints || 0)} appearance and ${formatMiniFantasyPoints(selectedRow.fixtureWinnerBonusPoints || 0)} winner-side points.`
+              : 'No-result rule applied, so every player finished on 0.'
+          ].filter(Boolean).join(' ')
+        : '';
       const detailNote = selectedRow.fixtureStatus === 'did_not_lock'
         ? `${viewedName} did not save a team before this fixture locked.`
         : selectedRow.fixtureStatus === 'missed_lock_relief'
@@ -9400,7 +9486,10 @@ function titleBandScore(pick, live){
                     : selectedRow.fixtureStatus === 'no_locked_teams'
                       ? '<span class="fantasy-summary-chip">No teams locked</span>'
                       : captain ? `<span class="fantasy-summary-chip">Captain: ${escapeHtml(captain.name)}</span>` : ''}
+              ${hasAuditLog && Number(selectedRow.fixtureSpentCredits || 0) > 0 ? `<span class="fantasy-summary-chip">Spent: ${escapeHtml(formatMiniFantasyPrice(selectedRow.fixtureSpentCredits))}</span>` : ''}
+              ${hasAuditLog && selectedRow.fixtureSavedAt ? `<span class="fantasy-summary-chip">Saved: ${escapeHtml(formatMiniFantasyAuditTimestamp(selectedRow.fixtureSavedAt))}</span>` : ''}
             </div>
+            ${auditNote ? `<div class="fantasy-window-note">${escapeHtml(auditNote)}</div>` : ''}
           </div>
           ${selectedRow.fixtureStatus === 'did_not_lock'
             ? '<div class="fantasy-empty">No locked team exists for this user on the selected fixture.</div>'
@@ -9411,6 +9500,7 @@ function titleBandScore(pick, live){
                     <div class="fantasy-entry-copy">
                       <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
                       <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}</div>
+                      <div class="fantasy-picker-role">${escapeHtml(formatMiniFantasyAuditBreakdown(player))}</div>
                     </div>
                     <div class="fantasy-entry-copy" style="justify-items:end">
                       <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.scoredPoints ?? player.points))}</div>

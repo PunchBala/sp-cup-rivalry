@@ -1631,6 +1631,16 @@ function calculateMiniFantasyAppearanceBonus({
   );
 }
 
+function fallbackMiniFantasyPlayerName(playerId = '') {
+  const raw = normalizeWhitespace(playerId || '').split('_').slice(1).join(' ') || normalizeWhitespace(playerId || '');
+  if (!raw) return 'Unknown player';
+  return raw
+    .split('-')
+    .map((part) => (part ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : ''))
+    .join(' ')
+    .trim() || raw;
+}
+
 export function scoreMiniFantasyEntry({
   entry = {},
   liveData = {},
@@ -1719,6 +1729,93 @@ export function scoreMiniFantasyEntry({
       selectedPlayerIds,
       appearedByPlayerId
     })
+  };
+}
+
+export function buildMiniFantasyEntryAuditLog({
+  entry = {},
+  score = null,
+  liveData = {},
+  schedule = [],
+  squads = {},
+  fixtureRecordMap = null,
+  winningTeamCode = undefined,
+  noResult = undefined,
+  completedMatchCount = undefined
+} = {}) {
+  if (!entry) return null;
+  const selectedPlayerIds = Array.isArray(entry?.selectedPlayerIds)
+    ? entry.selectedPlayerIds.filter(Boolean)
+    : (Array.isArray(entry?.selected_player_ids) ? entry?.selected_player_ids.filter(Boolean) : []);
+  const captainPlayerId = normalizeWhitespace(entry?.captainPlayerId || entry?.captain_player_id || '');
+  const priceSnapshot = entry?.priceSnapshot && typeof entry.priceSnapshot === 'object'
+    ? entry.priceSnapshot
+    : (entry?.price_snapshot && typeof entry.price_snapshot === 'object' ? entry.price_snapshot : {});
+  const resolvedScore = score && typeof score === 'object'
+    ? score
+    : scoreMiniFantasyEntry({
+        entry,
+        liveData,
+        schedule,
+        squads,
+        fixtureRecordMap,
+        winningTeamCode,
+        noResult,
+        completedMatchCount
+      });
+
+  const pointsByPlayerId = resolvedScore?.points_by_player_id || {};
+  const appearanceBonusByPlayerId = resolvedScore?.appearance_bonus_by_player_id || {};
+  const winnerBonusByPlayerId = resolvedScore?.winner_bonus_by_player_id || {};
+  const eligiblePointsByPlayerId = resolvedScore?.eligible_points_by_player_id || {};
+  const scoredPointsByPlayerId = resolvedScore?.scored_points_by_player_id || {};
+
+  const players = selectedPlayerIds.map((playerId) => {
+    const snapshot = priceSnapshot?.[playerId] || {};
+    const isCaptain = captainPlayerId === playerId;
+    const teamCode = normalizeWhitespace(snapshot.team || resolveMiniFantasyPlayerTeamCode(playerId) || '');
+    const basePoints = toNumber(pointsByPlayerId[playerId], 0);
+    const appearanceBonus = toNumber(appearanceBonusByPlayerId[playerId], 0);
+    const winnerBonus = toNumber(winnerBonusByPlayerId[playerId], 0);
+    const eligiblePoints = Number.isFinite(Number(eligiblePointsByPlayerId[playerId]))
+      ? Number(eligiblePointsByPlayerId[playerId])
+      : roundTo(basePoints + appearanceBonus + winnerBonus, 2);
+    const captainMultiplier = isCaptain ? MINI_FANTASY_CAPTAIN_MULTIPLIER : 1;
+    const scoredPoints = Number.isFinite(Number(scoredPointsByPlayerId[playerId]))
+      ? Number(scoredPointsByPlayerId[playerId])
+      : roundTo(eligiblePoints * captainMultiplier, 2);
+    return {
+      player_id: playerId,
+      name: normalizeWhitespace(snapshot.name || fallbackMiniFantasyPlayerName(playerId)) || fallbackMiniFantasyPlayerName(playerId),
+      team: teamCode,
+      role: normalizeWhitespace(snapshot.role || '') || '',
+      price: toNumber(snapshot.final_price, 0),
+      points: basePoints,
+      appearance_bonus: appearanceBonus,
+      winner_bonus: winnerBonus,
+      eligible_points: eligiblePoints,
+      captain_multiplier: captainMultiplier,
+      scored_points: scoredPoints,
+      is_captain: isCaptain
+    };
+  });
+
+  const bestPick = [...players].sort((a, b) => b.scored_points - a.scored_points || a.name.localeCompare(b.name))[0] || null;
+
+  return {
+    version: 'mini_fantasy_entry_audit_v1',
+    match_no: Number(entry?.matchNo || entry?.match_no || 0) || null,
+    total_points: toNumber(resolvedScore?.total_points, 0),
+    spent_credits: toNumber(entry?.spentCredits ?? entry?.spent_credits, 0),
+    saved_at: entry?.savedAt || entry?.saved_at || entry?.updatedAt || entry?.updated_at || null,
+    selected_player_ids: selectedPlayerIds,
+    captain_player_id: captainPlayerId || null,
+    winning_team_code: normalizeWhitespace(resolvedScore?.winning_team_code || '') || null,
+    is_no_result: Boolean(resolvedScore?.is_no_result),
+    appearance_bonus_points: toNumber(resolvedScore?.appearance_bonus_points, 0),
+    winner_bonus_points: toNumber(resolvedScore?.winner_bonus_points, 0),
+    best_pick_player_id: bestPick?.player_id || null,
+    players
   };
 }
 
@@ -1856,7 +1953,14 @@ export function buildMiniFantasyLeaderboard({
         display_name: row?.display_name || normalizeWhitespace(entry?.displayName || entry?.display_name || ownerHandle || userId),
         match_no: matchNo,
         saved_at: entry?.savedAt || entry?.saved_at || entry?.updatedAt || entry?.updated_at || null,
+        selected_player_ids: Array.isArray(entry?.selectedPlayerIds)
+          ? entry.selectedPlayerIds.filter(Boolean)
+          : (Array.isArray(entry?.selected_player_ids) ? entry.selected_player_ids.filter(Boolean) : []),
         captain_player_id: entry?.captainPlayerId || entry?.captain_player_id || null,
+        price_snapshot: entry?.priceSnapshot && typeof entry.priceSnapshot === 'object'
+          ? entry.priceSnapshot
+          : (entry?.price_snapshot && typeof entry.price_snapshot === 'object' ? entry.price_snapshot : {}),
+        spent_credits: toNumber(entry?.spentCredits ?? entry?.spent_credits, 0),
         total_points: toNumber(score.total_points, 0),
         is_scored: Boolean(score.is_scored),
         is_no_result: Boolean(score.is_no_result),
@@ -1905,6 +2009,17 @@ export function buildMiniFantasyLeaderboard({
     [...grouped.values()].forEach((row) => {
       const entry = entryByMatchAndParticipant.get(`${matchNo}:${row.key}`);
       if (entry) {
+        const auditLog = buildMiniFantasyEntryAuditLog({
+          entry: {
+            match_no: entry.match_no,
+            selected_player_ids: entry.selected_player_ids,
+            captain_player_id: entry.captain_player_id,
+            price_snapshot: entry.price_snapshot,
+            spent_credits: entry.spent_credits,
+            saved_at: entry.saved_at
+          },
+          score: entry.score
+        });
         row.matches.push({
           match_no: matchNo,
           total_points: entry.total_points,
@@ -1912,6 +2027,9 @@ export function buildMiniFantasyLeaderboard({
           source: 'locked_entry',
           captain_player_id: entry.captain_player_id,
           is_no_result: entry.is_no_result,
+          spent_credits: auditLog?.spent_credits ?? 0,
+          saved_at: auditLog?.saved_at || null,
+          audit_log: auditLog,
           summary: entry.is_no_result
             ? 'No result: everyone finishes on 0 for this fixture.'
             : `Locked team score: ${roundTo(entry.total_points, 2)} points.`

@@ -59,6 +59,9 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function loadPlayerAvailabilityData\(/);
   assert.match(html, /function loadMiniFantasyOpenFixturePriceSnapshots\(/);
   assert.match(html, /function miniFantasyAvailabilityBadgeLabel\(/);
+  assert.match(html, /function formatMiniFantasyAuditTimestamp\(/);
+  assert.match(html, /function formatMiniFantasyAuditBreakdown\(/);
+  assert.match(html, /function describeMiniFantasyAuditLog\(/);
   assert.match(html, /function renderMiniFantasySection\(/);
   assert.match(html, /function renderMiniFantasyFixtures\(/);
   assert.match(html, /function renderMiniFantasyBuilder\(/);

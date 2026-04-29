@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   MINI_FANTASY_BUDGET,
   MINI_FANTASY_NEW_PLAYER_BASELINE_POINTS,
+  buildMiniFantasyEntryAuditLog,
   buildMiniFantasyLeaderboard,
   buildMiniFantasyFixturePointsIndex,
   buildMiniFantasyPlayerPointsIndex,
@@ -1511,13 +1512,21 @@ test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy point
         ownerHandle: 'senthil',
         displayName: 'Senthil',
         matchNo: 14,
+        spentCredits: 30.5,
+        savedAt: '2026-04-08T13:58:00Z',
         selectedPlayerIds: [
           buildMiniFantasyPlayerId('DC', 'DC Batter'),
           buildMiniFantasyPlayerId('DC', 'DC Bowler'),
           buildMiniFantasyPlayerId('GT', 'GT Bowler'),
           buildMiniFantasyPlayerId('GT', 'GT Keeper')
         ],
-        captainPlayerId: buildMiniFantasyPlayerId('DC', 'DC Batter')
+        captainPlayerId: buildMiniFantasyPlayerId('DC', 'DC Batter'),
+        priceSnapshot: {
+          [buildMiniFantasyPlayerId('DC', 'DC Batter')]: { name: 'DC Batter', team: 'DC', role: 'batter', final_price: 9 },
+          [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: { name: 'DC Bowler', team: 'DC', role: 'bowler', final_price: 7 },
+          [buildMiniFantasyPlayerId('GT', 'GT Bowler')]: { name: 'GT Bowler', team: 'GT', role: 'bowler', final_price: 6 },
+          [buildMiniFantasyPlayerId('GT', 'GT Keeper')]: { name: 'GT Keeper', team: 'GT', role: 'wicket_keeper', final_price: 8.5 }
+        }
       },
       {
         ownerHandle: 'sai',
@@ -1544,6 +1553,86 @@ test('buildMiniFantasyLeaderboard ranks saved users by scored mini fantasy point
   assert.equal(leaderboard.rows[1].medal, 'silver');
   assert.equal(leaderboard.rows[0].total_points, 123.5);
   assert.equal(leaderboard.rows[1].total_points, 107);
+  assert.equal(leaderboard.rows[0].matches[0].source, 'locked_entry');
+  assert.equal(leaderboard.rows[0].matches[0].spent_credits, 30.5);
+  assert.equal(leaderboard.rows[0].matches[0].saved_at, '2026-04-08T13:58:00Z');
+  assert.equal(leaderboard.rows[0].matches[0].audit_log.players.length, 4);
+  assert.equal(leaderboard.rows[0].matches[0].audit_log.captain_player_id, buildMiniFantasyPlayerId('DC', 'DC Batter'));
+  assert.equal(leaderboard.rows[0].matches[0].audit_log.best_pick_player_id, buildMiniFantasyPlayerId('DC', 'DC Batter'));
+  assert.equal(leaderboard.rows[0].matches[0].audit_log.players[0].captain_multiplier, 1.5);
+  assert.equal(leaderboard.rows[0].matches[0].audit_log.players[0].scored_points, 70.5);
+});
+
+test('buildMiniFantasyEntryAuditLog includes per-player score breakdown, captain, credits, and save timestamp', () => {
+  const entry = {
+    matchNo: 14,
+    spentCredits: 30.5,
+    savedAt: '2026-04-08T13:58:00Z',
+    selectedPlayerIds: [
+      buildMiniFantasyPlayerId('DC', 'DC Batter'),
+      buildMiniFantasyPlayerId('DC', 'DC Bowler'),
+      buildMiniFantasyPlayerId('GT', 'GT Bowler'),
+      buildMiniFantasyPlayerId('GT', 'GT Keeper')
+    ],
+    captainPlayerId: buildMiniFantasyPlayerId('DC', 'DC Batter'),
+    priceSnapshot: {
+      [buildMiniFantasyPlayerId('DC', 'DC Batter')]: { name: 'DC Batter', team: 'DC', role: 'batter', final_price: 9 },
+      [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: { name: 'DC Bowler', team: 'DC', role: 'bowler', final_price: 7 },
+      [buildMiniFantasyPlayerId('GT', 'GT Bowler')]: { name: 'GT Bowler', team: 'GT', role: 'bowler', final_price: 6 },
+      [buildMiniFantasyPlayerId('GT', 'GT Keeper')]: { name: 'GT Keeper', team: 'GT', role: 'wicket_keeper', final_price: 8.5 }
+    }
+  };
+  const score = {
+    total_points: 123.5,
+    is_no_result: false,
+    winning_team_code: 'DC',
+    appearance_bonus_points: 8,
+    winner_bonus_points: 10,
+    points_by_player_id: {
+      [buildMiniFantasyPlayerId('DC', 'DC Batter')]: 40,
+      [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: 20,
+      [buildMiniFantasyPlayerId('GT', 'GT Bowler')]: 10,
+      [buildMiniFantasyPlayerId('GT', 'GT Keeper')]: 12
+    },
+    appearance_bonus_by_player_id: {
+      [buildMiniFantasyPlayerId('DC', 'DC Batter')]: 2,
+      [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: 2,
+      [buildMiniFantasyPlayerId('GT', 'GT Bowler')]: 2,
+      [buildMiniFantasyPlayerId('GT', 'GT Keeper')]: 2
+    },
+    winner_bonus_by_player_id: {
+      [buildMiniFantasyPlayerId('DC', 'DC Batter')]: 5,
+      [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: 5,
+      [buildMiniFantasyPlayerId('GT', 'GT Bowler')]: 0,
+      [buildMiniFantasyPlayerId('GT', 'GT Keeper')]: 0
+    },
+    eligible_points_by_player_id: {
+      [buildMiniFantasyPlayerId('DC', 'DC Batter')]: 47,
+      [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: 27,
+      [buildMiniFantasyPlayerId('GT', 'GT Bowler')]: 12,
+      [buildMiniFantasyPlayerId('GT', 'GT Keeper')]: 14
+    },
+    scored_points_by_player_id: {
+      [buildMiniFantasyPlayerId('DC', 'DC Batter')]: 70.5,
+      [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: 27,
+      [buildMiniFantasyPlayerId('GT', 'GT Bowler')]: 12,
+      [buildMiniFantasyPlayerId('GT', 'GT Keeper')]: 14
+    }
+  };
+
+  const audit = buildMiniFantasyEntryAuditLog({ entry, score });
+
+  assert.equal(audit.version, 'mini_fantasy_entry_audit_v1');
+  assert.equal(audit.spent_credits, 30.5);
+  assert.equal(audit.saved_at, '2026-04-08T13:58:00Z');
+  assert.equal(audit.captain_player_id, buildMiniFantasyPlayerId('DC', 'DC Batter'));
+  assert.equal(audit.best_pick_player_id, buildMiniFantasyPlayerId('DC', 'DC Batter'));
+  assert.equal(audit.players[0].name, 'DC Batter');
+  assert.equal(audit.players[0].appearance_bonus, 2);
+  assert.equal(audit.players[0].winner_bonus, 5);
+  assert.equal(audit.players[0].eligible_points, 47);
+  assert.equal(audit.players[0].captain_multiplier, 1.5);
+  assert.equal(audit.players[0].scored_points, 70.5);
 });
 
 test('buildMiniFantasyLeaderboard adds missed-lock relief, daily visit bonus, and new-player baseline points', () => {
@@ -1754,7 +1843,20 @@ test('serializeMiniFantasyLeaderboardRows keeps the leaderboard snapshot shape s
             {
               match_no: 14,
               total_points: 83.5,
-              source: 'locked_entry'
+              source: 'locked_entry',
+              spent_credits: 30.5,
+              saved_at: '2026-04-08T13:58:00Z',
+              audit_log: {
+                version: 'mini_fantasy_entry_audit_v1',
+                spent_credits: 30.5,
+                players: [
+                  {
+                    player_id: 'dc_dc-batter',
+                    name: 'DC Batter',
+                    scored_points: 70.5
+                  }
+                ]
+              }
             }
           ]
         }
@@ -1787,7 +1889,20 @@ test('serializeMiniFantasyLeaderboardRows keeps the leaderboard snapshot shape s
         {
           match_no: 14,
           total_points: 83.5,
-          source: 'locked_entry'
+          source: 'locked_entry',
+          spent_credits: 30.5,
+          saved_at: '2026-04-08T13:58:00Z',
+          audit_log: {
+            version: 'mini_fantasy_entry_audit_v1',
+            spent_credits: 30.5,
+            players: [
+              {
+                player_id: 'dc_dc-batter',
+                name: 'DC Batter',
+                scored_points: 70.5
+              }
+            ]
+          }
         }
       ],
       live_data_fetched_at: '2026-04-19T10:00:00Z',
