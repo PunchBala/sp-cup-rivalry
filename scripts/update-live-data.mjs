@@ -515,6 +515,9 @@ function createEmptyLive() {
         scorecardCacheHits: 0,
         backlogProcessed: 0,
         backlogRemaining: 0,
+        missingProcessedScorecards: 0,
+        missingProcessedScorecardMatchIds: [],
+        missingProcessedScorecardReason: null,
         liveOverlayFetched: false,
         liveOverlayReused: false,
         liveOverlaySkippedReason: null,
@@ -2505,6 +2508,36 @@ export function endedUnprocessedMatches(matchList, processedIds, processedKeys =
     .sort(compareMatchesChronologically);
 }
 
+export async function findMissingProcessedScorecardRefs(processedRefs, { cacheDir = SCORECARD_CACHE_DIR } = {}) {
+  const uniqueMissing = [];
+  const seenIds = new Set();
+  for (const ref of safeArray(processedRefs)) {
+    const matchId = String(ref?.id || '').trim();
+    if (!matchId || seenIds.has(matchId)) continue;
+    seenIds.add(matchId);
+    const cached = await readCachedScorecard(matchId, { cacheDir });
+    if (!cached) uniqueMissing.push(ref);
+  }
+  return uniqueMissing;
+}
+
+function noteMissingProcessedScorecards(live, missingRefs = []) {
+  const refs = safeArray(missingRefs)
+    .map((ref) => ({ ...ref, id: String(ref?.id || '').trim() }))
+    .filter((ref) => ref.id);
+  const ids = [...new Set(refs.map((ref) => ref.id))];
+  live.meta.lastRun.missingProcessedScorecards = ids.length;
+  live.meta.lastRun.missingProcessedScorecardMatchIds = ids.slice(-5);
+  live.meta.lastRun.missingProcessedScorecardReason = ids.length
+    ? `processed matches missing cached scorecard: ${ids.join(', ')}`
+    : null;
+  if (ids.length && !live.meta.scorecardBudget.lastDeferredReason) {
+    live.meta.scorecardBudget.lastDeferredAt = isoNow();
+    live.meta.scorecardBudget.lastDeferredMatchId = ids[ids.length - 1];
+    live.meta.scorecardBudget.lastDeferredReason = live.meta.lastRun.missingProcessedScorecardReason;
+  }
+}
+
 function liveMatchCandidate(matchList) {
   return safeArray(matchList).find((m) => m.matchStarted && !m.matchEnded) || null;
 }
@@ -2593,6 +2626,9 @@ async function main() {
     scorecardCacheHits: 0,
     backlogProcessed: 0,
     backlogRemaining: 0,
+    missingProcessedScorecards: 0,
+    missingProcessedScorecardMatchIds: [],
+    missingProcessedScorecardReason: null,
     liveOverlayFetched: false,
     liveOverlayReused: false,
     liveOverlaySkippedReason: null,
@@ -2784,7 +2820,11 @@ async function main() {
     live.meta.lastRun.backlogProcessed += 1;
   }
 
-  const backlogRemaining = Math.max(0, endedBacklog.length - live.meta.lastRun.backlogProcessed);
+  const unresolvedBacklog = Math.max(0, endedBacklog.length - live.meta.lastRun.backlogProcessed);
+  const processedRefsForCacheHealth = buildProcessedMatchRefs(matchList, Array.from(new Set(processedMatchKeys)), [...processedIds]);
+  const missingProcessedScorecards = await findMissingProcessedScorecardRefs(processedRefsForCacheHealth);
+  noteMissingProcessedScorecards(live, missingProcessedScorecards);
+  const backlogRemaining = unresolvedBacklog + live.meta.lastRun.missingProcessedScorecards;
   live.meta.lastRun.backlogRemaining = backlogRemaining;
   if (live.meta.lastRun.backlogProcessed > 0) {
     live.meta.scorecardBudget.lastBacklogProcessAt = isoNow();

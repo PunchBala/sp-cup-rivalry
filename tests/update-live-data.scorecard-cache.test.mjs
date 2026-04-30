@@ -11,6 +11,7 @@ import {
   canUseFreshScorecardCall,
   completedScorecardIntegrityIssues,
   findMissingScorecardCaches,
+  findMissingProcessedScorecardRefs,
   freshScorecardBudgetRemaining,
   incompleteCompletedScorecardDetails,
   inferProcessedMatchKeys,
@@ -500,6 +501,53 @@ test('stable processed match keys prevent duplicate backlog when CricketData rot
   assert.deepEqual(processedKeys, ['match:1', 'match:2']);
   assert.equal(backlog.length, 1);
   assert.equal(backlog[0].id, 'new-match-3');
+});
+
+test('findMissingProcessedScorecardRefs still flags processed matches when the current provider id has no cache yet', async () => {
+  const cacheDir = await makeTempCacheDir();
+  const oldScorecard = makeFinalScorecard({
+    teams: ['Mumbai Indians', 'Sunrisers Hyderabad'],
+    winner: 'Sunrisers Hyderabad',
+    batter: 'Ryan Rickelton',
+    bowler: 'Pat Cummins',
+    catcher: 'Heinrich Klaasen',
+    runs: 123,
+    balls: 55,
+    sixes: 8,
+    wickets: 2,
+    concededRuns: 39,
+    overs: '4',
+    scoreA: 243,
+    scoreB: 249
+  });
+  await writeCachedScorecard('old-match-41', oldScorecard, { cacheDir });
+
+  const live = {
+    meta: {
+      processedMatchIds: ['old-match-41'],
+      processedMatchKeys: ['match:41']
+    }
+  };
+  const matchList = [
+    {
+      id: 'current-match-41',
+      name: 'Mumbai Indians vs Sunrisers Hyderabad, 41st Match, Indian Premier League 2026',
+      status: 'Sunrisers Hyderabad won by 6 wkts',
+      dateTimeGMT: '2026-04-29T14:00:00Z',
+      teams: ['Mumbai Indians', 'Sunrisers Hyderabad'],
+      matchStarted: true,
+      matchEnded: true,
+      matchNo: 41,
+      matchKey: 'match:41'
+    }
+  ];
+
+  const processedRefs = buildCurrentProcessedMatchRefs(live, matchList);
+  const missingRefs = await findMissingProcessedScorecardRefs(processedRefs, { cacheDir });
+
+  assert.equal(processedRefs.length, 1);
+  assert.equal(processedRefs[0].id, 'current-match-41');
+  assert.deepEqual(missingRefs.map((ref) => ref.id), ['current-match-41']);
 });
 
 test('current processed refs rebuild includes matches added after the initial processed-ref snapshot', () => {
