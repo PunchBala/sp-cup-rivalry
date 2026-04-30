@@ -144,6 +144,74 @@ function validateRankedCategory(errors, category, pathLabel, opts = {}) {
   if (opts.playoffs) expectArrayOfStrings(errors, category.playoffs, `${pathLabel}.playoffs`);
 }
 
+function validateScrapeReportEntry(errors, entry, pathLabel, { allowFalse = false } = {}) {
+  if (!expectObject(errors, entry, pathLabel)) return;
+  expectBoolean(errors, entry.ok, `${pathLabel}.ok`);
+  expectString(errors, entry.source, `${pathLabel}.source`);
+  expectString(errors, entry.method, `${pathLabel}.method`);
+  if (!allowFalse && entry.ok === false) {
+    push(errors, `${pathLabel}.ok`, 'must be true');
+  }
+}
+
+function validateScrapeReport(errors, scrapeReport, pathLabel) {
+  if (!expectObject(errors, scrapeReport, pathLabel)) return;
+
+  [
+    'orangeCap',
+    'mostSixes',
+    'purpleCap',
+    'highestScoreTeam',
+    'striker',
+    'bestBowlingFigures',
+    'bestBowlingStrikeRate',
+    'mostCatches',
+    'titleWinner',
+    'tableBottom',
+    'mvp',
+    'uncappedMvp',
+    'fairPlay',
+    'leastMvp'
+  ].forEach((key) => validateScrapeReportEntry(errors, scrapeReport[key], `${pathLabel}.${key}`, { allowFalse: key === 'fairPlay' }));
+
+  validateScrapeReportEntry(errors, scrapeReport.mostDots, `${pathLabel}.mostDots`, { allowFalse: true });
+  if (expectObject(errors, scrapeReport.mostDots, `${pathLabel}.mostDots`)) {
+    if (scrapeReport.mostDots.ok) {
+      expectNumber(errors, scrapeReport.mostDots.rows, `${pathLabel}.mostDots.rows`);
+    } else {
+      expectString(errors, scrapeReport.mostDots.reason, `${pathLabel}.mostDots.reason`, { optional: true });
+      expectString(errors, scrapeReport.mostDots.error, `${pathLabel}.mostDots.error`, { optional: true });
+      expectString(errors, scrapeReport.mostDots.fallback, `${pathLabel}.mostDots.fallback`, { optional: true });
+      expectNumber(errors, scrapeReport.mostDots.cachedRows, `${pathLabel}.mostDots.cachedRows`, { optional: true });
+    }
+  }
+
+  validateScrapeReportEntry(errors, scrapeReport.costControl, `${pathLabel}.costControl`, { allowFalse: true });
+  if (expectObject(errors, scrapeReport.costControl, `${pathLabel}.costControl`)) {
+    expectBoolean(errors, scrapeReport.costControl.liveScorecardsEnabled, `${pathLabel}.costControl.liveScorecardsEnabled`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.liveScorecardIntervalMinutes, `${pathLabel}.costControl.liveScorecardIntervalMinutes`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.maxBacklogScorecardsPerRun, `${pathLabel}.costControl.maxBacklogScorecardsPerRun`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.maxFreshScorecardCallsPerRun, `${pathLabel}.costControl.maxFreshScorecardCallsPerRun`, { optional: true });
+    expectBoolean(errors, scrapeReport.costControl.historicalReplayApiFallbackAllowed, `${pathLabel}.costControl.historicalReplayApiFallbackAllowed`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.scorecardCallsThisRun, `${pathLabel}.costControl.scorecardCallsThisRun`);
+    expectNumber(errors, scrapeReport.costControl.backlogRemaining, `${pathLabel}.costControl.backlogRemaining`);
+    expectBoolean(errors, scrapeReport.costControl.quotaExceeded, `${pathLabel}.costControl.quotaExceeded`, { optional: true });
+    expectBoolean(errors, scrapeReport.costControl.providerFailure, `${pathLabel}.costControl.providerFailure`, { optional: true });
+    expectString(errors, scrapeReport.costControl.reason, `${pathLabel}.costControl.reason`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.hitsToday, `${pathLabel}.costControl.hitsToday`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.hitsLimit, `${pathLabel}.costControl.hitsLimit`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.scorecardCacheHitsThisRun, `${pathLabel}.costControl.scorecardCacheHitsThisRun`, { optional: true });
+    expectArrayOfStrings(errors, scrapeReport.costControl.forcedScorecardRefetchIds, `${pathLabel}.costControl.forcedScorecardRefetchIds`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.forcedScorecardRefetches, `${pathLabel}.costControl.forcedScorecardRefetches`, { optional: true });
+    expectBoolean(errors, scrapeReport.costControl.historicalReplaySkipped, `${pathLabel}.costControl.historicalReplaySkipped`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.historicalReplayMissingCaches, `${pathLabel}.costControl.historicalReplayMissingCaches`, { optional: true });
+    expectBoolean(errors, scrapeReport.costControl.freshScorecardBudgetExhausted, `${pathLabel}.costControl.freshScorecardBudgetExhausted`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.freshScorecardBudgetSkips, `${pathLabel}.costControl.freshScorecardBudgetSkips`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.freshScorecardBudgetRemaining, `${pathLabel}.costControl.freshScorecardBudgetRemaining`, { optional: true });
+    expectNumber(errors, scrapeReport.costControl.failoversThisRun, `${pathLabel}.costControl.failoversThisRun`, { optional: true });
+  }
+}
+
 export function validateLiveData(data) {
   const errors = [];
 
@@ -154,7 +222,7 @@ export function validateLiveData(data) {
   expectString(errors, data.source, 'live.source');
   expectString(errors, data.fetchedAt, 'live.fetchedAt', { nullable: true, iso: true });
   expectString(errors, data.scrapeStatus, 'live.scrapeStatus');
-  expectObject(errors, data.scrapeReport, 'live.scrapeReport');
+  validateScrapeReport(errors, data.scrapeReport, 'live.scrapeReport');
 
   if (expectObject(errors, data.meta, 'live.meta')) {
     if (expectObject(errors, data.meta.scheduler, 'live.meta.scheduler')) {
@@ -280,19 +348,19 @@ async function main() {
   try {
     data = await readJson(target);
   } catch (error) {
-    console.error(`❌ Could not read ${target}`);
+    console.error(`âŒ Could not read ${target}`);
     console.error(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 
   const errors = validateLiveData(data);
   if (errors.length) {
-    console.error(`❌ Live data contract failed for ${target}`);
+    console.error(`âŒ Live data contract failed for ${target}`);
     errors.forEach((line) => console.error(`- ${line}`));
     process.exit(1);
   }
 
-  console.log(`✅ Live data contract passed for ${target}`);
+  console.log(`âœ… Live data contract passed for ${target}`);
 }
 
 const directRun = process.argv[1] && path.resolve(process.argv[1]) === __filename;
