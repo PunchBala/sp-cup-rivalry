@@ -38,3 +38,20 @@ test('validator catches non-numeric category values', async () => {
   const errors = validateLiveData(live);
   assert.ok(errors.some((line) => line.includes(`live.mostCatches.values.${firstKey}`)));
 });
+
+test('validator catches malformed mostDots scrape report fallback fields', async () => {
+  const live = await readJson(repoPath('data', 'live.json'));
+  live.scrapeReport.mostDots.ok = false;
+  delete live.scrapeReport.mostDots.rows;
+  live.scrapeReport.mostDots.reason = 'refresh interval not reached';
+  live.scrapeReport.mostDots.cachedRows = '104';
+  const errors = validateLiveData(live);
+  assert.ok(errors.some((line) => line.includes('live.scrapeReport.mostDots.cachedRows')));
+});
+
+test('validator catches malformed costControl contract fields', async () => {
+  const live = await readJson(repoPath('data', 'live.json'));
+  live.scrapeReport.costControl.historicalReplayApiFallbackAllowed = 'true';
+  const errors = validateLiveData(live);
+  assert.ok(errors.some((line) => line.includes('live.scrapeReport.costControl.historicalReplayApiFallbackAllowed')));
+});
