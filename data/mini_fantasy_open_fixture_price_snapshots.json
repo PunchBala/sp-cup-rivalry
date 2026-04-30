@@ -1,8 +1,8 @@
 {
   "version": "mini_fantasy_open_fixture_prices_v1",
   "season": "IPL 2026",
-  "generated_at_utc": "2026-04-30T21:07:36.071Z",
-  "source_price_book_generated_at_utc": "2026-04-30T21:07:36.071Z",
+  "generated_at_utc": "2026-04-30T21:45:12.924Z",
+  "source_price_book_generated_at_utc": "2026-04-30T21:45:12.924Z",
   "fixtures": [
     {
       "season": "IPL 2026",
@@ -133,15 +133,6 @@
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "dc_t-natarajan": {
-          "player_id": "dc_t-natarajan",
-          "name": "T. Natarajan",
-          "team": "DC",
-          "role": "bowler",
-          "final_price": 7,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
         "dc_vipraj-nigam": {
           "player_id": "dc_vipraj-nigam",
           "name": "Vipraj Nigam",
@@ -166,6 +157,15 @@
           "team": "DC",
           "role": "bowler",
           "final_price": 6.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "dc_t-natarajan": {
+          "player_id": "dc_t-natarajan",
+          "name": "T. Natarajan",
+          "team": "DC",
+          "role": "bowler",
+          "final_price": 7,
           "is_uncapped": false,
           "pricing_eligible": true
         },
@@ -286,24 +286,6 @@
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "rr_yashasvi-jaiswal": {
-          "player_id": "rr_yashasvi-jaiswal",
-          "name": "Yashasvi Jaiswal",
-          "team": "RR",
-          "role": "batter",
-          "final_price": 8.5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "rr_brijesh-sharma": {
-          "player_id": "rr_brijesh-sharma",
-          "name": "Brijesh Sharma",
-          "team": "RR",
-          "role": "bowler",
-          "final_price": 8,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
         "rr_ravindra-jadeja": {
           "player_id": "rr_ravindra-jadeja",
           "name": "Ravindra Jadeja",
@@ -334,6 +316,24 @@
         "rr_yash-raj-punja": {
           "player_id": "rr_yash-raj-punja",
           "name": "Yash Raj Punja",
+          "team": "RR",
+          "role": "bowler",
+          "final_price": 8,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "rr_yashasvi-jaiswal": {
+          "player_id": "rr_yashasvi-jaiswal",
+          "name": "Yashasvi Jaiswal",
+          "team": "RR",
+          "role": "batter",
+          "final_price": 8.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "rr_brijesh-sharma": {
+          "player_id": "rr_brijesh-sharma",
+          "name": "Brijesh Sharma",
           "team": "RR",
           "role": "bowler",
           "final_price": 8,
