@@ -1617,6 +1617,21 @@ test('buildMiniFantasyEntryAuditLog includes per-player score breakdown, captain
       [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: 27,
       [buildMiniFantasyPlayerId('GT', 'GT Bowler')]: 12,
       [buildMiniFantasyPlayerId('GT', 'GT Keeper')]: 14
+    },
+    base_breakdown_by_player_id: {
+      [buildMiniFantasyPlayerId('DC', 'DC Batter')]: {
+        runs_points: 40,
+        sixes_bonus_points: 0,
+        wicket_points: 0,
+        dot_ball_points: 0,
+        catch_points: 0,
+        stumping_points: 0,
+        strike_rate_bonus_points: 0,
+        economy_bonus_points: 0,
+        milestone_bonus_points: 0,
+        duck_penalty_points: 0,
+        total_points: 40
+      }
     }
   };
 
@@ -1633,6 +1648,113 @@ test('buildMiniFantasyEntryAuditLog includes per-player score breakdown, captain
   assert.equal(audit.players[0].eligible_points, 47);
   assert.equal(audit.players[0].captain_multiplier, 1.5);
   assert.equal(audit.players[0].scored_points, 70.5);
+  assert.equal(audit.players[0].base_breakdown.runs_points, 40);
+  assert.equal(audit.players[0].base_breakdown.total_points, 40);
+});
+
+test('buildMiniFantasyEntryAuditLog derives base breakdown from score history snapshots when score detail is absent', () => {
+  const playerId = buildMiniFantasyPlayerId('DC', 'DC Batter');
+  const liveData = {
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 13,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'DC Batter': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'DC Batter': {
+                  score: 50,
+                  runs: 50,
+                  sixes: 1,
+                  wickets: 0,
+                  dotBalls: 0,
+                  catches: 0,
+                  stumpings: 0,
+                  bonuses: {
+                    sr: 0,
+                    economy: 0,
+                    ducks: 0,
+                    batting50s: 1,
+                    batting100s: 0,
+                    impact30s: 0,
+                    bowling3w: 0,
+                    bowling4w: 0,
+                    bowling5w: 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 14,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'DC Batter': 2
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'DC Batter': {
+                  score: 97,
+                  runs: 80,
+                  sixes: 3,
+                  wickets: 0,
+                  dotBalls: 0,
+                  catches: 1,
+                  stumpings: 0,
+                  bonuses: {
+                    sr: 5,
+                    economy: 0,
+                    ducks: 0,
+                    batting50s: 1,
+                    batting100s: 0,
+                    impact30s: 0,
+                    bowling3w: 0,
+                    bowling4w: 0,
+                    bowling5w: 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const entry = {
+    matchNo: 14,
+    selectedPlayerIds: [playerId],
+    captainPlayerId: '',
+    priceSnapshot: {
+      [playerId]: { name: 'DC Batter', team: 'DC', role: 'batter', final_price: 9 }
+    }
+  };
+  const schedule = [
+    { match_no: 14, datetime_utc: '2026-04-08T14:00:00Z', home_team: 'Delhi Capitals', away_team: 'Gujarat Titans' }
+  ];
+  const squads = {
+    DC: ['DC Batter']
+  };
+
+  const audit = buildMiniFantasyEntryAuditLog({ entry, liveData, schedule, squads });
+
+  assert.equal(audit.players[0].points, 47);
+  assert.equal(audit.players[0].base_breakdown.runs_points, 30);
+  assert.equal(audit.players[0].base_breakdown.sixes_bonus_points, 4);
+  assert.equal(audit.players[0].base_breakdown.catch_points, 8);
+  assert.equal(audit.players[0].base_breakdown.strike_rate_bonus_points, 5);
+  assert.equal(audit.players[0].base_breakdown.total_points, 47);
 });
 
 test('buildMiniFantasyLeaderboard adds missed-lock relief, daily visit bonus, and new-player baseline points', () => {

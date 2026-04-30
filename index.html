@@ -8395,9 +8395,36 @@ function titleBandScore(pick, live){
       return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
     }
 
+    function formatMiniFantasyAuditBaseDetail(baseBreakdown, fallbackPoints = 0){
+      const breakdown = baseBreakdown && typeof baseBreakdown === 'object' ? baseBreakdown : null;
+      if (!breakdown) return `${formatMiniFantasyPoints(fallbackPoints)} base`;
+      const contributions = [
+        { value: Number(breakdown.runsPoints ?? breakdown.runs_points ?? 0) || 0, label: 'runs' },
+        { value: Number(breakdown.sixesBonusPoints ?? breakdown.sixes_bonus_points ?? 0) || 0, label: 'six bonus' },
+        { value: Number(breakdown.wicketPoints ?? breakdown.wicket_points ?? 0) || 0, label: 'wicket bonus' },
+        { value: Number(breakdown.dotBallPoints ?? breakdown.dot_ball_points ?? 0) || 0, label: 'dot bonus' },
+        { value: Number(breakdown.catchPoints ?? breakdown.catch_points ?? 0) || 0, label: 'catches' },
+        { value: Number(breakdown.stumpingPoints ?? breakdown.stumping_points ?? 0) || 0, label: 'stumpings' },
+        { value: Number(breakdown.strikeRateBonusPoints ?? breakdown.strike_rate_bonus_points ?? 0) || 0, label: 'SR' },
+        { value: Number(breakdown.economyBonusPoints ?? breakdown.economy_bonus_points ?? 0) || 0, label: 'econ' },
+        { value: Number(breakdown.milestoneBonusPoints ?? breakdown.milestone_bonus_points ?? 0) || 0, label: 'milestones' },
+        { value: Number(breakdown.duckPenaltyPoints ?? breakdown.duck_penalty_points ?? 0) || 0, label: 'duck' }
+      ].filter((item) => Math.abs(item.value) > 0.001);
+      if (!contributions.length) return `${formatMiniFantasyPoints(fallbackPoints)} base`;
+      const detail = contributions.reduce((text, item, index) => {
+        const amount = formatMiniFantasyPoints(Math.abs(item.value));
+        const chunk = `${amount} ${item.label}`;
+        if (index === 0) {
+          return `${item.value < 0 ? '-' : ''}${chunk}`;
+        }
+        return `${text}${item.value < 0 ? ' - ' : ' + '}${chunk}`;
+      }, '');
+      return `${formatMiniFantasyPoints(fallbackPoints)} base (${detail})`;
+    }
+
     function formatMiniFantasyAuditBreakdown(player){
       if (!player) return '';
-      const parts = [`${formatMiniFantasyPoints(player.points)} base`];
+      const parts = [formatMiniFantasyAuditBaseDetail(player.baseBreakdown, player.points)];
       if (Number(player.appearanceBonus || 0)) parts.push(`${formatMiniFantasyPoints(player.appearanceBonus)} appearance`);
       if (Number(player.winnerBonus || 0)) parts.push(`${formatMiniFantasyPoints(player.winnerBonus)} winner`);
       const eligiblePoints = Number(player.eligiblePoints ?? player.points ?? 0) || 0;
@@ -8418,6 +8445,21 @@ function titleBandScore(pick, live){
         role: normalizeTextValue(player?.role || ''),
         price: Number(player?.price ?? player?.final_price ?? 0) || 0,
         points: Number(player?.points || 0) || 0,
+        baseBreakdown: player?.base_breakdown && typeof player.base_breakdown === 'object'
+          ? {
+              runsPoints: Number(player.base_breakdown.runs_points ?? player.base_breakdown.runsPoints ?? 0) || 0,
+              sixesBonusPoints: Number(player.base_breakdown.sixes_bonus_points ?? player.base_breakdown.sixesBonusPoints ?? 0) || 0,
+              wicketPoints: Number(player.base_breakdown.wicket_points ?? player.base_breakdown.wicketPoints ?? 0) || 0,
+              dotBallPoints: Number(player.base_breakdown.dot_ball_points ?? player.base_breakdown.dotBallPoints ?? 0) || 0,
+              catchPoints: Number(player.base_breakdown.catch_points ?? player.base_breakdown.catchPoints ?? 0) || 0,
+              stumpingPoints: Number(player.base_breakdown.stumping_points ?? player.base_breakdown.stumpingPoints ?? 0) || 0,
+              strikeRateBonusPoints: Number(player.base_breakdown.strike_rate_bonus_points ?? player.base_breakdown.strikeRateBonusPoints ?? 0) || 0,
+              economyBonusPoints: Number(player.base_breakdown.economy_bonus_points ?? player.base_breakdown.economyBonusPoints ?? 0) || 0,
+              milestoneBonusPoints: Number(player.base_breakdown.milestone_bonus_points ?? player.base_breakdown.milestoneBonusPoints ?? 0) || 0,
+              duckPenaltyPoints: Number(player.base_breakdown.duck_penalty_points ?? player.base_breakdown.duckPenaltyPoints ?? 0) || 0,
+              totalPoints: Number(player.base_breakdown.total_points ?? player.base_breakdown.totalPoints ?? 0) || 0
+            }
+          : null,
         appearanceBonus: Number(player?.appearance_bonus ?? player?.appearanceBonus ?? 0) || 0,
         winnerBonus: Number(player?.winner_bonus ?? player?.winnerBonus ?? 0) || 0,
         eligiblePoints: Number(player?.eligible_points ?? player?.eligiblePoints ?? 0) || 0,

@@ -177,6 +177,17 @@ export function normalizeName(value) {
 
 const UNCAPPED_MVP_PLAYER_KEYS = new Set(UNCAPPED_MVP_PLAYERS.map((name) => normalizeName(name)));
 
+const MINI_FANTASY_MILESTONE_POINTS = Object.freeze({
+  batting50: 10,
+  batting100: 25,
+  impact30: 8,
+  bowling3w: 12,
+  bowling4w: 20,
+  bowling5w: 30
+});
+
+const MINI_FANTASY_DUCK_PENALTY = -5;
+
 // Keep a conservative alias map for common score-feed spelling drift.
 const NAME_TOKEN_ALIASES = Object.freeze({
   mohd: 'mohammad',
@@ -1369,6 +1380,196 @@ function latestCompletedScoreHistoryEntry(liveData = {}) {
   return ordered.length ? ordered[ordered.length - 1] : null;
 }
 
+function mergeMvpStatValue(existingValue, incomingValue) {
+  if (existingValue == null) return roundTo(toNumber(incomingValue, 0), 2);
+  if (incomingValue == null) return roundTo(toNumber(existingValue, 0), 2);
+  const existing = roundTo(toNumber(existingValue, 0), 2);
+  const incoming = roundTo(toNumber(incomingValue, 0), 2);
+  return Math.abs(incoming) > Math.abs(existing) ? incoming : existing;
+}
+
+function mergeMvpBonusPayload(existingBonus = {}, incomingBonus = {}) {
+  const merged = { ...(existingBonus || {}) };
+  [
+    'sr',
+    'economy',
+    'ducks',
+    'batting50s',
+    'batting100s',
+    'impact30s',
+    'bowling3w',
+    'bowling4w',
+    'bowling5w'
+  ].forEach((key) => {
+    merged[key] = mergeMvpStatValue(existingBonus?.[key], incomingBonus?.[key]);
+  });
+  return merged;
+}
+
+function mergeMvpValuePayload(existingPayload = {}, incomingPayload = {}) {
+  return {
+    score: mergeMvpStatValue(existingPayload?.score, incomingPayload?.score),
+    runs: mergeMvpStatValue(existingPayload?.runs, incomingPayload?.runs),
+    sixes: mergeMvpStatValue(existingPayload?.sixes, incomingPayload?.sixes),
+    wickets: mergeMvpStatValue(existingPayload?.wickets, incomingPayload?.wickets),
+    dotBalls: mergeMvpStatValue(existingPayload?.dotBalls, incomingPayload?.dotBalls),
+    catches: mergeMvpStatValue(existingPayload?.catches, incomingPayload?.catches),
+    stumpings: mergeMvpStatValue(existingPayload?.stumpings, incomingPayload?.stumpings),
+    battingStrikeRate: mergeMvpStatValue(existingPayload?.battingStrikeRate, incomingPayload?.battingStrikeRate),
+    economy: mergeMvpStatValue(existingPayload?.economy, incomingPayload?.economy),
+    bonuses: mergeMvpBonusPayload(existingPayload?.bonuses || {}, incomingPayload?.bonuses || {})
+  };
+}
+
+function snapshotMvpValuePayloadLookup(snapshot = {}) {
+  const rawValues = snapshot?.mvp?.values && typeof snapshot.mvp.values === 'object' ? snapshot.mvp.values : {};
+  return Object.entries(rawValues).reduce((lookup, [playerName, payload]) => {
+    const canonical = canonicalHistoryKey(playerName);
+    lookup.set(canonical, mergeMvpValuePayload(lookup.get(canonical), payload || {}));
+    return lookup;
+  }, new Map());
+}
+
+function positiveDelta(currentValue, previousValue) {
+  return roundTo(Math.max(0, toNumber(currentValue, 0) - toNumber(previousValue, 0)), 2);
+}
+
+function signedDelta(currentValue, previousValue) {
+  return roundTo(toNumber(currentValue, 0) - toNumber(previousValue, 0), 2);
+}
+
+function buildMiniFantasyBaseBreakdown(currentPayload = {}, previousPayload = {}) {
+  const runs = positiveDelta(currentPayload?.runs, previousPayload?.runs);
+  const sixes = positiveDelta(currentPayload?.sixes, previousPayload?.sixes);
+  const wickets = positiveDelta(currentPayload?.wickets, previousPayload?.wickets);
+  const dotBalls = positiveDelta(currentPayload?.dotBalls, previousPayload?.dotBalls);
+  const catches = positiveDelta(currentPayload?.catches, previousPayload?.catches);
+  const stumpings = positiveDelta(currentPayload?.stumpings, previousPayload?.stumpings);
+
+  const strikeRateBonusPoints = signedDelta(currentPayload?.bonuses?.sr, previousPayload?.bonuses?.sr);
+  const economyBonusPoints = signedDelta(currentPayload?.bonuses?.economy, previousPayload?.bonuses?.economy);
+
+  const batting50s = positiveDelta(currentPayload?.bonuses?.batting50s, previousPayload?.bonuses?.batting50s);
+  const batting100s = positiveDelta(currentPayload?.bonuses?.batting100s, previousPayload?.bonuses?.batting100s);
+  const impact30s = positiveDelta(currentPayload?.bonuses?.impact30s, previousPayload?.bonuses?.impact30s);
+  const bowling3w = positiveDelta(currentPayload?.bonuses?.bowling3w, previousPayload?.bonuses?.bowling3w);
+  const bowling4w = positiveDelta(currentPayload?.bonuses?.bowling4w, previousPayload?.bonuses?.bowling4w);
+  const bowling5w = positiveDelta(currentPayload?.bonuses?.bowling5w, previousPayload?.bonuses?.bowling5w);
+  const ducks = positiveDelta(currentPayload?.bonuses?.ducks, previousPayload?.bonuses?.ducks);
+
+  const runsPoints = runs;
+  const sixesBonusPoints = roundTo(sixes * 2, 2);
+  const wicketPoints = roundTo(wickets * 20, 2);
+  const dotBallPoints = roundTo(dotBalls * 1.5, 2);
+  const catchPoints = roundTo(catches * 8, 2);
+  const stumpingPoints = roundTo(stumpings * 12, 2);
+  const milestoneBonusPoints = roundTo(
+    (batting50s * MINI_FANTASY_MILESTONE_POINTS.batting50) +
+    (batting100s * MINI_FANTASY_MILESTONE_POINTS.batting100) +
+    (impact30s * MINI_FANTASY_MILESTONE_POINTS.impact30) +
+    (bowling3w * MINI_FANTASY_MILESTONE_POINTS.bowling3w) +
+    (bowling4w * MINI_FANTASY_MILESTONE_POINTS.bowling4w) +
+    (bowling5w * MINI_FANTASY_MILESTONE_POINTS.bowling5w),
+    2
+  );
+  const duckPenaltyPoints = roundTo(ducks * MINI_FANTASY_DUCK_PENALTY, 2);
+  const totalPoints = roundTo(
+    runsPoints +
+    sixesBonusPoints +
+    wicketPoints +
+    dotBallPoints +
+    catchPoints +
+    stumpingPoints +
+    strikeRateBonusPoints +
+    economyBonusPoints +
+    milestoneBonusPoints +
+    duckPenaltyPoints,
+    2
+  );
+
+  return {
+    runs,
+    sixes,
+    wickets,
+    dot_balls: dotBalls,
+    catches,
+    stumpings,
+    milestone_counts: {
+      batting50s,
+      batting100s,
+      impact30s,
+      bowling3w,
+      bowling4w,
+      bowling5w,
+      ducks
+    },
+    runs_points: runsPoints,
+    sixes_bonus_points: sixesBonusPoints,
+    wicket_points: wicketPoints,
+    dot_ball_points: dotBallPoints,
+    catch_points: catchPoints,
+    stumping_points: stumpingPoints,
+    strike_rate_bonus_points: strikeRateBonusPoints,
+    economy_bonus_points: economyBonusPoints,
+    milestone_bonus_points: milestoneBonusPoints,
+    duck_penalty_points: duckPenaltyPoints,
+    total_points: totalPoints
+  };
+}
+
+function buildMiniFantasySnapshotBreakdownLookup({
+  liveData = {},
+  matchNo = null,
+  completedMatchCount = undefined
+} = {}) {
+  const targetMatchNo = Number(matchNo || 0) || null;
+  if (!targetMatchNo) return new Map();
+
+  const scoreHistory = [...(Array.isArray(liveData?.meta?.scoreHistory) ? liveData.meta.scoreHistory : [])]
+    .sort((a, b) => toNumber(a?.processedMatchCount, 0) - toNumber(b?.processedMatchCount, 0));
+  const resolvedCompletedMatchCount = Number.isFinite(Number(completedMatchCount))
+    ? Number(completedMatchCount)
+    : getCompletedMiniFantasyMatchCount(liveData);
+
+  let currentSnapshot = null;
+  let previousSnapshot = null;
+
+  if (targetMatchNo <= resolvedCompletedMatchCount) {
+    const targetIndex = scoreHistory.findIndex((entry) => Number(entry?.processedMatchCount || 0) === targetMatchNo);
+    if (targetIndex === -1) return new Map();
+    currentSnapshot = scoreHistory[targetIndex]?.snapshot || null;
+    previousSnapshot = targetIndex > 0 ? (scoreHistory[targetIndex - 1]?.snapshot || null) : null;
+  } else if (targetMatchNo === resolvedCompletedMatchCount + 1) {
+    currentSnapshot = liveData || null;
+    previousSnapshot = latestCompletedScoreHistoryEntry(liveData)?.snapshot || null;
+  } else {
+    return new Map();
+  }
+
+  const currentLookup = snapshotMvpValuePayloadLookup(currentSnapshot || {});
+  const previousLookup = snapshotMvpValuePayloadLookup(previousSnapshot || {});
+  const breakdownLookup = new Map();
+  const canonicalNames = new Set([...currentLookup.keys(), ...previousLookup.keys()]);
+  canonicalNames.forEach((canonicalName) => {
+    breakdownLookup.set(
+      canonicalName,
+      buildMiniFantasyBaseBreakdown(currentLookup.get(canonicalName) || {}, previousLookup.get(canonicalName) || {})
+    );
+  });
+  return breakdownLookup;
+}
+
+function resolveMiniFantasySnapshotBreakdown(playerName = '', breakdownLookup = new Map()) {
+  if (!(breakdownLookup instanceof Map) || !normalizeWhitespace(playerName)) return null;
+  const candidateKeys = [...new Set(buildNameAliasKeys(playerName).map((alias) => canonicalHistoryKey(alias)))];
+  for (const candidateKey of candidateKeys) {
+    if (breakdownLookup.has(candidateKey)) {
+      return breakdownLookup.get(candidateKey);
+    }
+  }
+  return null;
+}
+
 function snapshotPlayerMatches(snapshot = {}) {
   const rawMatches = snapshot?.meta?.aggregates?.playerMatches || {};
   return Object.entries(rawMatches).reduce((canonicalized, [playerName, matches]) => {
@@ -1460,13 +1661,22 @@ function buildMiniFantasyFixturePlayerRecordMap({
   const resolvedCompletedMatchCount = Number.isFinite(Number(completedMatchCount))
     ? Number(completedMatchCount)
     : getCompletedMiniFantasyMatchCount(liveData);
+  const breakdownLookup = buildMiniFantasySnapshotBreakdownLookup({
+    liveData,
+    matchNo: targetMatchNo,
+    completedMatchCount: resolvedCompletedMatchCount
+  });
 
   if (targetMatchNo <= resolvedCompletedMatchCount) {
     baseIndex.forEach((payload, playerId) => {
       const pointsByMatchNo = payload?.points_by_match_no || {};
+      const baseBreakdown = resolveMiniFantasySnapshotBreakdown(payload?.name || '', breakdownLookup);
       const record = {
         points: toNumber(pointsByMatchNo[targetMatchNo], 0),
-        appeared: hasFixturePoints(pointsByMatchNo, targetMatchNo)
+        appeared: hasFixturePoints(pointsByMatchNo, targetMatchNo),
+        base_breakdown: baseBreakdown && typeof baseBreakdown === 'object'
+          ? { ...baseBreakdown, total_points: toNumber(pointsByMatchNo[targetMatchNo], 0) }
+          : null
       };
       recordMap.set(playerId, record);
       const teamCode = payload?.team || resolveMiniFantasyPlayerTeamCode(playerId);
@@ -1492,9 +1702,13 @@ function buildMiniFantasyFixturePlayerRecordMap({
       const playerId = buildMiniFantasyPlayerId(teamCode, playerName);
       const history = resolvePlayerHistory(playerName, liveDeltaHistories);
       const pointsByMatchNo = history?.points_by_match_no || {};
+      const baseBreakdown = resolveMiniFantasySnapshotBreakdown(playerName, breakdownLookup);
       const record = {
         points: toNumber(pointsByMatchNo[targetMatchNo], 0),
-        appeared: hasFixturePoints(pointsByMatchNo, targetMatchNo)
+        appeared: hasFixturePoints(pointsByMatchNo, targetMatchNo),
+        base_breakdown: baseBreakdown && typeof baseBreakdown === 'object'
+          ? { ...baseBreakdown, total_points: toNumber(pointsByMatchNo[targetMatchNo], 0) }
+          : null
       };
       recordMap.set(playerId, record);
       buildMiniFantasyAliasPlayerIds(teamCode, playerName).forEach((aliasPlayerId) => {
@@ -1694,6 +1908,7 @@ export function scoreMiniFantasyEntry({
   const appearanceBonusByPlayerId = {};
   const winnerBonusByPlayerId = {};
   const eligiblePointsByPlayerId = {};
+  const baseBreakdownByPlayerId = {};
   selectedPlayerIds.forEach((playerId) => {
     const basePoints = resolvedNoResult ? 0 : toNumber(pointsByPlayerId[playerId], 0);
     const appeared = resolvedNoResult ? false : Boolean(appearedByPlayerId[playerId]);
@@ -1703,10 +1918,17 @@ export function scoreMiniFantasyEntry({
       : 0;
     const eligiblePoints = basePoints + appearanceBonus + winnerBonus;
     const multiplier = playerId === captainPlayerId ? MINI_FANTASY_CAPTAIN_MULTIPLIER : 1;
+    const recordBreakdown = resolvedFixtureRecordMap.get(playerId)?.base_breakdown;
     appearanceBonusByPlayerId[playerId] = appearanceBonus;
     winnerBonusByPlayerId[playerId] = winnerBonus;
     eligiblePointsByPlayerId[playerId] = eligiblePoints;
     scoredPointsByPlayerId[playerId] = roundTo(eligiblePoints * multiplier, 2);
+    baseBreakdownByPlayerId[playerId] = recordBreakdown && typeof recordBreakdown === 'object'
+      ? {
+          ...recordBreakdown,
+          total_points: basePoints
+        }
+      : null;
   });
   return {
     match_no: matchNo,
@@ -1719,6 +1941,7 @@ export function scoreMiniFantasyEntry({
     winner_bonus_by_player_id: winnerBonusByPlayerId,
     eligible_points_by_player_id: eligiblePointsByPlayerId,
     scored_points_by_player_id: scoredPointsByPlayerId,
+    base_breakdown_by_player_id: baseBreakdownByPlayerId,
     winning_team_code: resolvedWinningTeamCode || null,
     winner_bonus_points: calculateMiniFantasyWinningTeamBonus({
       selectedPlayerIds,
@@ -1769,6 +1992,7 @@ export function buildMiniFantasyEntryAuditLog({
   const winnerBonusByPlayerId = resolvedScore?.winner_bonus_by_player_id || {};
   const eligiblePointsByPlayerId = resolvedScore?.eligible_points_by_player_id || {};
   const scoredPointsByPlayerId = resolvedScore?.scored_points_by_player_id || {};
+  const baseBreakdownByPlayerId = resolvedScore?.base_breakdown_by_player_id || {};
 
   const players = selectedPlayerIds.map((playerId) => {
     const snapshot = priceSnapshot?.[playerId] || {};
@@ -1784,6 +2008,12 @@ export function buildMiniFantasyEntryAuditLog({
     const scoredPoints = Number.isFinite(Number(scoredPointsByPlayerId[playerId]))
       ? Number(scoredPointsByPlayerId[playerId])
       : roundTo(eligiblePoints * captainMultiplier, 2);
+    const baseBreakdown = baseBreakdownByPlayerId?.[playerId] && typeof baseBreakdownByPlayerId[playerId] === 'object'
+      ? {
+          ...baseBreakdownByPlayerId[playerId],
+          total_points: basePoints
+        }
+      : null;
     return {
       player_id: playerId,
       name: normalizeWhitespace(snapshot.name || fallbackMiniFantasyPlayerName(playerId)) || fallbackMiniFantasyPlayerName(playerId),
@@ -1791,6 +2021,7 @@ export function buildMiniFantasyEntryAuditLog({
       role: normalizeWhitespace(snapshot.role || '') || '',
       price: toNumber(snapshot.final_price, 0),
       points: basePoints,
+      base_breakdown: baseBreakdown,
       appearance_bonus: appearanceBonus,
       winner_bonus: winnerBonus,
       eligible_points: eligiblePoints,
