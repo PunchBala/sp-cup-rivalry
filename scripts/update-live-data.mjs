@@ -1373,6 +1373,17 @@ function addNumberMap(map, key, amount) {
   map[key] = (map[key] || 0) + Number(amount || 0);
 }
 
+function scorecardBowlingDotsValue(row) {
+  const dots = Number(
+    row?.dots
+    ?? row?.dotBalls
+    ?? row?.dotballs
+    ?? row?.d
+    ?? 0
+  );
+  return Number.isFinite(dots) ? dots : 0;
+}
+
 function incrementCountMap(map, key) {
   if (!key) return;
   map[key] = (map[key] || 0) + 1;
@@ -1580,6 +1591,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
       addNumberMap(aggregates.bowlingWickets, bowler, wickets);
       addNumberMap(aggregates.bowlingBalls, bowler, balls);
       addNumberMap(aggregates.bowlingRunsConceded, bowler, bowl?.r || 0);
+      addNumberMap(aggregates.bowlingDots, bowler, scorecardBowlingDotsValue(bowl));
       updateBestBowlingFigure(aggregates.bestBowlingFigures, bowler, wickets, bowl?.r || 0, balls);
       if (wickets >= 3) incrementCountMap(aggregates.bowling3w, bowler);
       if (wickets >= 4) incrementCountMap(aggregates.bowling4w, bowler);
@@ -1720,6 +1732,16 @@ function canonicalizePlayerNumericMap(mapObj = {}, displayNameMap = null) {
     if (!canonicalKey) continue;
     const outputKey = displayNameMap?.[canonicalKey] || canonicalKey;
     out[outputKey] = Number(out[outputKey] || 0) + Number(value || 0);
+  }
+  return out;
+}
+
+function mergeBowlingDotsValues(preferredValues = {}, fallbackValues = {}) {
+  const preferred = canonicalizePlayerNumericMap(preferredValues);
+  const fallback = canonicalizePlayerNumericMap(fallbackValues);
+  const out = { ...fallback };
+  for (const [playerName, value] of Object.entries(preferred)) {
+    out[playerName] = Math.max(Number(out[playerName] || 0), Number(value || 0));
   }
   return out;
 }
@@ -2293,7 +2315,7 @@ export async function rebuildHistoricalState(processedIds, baseLive = null, { in
     }
     const historicalCumulativeDots = resolveHistoricalCumulativeDots(baseLive, processedMatchCount);
     if (Object.keys(historicalCumulativeDots).length) {
-      rebuilt.bowlingDots = historicalCumulativeDots;
+      rebuilt.bowlingDots = mergeBowlingDotsValues(rebuilt.bowlingDots, historicalCumulativeDots);
     }
 
     if (includeHistory) {
