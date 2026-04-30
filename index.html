@@ -8493,12 +8493,52 @@ function titleBandScore(pick, live){
             : 'Captain is not set on this saved team.',
         isNoResult: Boolean(auditLog.is_no_result ?? auditLog.isNoResult),
         auditLog
-      };
-    }
+        };
+      }
 
-    function describeMiniFantasyEntry(entry, fixturePointsIndex = new Map()){
-      if (!entry) {
+      function buildMiniFantasyEntryFromAuditLog(auditLog, matchSummary = {}){
+        if (!auditLog || typeof auditLog !== 'object') return null;
+        const selectedPlayerIds = Array.isArray(auditLog.selected_player_ids)
+          ? auditLog.selected_player_ids.filter(Boolean)
+          : (Array.isArray(auditLog.selectedPlayerIds) ? auditLog.selectedPlayerIds.filter(Boolean) : []);
+        const captainPlayerId = normalizeTextValue(
+          auditLog.captain_player_id
+          || auditLog.captainPlayerId
+          || matchSummary?.captain_player_id
+          || matchSummary?.captainPlayerId
+          || ''
+        );
+        const players = Array.isArray(auditLog.players) ? auditLog.players : [];
+        const fallbackSelectedPlayerIds = players
+          .map((player) => normalizeTextValue(player?.player_id || player?.playerId || ''))
+          .filter(Boolean);
+        const resolvedPlayerIds = selectedPlayerIds.length ? selectedPlayerIds : fallbackSelectedPlayerIds;
+        if (!resolvedPlayerIds.length) return null;
+        const priceSnapshot = players.reduce((snapshot, player) => {
+          const playerId = normalizeTextValue(player?.player_id || player?.playerId || '');
+          if (!playerId) return snapshot;
+          snapshot[playerId] = {
+            player_id: playerId,
+            name: normalizeTextValue(player?.name || fallbackMiniFantasyPlayerName(playerId)) || fallbackMiniFantasyPlayerName(playerId),
+            team: normalizeTextValue(player?.team || ''),
+            role: normalizeTextValue(player?.role || ''),
+            final_price: Number(player?.price ?? player?.final_price ?? player?.finalPrice ?? 0) || 0
+          };
+          return snapshot;
+        }, {});
         return {
+          match_no: Number(matchSummary?.match_no || auditLog.match_no || auditLog.matchNo || 0) || null,
+          selected_player_ids: resolvedPlayerIds,
+          captain_player_id: captainPlayerId || null,
+          price_snapshot: priceSnapshot,
+          spent_credits: Number(matchSummary?.spent_credits ?? matchSummary?.spentCredits ?? auditLog.spent_credits ?? auditLog.spentCredits ?? 0) || 0,
+          saved_at: normalizeTextValue(matchSummary?.saved_at || matchSummary?.savedAt || auditLog.saved_at || auditLog.savedAt || '') || null
+        };
+      }
+
+      function describeMiniFantasyEntry(entry, fixturePointsIndex = new Map()){
+        if (!entry) {
+          return {
           totalPoints: 0,
           pointsByPlayerId: {},
           scoredPointsByPlayerId: {},
@@ -8622,7 +8662,12 @@ function titleBandScore(pick, live){
         const fixtureEntry = entryByOwner.get(ownerHandle) || null;
         const matchSummary = (Array.isArray(row.matches) ? row.matches : []).find((item) => Number(item?.match_no || 0) === matchNo) || null;
         const detail = fixtureEntry ? describeMiniFantasyEntry(fixtureEntry, pointsIndex) : null;
-        const fallbackDetail = !fixtureEntry && matchSummary?.audit_log ? describeMiniFantasyAuditLog(matchSummary.audit_log) : null;
+        const auditFallbackEntry = !fixtureEntry && matchSummary?.audit_log
+          ? buildMiniFantasyEntryFromAuditLog(matchSummary.audit_log, matchSummary)
+          : null;
+        const fallbackDetail = !fixtureEntry && auditFallbackEntry
+          ? describeMiniFantasyEntry(auditFallbackEntry, pointsIndex)
+          : (!fixtureEntry && matchSummary?.audit_log ? describeMiniFantasyAuditLog(matchSummary.audit_log) : null);
         let fixtureStatus = fixtureEntry ? stage : 'did_not_lock';
         let fixturePoints = detail ? detail.totalPoints : 0;
         let fixturePlayers = detail ? detail.players : [];
