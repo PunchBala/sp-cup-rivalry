@@ -1757,6 +1757,146 @@ test('buildMiniFantasyEntryAuditLog derives base breakdown from score history sn
   assert.equal(audit.players[0].base_breakdown.total_points, 47);
 });
 
+test('buildMiniFantasyEntryAuditLog resolves aggregate breakdowns across Mohammed-name drift', () => {
+  const playerId = buildMiniFantasyPlayerId('GT', 'Mohammed Siraj');
+  const liveData = {
+    meta: {
+      scoreHistory: [
+        {
+          processedMatchCount: 41,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Mohammed Siraj': 8
+                },
+                bowlingWickets: {
+                  'Mohammed Siraj': 8
+                },
+                bowlingBalls: {
+                  'Mohammed Siraj': 174
+                },
+                bowlingRunsConceded: {
+                  'Mohammed Siraj': 230
+                },
+                bowlingDots: {
+                  'mohammed siraj': 98
+                },
+                catches: {
+                  'Mohammed Siraj': 3
+                },
+                battingDucks: {
+                  'Mohammed Siraj': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Mohammed Siraj': {
+                  score: 161,
+                  runs: 0,
+                  sixes: 0,
+                  wickets: 8,
+                  dotBalls: 0,
+                  catches: 3,
+                  stumpings: 0,
+                  bonuses: {
+                    sr: 0,
+                    economy: 2,
+                    ducks: 1,
+                    batting50s: 0,
+                    batting100s: 0,
+                    impact30s: 0,
+                    bowling3w: 0,
+                    bowling4w: 0,
+                    bowling5w: 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          processedMatchCount: 42,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'Mohammed Siraj': 9
+                },
+                bowlingWickets: {
+                  'Mohammed Siraj': 9
+                },
+                bowlingBalls: {
+                  'Mohammed Siraj': 198
+                },
+                bowlingRunsConceded: {
+                  'Mohammed Siraj': 268
+                },
+                bowlingDots: {
+                  'mohammed siraj': 110
+                },
+                catches: {
+                  'Mohammed Siraj': 3
+                },
+                battingDucks: {
+                  'Mohammed Siraj': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'Mohammed Siraj': {
+                  score: 199,
+                  runs: 0,
+                  sixes: 0,
+                  wickets: 9,
+                  dotBalls: 0,
+                  catches: 3,
+                  stumpings: 0,
+                  bonuses: {
+                    sr: 0,
+                    economy: 0,
+                    ducks: 1,
+                    batting50s: 0,
+                    batting100s: 0,
+                    impact30s: 0,
+                    bowling3w: 0,
+                    bowling4w: 0,
+                    bowling5w: 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+  const entry = {
+    matchNo: 42,
+    selectedPlayerIds: [playerId],
+    captainPlayerId: '',
+    priceSnapshot: {
+      [playerId]: { name: 'Mohammed Siraj', team: 'GT', role: 'bowler', final_price: 7.5 }
+    }
+  };
+  const schedule = [
+    { match_no: 42, datetime_utc: '2026-04-30T14:00:00Z', home_team: 'Gujarat Titans', away_team: 'Royal Challengers Bengaluru' }
+  ];
+  const squads = {
+    GT: ['Mohammed Siraj']
+  };
+
+  const audit = buildMiniFantasyEntryAuditLog({ entry, liveData, schedule, squads });
+
+  assert.equal(audit.players[0].points, 38);
+  assert.equal(audit.players[0].base_breakdown.wicket_points, 20);
+  assert.equal(audit.players[0].base_breakdown.dot_ball_points, 18);
+  assert.equal(audit.players[0].base_breakdown.economy_bonus_points, 0);
+  assert.equal(audit.players[0].base_breakdown.total_points, 38);
+});
+
 test('buildMiniFantasyLeaderboard adds missed-lock relief, daily visit bonus, and new-player baseline points', () => {
   const liveData = {
     meta: {

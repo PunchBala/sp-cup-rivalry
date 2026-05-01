@@ -435,7 +435,11 @@ const HISTORY_KEY_ALIASES = Object.freeze({
 
 function canonicalHistoryKey(value) {
   const normalized = normalizeName(value);
-  return HISTORY_KEY_ALIASES[normalized] || normalized;
+  const tokenCanonical = tokenizeAliasName(value).join(' ').trim();
+  return HISTORY_KEY_ALIASES[tokenCanonical]
+    || HISTORY_KEY_ALIASES[normalized]
+    || tokenCanonical
+    || normalized;
 }
 
 function mergeCanonicalSnapshotScore(existingScore, incomingScore) {
@@ -1517,6 +1521,182 @@ function buildMiniFantasyBaseBreakdown(currentPayload = {}, previousPayload = {}
   };
 }
 
+function calculateMiniFantasyStrikeRateBonusPoints(runs = 0, balls = 0) {
+  const numericRuns = toNumber(runs, 0);
+  const numericBalls = toNumber(balls, 0);
+  if (numericBalls <= 0 || (numericRuns < 30 && numericBalls < 10)) return 0;
+  const strikeRate = (100 * numericRuns) / numericBalls;
+  if (strikeRate > 170) return 8;
+  if (strikeRate > 150) return 5;
+  if (strikeRate > 130) return 2;
+  if (strikeRate < 100) return -5;
+  return 0;
+}
+
+function calculateMiniFantasyEconomyBonusPoints(runsConceded = 0, ballsBowled = 0) {
+  const numericRunsConceded = toNumber(runsConceded, 0);
+  const numericBallsBowled = toNumber(ballsBowled, 0);
+  if (numericBallsBowled < 12) return 0;
+  const economyRate = (numericRunsConceded * 6) / numericBallsBowled;
+  if (economyRate < 6) return 8;
+  if (economyRate < 7) return 5;
+  if (economyRate < 8) return 2;
+  if (economyRate > 10) return -5;
+  return 0;
+}
+
+function mergeSnapshotAggregateValue(existingValue, incomingValue) {
+  if (existingValue == null) return roundTo(toNumber(incomingValue, 0), 2);
+  if (incomingValue == null) return roundTo(toNumber(existingValue, 0), 2);
+  const existing = roundTo(toNumber(existingValue, 0), 2);
+  const incoming = roundTo(toNumber(incomingValue, 0), 2);
+  return Math.abs(incoming) > Math.abs(existing) ? incoming : existing;
+}
+
+function snapshotAggregateLookup(snapshot = {}, aggregateKey = '') {
+  const rawValues = snapshot?.meta?.aggregates?.[aggregateKey];
+  return Object.entries(rawValues && typeof rawValues === 'object' ? rawValues : {}).reduce((lookup, [playerName, value]) => {
+    const canonical = canonicalHistoryKey(playerName);
+    lookup.set(canonical, mergeSnapshotAggregateValue(lookup.get(canonical), value));
+    return lookup;
+  }, new Map());
+}
+
+function buildMiniFantasyAggregateBreakdownLookup(currentSnapshot = {}, previousSnapshot = {}) {
+  const aggregateKeys = [
+    'battingRuns',
+    'battingBalls',
+    'battingSixes',
+    'bowlingWickets',
+    'bowlingBalls',
+    'bowlingRunsConceded',
+    'catches',
+    'stumpings',
+    'bowlingDots',
+    'battingFifties',
+    'battingHundreds',
+    'battingImpact30s',
+    'battingDucks',
+    'bowling3w',
+    'bowling4w',
+    'bowling5w'
+  ];
+  const currentLookups = Object.fromEntries(aggregateKeys.map((key) => [key, snapshotAggregateLookup(currentSnapshot, key)]));
+  const previousLookups = Object.fromEntries(aggregateKeys.map((key) => [key, snapshotAggregateLookup(previousSnapshot, key)]));
+  const breakdownLookup = new Map();
+  const canonicalNames = new Set(
+    aggregateKeys.flatMap((key) => [
+      ...currentLookups[key].keys(),
+      ...previousLookups[key].keys()
+    ])
+  );
+
+  canonicalNames.forEach((canonicalName) => {
+    const runs = positiveDelta(currentLookups.battingRuns.get(canonicalName), previousLookups.battingRuns.get(canonicalName));
+    const battingBalls = positiveDelta(currentLookups.battingBalls.get(canonicalName), previousLookups.battingBalls.get(canonicalName));
+    const sixes = positiveDelta(currentLookups.battingSixes.get(canonicalName), previousLookups.battingSixes.get(canonicalName));
+    const wickets = positiveDelta(currentLookups.bowlingWickets.get(canonicalName), previousLookups.bowlingWickets.get(canonicalName));
+    const bowlingBalls = positiveDelta(currentLookups.bowlingBalls.get(canonicalName), previousLookups.bowlingBalls.get(canonicalName));
+    const runsConceded = positiveDelta(currentLookups.bowlingRunsConceded.get(canonicalName), previousLookups.bowlingRunsConceded.get(canonicalName));
+    const catches = positiveDelta(currentLookups.catches.get(canonicalName), previousLookups.catches.get(canonicalName));
+    const stumpings = positiveDelta(currentLookups.stumpings.get(canonicalName), previousLookups.stumpings.get(canonicalName));
+    const dotBalls = positiveDelta(currentLookups.bowlingDots.get(canonicalName), previousLookups.bowlingDots.get(canonicalName));
+    const batting50s = positiveDelta(currentLookups.battingFifties.get(canonicalName), previousLookups.battingFifties.get(canonicalName));
+    const batting100s = positiveDelta(currentLookups.battingHundreds.get(canonicalName), previousLookups.battingHundreds.get(canonicalName));
+    const impact30s = positiveDelta(currentLookups.battingImpact30s.get(canonicalName), previousLookups.battingImpact30s.get(canonicalName));
+    const ducks = positiveDelta(currentLookups.battingDucks.get(canonicalName), previousLookups.battingDucks.get(canonicalName));
+    const bowling3w = positiveDelta(currentLookups.bowling3w.get(canonicalName), previousLookups.bowling3w.get(canonicalName));
+    const bowling4w = positiveDelta(currentLookups.bowling4w.get(canonicalName), previousLookups.bowling4w.get(canonicalName));
+    const bowling5w = positiveDelta(currentLookups.bowling5w.get(canonicalName), previousLookups.bowling5w.get(canonicalName));
+
+    const runsPoints = runs;
+    const sixesBonusPoints = roundTo(sixes * 2, 2);
+    const wicketPoints = roundTo(wickets * 20, 2);
+    const dotBallPoints = roundTo(dotBalls * 1.5, 2);
+    const catchPoints = roundTo(catches * 8, 2);
+    const stumpingPoints = roundTo(stumpings * 12, 2);
+    const strikeRateBonusPoints = calculateMiniFantasyStrikeRateBonusPoints(runs, battingBalls);
+    const economyBonusPoints = calculateMiniFantasyEconomyBonusPoints(runsConceded, bowlingBalls);
+    const milestoneBonusPoints = roundTo(
+      (batting50s * MINI_FANTASY_MILESTONE_POINTS.batting50) +
+      (batting100s * MINI_FANTASY_MILESTONE_POINTS.batting100) +
+      (impact30s * MINI_FANTASY_MILESTONE_POINTS.impact30) +
+      (bowling3w * MINI_FANTASY_MILESTONE_POINTS.bowling3w) +
+      (bowling4w * MINI_FANTASY_MILESTONE_POINTS.bowling4w) +
+      (bowling5w * MINI_FANTASY_MILESTONE_POINTS.bowling5w),
+      2
+    );
+    const duckPenaltyPoints = roundTo(ducks * MINI_FANTASY_DUCK_PENALTY, 2);
+    const totalPoints = roundTo(
+      runsPoints +
+      sixesBonusPoints +
+      wicketPoints +
+      dotBallPoints +
+      catchPoints +
+      stumpingPoints +
+      strikeRateBonusPoints +
+      economyBonusPoints +
+      milestoneBonusPoints +
+      duckPenaltyPoints,
+      2
+    );
+
+    const hasSignal = [
+      runs,
+      battingBalls,
+      sixes,
+      wickets,
+      bowlingBalls,
+      runsConceded,
+      catches,
+      stumpings,
+      dotBalls,
+      batting50s,
+      batting100s,
+      impact30s,
+      ducks,
+      bowling3w,
+      bowling4w,
+      bowling5w
+    ].some((value) => Math.abs(toNumber(value, 0)) > 0.001);
+    if (!hasSignal) return;
+
+    breakdownLookup.set(canonicalName, {
+      runs,
+      sixes,
+      wickets,
+      dot_balls: dotBalls,
+      catches,
+      stumpings,
+      batting_balls: battingBalls,
+      bowling_balls: bowlingBalls,
+      bowling_runs_conceded: runsConceded,
+      milestone_counts: {
+        batting50s,
+        batting100s,
+        impact30s,
+        bowling3w,
+        bowling4w,
+        bowling5w,
+        ducks
+      },
+      runs_points: runsPoints,
+      sixes_bonus_points: sixesBonusPoints,
+      wicket_points: wicketPoints,
+      dot_ball_points: dotBallPoints,
+      catch_points: catchPoints,
+      stumping_points: stumpingPoints,
+      strike_rate_bonus_points: strikeRateBonusPoints,
+      economy_bonus_points: economyBonusPoints,
+      milestone_bonus_points: milestoneBonusPoints,
+      duck_penalty_points: duckPenaltyPoints,
+      total_points: totalPoints
+    });
+  });
+
+  return breakdownLookup;
+}
+
 function buildMiniFantasySnapshotBreakdownLookup({
   liveData = {},
   matchNo = null,
@@ -1546,11 +1726,16 @@ function buildMiniFantasySnapshotBreakdownLookup({
     return new Map();
   }
 
+  const aggregateLookup = buildMiniFantasyAggregateBreakdownLookup(currentSnapshot || {}, previousSnapshot || {});
   const currentLookup = snapshotMvpValuePayloadLookup(currentSnapshot || {});
   const previousLookup = snapshotMvpValuePayloadLookup(previousSnapshot || {});
   const breakdownLookup = new Map();
-  const canonicalNames = new Set([...currentLookup.keys(), ...previousLookup.keys()]);
+  const canonicalNames = new Set([...aggregateLookup.keys(), ...currentLookup.keys(), ...previousLookup.keys()]);
   canonicalNames.forEach((canonicalName) => {
+    if (aggregateLookup.has(canonicalName)) {
+      breakdownLookup.set(canonicalName, aggregateLookup.get(canonicalName));
+      return;
+    }
     breakdownLookup.set(
       canonicalName,
       buildMiniFantasyBaseBreakdown(currentLookup.get(canonicalName) || {}, previousLookup.get(canonicalName) || {})
