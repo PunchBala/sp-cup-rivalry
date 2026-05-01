@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-05-01T20:47:52.098Z",
+    "as_of_utc": "2026-05-01T21:50:39.122Z",
     "price_min": 4.5,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -86,9 +86,9 @@
   "summary": {
     "total_players_received": 257,
     "eligible_players_ranked": 257,
-    "price_rises": 1,
+    "price_rises": 0,
     "price_drops": 0,
-    "price_unchanged": 256
+    "price_unchanged": 257
   },
   "players": [
     {
@@ -3901,12 +3901,12 @@
       "role": "wicket_keeper",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
+      "old_price": 9.5,
+      "initial_price": 9.5,
       "target_price": 9.5,
       "smoothed_price": 9.5,
       "final_price": 9.5,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 6,
       "season_total_points": 369,
       "season_avg_points": 61.5,
@@ -3919,8 +3919,7 @@
       "rank": 6,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 6"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-29T14:00:00"
     },
@@ -7666,5 +7665,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-05-01T20:47:52.098Z"
+  "generated_at_utc": "2026-05-01T21:50:39.122Z"
 }
