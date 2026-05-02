@@ -233,10 +233,17 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
 
   await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Mini Fantasy');
   await expect(page.getByRole('button', { name: 'Duel', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Badges', exact: true })).toBeVisible();
   await expect(page.locator('#browseDuelsButton')).toHaveCount(0);
   await expect(page.locator('#createDuelButton')).toHaveCount(0);
   await expect(page.locator('#manageDuelButton')).toHaveCount(0);
   await expect(page.locator('#profileChipButton')).toContainText('Mini Bala');
+
+  await page.getByRole('button', { name: 'Badges', exact: true }).click();
+  await expect(page.locator('#badgesSection')).toContainText("Mini Bala's badge cabinet");
+  await expect(page.locator('#badgesPanel')).toContainText('Unlocked');
+  await page.getByRole('button', { name: 'Mini Fantasy', exact: true }).click();
+
   await expectLocatorCountAtLeast(page.locator('#miniFantasyFixtures [data-mini-fixture]'), 1);
   await expect(page.locator('#miniFantasySection')).toContainText('How Mini Fantasy works');
   await expect(page.locator('#miniFantasyFixtures')).toContainText('Match 14');
