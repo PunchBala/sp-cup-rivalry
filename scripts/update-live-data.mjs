@@ -41,6 +41,8 @@ const IPLT20_FAIRPLAY_ENABLED = parseEnvBool(process.env.IPLT20_FAIRPLAY_ENABLED
 const IPLT20_FAIRPLAY_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/2026-fairplayList.js?callback=onFairplayAward';
 const AGGREGATE_SCHEMA_VERSION = 4;
 const LEAST_MVP_MIN_MATCHES = 5;
+const MVP_WICKET_POINTS = 25;
+const MVP_DOT_BALL_POINTS = 2;
 const UNCAPPED_MVP_PLAYERS = [
   'Ayush Mhatre', 'Kartik Sharma', 'Urvil Patel', 'Ramakrishna Ghosh', 'Prashant Veer', 'Aman Khan',
   'Anshul Kamboj', 'Mukesh Choudhary', 'Shreyas Gopal', 'Gurjapneet Singh', 'Mahendra Singh Dhoni',
@@ -2168,7 +2170,7 @@ function buildMvpRanking(agg, dotsValues) {
     const duckPenalty = Number(agg.battingDucks?.[player] || 0) * -5;
 
     const battingBase = runs + (sixes * 2);
-    const bowlingBase = (wickets * 20) + (dotBalls * 1.5);
+    const bowlingBase = (wickets * MVP_WICKET_POINTS) + (dotBalls * MVP_DOT_BALL_POINTS);
     const fieldingBase = (catches * 8) + (stumpings * 12);
     const srBonus = battingStrikeRateBonus(runs, balls);
     const econBonus = bowlingEconomyBonus(runsConceded, Number(agg.bowlingBalls[player] || 0));
@@ -2462,7 +2464,7 @@ function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = nul
     ranking: mvpExtendedRanking.slice(0, 10),
     extendedRanking: mvpExtendedRanking,
     values: mvp.values,
-    formula: 'Runs + (Sixes×2) + (Wickets×20) + (Dot balls×1.5) + (Catches×8) + (Stumpings×12) + batting SR bonus + bowling economy bonus + milestone bonuses',
+    formula: 'Runs + (Sixes×2) + (Wickets×25) + (Dot balls×2) + (Catches×8) + (Stumpings×12) + batting SR bonus + bowling economy bonus + milestone bonuses',
     milestoneRules: {
       batting50: 10,
       batting100: 25,

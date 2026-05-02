@@ -1891,8 +1891,8 @@ test('buildMiniFantasyEntryAuditLog resolves aggregate breakdowns across Mohamme
   const audit = buildMiniFantasyEntryAuditLog({ entry, liveData, schedule, squads });
 
   assert.equal(audit.players[0].points, 38);
-  assert.equal(audit.players[0].base_breakdown.wicket_points, 20);
-  assert.equal(audit.players[0].base_breakdown.dot_ball_points, 18);
+  assert.equal(audit.players[0].base_breakdown.wicket_points, 25);
+  assert.equal(audit.players[0].base_breakdown.dot_ball_points, 24);
   assert.equal(audit.players[0].base_breakdown.economy_bonus_points, 0);
   assert.equal(audit.players[0].base_breakdown.total_points, 38);
 });

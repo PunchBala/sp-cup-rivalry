@@ -167,7 +167,7 @@ test('direct dot balls in cached scorecards flow into manual backfill history re
     }
   );
 
-  assert.equal(histories['pat cummins'].points_by_match_no[41], 63);
+  assert.equal(histories['pat cummins'].points_by_match_no[41], 79);
 
   const rebuilt = await rebuildHistoricalState(
     ['match-41'],

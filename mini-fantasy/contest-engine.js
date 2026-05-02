@@ -187,6 +187,8 @@ const MINI_FANTASY_MILESTONE_POINTS = Object.freeze({
 });
 
 const MINI_FANTASY_DUCK_PENALTY = -5;
+const MINI_FANTASY_WICKET_POINTS = 25;
+const MINI_FANTASY_DOT_BALL_POINTS = 2;
 
 // Keep a conservative alias map for common score-feed spelling drift.
 const NAME_TOKEN_ALIASES = Object.freeze({
@@ -1463,8 +1465,8 @@ function buildMiniFantasyBaseBreakdown(currentPayload = {}, previousPayload = {}
 
   const runsPoints = runs;
   const sixesBonusPoints = roundTo(sixes * 2, 2);
-  const wicketPoints = roundTo(wickets * 20, 2);
-  const dotBallPoints = roundTo(dotBalls * 1.5, 2);
+  const wicketPoints = roundTo(wickets * MINI_FANTASY_WICKET_POINTS, 2);
+  const dotBallPoints = roundTo(dotBalls * MINI_FANTASY_DOT_BALL_POINTS, 2);
   const catchPoints = roundTo(catches * 8, 2);
   const stumpingPoints = roundTo(stumpings * 12, 2);
   const milestoneBonusPoints = roundTo(
@@ -1611,8 +1613,8 @@ function buildMiniFantasyAggregateBreakdownLookup(currentSnapshot = {}, previous
 
     const runsPoints = runs;
     const sixesBonusPoints = roundTo(sixes * 2, 2);
-    const wicketPoints = roundTo(wickets * 20, 2);
-    const dotBallPoints = roundTo(dotBalls * 1.5, 2);
+    const wicketPoints = roundTo(wickets * MINI_FANTASY_WICKET_POINTS, 2);
+    const dotBallPoints = roundTo(dotBalls * MINI_FANTASY_DOT_BALL_POINTS, 2);
     const catchPoints = roundTo(catches * 8, 2);
     const stumpingPoints = roundTo(stumpings * 12, 2);
     const strikeRateBonusPoints = calculateMiniFantasyStrikeRateBonusPoints(runs, battingBalls);
