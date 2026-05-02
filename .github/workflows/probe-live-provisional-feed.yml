@@ -1,0 +1,43 @@
+name: Probe live provisional cricket feed
+
+on:
+  workflow_dispatch:
+    inputs:
+      request_url:
+        description: Full RapidAPI playground URL to probe
+        required: true
+        type: string
+      rapidapi_host:
+        description: RapidAPI host header from the API listing/playground
+        required: true
+        default: free-cricbuzz-cricket-api.p.rapidapi.com
+        type: string
+      label:
+        description: Friendly label for this probe run
+        required: false
+        default: RapidAPI Cricbuzz live probe
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  probe-live-feed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Probe RapidAPI live feed
+        env:
+          RAPIDAPI_KEY: ${{ secrets.LIVE_PROVISIONAL_RAPIDAPI_KEY }}
+          RAPIDAPI_HOST: ${{ inputs.rapidapi_host }}
+          RAPIDAPI_PROBE_URL: ${{ inputs.request_url }}
+          RAPIDAPI_PROBE_LABEL: ${{ inputs.label }}
+        run: node scripts/diagnose-rapidapi-live-feed.mjs
