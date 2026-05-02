@@ -1152,6 +1152,93 @@
       line-height:1.55;
       font-weight:700;
     }
+    .badges-shell{display:grid;gap:16px}
+    .badges-summary{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      padding:16px 18px;
+      border-radius:18px;
+      border:1px solid rgba(255,200,87,.18);
+      background:linear-gradient(180deg, rgba(255,200,87,.10), rgba(84,138,255,.06));
+    }
+    .badges-summary-copy{display:grid;gap:6px}
+    .badges-summary-title{font-size:18px;font-weight:900;color:#fff}
+    .badges-summary-note{font-size:13px;line-height:1.5;color:#ffecc8;max-width:720px}
+    .badges-summary-stats{display:flex;gap:10px;flex-wrap:wrap}
+    .badges-summary-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(124,196,255,.18);
+      background:rgba(255,255,255,.04);
+      color:#e6f0ff;
+      font-size:12px;
+      font-weight:800;
+    }
+    .badges-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+    .badge-card{
+      display:grid;
+      gap:10px;
+      align-content:start;
+      min-height:214px;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid rgba(124,196,255,.14);
+      background:linear-gradient(180deg, rgba(18,24,44,.96), rgba(8,10,20,.96));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      opacity:.62;
+      filter:saturate(.72);
+    }
+    .badge-card.unlocked{
+      opacity:1;
+      filter:none;
+      border-color:rgba(255,200,87,.34);
+      background:linear-gradient(180deg, rgba(255,200,87,.14), rgba(84,138,255,.12), rgba(13,16,31,.96));
+      box-shadow:0 12px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .badge-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+    .badge-icon{
+      width:50px;
+      height:50px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      font-size:28px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(124,196,255,.14);
+    }
+    .badge-card.unlocked .badge-icon{background:rgba(255,200,87,.16);border-color:rgba(255,200,87,.32)}
+    .badge-state{
+      padding:6px 9px;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      border:1px solid rgba(255,255,255,.10);
+      color:#bac9e6;
+      background:rgba(255,255,255,.04);
+    }
+    .badge-card.unlocked .badge-state{color:#fff4c3;border-color:rgba(255,200,87,.28);background:rgba(255,200,87,.12)}
+    .badge-name{font-size:17px;font-weight:900;line-height:1.2;color:#f2f5ff}
+    .badge-card.unlocked .badge-name{color:#fff7db}
+    .badge-description{font-size:13px;line-height:1.45;color:#dce7fb}
+    .badge-rule{
+      margin-top:auto;
+      padding-top:10px;
+      border-top:1px solid rgba(255,255,255,.08);
+      font-size:12px;
+      line-height:1.45;
+      color:#aebfe0;
+    }
+    .badge-rule strong{color:#eef4ff}
+    .badge-card.unlocked .badge-rule{color:#dfe9fb}
+    .badge-unlock-note{font-size:11px;line-height:1.35;color:#d8f8e4}
 
   </style>
 
@@ -1339,6 +1426,15 @@
       </div>
     </div>
 
+    <div id="badgesSection" class="section-hidden">
+      <div class="grid">
+        <div class="card span-12">
+          <div class="section-title">Badges</div>
+          <div id="badgesPanel"></div>
+        </div>
+      </div>
+    </div>
+
     <div id="adminSection" class="section-hidden">
       <div class="grid">
         <div class="span-12">
@@ -1492,6 +1588,7 @@
       buildMiniFantasyLeaderboard,
       buildMiniFantasyEntryAuditLog,
       buildEntryPriceSnapshot,
+      calculateMiniFantasyMissedLockPoints,
       formatDateKeyInTimeZone,
       buildFixturePlayerPool,
       generateMiniFantasyPriceBook,
@@ -6007,6 +6104,281 @@ function titleBandScore(pick, live){
       };
     }
 
+    const BADGE_DEFINITIONS = [
+      {
+        key: 'host_mode',
+        name: 'Host Mode',
+        emoji: '🎯',
+        description: 'You started the chaos.',
+        rule: 'Create your first duel.'
+      },
+      {
+        key: 'game_on',
+        name: 'Game On',
+        emoji: '🕹️',
+        description: 'You stepped into a duel for real.',
+        rule: 'Submit picks in your first duel.'
+      },
+      {
+        key: 'regular',
+        name: 'Regular',
+        emoji: '🔥',
+        description: 'You kept showing up.',
+        rule: 'Hit a 10-day Mini Fantasy activity streak.'
+      },
+      {
+        key: 'captain_obvious',
+        name: 'Captain Obvious',
+        emoji: '🫡',
+        description: 'Your captain actually carried your team.',
+        rule: 'Have your captain finish as the highest scorer in your team.'
+      },
+      {
+        key: 'bullseye_captain',
+        name: 'Bullseye Captain',
+        emoji: '🏹',
+        description: 'A perfect captain call.',
+        rule: 'Have your captain finish as the highest scorer in the whole fixture pool.'
+      },
+      {
+        key: 'shouldve_stayed_in_bed',
+        name: "Should've Stayed in Bed",
+        emoji: '🛌',
+        description: 'Even the safety net would have beaten that team.',
+        rule: 'Finish below standard missed-lock relief in a scored fixture.'
+      },
+      {
+        key: 'one_man_army',
+        name: 'One-Man Army',
+        emoji: '🪖',
+        description: 'One player dragged the whole lineup.',
+        rule: 'Have one player contribute at least half your team score.'
+      },
+      {
+        key: 'differential_demon',
+        name: 'Differential Demon',
+        emoji: '😈',
+        description: 'Your unique pick became the dagger.',
+        rule: 'Have your top scorer be owned by only you for that fixture.'
+      },
+      {
+        key: 'main_character',
+        name: 'Main Character',
+        emoji: '👑',
+        description: 'The whole fixture revolved around your team.',
+        rule: 'Finish #1 on a completed Mini Fantasy fixture rail.'
+      },
+      {
+        key: 'cooked',
+        name: 'Cooked',
+        emoji: '🍳',
+        description: 'Everything somehow went wrong at once.',
+        rule: 'Have 3 or more players finish on 10 points or fewer in one fixture.'
+      }
+    ];
+
+    function currentUserMatchupEntry(matchup){
+      const role = currentUserRoleInMatchup(matchup);
+      if (role === 'creator') return matchup?.a || null;
+      if (role === 'challenger') return matchup?.b || null;
+      return null;
+    }
+
+    function badgeDateKeyToUtcMs(dateKey){
+      const normalized = normalizeTextValue(dateKey || '');
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return null;
+      const [year, month, day] = normalized.split('-').map((value) => Number(value || 0));
+      if (!year || !month || !day) return null;
+      return Date.UTC(year, month - 1, day);
+    }
+
+    function miniFantasyBadgeActivityDateKeys(){
+      const keys = new Set();
+      const currentHandle = normalizeOwnerId(CURRENT_USER?.ownerId || '');
+      currentMiniFantasyDailyBonuses()
+        .filter((bonus) => normalizeOwnerId(bonus.ownerHandle || bonus.owner_handle || bonus.handle || '') === currentHandle)
+        .forEach((bonus) => {
+          const key = normalizeTextValue(bonus.bonusDateIst || bonus.bonus_date_ist || bonus.dateKey || '');
+          if (key) keys.add(key);
+        });
+      currentMiniFantasyEntries().forEach((entry) => {
+        const timestamp = normalizeTextValue(entry.savedAt || entry.saved_at || entry.updatedAt || entry.updated_at || '');
+        if (!timestamp) return;
+        const key = formatDateKeyInTimeZone(new Date(timestamp), MINI_FANTASY_DAILY_VISIT_TIME_ZONE);
+        if (key) keys.add(key);
+      });
+      return [...keys]
+        .map((key) => ({ key, ms: badgeDateKeyToUtcMs(key) }))
+        .filter((item) => Number.isFinite(item.ms))
+        .sort((a, b) => a.ms - b.ms);
+    }
+
+    function computeMiniFantasyBadgeStreakStats(){
+      const ordered = miniFantasyBadgeActivityDateKeys();
+      let max = 0;
+      let current = 0;
+      let bestEndKey = '';
+      ordered.forEach((item, index) => {
+        const prev = ordered[index - 1];
+        if (prev && item.ms - prev.ms === 86400000) {
+          current += 1;
+        } else {
+          current = 1;
+        }
+        if (current >= max) {
+          max = current;
+          bestEndKey = item.key;
+        }
+      });
+      return {
+        max,
+        latestKey: ordered[ordered.length - 1]?.key || '',
+        bestEndKey
+      };
+    }
+
+    function buildMiniFantasyBadgeFixtureRecords(){
+      if (!CURRENT_USER) return [];
+      const ownHandle = normalizeOwnerId(CURRENT_USER.ownerId || '');
+      const publicEntries = currentMiniFantasyLeaderboardEntries();
+      const entriesByMatch = new Map();
+      publicEntries.forEach((entry) => {
+        const matchNo = Number(entry.matchNo || entry.match_no || 0) || null;
+        if (!matchNo) return;
+        if (!entriesByMatch.has(matchNo)) entriesByMatch.set(matchNo, []);
+        entriesByMatch.get(matchNo).push(entry);
+      });
+      return lockedMiniFantasyFixtures()
+        .filter((fixture) => miniFantasyRecentFixtureStage(fixture) === 'final')
+        .map((fixture) => {
+          const matchNo = Number(fixture.match_no || 0) || null;
+          if (!matchNo) return null;
+          const matchEntries = entriesByMatch.get(matchNo) || [];
+          if (!matchEntries.length) return null;
+          const pointsIndex = buildMiniFantasyFixturePointsIndex({
+            liveData: LIVE_2026,
+            schedule: LEAGUE_STAGE_SCHEDULE,
+            squads: IPL_SQUADS,
+            matchNo
+          });
+          const scoredEntries = matchEntries.map((entry) => ({
+            entry,
+            ownerHandle: normalizeOwnerId(entry.ownerHandle || entry.owner_handle || ''),
+            detail: describeMiniFantasyEntry(entry, pointsIndex)
+          })).filter((item) => item.ownerHandle && item.detail && !item.detail.isNoResult);
+          const ownItem = scoredEntries.find((item) => item.ownerHandle === ownHandle) || null;
+          if (!ownItem) return null;
+          const ownershipCounts = new Map();
+          matchEntries.forEach((entry) => {
+            const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds)
+              ? entry.selectedPlayerIds.filter(Boolean)
+              : (Array.isArray(entry.selected_player_ids) ? entry.selected_player_ids.filter(Boolean) : []);
+            [...new Set(selectedPlayerIds)].forEach((playerId) => {
+              ownershipCounts.set(playerId, (ownershipCounts.get(playerId) || 0) + 1);
+            });
+          });
+          const playerPool = currentMiniFantasyPlayerPool(fixture);
+          const maxFixturePoints = playerPool.reduce((best, player) => {
+            const playerId = normalizeTextValue(player?.player_id || player?.playerId || '');
+            return Math.max(best, roundMiniFantasyValue(Number(pointsIndex.get(playerId) || 0)));
+          }, 0);
+          const topEntryPoints = scoredEntries.reduce((best, item) => Math.max(best, Number(item.detail?.totalPoints || 0)), 0);
+          const averageLockedScore = scoredEntries.length
+            ? scoredEntries.reduce((sum, item) => sum + Number(item.detail?.totalPoints || 0), 0) / scoredEntries.length
+            : 0;
+          const standardRelief = calculateMiniFantasyMissedLockPoints(averageLockedScore, 1);
+          return {
+            fixture,
+            matchNo,
+            ownItem,
+            scoredEntries,
+            ownershipCounts,
+            maxFixturePoints,
+            topEntryPoints,
+            standardRelief
+          };
+        })
+        .filter(Boolean);
+    }
+
+    function buildBadgeUnlockLookup(){
+      const profile = profileSnapshot();
+      const streak = computeMiniFantasyBadgeStreakStats();
+      const badgeFixtures = buildMiniFantasyBadgeFixtureRecords();
+
+      const captainObviousRecord = badgeFixtures.find((record) => {
+        const players = Array.isArray(record.ownItem?.detail?.players) ? record.ownItem.detail.players : [];
+        const captain = record.ownItem?.detail?.captain || null;
+        if (!captain || !players.length) return false;
+        const teamHigh = players.reduce((best, player) => Math.max(best, Number(player.scoredPoints ?? player.points ?? 0)), 0);
+        return Number(captain.scoredPoints ?? captain.points ?? 0) >= teamHigh && teamHigh > 0;
+      }) || null;
+
+      const bullseyeCaptainRecord = badgeFixtures.find((record) => {
+        const captain = record.ownItem?.detail?.captain || null;
+        const captainPoints = Number(captain?.scoredPoints ?? captain?.points ?? 0);
+        return captain && captainPoints > 0 && captainPoints >= Number(record.maxFixturePoints || 0);
+      }) || null;
+
+      const sleptThroughBetterRecord = badgeFixtures.find((record) =>
+        Number(record.ownItem?.detail?.totalPoints || 0) < Number(record.standardRelief || 0)
+      ) || null;
+
+      const oneManArmyRecord = badgeFixtures.find((record) => {
+        const bestPickPoints = Number(record.ownItem?.detail?.bestPick?.scoredPoints ?? record.ownItem?.detail?.bestPick?.points ?? 0);
+        const totalPoints = Number(record.ownItem?.detail?.totalPoints || 0);
+        return totalPoints > 0 && bestPickPoints >= totalPoints * 0.5;
+      }) || null;
+
+      const differentialDemonRecord = badgeFixtures.find((record) => {
+        const bestPick = record.ownItem?.detail?.bestPick || null;
+        const playerId = normalizeTextValue(bestPick?.playerId || bestPick?.player_id || '');
+        return playerId && Number(record.ownershipCounts.get(playerId) || 0) === 1;
+      }) || null;
+
+      const mainCharacterRecord = badgeFixtures.find((record) =>
+        Number(record.ownItem?.detail?.totalPoints || 0) > 0
+        && Number(record.ownItem?.detail?.totalPoints || 0) >= Number(record.topEntryPoints || 0)
+      ) || null;
+
+      const cookedRecord = badgeFixtures.find((record) => {
+        const players = Array.isArray(record.ownItem?.detail?.players) ? record.ownItem.detail.players : [];
+        return players.filter((player) => Number(player.scoredPoints ?? player.points ?? 0) <= 10).length >= 3;
+      }) || null;
+
+      const playedDuel = profile.myDuels.find((item) => {
+        const ownEntry = currentUserMatchupEntry(item.matchup);
+        return Boolean(ownEntry?.submittedAt) || ['armed', 'live', 'clash'].includes(item.status);
+      }) || null;
+
+      return {
+        host_mode: profile.created > 0 ? { unlocked: true, note: `${profile.created} duel${profile.created === 1 ? '' : 's'} created.` } : { unlocked: false },
+        game_on: playedDuel ? { unlocked: true, note: `${visibleDuelLabel(playedDuel.matchup)} is on your duel log.` } : { unlocked: false },
+        regular: streak.max >= 10 ? { unlocked: true, note: `${streak.max}-day streak reached.` } : { unlocked: false },
+        captain_obvious: captainObviousRecord ? { unlocked: true, note: `Captain nailed Match ${captainObviousRecord.matchNo}.` } : { unlocked: false },
+        bullseye_captain: bullseyeCaptainRecord ? { unlocked: true, note: `Fixture-best captain call in Match ${bullseyeCaptainRecord.matchNo}.` } : { unlocked: false },
+        shouldve_stayed_in_bed: sleptThroughBetterRecord ? { unlocked: true, note: `Match ${sleptThroughBetterRecord.matchNo}: ${formatMiniFantasyPoints(sleptThroughBetterRecord.ownItem.detail.totalPoints)} vs ${formatMiniFantasyPoints(sleptThroughBetterRecord.standardRelief)} relief.` } : { unlocked: false },
+        one_man_army: oneManArmyRecord ? { unlocked: true, note: `${oneManArmyRecord.ownItem.detail.bestPick?.name || 'One pick'} carried Match ${oneManArmyRecord.matchNo}.` } : { unlocked: false },
+        differential_demon: differentialDemonRecord ? { unlocked: true, note: `${differentialDemonRecord.ownItem.detail.bestPick?.name || 'A solo pick'} spiked Match ${differentialDemonRecord.matchNo}.` } : { unlocked: false },
+        main_character: mainCharacterRecord ? { unlocked: true, note: `You topped Match ${mainCharacterRecord.matchNo}.` } : { unlocked: false },
+        cooked: cookedRecord ? { unlocked: true, note: `Three picks sank Match ${cookedRecord.matchNo}.` } : { unlocked: false }
+      };
+    }
+
+    function buildBadgeSnapshot(){
+      const unlockLookup = buildBadgeUnlockLookup();
+      const badges = BADGE_DEFINITIONS.map((badge) => ({
+        ...badge,
+        unlocked: Boolean(unlockLookup[badge.key]?.unlocked),
+        unlockNote: normalizeTextValue(unlockLookup[badge.key]?.note || '')
+      }));
+      return {
+        badges,
+        unlockedCount: badges.filter((badge) => badge.unlocked).length,
+        totalCount: badges.length
+      };
+    }
+
     function readinessSteps(bundle, ownEntry, otherEntry, lifecycle){
       const steps = [
         {
@@ -7176,6 +7548,7 @@ function titleBandScore(pick, live){
       const tabs = [
         { key:'warroom', label:'Duel', type:'warroom' },
         { key:'fantasy', label:'Mini Fantasy', type:'fantasy' },
+        { key:'badges', label:'Badges', type:'badges' },
         { key:'stats', label:'Nerd Room', type:'stats' },
         { key:'schedule', label:'Schedule', type:'schedule' }
       ];
@@ -7192,6 +7565,8 @@ function titleBandScore(pick, live){
             activeView = 'warroom';
           } else if (type === 'fantasy') {
             activeView = 'fantasy';
+          } else if (type === 'badges') {
+            activeView = 'badges';
           } else if (type === 'stats') {
             activeView = 'stats';
           } else if (type === 'schedule') {
@@ -7200,12 +7575,13 @@ function titleBandScore(pick, live){
             activeView = 'admin';
           }
           render();
-          if (activeView === 'fantasy') {
+          if (['fantasy', 'badges'].includes(activeView)) {
             setTimeout(() => {
               queueMiniFantasyPublicDataLoad().catch(() => {});
               maybeClaimMiniFantasyDailyVisitBonus()
                 .then((claimed) => {
                   if (claimed && activeView === 'fantasy') renderMiniFantasySection();
+                  if (claimed && activeView === 'badges') renderBadgesSection();
                 })
                 .catch(() => {});
             }, 0);
@@ -7502,9 +7878,16 @@ function titleBandScore(pick, live){
           <div class="pill">${snapshotRow?.updatedAt ? `Published ${escapeHtml(formatTimestamp(snapshotRow.updatedAt))}` : 'No hosted live snapshot published yet'}</div>
           <div class="pill">Mini Fantasy manual live ops</div>
         `;
+      } else if (activeView === 'badges') {
+        const badgeSnapshot = CURRENT_USER ? buildBadgeSnapshot() : { unlockedCount: 0, totalCount: BADGE_DEFINITIONS.length };
+        nav.innerHTML = `
+          <div class="pill">Badges</div>
+          <div class="pill">${CURRENT_USER ? `Unlocked: ${escapeHtml(String(badgeSnapshot.unlockedCount))}/${escapeHtml(String(badgeSnapshot.totalCount))}` : 'Sign in to start unlocking badges'}</div>
+          <div class="pill">Duel + Mini Fantasy milestones</div>
+        `;
       }
       if (!ACTIVE_ROOM || !matchup || !MATCHUPS.length) {
-        if (!['fantasy', 'admin'].includes(activeView)) nav.innerHTML = '';
+        if (!['fantasy', 'admin', 'badges'].includes(activeView)) nav.innerHTML = '';
         summary.textContent = 'No public duels are available yet.';
         directory.innerHTML = '<div class="small">Add a duel fixture to populate the directory.</div>';
         return;
@@ -7516,7 +7899,7 @@ function titleBandScore(pick, live){
       const activeLabel = visibleDuelLabel(matchup);
       const statusLabel = matchup.lifecycle?.status === 'live' ? 'Live duel' : lifecycleHeadline(matchup.lifecycle);
       const fallbackTag = requestedDuelMissing ? 'Requested duel was not found, so this page fell back to the first available duel.' : '';
-      if (!['fantasy', 'admin'].includes(activeView)) {
+      if (!['fantasy', 'admin', 'badges'].includes(activeView)) {
         nav.innerHTML = `
           <div class="pill">Active duel: ${escapeHtml(activeLabel)}</div>
           <div class="pill">Status: ${escapeHtml(statusLabel)}</div>
@@ -10758,6 +11141,49 @@ function titleBandScore(pick, live){
       renderMiniFantasyPicker();
     }
 
+    function renderBadgesSection(){
+      const panel = document.getElementById('badgesPanel');
+      if (!panel) return;
+      if (usesHostedDuelsBackend() && MINI_FANTASY_PUBLIC_DATA_STATUS === 'idle') {
+        setTimeout(() => {
+          queueMiniFantasyPublicDataLoad().catch(() => {});
+        }, 0);
+      }
+      if (!CURRENT_USER) {
+        panel.innerHTML = '<div class="fantasy-empty">Sign in to light up your badge cabinet. Your duel actions, Mini Fantasy streaks, captain hits, and glorious disasters will all count here.</div>';
+        return;
+      }
+      const snapshot = buildBadgeSnapshot();
+      panel.innerHTML = `
+        <div class="badges-shell">
+          <div class="badges-summary">
+            <div class="badges-summary-copy">
+              <div class="badges-summary-title">${escapeHtml(CURRENT_USER.displayName)}'s badge cabinet</div>
+              <div class="badges-summary-note">These first 10 badges keep things simple: duel creation, actual duel play, Mini Fantasy consistency, captain calls, and a couple of funny fail states. Locked badges stay muted for now. Unlocked ones pop bright.</div>
+            </div>
+            <div class="badges-summary-stats">
+              <span class="badges-summary-pill">${escapeHtml(String(snapshot.unlockedCount))}/${escapeHtml(String(snapshot.totalCount))} unlocked</span>
+              <span class="badges-summary-pill">@${escapeHtml(CURRENT_USER.ownerId || '')}</span>
+            </div>
+          </div>
+          <div class="badges-grid">
+            ${snapshot.badges.map((badge) => `
+              <div class="badge-card ${badge.unlocked ? 'unlocked' : ''}">
+                <div class="badge-top">
+                  <div class="badge-icon" aria-hidden="true">${escapeHtml(badge.emoji || '🏅')}</div>
+                  <span class="badge-state">${escapeHtml(badge.unlocked ? 'Unlocked' : 'Locked')}</span>
+                </div>
+                <div class="badge-name">${escapeHtml(badge.name)}</div>
+                <div class="badge-description">${escapeHtml(badge.description)}</div>
+                <div class="badge-rule"><strong>Unlock rule:</strong> ${escapeHtml(badge.rule)}</div>
+                ${badge.unlocked && badge.unlockNote ? `<div class="badge-unlock-note">${escapeHtml(badge.unlockNote)}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
     function renderAdminSection(){
       renderMiniFantasyAdminPanel();
     }
@@ -10771,11 +11197,14 @@ function titleBandScore(pick, live){
       renderPickPicker();
       document.getElementById('warRoomSection').classList.toggle('section-hidden', activeView !== 'warroom');
       document.getElementById('miniFantasySection').classList.toggle('section-hidden', activeView !== 'fantasy');
+      document.getElementById('badgesSection').classList.toggle('section-hidden', activeView !== 'badges');
       document.getElementById('adminSection').classList.toggle('section-hidden', activeView !== 'admin');
       document.getElementById('statsSection').classList.toggle('section-hidden', activeView !== 'stats');
       document.getElementById('scheduleSection').classList.toggle('section-hidden', activeView !== 'schedule');
       if (activeView === 'fantasy') {
         renderMiniFantasySection();
+      } else if (activeView === 'badges') {
+        renderBadgesSection();
       } else if (activeView === 'admin') {
         renderAdminSection();
       } else {

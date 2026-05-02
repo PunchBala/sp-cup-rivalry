@@ -14,8 +14,10 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /id="manageDrawer"/);
   assert.match(html, /id="browseDrawer"/);
   assert.match(html, /id="miniFantasySection"/);
+  assert.match(html, /id="badgesSection"/);
   assert.match(html, /id="adminSection"/);
   assert.match(html, /id="miniFantasyAdminPanel"/);
+  assert.match(html, /id="badgesPanel"/);
   assert.match(html, /id="miniFantasyFixtures"/);
   assert.match(html, /id="miniFantasyBuilder"/);
   assert.match(html, /id="miniFantasyLeaderboard"/);
@@ -71,6 +73,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function describeMiniFantasyAuditLog\(/);
   assert.match(html, /function buildMiniFantasyEntryFromAuditLog\(/);
   assert.match(html, /function renderMiniFantasySection\(/);
+  assert.match(html, /function renderBadgesSection\(/);
   assert.match(html, /function renderMiniFantasyFixtures\(/);
   assert.match(html, /function renderMiniFantasyBuilder\(/);
   assert.match(html, /function renderMiniFantasyLeaderboard\(/);
@@ -95,6 +98,13 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /Only email \+ password are needed here\./);
   assert.match(html, /How Duel works/);
   assert.match(html, /How Mini Fantasy works/);
+  assert.match(html, /Badges/);
+  assert.match(html, /badge cabinet/i);
+  assert.match(html, /Host Mode/);
+  assert.match(html, /Game On/);
+  assert.match(html, /Should've Stayed in Bed/);
+  assert.match(html, /Main Character/);
+  assert.match(html, /Cooked/);
   assert.match(html, /Admin control/);
   assert.match(html, /Admin live panel/);
   assert.match(html, /Live snapshot/);
