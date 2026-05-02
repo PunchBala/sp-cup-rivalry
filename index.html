@@ -9279,7 +9279,6 @@ function titleBandScore(pick, live){
       const swingCandidate = [...playerStats.entries()]
         .filter(([, stat]) => stat.count < Math.max(totalLocked, 1))
         .sort((a, b) => a[1].count - b[1].count || b[1].maxPoints - a[1].maxPoints || a[0].localeCompare(b[0]))[0] || null;
-      const noLockRows = rows.filter((row) => row.fixtureStatus === 'did_not_lock');
       const currentHandle = normalizeOwnerId(CURRENT_USER?.ownerId || '');
       const myRow = rows.find((row) => normalizeOwnerId(row.owner_handle || '') === currentHandle) || null;
       const sameTeam = myRow && selectedRow && normalizeOwnerId(myRow.owner_handle || '') === normalizeOwnerId(selectedRow.owner_handle || '');
@@ -9345,14 +9344,6 @@ function titleBandScore(pick, live){
               ? `${formatMiniFantasyPoints(swingCandidate[1].maxPoints)} pts already on the board. Only ${swingCandidate[1].count} team${swingCandidate[1].count === 1 ? '' : 's'} are exposed.`
               : `Only ${swingCandidate[1].count} team${swingCandidate[1].count === 1 ? '' : 's'} are on this player if the match flips.`)
             : 'The field is clustered heavily around the same names right now.'
-        },
-        {
-          tone: 'dead',
-          label: 'Dead teams',
-          head: noLockRows.length ? `${noLockRows.length} missed lock` : 'Everybody locked in',
-          note: noLockRows.length
-            ? formatMiniFantasyNameList(noLockRows.map((row) => row.display_name || row.owner_handle), 3)
-            : `${totalLocked} live team${totalLocked === 1 ? '' : 's'} are fully in the mix.`
         },
         {
           tone: 'you',
