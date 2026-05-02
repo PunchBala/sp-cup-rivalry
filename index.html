@@ -1666,6 +1666,7 @@
     let MINI_FANTASY_COMPUTE_REVISION = 0;
     let MINI_FANTASY_LEADERBOARD_CACHE = { key: '', value: null };
     let MINI_FANTASY_RECENT_BOARD_CACHE = { key: '', value: null };
+    let MINI_FANTASY_BADGE_CACHE = { key: '', value: null };
     const DUELS_BACKEND = window.DUELS_BACKEND_API || window.createDuelsBackend?.(window.DUELS_BACKEND_CONFIG || {}) || { enabled: false, label: 'Local beta storage' };
     let DUEL_STUDIO_NOTICE = null;
     let IPL_SQUADS = {};
@@ -4685,6 +4686,7 @@ function titleBandScore(pick, live){
       MINI_FANTASY_COMPUTE_REVISION += 1;
       MINI_FANTASY_LEADERBOARD_CACHE = { key: '', value: null };
       MINI_FANTASY_RECENT_BOARD_CACHE = { key: '', value: null };
+      MINI_FANTASY_BADGE_CACHE = { key: '', value: null };
     }
 
     function isMiniFantasyDailyBonusTableError(error){
@@ -6240,69 +6242,67 @@ function titleBandScore(pick, live){
     function buildMiniFantasyBadgeFixtureRecords(){
       if (!CURRENT_USER) return [];
       const ownHandle = normalizeOwnerId(CURRENT_USER.ownerId || '');
-      const publicEntries = currentMiniFantasyLeaderboardEntries();
-      const entriesByMatch = new Map();
-      publicEntries.forEach((entry) => {
-        const matchNo = Number(entry.matchNo || entry.match_no || 0) || null;
-        if (!matchNo) return;
-        if (!entriesByMatch.has(matchNo)) entriesByMatch.set(matchNo, []);
-        entriesByMatch.get(matchNo).push(entry);
-      });
-      return lockedMiniFantasyFixtures()
-        .filter((fixture) => miniFantasyRecentFixtureStage(fixture) === 'final')
-        .map((fixture) => {
-          const matchNo = Number(fixture.match_no || 0) || null;
-          if (!matchNo) return null;
-          const matchEntries = entriesByMatch.get(matchNo) || [];
-          if (!matchEntries.length) return null;
-          const pointsIndex = buildMiniFantasyFixturePointsIndex({
-            liveData: LIVE_2026,
-            schedule: LEAGUE_STAGE_SCHEDULE,
-            squads: IPL_SQUADS,
-            matchNo
+      const leaderboardRows = Array.isArray(miniFantasyLeaderboardData()?.rows) ? miniFantasyLeaderboardData().rows : [];
+      const ownRow = leaderboardRows.find((row) => normalizeOwnerId(row.owner_handle || '') === ownHandle) || null;
+      if (!ownRow) return [];
+      const fieldMatchesByNo = new Map();
+      leaderboardRows.forEach((row) => {
+        (Array.isArray(row.matches) ? row.matches : []).forEach((matchSummary) => {
+          const matchNo = Number(matchSummary?.match_no || 0) || null;
+          if (!matchNo) return;
+          if (!fieldMatchesByNo.has(matchNo)) fieldMatchesByNo.set(matchNo, []);
+          fieldMatchesByNo.get(matchNo).push({
+            ownerHandle: normalizeOwnerId(row.owner_handle || ''),
+            matchSummary
           });
-          const scoredEntries = matchEntries.map((entry) => ({
-            entry,
-            ownerHandle: normalizeOwnerId(entry.ownerHandle || entry.owner_handle || ''),
-            detail: describeMiniFantasyEntry(entry, pointsIndex)
-          })).filter((item) => item.ownerHandle && item.detail && !item.detail.isNoResult);
-          const ownItem = scoredEntries.find((item) => item.ownerHandle === ownHandle) || null;
-          if (!ownItem) return null;
+        });
+      });
+      return (Array.isArray(ownRow.matches) ? ownRow.matches : [])
+        .map((ownMatchSummary) => {
+          const matchNo = Number(ownMatchSummary?.match_no || 0) || null;
+          if (!matchNo) return null;
+          const ownDetail = ownMatchSummary?.audit_log ? describeMiniFantasyAuditLog(ownMatchSummary.audit_log) : null;
+          if (!ownDetail || ownDetail.isNoResult) return null;
+          const fieldSummaries = fieldMatchesByNo.get(matchNo) || [];
+          const lockedFieldEntries = fieldSummaries
+            .filter((item) => normalizeTextValue(item.matchSummary?.source || '') === 'locked_entry' && item.matchSummary?.audit_log)
+            .map((item) => ({
+              ownerHandle: item.ownerHandle,
+              detail: describeMiniFantasyAuditLog(item.matchSummary.audit_log)
+            }))
+            .filter((item) => item.detail && !item.detail.isNoResult);
+          if (!lockedFieldEntries.length) return null;
           const ownershipCounts = new Map();
-          matchEntries.forEach((entry) => {
-            const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds)
-              ? entry.selectedPlayerIds.filter(Boolean)
-              : (Array.isArray(entry.selected_player_ids) ? entry.selected_player_ids.filter(Boolean) : []);
-            [...new Set(selectedPlayerIds)].forEach((playerId) => {
+          let maxSeenPlayerPoints = 0;
+          lockedFieldEntries.forEach((item) => {
+            const playerIds = [...new Set((Array.isArray(item.detail.players) ? item.detail.players : []).map((player) => normalizeTextValue(player.playerId || '')).filter(Boolean))];
+            playerIds.forEach((playerId) => {
               ownershipCounts.set(playerId, (ownershipCounts.get(playerId) || 0) + 1);
             });
+            (Array.isArray(item.detail.players) ? item.detail.players : []).forEach((player) => {
+              maxSeenPlayerPoints = Math.max(maxSeenPlayerPoints, Number(player.scoredPoints ?? player.points ?? 0) || 0);
+            });
           });
-          const playerPool = currentMiniFantasyPlayerPool(fixture);
-          const maxFixturePoints = playerPool.reduce((best, player) => {
-            const playerId = normalizeTextValue(player?.player_id || player?.playerId || '');
-            return Math.max(best, roundMiniFantasyValue(Number(pointsIndex.get(playerId) || 0)));
-          }, 0);
-          const topEntryPoints = scoredEntries.reduce((best, item) => Math.max(best, Number(item.detail?.totalPoints || 0)), 0);
-          const averageLockedScore = scoredEntries.length
-            ? scoredEntries.reduce((sum, item) => sum + Number(item.detail?.totalPoints || 0), 0) / scoredEntries.length
-            : 0;
-          const standardRelief = calculateMiniFantasyMissedLockPoints(averageLockedScore, 1);
+          const topEntryPoints = lockedFieldEntries.reduce((best, item) => Math.max(best, Number(item.detail?.totalPoints || 0)), 0);
+          const averageLockedScore = lockedFieldEntries.reduce((sum, item) => sum + Number(item.detail?.totalPoints || 0), 0) / lockedFieldEntries.length;
           return {
-            fixture,
+            fixture: miniFantasyFixtureByMatchNo(matchNo),
             matchNo,
-            ownItem,
-            scoredEntries,
+            ownItem: {
+              ownerHandle: ownHandle,
+              detail: ownDetail
+            },
+            lockedFieldEntries,
             ownershipCounts,
-            maxFixturePoints,
+            maxFixturePoints: maxSeenPlayerPoints,
             topEntryPoints,
-            standardRelief
+            standardRelief: calculateMiniFantasyMissedLockPoints(averageLockedScore, 1)
           };
         })
         .filter(Boolean);
     }
 
-    function buildBadgeUnlockLookup(){
-      const profile = profileSnapshot();
+    function buildBadgeUnlockLookup(profile = profileSnapshot()){
       const streak = computeMiniFantasyBadgeStreakStats();
       const badgeFixtures = buildMiniFantasyBadgeFixtureRecords();
 
@@ -6366,17 +6366,35 @@ function titleBandScore(pick, live){
     }
 
     function buildBadgeSnapshot(){
-      const unlockLookup = buildBadgeUnlockLookup();
+      const profile = profileSnapshot();
+      const cacheKey = [
+        MINI_FANTASY_COMPUTE_REVISION,
+        LIVE_2026?.fetchedAt || '',
+        normalizeOwnerId(CURRENT_USER?.ownerId || ''),
+        profile.total,
+        profile.created,
+        profile.joined,
+        profile.live,
+        profile.armed,
+        profile.clash,
+        profile.draft
+      ].join('|');
+      if (MINI_FANTASY_BADGE_CACHE.key === cacheKey && MINI_FANTASY_BADGE_CACHE.value) {
+        return MINI_FANTASY_BADGE_CACHE.value;
+      }
+      const unlockLookup = buildBadgeUnlockLookup(profile);
       const badges = BADGE_DEFINITIONS.map((badge) => ({
         ...badge,
         unlocked: Boolean(unlockLookup[badge.key]?.unlocked),
         unlockNote: normalizeTextValue(unlockLookup[badge.key]?.note || '')
       }));
-      return {
+      const value = {
         badges,
         unlockedCount: badges.filter((badge) => badge.unlocked).length,
         totalCount: badges.length
       };
+      MINI_FANTASY_BADGE_CACHE = { key: cacheKey, value };
+      return value;
     }
 
     function readinessSteps(bundle, ownEntry, otherEntry, lifecycle){
@@ -7879,11 +7897,10 @@ function titleBandScore(pick, live){
           <div class="pill">Mini Fantasy manual live ops</div>
         `;
       } else if (activeView === 'badges') {
-        const badgeSnapshot = CURRENT_USER ? buildBadgeSnapshot() : { unlockedCount: 0, totalCount: BADGE_DEFINITIONS.length };
         nav.innerHTML = `
           <div class="pill">Badges</div>
-          <div class="pill">${CURRENT_USER ? `Unlocked: ${escapeHtml(String(badgeSnapshot.unlockedCount))}/${escapeHtml(String(badgeSnapshot.totalCount))}` : 'Sign in to start unlocking badges'}</div>
-          <div class="pill">Duel + Mini Fantasy milestones</div>
+          <div class="pill">${CURRENT_USER ? 'Duel + Mini Fantasy milestones' : 'Sign in to start unlocking badges'}</div>
+          <div class="pill">Bright when won</div>
         `;
       }
       if (!ACTIVE_ROOM || !matchup || !MATCHUPS.length) {
