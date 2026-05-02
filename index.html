@@ -6176,6 +6176,34 @@ function titleBandScore(pick, live){
         emoji: '🍳',
         description: 'Everything somehow went wrong at once.',
         rule: 'Have 3 or more players finish on 10 points or fewer in one fixture.'
+      },
+      {
+        key: 'budget_bandit',
+        name: 'Budget Bandit',
+        emoji: '💸',
+        description: 'You robbed the room on discount credits.',
+        rule: 'Score 200+ in a Mini Fantasy fixture with 29 credits or less.'
+      },
+      {
+        key: 'full_send',
+        name: 'Full Send',
+        emoji: '🚀',
+        description: 'Every pick came ready to cash.',
+        rule: 'Have all 4 players score 50+ in one fixture.'
+      },
+      {
+        key: 'zero_mercy',
+        name: 'Zero Mercy',
+        emoji: '⚔️',
+        description: 'You did not leave second place a route back in.',
+        rule: 'Finish #1 in a fixture by 100+ points over second place.'
+      },
+      {
+        key: 'early_bird',
+        name: 'Early Bird',
+        emoji: '🐦',
+        description: 'Locked the team early and still won the room.',
+        rule: 'Save your team 6+ hours before lock and still finish #1 in that fixture.'
       }
     ];
 
@@ -6296,6 +6324,9 @@ function titleBandScore(pick, live){
             ownershipCounts,
             maxFixturePoints: maxSeenPlayerPoints,
             topEntryPoints,
+            secondEntryPoints: lockedFieldEntries
+              .map((item) => Number(item.detail?.totalPoints || 0) || 0)
+              .sort((a, b) => b - a)[1] || 0,
             standardRelief: calculateMiniFantasyMissedLockPoints(averageLockedScore, 1)
           };
         })
@@ -6346,6 +6377,34 @@ function titleBandScore(pick, live){
         return players.filter((player) => Number(player.scoredPoints ?? player.points ?? 0) <= 10).length >= 3;
       }) || null;
 
+      const budgetBanditRecord = badgeFixtures.find((record) =>
+        Number(record.ownItem?.detail?.totalPoints || 0) >= 200
+        && Number(record.ownItem?.detail?.spentCredits || 0) > 0
+        && Number(record.ownItem?.detail?.spentCredits || 0) <= 29
+      ) || null;
+
+      const fullSendRecord = badgeFixtures.find((record) => {
+        const players = Array.isArray(record.ownItem?.detail?.players) ? record.ownItem.detail.players : [];
+        return players.length >= 4 && players.every((player) => Number(player.scoredPoints ?? player.points ?? 0) >= 50);
+      }) || null;
+
+      const zeroMercyRecord = badgeFixtures.find((record) =>
+        record.lockedFieldEntries.length >= 2
+        && Number(record.ownItem?.detail?.totalPoints || 0) >= Number(record.topEntryPoints || 0)
+        && Number(record.ownItem?.detail?.totalPoints || 0) - Number(record.secondEntryPoints || 0) >= 100
+      ) || null;
+
+      const earlyBirdRecord = badgeFixtures.find((record) => {
+        const ownPoints = Number(record.ownItem?.detail?.totalPoints || 0) || 0;
+        if (!(ownPoints > 0 && ownPoints >= Number(record.topEntryPoints || 0))) return false;
+        const savedAtMs = Date.parse(record.ownItem?.detail?.savedAt || '');
+        const fixture = record.fixture || {};
+        const lockAtRaw = fixture.locks_at_utc || fixture.locksAtUtc || fixture.datetime_utc || fixture.starts_at_utc || fixture.startsAtUtc || '';
+        const lockAtMs = Date.parse(lockAtRaw);
+        if (!Number.isFinite(savedAtMs) || !Number.isFinite(lockAtMs)) return false;
+        return savedAtMs <= (lockAtMs - (6 * 60 * 60 * 1000));
+      }) || null;
+
       const playedDuel = profile.myDuels.find((item) => {
         const ownEntry = currentUserMatchupEntry(item.matchup);
         return Boolean(ownEntry?.submittedAt) || ['armed', 'live', 'clash'].includes(item.status);
@@ -6361,7 +6420,11 @@ function titleBandScore(pick, live){
         one_man_army: oneManArmyRecord ? { unlocked: true, note: `${oneManArmyRecord.ownItem.detail.bestPick?.name || 'One pick'} carried Match ${oneManArmyRecord.matchNo}.` } : { unlocked: false },
         differential_demon: differentialDemonRecord ? { unlocked: true, note: `${differentialDemonRecord.ownItem.detail.bestPick?.name || 'A solo pick'} spiked Match ${differentialDemonRecord.matchNo}.` } : { unlocked: false },
         main_character: mainCharacterRecord ? { unlocked: true, note: `You topped Match ${mainCharacterRecord.matchNo}.` } : { unlocked: false },
-        cooked: cookedRecord ? { unlocked: true, note: `Three picks sank Match ${cookedRecord.matchNo}.` } : { unlocked: false }
+        cooked: cookedRecord ? { unlocked: true, note: `Three picks sank Match ${cookedRecord.matchNo}.` } : { unlocked: false },
+        budget_bandit: budgetBanditRecord ? { unlocked: true, note: `Match ${budgetBanditRecord.matchNo}: ${formatMiniFantasyPoints(budgetBanditRecord.ownItem.detail.totalPoints)} on ${formatMiniFantasyPrice(budgetBanditRecord.ownItem.detail.spentCredits)} credits.` } : { unlocked: false },
+        full_send: fullSendRecord ? { unlocked: true, note: `All four picks cleared 50 in Match ${fullSendRecord.matchNo}.` } : { unlocked: false },
+        zero_mercy: zeroMercyRecord ? { unlocked: true, note: `Match ${zeroMercyRecord.matchNo}: won by ${formatMiniFantasyPoints(Number(zeroMercyRecord.ownItem.detail.totalPoints || 0) - Number(zeroMercyRecord.secondEntryPoints || 0))} points.` } : { unlocked: false },
+        early_bird: earlyBirdRecord ? { unlocked: true, note: `Match ${earlyBirdRecord.matchNo}: early lock, late victory.` } : { unlocked: false }
       };
     }
 
