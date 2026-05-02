@@ -52,6 +52,7 @@ Once configured:
 - `Mini Fantasy` saves one hosted entry per user per match
 - saved Mini Fantasy entries carry a fixture-specific price snapshot
 - Mini Fantasy leaderboard prefers the hosted snapshot table and falls back to hosted entry rows if the snapshot is stale or empty
+- Mini Fantasy live provisional scoring can be published from the admin panel through a hosted snapshot row
 
 ## Current scope
 
@@ -63,6 +64,7 @@ The backend owns:
 - Mini Fantasy match entries
 - Mini Fantasy leaderboard source rows
 - precomputed Mini Fantasy leaderboard snapshot rows
+- Mini Fantasy live provisional snapshot rows
 - entry ownership
 - persisted submitted picks
 - persisted saved Mini Fantasy lineups plus captain choice
@@ -84,8 +86,10 @@ That refresh keeps:
 
 - `mini_fantasy_entries` present
 - `mini_fantasy_leaderboard_rows` present
+- `mini_fantasy_live_provisional_snapshots` present
 - latest insert/update lock policies in place
 - public read policy in place for the leaderboard
+- admin-only write policy in place for hosted live provisional snapshots
 - `mini_fantasy_entries.spent_credits` upgraded to `numeric(5,2)` so half-credit teams like `30.5` save correctly
 
 ## Optional leaderboard publishing

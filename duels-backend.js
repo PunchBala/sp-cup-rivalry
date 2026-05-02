@@ -12,7 +12,8 @@
       duelEntries: 'duel_entries',
       miniFantasyEntries: 'mini_fantasy_entries',
       miniFantasyDailyBonuses: 'mini_fantasy_daily_bonus_claims',
-      miniFantasyLeaderboardRows: 'mini_fantasy_leaderboard_rows'
+      miniFantasyLeaderboardRows: 'mini_fantasy_leaderboard_rows',
+      miniFantasyLiveSnapshots: 'mini_fantasy_live_provisional_snapshots'
     }
   };
 
@@ -199,8 +200,11 @@
         async listPublicMiniFantasyProfiles() { return []; },
         async listPublicMiniFantasyDailyBonuses() { return []; },
         async listMiniFantasyLeaderboardRows() { return []; },
+        async listPublicMiniFantasyLiveSnapshots() { return []; },
         async claimMiniFantasyDailyBonus() { throw disabledError(); },
-        async upsertMiniFantasyEntry() { throw disabledError(); }
+        async upsertMiniFantasyEntry() { throw disabledError(); },
+        async upsertMiniFantasyLiveSnapshot() { throw disabledError(); },
+        async deleteMiniFantasyLiveSnapshot() { throw disabledError(); }
       };
   }
 
@@ -508,6 +512,22 @@ function normalizeMiniFantasyEntryRow(row) {
         live_data_fetched_at: row.live_data_fetched_at || null,
         generatedAt: row.generated_at || null,
         generated_at: row.generated_at || null
+      };
+    }
+
+    function normalizeMiniFantasyLiveSnapshotRow(row) {
+      if (!row) return null;
+      return {
+        id: row.id || null,
+        season: normalizeWhitespace(row.season || ''),
+        matchNo: Number(row.match_no || 0) || null,
+        fixtureLabel: normalizeWhitespace(row.fixture_label || ''),
+        manualInput: cloneJson(row.manual_input || {}),
+        snapshot: cloneJson(row.snapshot || {}),
+        updatedByUserId: row.updated_by_user_id || null,
+        updatedByHandle: normalizeSlug(row.updated_by_handle || ''),
+        createdAt: row.created_at || null,
+        updatedAt: row.updated_at || null
       };
     }
 
@@ -895,6 +915,21 @@ function normalizeMiniFantasyEntryRow(row) {
         return (Array.isArray(rows) ? rows : []).map(normalizeMiniFantasyLeaderboardRow).filter(Boolean);
       },
 
+      async listPublicMiniFantasyLiveSnapshots({ season, currentUser } = {}) {
+        const activeSession = await ensureFreshSession();
+        const safeSeason = normalizeWhitespace(season || '');
+        const rows = await restRequest(config.tables.miniFantasyLiveSnapshots, {
+          method: 'GET',
+          query: {
+            select: 'id,season,match_no,fixture_label,manual_input,snapshot,updated_by_user_id,updated_by_handle,created_at,updated_at',
+            ...(safeSeason ? { season: `eq.${safeSeason}` } : {}),
+            order: 'match_no.desc,updated_at.desc.nullslast'
+          },
+          accessToken: activeSession?.access_token || currentUser?.accessToken || null
+        });
+        return (Array.isArray(rows) ? rows : []).map(normalizeMiniFantasyLiveSnapshotRow).filter(Boolean);
+      },
+
       async claimMiniFantasyDailyBonus({ currentUser, season, bonusDateIst, bonusPoints }) {
         const activeSession = await ensureFreshSession();
         if (!activeSession?.access_token || !currentUser?.userId) {
@@ -961,6 +996,60 @@ function normalizeMiniFantasyEntryRow(row) {
           prefer: 'resolution=merge-duplicates,return=representation'
         });
         return normalizeMiniFantasyEntryRow(firstArrayItem(rows));
+      },
+
+      async upsertMiniFantasyLiveSnapshot({ currentUser, season, matchNo, fixtureLabel, manualInput, snapshot }) {
+        const activeSession = await ensureFreshSession();
+        if (!activeSession?.access_token || !currentUser?.userId) {
+          throw new Error('Sign in with a backend account before publishing Mini Fantasy live provisional data.');
+        }
+        const safeSeason = normalizeWhitespace(season || '');
+        const safeMatchNo = Number(matchNo || 0) || null;
+        if (!safeSeason || !safeMatchNo) {
+          throw new Error('Mini Fantasy live provisional publish needs a season and match number.');
+        }
+        const rows = await restRequest(config.tables.miniFantasyLiveSnapshots, {
+          method: 'POST',
+          query: {
+            on_conflict: 'season,match_no',
+            select: 'id,season,match_no,fixture_label,manual_input,snapshot,updated_by_user_id,updated_by_handle,created_at,updated_at'
+          },
+          body: {
+            season: safeSeason,
+            match_no: safeMatchNo,
+            fixture_label: normalizeWhitespace(fixtureLabel || ''),
+            manual_input: cloneJson(manualInput || {}),
+            snapshot: cloneJson(snapshot || {}),
+            updated_by_user_id: currentUser.userId,
+            updated_by_handle: currentUser.ownerId
+          },
+          accessToken: activeSession.access_token,
+          prefer: 'resolution=merge-duplicates,return=representation'
+        });
+        return normalizeMiniFantasyLiveSnapshotRow(firstArrayItem(rows));
+      },
+
+      async deleteMiniFantasyLiveSnapshot({ currentUser, season, matchNo }) {
+        const activeSession = await ensureFreshSession();
+        if (!activeSession?.access_token || !currentUser?.userId) {
+          throw new Error('Sign in with a backend account before clearing Mini Fantasy live provisional data.');
+        }
+        const safeSeason = normalizeWhitespace(season || '');
+        const safeMatchNo = Number(matchNo || 0) || null;
+        if (!safeSeason || !safeMatchNo) {
+          throw new Error('Mini Fantasy live provisional clear needs a season and match number.');
+        }
+        const rows = await restRequest(config.tables.miniFantasyLiveSnapshots, {
+          method: 'DELETE',
+          query: {
+            season: `eq.${safeSeason}`,
+            match_no: `eq.${safeMatchNo}`,
+            select: 'id,season,match_no,fixture_label,manual_input,snapshot,updated_by_user_id,updated_by_handle,created_at,updated_at'
+          },
+          accessToken: activeSession.access_token,
+          prefer: 'return=representation'
+        });
+        return normalizeMiniFantasyLiveSnapshotRow(firstArrayItem(rows));
       }
     };
   }

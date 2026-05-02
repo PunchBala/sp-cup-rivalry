@@ -105,6 +105,20 @@ create table if not exists public.mini_fantasy_leaderboard_rows (
   unique (season, owner_handle)
 );
 
+create table if not exists public.mini_fantasy_live_provisional_snapshots (
+  id uuid primary key default gen_random_uuid(),
+  season text not null,
+  match_no integer not null,
+  fixture_label text not null default '',
+  manual_input jsonb not null default '{}'::jsonb,
+  snapshot jsonb not null default '{}'::jsonb,
+  updated_by_user_id uuid references auth.users (id) on delete set null,
+  updated_by_handle text not null default '',
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  unique (season, match_no)
+);
+
 alter table public.mini_fantasy_entries
   add column if not exists display_name text not null default '';
 
@@ -138,12 +152,18 @@ create trigger mini_fantasy_entries_set_updated_at
 before update on public.mini_fantasy_entries
 for each row execute procedure public.set_updated_at();
 
+drop trigger if exists mini_fantasy_live_provisional_snapshots_set_updated_at on public.mini_fantasy_live_provisional_snapshots;
+create trigger mini_fantasy_live_provisional_snapshots_set_updated_at
+before update on public.mini_fantasy_live_provisional_snapshots
+for each row execute procedure public.set_updated_at();
+
 alter table public.profiles enable row level security;
 alter table public.duels enable row level security;
 alter table public.duel_entries enable row level security;
 alter table public.mini_fantasy_entries enable row level security;
 alter table public.mini_fantasy_daily_bonus_claims enable row level security;
 alter table public.mini_fantasy_leaderboard_rows enable row level security;
+alter table public.mini_fantasy_live_provisional_snapshots enable row level security;
 
 drop policy if exists "profiles are public readable" on public.profiles;
 create policy "profiles are public readable"
@@ -285,6 +305,61 @@ create policy "mini fantasy leaderboard rows are public readable"
 on public.mini_fantasy_leaderboard_rows
 for select
 using (true);
+
+drop policy if exists "mini fantasy live provisional snapshots are public readable" on public.mini_fantasy_live_provisional_snapshots;
+create policy "mini fantasy live provisional snapshots are public readable"
+on public.mini_fantasy_live_provisional_snapshots
+for select
+using (true);
+
+drop policy if exists "senthil manages mini fantasy live provisional snapshots" on public.mini_fantasy_live_provisional_snapshots;
+create policy "senthil manages mini fantasy live provisional snapshots"
+on public.mini_fantasy_live_provisional_snapshots
+for insert
+with check (
+  auth.uid() = updated_by_user_id
+  and exists (
+    select 1
+    from public.profiles
+    where profiles.id = auth.uid()
+      and lower(profiles.handle) = 'senthil'
+  )
+);
+
+drop policy if exists "senthil updates mini fantasy live provisional snapshots" on public.mini_fantasy_live_provisional_snapshots;
+create policy "senthil updates mini fantasy live provisional snapshots"
+on public.mini_fantasy_live_provisional_snapshots
+for update
+using (
+  exists (
+    select 1
+    from public.profiles
+    where profiles.id = auth.uid()
+      and lower(profiles.handle) = 'senthil'
+  )
+)
+with check (
+  auth.uid() = updated_by_user_id
+  and exists (
+    select 1
+    from public.profiles
+    where profiles.id = auth.uid()
+      and lower(profiles.handle) = 'senthil'
+  )
+);
+
+drop policy if exists "senthil deletes mini fantasy live provisional snapshots" on public.mini_fantasy_live_provisional_snapshots;
+create policy "senthil deletes mini fantasy live provisional snapshots"
+on public.mini_fantasy_live_provisional_snapshots
+for delete
+using (
+  exists (
+    select 1
+    from public.profiles
+    where profiles.id = auth.uid()
+      and lower(profiles.handle) = 'senthil'
+  )
+);
 
 drop policy if exists "users claim their own mini fantasy daily bonus" on public.mini_fantasy_daily_bonus_claims;
 create policy "users claim their own mini fantasy daily bonus"

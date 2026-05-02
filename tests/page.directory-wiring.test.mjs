@@ -14,6 +14,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /id="manageDrawer"/);
   assert.match(html, /id="browseDrawer"/);
   assert.match(html, /id="miniFantasySection"/);
+  assert.match(html, /id="miniFantasyAdminPanel"/);
   assert.match(html, /id="miniFantasyFixtures"/);
   assert.match(html, /id="miniFantasyBuilder"/);
   assert.match(html, /id="miniFantasyLeaderboard"/);
@@ -34,6 +35,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /mini-fantasy\/contest-engine\.js/);
   assert.match(html, /data\/mini_fantasy_open_fixture_price_snapshots\.json/);
   assert.match(html, /data\/mini_fantasy_live_provisional\.json/);
+  assert.match(html, /mini-fantasy\/live-provisional-builder\.js/);
   assert.match(html, /ipl_2026_player_availability\.json/);
   assert.match(html, /function sortedDirectoryDuels\(/);
     assert.match(html, /function buildDuelShareUrl\(/);
@@ -60,6 +62,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function loadPlayerAvailabilityData\(/);
   assert.match(html, /function loadMiniFantasyOpenFixturePriceSnapshots\(/);
   assert.match(html, /function loadMiniFantasyLiveProvisional\(/);
+  assert.match(html, /function renderMiniFantasyAdminPanel\(/);
   assert.match(html, /function miniFantasyLiveProvisionalContext\(/);
   assert.match(html, /function miniFantasyAvailabilityBadgeLabel\(/);
   assert.match(html, /function formatMiniFantasyAuditTimestamp\(/);
@@ -91,6 +94,8 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /Only email \+ password are needed here\./);
   assert.match(html, /How Duel works/);
   assert.match(html, /How Mini Fantasy works/);
+  assert.match(html, /Admin live panel/);
+  assert.match(html, /Paste the structured innings JSON here/);
   assert.match(html, /Mini Fantasy current pricing/);
   assert.match(html, /official IPL manual refresh/);
   assert.match(html, /Fixture-only scoring:/);

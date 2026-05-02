@@ -737,6 +737,48 @@
       line-height:1.55;
     }
     .fantasy-guide-list strong{color:#fff}
+    .fantasy-admin-card{
+      margin-top:16px;
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid rgba(95,240,200,.22);
+      background:
+        radial-gradient(circle at top left, rgba(95,240,200,.16), transparent 34%),
+        linear-gradient(180deg, rgba(8,31,34,.96), rgba(6,17,22,.92));
+      display:grid;
+      gap:12px;
+    }
+    .fantasy-admin-card .section-title{color:#d7fff1}
+    .fantasy-admin-head{display:grid;gap:6px}
+    .fantasy-admin-sub{font-size:12px;color:#c9f2e6;line-height:1.55}
+    .fantasy-admin-meta{display:flex;gap:8px;flex-wrap:wrap}
+    .fantasy-admin-meta .pill{background:rgba(255,255,255,.05);border-color:rgba(95,240,200,.16)}
+    .fantasy-admin-textarea{
+      width:100%;
+      min-height:320px;
+      resize:vertical;
+      font:12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .fantasy-admin-preview{
+      display:grid;
+      gap:8px;
+      padding:12px 13px;
+      border-radius:16px;
+      border:1px solid rgba(124,196,255,.16);
+      background:rgba(124,196,255,.08);
+    }
+    .fantasy-admin-preview-list{
+      display:grid;
+      gap:6px;
+    }
+    .fantasy-admin-preview-row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      font-size:12px;
+      color:#e6f0ff;
+    }
+    .fantasy-admin-preview-row strong{color:#fff}
     .fantasy-fixture-list{display:grid;gap:10px}
     .fantasy-switcher-shell{display:grid;gap:10px}
     .fantasy-switcher-caption{
@@ -1225,6 +1267,7 @@
                   </ul>
                 </div>
               </div>
+              <div id="miniFantasyAdminPanel"></div>
             </div>
             <div class="fantasy-top-builder-shell">
               <div class="section-title">Team builder</div>
@@ -1406,6 +1449,11 @@
       scoreMiniFantasyEntry,
       validateMiniFantasyEntry
     } from './mini-fantasy/contest-engine.js';
+    import {
+      buildMiniFantasyLiveProvisionalPayload,
+      buildMiniFantasyLiveProvisionalSummary,
+      createMiniFantasyLiveTemplate
+    } from './mini-fantasy/live-provisional-builder.js';
 
     const SEASON = 2026;
     const SERIES_TAG = 'IPL 2026';
@@ -1425,6 +1473,7 @@
     const LOCAL_AUTH_STORAGE_KEY = 'sp-cup-duels-auth-v1';
     const LOCAL_CUSTOM_DUELS_STORAGE_KEY = 'sp-cup-duels-custom-v1';
     const LOCAL_MINI_FANTASY_ENTRIES_STORAGE_KEY = 'sp-cup-mini-fantasy-entries-v1';
+    const MINI_FANTASY_ADMIN_HANDLE = 'senthil';
     const EMPTY_CUSTOM_DUEL_STORE = { version: 1, rooms: {} };
     let BASE_ROOM = null;
     let ACTIVE_ROOM = null;
@@ -1453,9 +1502,11 @@
     let REMOTE_MINI_FANTASY_LEADERBOARD_ROWS = [];
     let REMOTE_MINI_FANTASY_PROFILES = [];
     let REMOTE_MINI_FANTASY_DAILY_BONUSES = [];
+    let REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS = [];
     let MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';
     let MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
     let MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE = true;
+    let MINI_FANTASY_LIVE_SNAPSHOT_TABLE_AVAILABLE = true;
     const MINI_FANTASY_PRECOMPUTED_LEADERBOARD_ENABLED = false;
     let MINI_FANTASY_FORCE_LEADERBOARD_FALLBACK = !MINI_FANTASY_PRECOMPUTED_LEADERBOARD_ENABLED;
     let MINI_FANTASY_COMPUTE_REVISION = 0;
@@ -1470,6 +1521,12 @@
     let MINI_FANTASY_OPEN_FIXTURE_PRICE_SNAPSHOTS = null;
     let MINI_FANTASY_LIVE_PROVISIONAL = null;
     let MINI_FANTASY_NOTICE = null;
+    let MINI_FANTASY_ADMIN_NOTICE = null;
+    let MINI_FANTASY_ADMIN_STATE = {
+      matchNo: null,
+      inputText: '',
+      preview: null
+    };
     let MINI_FANTASY_DRAFTS = {};
     let MINI_FANTASY_ACTIVE_MATCH_NO = null;
     let MINI_FANTASY_RECENT_MATCH_NO = null;
@@ -4206,8 +4263,31 @@ function titleBandScore(pick, live){
       };
     }
 
+    function chooseHostedMiniFantasyLiveSnapshotRow(rows = []){
+      const safeRows = (Array.isArray(rows) ? rows : [])
+        .filter((row) => Number(row?.matchNo || 0))
+        .slice()
+        .sort((a, b) => {
+          const aLive = miniFantasyRecentFixtureStage(miniFantasyFixtureByMatchNo(a?.matchNo)) === 'live' ? 1 : 0;
+          const bLive = miniFantasyRecentFixtureStage(miniFantasyFixtureByMatchNo(b?.matchNo)) === 'live' ? 1 : 0;
+          if (aLive !== bLive) return bLive - aLive;
+          const aMs = Date.parse(a?.updatedAt || a?.createdAt || '');
+          const bMs = Date.parse(b?.updatedAt || b?.createdAt || '');
+          if (Number.isFinite(aMs) && Number.isFinite(bMs) && aMs !== bMs) return bMs - aMs;
+          return Number(b?.matchNo || 0) - Number(a?.matchNo || 0);
+        });
+      return safeRows[0] || null;
+    }
+
+    function applyHostedMiniFantasyLiveSnapshotRows(rows = []){
+      setRemoteMiniFantasyLiveSnapshots(rows);
+      const activeRow = chooseHostedMiniFantasyLiveSnapshotRow(rows);
+      MINI_FANTASY_LIVE_PROVISIONAL = activeRow ? normalizeMiniFantasyLiveProvisionalData(activeRow.snapshot) : null;
+      return MINI_FANTASY_LIVE_PROVISIONAL;
+    }
+
     async function loadMiniFantasyLiveProvisional(){
-      try {
+      const loadStaticFallback = async () => {
         const cacheBust = `t=${Date.now()}`;
         const res = await fetch(`data/mini_fantasy_live_provisional.json?${cacheBust}`, {
           cache: 'no-store',
@@ -4216,9 +4296,30 @@ function titleBandScore(pick, live){
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         MINI_FANTASY_LIVE_PROVISIONAL = normalizeMiniFantasyLiveProvisionalData(data);
+      };
+      try {
+        if (usesHostedDuelsBackend() && MINI_FANTASY_LIVE_SNAPSHOT_TABLE_AVAILABLE && DUELS_BACKEND?.listPublicMiniFantasyLiveSnapshots) {
+          const rows = await DUELS_BACKEND.listPublicMiniFantasyLiveSnapshots({
+            season: MINI_FANTASY_SEASON,
+            currentUser: CURRENT_USER
+          });
+          applyHostedMiniFantasyLiveSnapshotRows(rows || []);
+          invalidateMiniFantasyComputedData();
+          return;
+        }
+        await loadStaticFallback();
       } catch (err) {
-        console.warn('Mini Fantasy live provisional feed unavailable, falling back to authoritative data only', err);
-        MINI_FANTASY_LIVE_PROVISIONAL = null;
+        if (noteMissingMiniFantasyLiveSnapshotTable(err)) {
+          try {
+            await loadStaticFallback();
+          } catch (fallbackError) {
+            console.warn('Mini Fantasy live provisional feed unavailable, falling back to authoritative data only', fallbackError);
+            MINI_FANTASY_LIVE_PROVISIONAL = null;
+          }
+        } else {
+          console.warn('Mini Fantasy live provisional feed unavailable, falling back to authoritative data only', err);
+          MINI_FANTASY_LIVE_PROVISIONAL = null;
+        }
       }
       invalidateMiniFantasyComputedData();
     }
@@ -4444,6 +4545,22 @@ function titleBandScore(pick, live){
       return true;
     }
 
+    function isMiniFantasyLiveSnapshotTableError(error){
+      const message = normalizeTextValue(error?.message || error || '').toLowerCase();
+      return message.includes('mini_fantasy_live_provisional_snapshots')
+        && (message.includes('could not find the table') || message.includes('relation') || message.includes('http 404') || message.includes('404'));
+    }
+
+    function noteMissingMiniFantasyLiveSnapshotTable(error){
+      if (!isMiniFantasyLiveSnapshotTableError(error)) return false;
+      MINI_FANTASY_LIVE_SNAPSHOT_TABLE_AVAILABLE = false;
+      return true;
+    }
+
+    function isMiniFantasyAdminUser(){
+      return normalizeOwnerId(CURRENT_USER?.ownerId || '') === MINI_FANTASY_ADMIN_HANDLE;
+    }
+
     function queueMiniFantasyPublicDataLoad({ force = false } = {}){
       if (!usesHostedDuelsBackend() || activeView !== 'fantasy') return Promise.resolve([]);
       if (!force && (MINI_FANTASY_PUBLIC_DATA_STATUS === 'loading' || MINI_FANTASY_PUBLIC_DATA_STATUS === 'ready')) {
@@ -4502,6 +4619,12 @@ function titleBandScore(pick, live){
       return REMOTE_MINI_FANTASY_DAILY_BONUSES;
     }
 
+    function setRemoteMiniFantasyLiveSnapshots(rows = []){
+      REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS = Array.isArray(rows) ? cloneJson(rows) : [];
+      invalidateMiniFantasyComputedData();
+      return REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS;
+    }
+
     function upsertRemoteMiniFantasyDailyBonus(bonus){
       if (!bonus) return null;
       const safeHandle = normalizeOwnerId(bonus.ownerHandle || bonus.owner_handle || bonus.handle || '');
@@ -4531,6 +4654,28 @@ function titleBandScore(pick, live){
       return entry;
     }
 
+    function upsertRemoteMiniFantasyLiveSnapshot(snapshotRow){
+      if (!snapshotRow) return null;
+      const keyMatchNo = Number(snapshotRow.matchNo || 0) || null;
+      const keySeason = normalizeTextValue(snapshotRow.season || MINI_FANTASY_SEASON);
+      const nextRows = (Array.isArray(REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS) ? REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS : [])
+        .filter((item) => !(Number(item.matchNo || 0) === keyMatchNo && normalizeTextValue(item.season || MINI_FANTASY_SEASON) === keySeason));
+      nextRows.push(cloneJson(snapshotRow));
+      REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS = nextRows;
+      invalidateMiniFantasyComputedData();
+      return snapshotRow;
+    }
+
+    function removeRemoteMiniFantasyLiveSnapshot(matchNo, season = MINI_FANTASY_SEASON){
+      const targetMatchNo = Number(matchNo || 0) || null;
+      const safeSeason = normalizeTextValue(season || MINI_FANTASY_SEASON);
+      if (!targetMatchNo) return REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS;
+      REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS = (Array.isArray(REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS) ? REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS : [])
+        .filter((item) => !(Number(item.matchNo || 0) === targetMatchNo && normalizeTextValue(item.season || MINI_FANTASY_SEASON) === safeSeason));
+      invalidateMiniFantasyComputedData();
+      return REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS;
+    }
+
     function usesHostedDuelsBackend(){
       return Boolean(DUELS_BACKEND?.enabled);
     }
@@ -4557,6 +4702,16 @@ function titleBandScore(pick, live){
 
     function currentMiniFantasyDailyBonuses(){
       return usesHostedDuelsBackend() ? (REMOTE_MINI_FANTASY_DAILY_BONUSES || []) : [];
+    }
+
+    function currentMiniFantasyLiveSnapshots(){
+      return usesHostedDuelsBackend() ? (REMOTE_MINI_FANTASY_LIVE_SNAPSHOTS || []) : [];
+    }
+
+    function findMiniFantasyLiveSnapshotRow(matchNo){
+      const target = Number(matchNo || 0) || null;
+      if (!target) return null;
+      return currentMiniFantasyLiveSnapshots().find((row) => Number(row.matchNo || 0) === target) || null;
     }
 
     function findMiniFantasyEntryForMatch(matchNo){
@@ -8354,6 +8509,116 @@ function titleBandScore(pick, live){
       return miniFantasyAvailabilityRows().find((fixture) => fixture.availability_status === 'upcoming') || null;
     }
 
+    function setMiniFantasyAdminNotice(type, payload){
+      if (!payload) {
+        MINI_FANTASY_ADMIN_NOTICE = null;
+        return;
+      }
+      MINI_FANTASY_ADMIN_NOTICE = typeof payload === 'string'
+        ? { type, title: '', text: payload }
+        : { type, ...payload };
+    }
+
+    function miniFantasyAdminCandidateFixtures(){
+      const byMatch = new Map();
+      const addFixture = (fixture) => {
+        const matchNo = Number(fixture?.match_no || fixture?.matchNo || 0) || null;
+        if (!matchNo || byMatch.has(matchNo)) return;
+        byMatch.set(matchNo, fixture);
+      };
+      availableMiniFantasyFixtures().forEach(addFixture);
+      lockedMiniFantasyFixtures().filter((fixture) => miniFantasyRecentFixtureStage(fixture) === 'live').forEach(addFixture);
+      const recentLocked = lockedMiniFantasyFixtures().slice(0, 4);
+      recentLocked.forEach(addFixture);
+      currentMiniFantasyLiveSnapshots().forEach((row) => addFixture(miniFantasyFixtureByMatchNo(row.matchNo)));
+      const activeRow = chooseHostedMiniFantasyLiveSnapshotRow(currentMiniFantasyLiveSnapshots());
+      if (activeRow) addFixture(miniFantasyFixtureByMatchNo(activeRow.matchNo));
+      return [...byMatch.values()].sort((a, b) => {
+        const stageRank = (fixture) => {
+          const stage = miniFantasyRecentFixtureStage(fixture);
+          if (stage === 'live') return 3;
+          if (fixture?.is_open) return 2;
+          if (stage === 'locked') return 1;
+          return 0;
+        };
+        const rankDiff = stageRank(b) - stageRank(a);
+        if (rankDiff) return rankDiff;
+        return Number(b?.match_no || 0) - Number(a?.match_no || 0);
+      });
+    }
+
+    function defaultMiniFantasyAdminMatchNo(){
+      const liveFixture = miniFantasyAdminCandidateFixtures().find((fixture) => miniFantasyRecentFixtureStage(fixture) === 'live');
+      if (liveFixture) return Number(liveFixture.match_no || 0) || null;
+      const activeFixture = activeMiniFantasyFixture();
+      if (activeFixture) return Number(activeFixture.match_no || 0) || null;
+      const activeRow = chooseHostedMiniFantasyLiveSnapshotRow(currentMiniFantasyLiveSnapshots());
+      return Number(activeRow?.matchNo || 0) || null;
+    }
+
+    function seedMiniFantasyAdminInputForMatch(matchNo, { preferSnapshot = true } = {}){
+      const targetMatchNo = Number(matchNo || 0) || null;
+      if (!targetMatchNo) return '';
+      const snapshotRow = preferSnapshot ? findMiniFantasyLiveSnapshotRow(targetMatchNo) : null;
+      if (snapshotRow?.manualInput && Object.keys(snapshotRow.manualInput).length) {
+        return JSON.stringify(snapshotRow.manualInput, null, 2);
+      }
+      const fixture = miniFantasyFixtureByMatchNo(targetMatchNo);
+      if (!fixture) return '';
+      return JSON.stringify(createMiniFantasyLiveTemplate(fixture), null, 2);
+    }
+
+    function ensureMiniFantasyAdminState(){
+      if (!MINI_FANTASY_ADMIN_STATE.matchNo) {
+        MINI_FANTASY_ADMIN_STATE.matchNo = defaultMiniFantasyAdminMatchNo();
+      }
+      if (!MINI_FANTASY_ADMIN_STATE.inputText && MINI_FANTASY_ADMIN_STATE.matchNo) {
+        MINI_FANTASY_ADMIN_STATE.inputText = seedMiniFantasyAdminInputForMatch(MINI_FANTASY_ADMIN_STATE.matchNo);
+      }
+      return MINI_FANTASY_ADMIN_STATE;
+    }
+
+    function parseMiniFantasyAdminManualInput(){
+      const state = ensureMiniFantasyAdminState();
+      const raw = normalizeTextValue(state.inputText || '');
+      if (!raw) {
+        throw new Error('Paste the structured innings JSON before previewing or publishing.');
+      }
+      let parsed = null;
+      try {
+        parsed = JSON.parse(raw);
+      } catch (error) {
+        throw new Error('The live JSON draft is not valid JSON yet.');
+      }
+      const selectedMatchNo = Number(state.matchNo || 0) || null;
+      if (!selectedMatchNo) {
+        throw new Error('Choose a target match before previewing or publishing.');
+      }
+      const payloadMatchNo = Number(parsed?.matchNo || parsed?.match_no || 0) || null;
+      if (payloadMatchNo && payloadMatchNo !== selectedMatchNo) {
+        throw new Error(`The JSON draft says Match ${payloadMatchNo}, but the admin panel is set to Match ${selectedMatchNo}.`);
+      }
+      return {
+        ...parsed,
+        matchNo: selectedMatchNo
+      };
+    }
+
+    function buildMiniFantasyAdminLivePayload(){
+      const manualInput = parseMiniFantasyAdminManualInput();
+      const fixture = miniFantasyFixtureByMatchNo(manualInput.matchNo);
+      if (!fixture) {
+        throw new Error(`Match ${manualInput.matchNo} is not available in the current schedule.`);
+      }
+      const payload = buildMiniFantasyLiveProvisionalPayload({
+        manualInput,
+        fixture,
+        squads: IPL_SQUADS,
+        teamRoles: IPL_TEAM_ROLES
+      });
+      return { manualInput, fixture, payload };
+    }
+
     function findMiniFantasyOpenFixturePriceSnapshot(matchNo){
       const target = Number(matchNo || 0) || null;
       if (!target) return null;
@@ -9849,6 +10114,203 @@ function titleBandScore(pick, live){
       render();
     }
 
+    function renderMiniFantasyAdminPanel(){
+      const panel = document.getElementById('miniFantasyAdminPanel');
+      if (!panel) return;
+      if (!usesHostedDuelsBackend() || !CURRENT_USER || !isMiniFantasyAdminUser()) {
+        panel.innerHTML = '';
+        return;
+      }
+      if (!MINI_FANTASY_LIVE_SNAPSHOT_TABLE_AVAILABLE) {
+        panel.innerHTML = `
+          <div class="fantasy-admin-card">
+            <div class="section-title">Admin live panel</div>
+            <div class="studio-alert bad">
+              <div class="studio-alert-title">Supabase schema refresh needed</div>
+              <div class="studio-alert-detail">Run the updated <code>docs/duels_backend_supabase.sql</code> once so the hosted live provisional snapshot table exists.</div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const state = ensureMiniFantasyAdminState();
+      const candidateFixtures = miniFantasyAdminCandidateFixtures();
+      const currentFixture = miniFantasyFixtureByMatchNo(state.matchNo) || candidateFixtures[0] || null;
+      const currentRow = currentFixture ? findMiniFantasyLiveSnapshotRow(currentFixture.match_no) : null;
+      const preview = state.preview || null;
+      const notice = MINI_FANTASY_ADMIN_NOTICE;
+      const currentStage = currentFixture ? miniFantasyRecentFixtureStage(currentFixture) : 'none';
+      const stageLabel = currentStage === 'live' ? 'Live now' : currentFixture?.is_open ? 'Open for save' : currentStage === 'locked' ? 'Locked pre-start' : 'Scheduled';
+      panel.innerHTML = `
+        <div class="fantasy-admin-card">
+          <div class="fantasy-admin-head">
+            <div class="section-title">Admin live panel</div>
+            <div class="fantasy-admin-sub">Visible only to @${escapeHtml(MINI_FANTASY_ADMIN_HANDLE)}. Paste the structured innings JSON here, validate it against the shared Mini Fantasy scorer, then publish it instantly for everyone on the live site.</div>
+          </div>
+          <div class="fantasy-admin-meta">
+            <span class="pill">Signed in as @${escapeHtml(CURRENT_USER.ownerId || '')}</span>
+            <span class="pill">${escapeHtml(currentFixture ? `Match ${currentFixture.match_no}` : 'No target match')}</span>
+            <span class="pill">${escapeHtml(stageLabel)}</span>
+            <span class="pill">${escapeHtml(currentRow?.updatedAt ? `Published ${formatTimestamp(currentRow.updatedAt)}` : 'No hosted live snapshot yet')}</span>
+          </div>
+          <div class="studio-form-grid">
+            <div class="studio-field">
+              <label for="miniFantasyAdminMatchSelect">Target match</label>
+              <select class="studio-input" id="miniFantasyAdminMatchSelect">
+                ${candidateFixtures.map((fixture) => `
+                  <option value="${escapeHtml(String(fixture.match_no || ''))}" ${Number(fixture.match_no || 0) === Number(state.matchNo || 0) ? 'selected' : ''}>
+                    Match ${escapeHtml(String(fixture.match_no || ''))} - ${escapeHtml(teamShort(fixture.home_team || ''))} vs ${escapeHtml(teamShort(fixture.away_team || ''))}
+                  </option>
+                `).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="studio-actions">
+            <button class="studio-button ghost" type="button" id="miniFantasyAdminLoadTemplateButton">Load fresh template</button>
+            <button class="studio-button ghost" type="button" id="miniFantasyAdminLoadSavedButton" ${currentRow ? '' : 'disabled'}>Load published draft</button>
+            <button class="studio-button secondary" type="button" id="miniFantasyAdminValidateButton">Validate draft</button>
+            <button class="studio-button" type="button" id="miniFantasyAdminPublishButton">Publish live snapshot</button>
+            <button class="studio-button ghost" type="button" id="miniFantasyAdminClearButton" ${currentRow ? '' : 'disabled'}>Clear snapshot</button>
+          </div>
+          <div class="studio-field">
+            <label for="miniFantasyAdminJson">Structured innings JSON</label>
+            <textarea class="studio-input fantasy-admin-textarea" id="miniFantasyAdminJson" spellcheck="false">${escapeHtml(state.inputText || '')}</textarea>
+          </div>
+          ${notice ? `<div class="studio-alert ${escapeHtml(notice.type || 'info')}">
+            ${notice.title ? `<div class="studio-alert-title">${escapeHtml(notice.title)}</div>` : ''}
+            <div class="studio-alert-detail">${escapeHtml(notice.text || '')}</div>
+          </div>` : ''}
+          ${preview ? `
+            <div class="fantasy-admin-preview">
+              <div class="fantasy-guide-title">Validated preview</div>
+              <div class="small">${escapeHtml(preview.summary.status || 'Manual live provisional update')}</div>
+              <div class="fantasy-admin-preview-list">
+                ${preview.summary.topPlayers.map((player, index) => `
+                  <div class="fantasy-admin-preview-row">
+                    <span><strong>#${index + 1}</strong> ${escapeHtml(player.name)} <span class="small">(${escapeHtml(player.team)})</span></span>
+                    <span>${escapeHtml(formatMiniFantasyPoints(player.points))}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      const select = document.getElementById('miniFantasyAdminMatchSelect');
+      if (select) {
+        select.onchange = () => {
+          MINI_FANTASY_ADMIN_STATE.matchNo = Number(select.value || 0) || null;
+          MINI_FANTASY_ADMIN_STATE.inputText = seedMiniFantasyAdminInputForMatch(MINI_FANTASY_ADMIN_STATE.matchNo);
+          MINI_FANTASY_ADMIN_STATE.preview = null;
+          setMiniFantasyAdminNotice(null);
+          renderMiniFantasySection();
+        };
+      }
+
+      const textarea = document.getElementById('miniFantasyAdminJson');
+      if (textarea) {
+        textarea.oninput = () => {
+          MINI_FANTASY_ADMIN_STATE.inputText = textarea.value || '';
+        };
+      }
+
+      const loadTemplateButton = document.getElementById('miniFantasyAdminLoadTemplateButton');
+      if (loadTemplateButton) {
+        loadTemplateButton.onclick = () => {
+          MINI_FANTASY_ADMIN_STATE.inputText = seedMiniFantasyAdminInputForMatch(MINI_FANTASY_ADMIN_STATE.matchNo, { preferSnapshot: false });
+          MINI_FANTASY_ADMIN_STATE.preview = null;
+          setMiniFantasyAdminNotice('info', 'Fresh template loaded for the selected match.');
+          renderMiniFantasySection();
+        };
+      }
+
+      const loadSavedButton = document.getElementById('miniFantasyAdminLoadSavedButton');
+      if (loadSavedButton) {
+        loadSavedButton.onclick = () => {
+          MINI_FANTASY_ADMIN_STATE.inputText = seedMiniFantasyAdminInputForMatch(MINI_FANTASY_ADMIN_STATE.matchNo, { preferSnapshot: true });
+          MINI_FANTASY_ADMIN_STATE.preview = null;
+          setMiniFantasyAdminNotice('info', 'Published hosted draft loaded back into the editor.');
+          renderMiniFantasySection();
+        };
+      }
+
+      const validateButton = document.getElementById('miniFantasyAdminValidateButton');
+      if (validateButton) {
+        validateButton.onclick = () => {
+          try {
+            const { payload } = buildMiniFantasyAdminLivePayload();
+            MINI_FANTASY_ADMIN_STATE.preview = {
+              summary: buildMiniFantasyLiveProvisionalSummary(payload),
+              payload
+            };
+            setMiniFantasyAdminNotice('good', 'Draft validated. The preview now shows the top live scorers from this snapshot.');
+          } catch (error) {
+            MINI_FANTASY_ADMIN_STATE.preview = null;
+            setMiniFantasyAdminNotice('bad', error.message || 'That draft did not validate.');
+          }
+          renderMiniFantasySection();
+        };
+      }
+
+      const publishButton = document.getElementById('miniFantasyAdminPublishButton');
+      if (publishButton) {
+        publishButton.onclick = async () => {
+          try {
+            const { manualInput, fixture, payload } = buildMiniFantasyAdminLivePayload();
+            const savedRow = await DUELS_BACKEND.upsertMiniFantasyLiveSnapshot({
+              currentUser: CURRENT_USER,
+              season: MINI_FANTASY_SEASON,
+              matchNo: fixture.match_no,
+              fixtureLabel: fixture.fixture || `${fixture.away_team || ''} vs ${fixture.home_team || ''}`,
+              manualInput,
+              snapshot: payload
+            });
+            upsertRemoteMiniFantasyLiveSnapshot(savedRow);
+            MINI_FANTASY_LIVE_PROVISIONAL = normalizeMiniFantasyLiveProvisionalData(savedRow?.snapshot || payload);
+            MINI_FANTASY_ADMIN_STATE.preview = {
+              summary: buildMiniFantasyLiveProvisionalSummary(payload),
+              payload
+            };
+            MINI_FANTASY_ADMIN_STATE.inputText = JSON.stringify(manualInput, null, 2);
+            setMiniFantasyAdminNotice('good', {
+              title: `Live snapshot published for Match ${fixture.match_no}`,
+              text: 'Everyone loading the hosted site now sees this provisional Mini Fantasy update immediately.'
+            });
+          } catch (error) {
+            noteMissingMiniFantasyLiveSnapshotTable(error);
+            setMiniFantasyAdminNotice('bad', error.message || 'Could not publish the live snapshot.');
+          }
+          renderMiniFantasySection();
+        };
+      }
+
+      const clearButton = document.getElementById('miniFantasyAdminClearButton');
+      if (clearButton) {
+        clearButton.onclick = async () => {
+          try {
+            const targetMatchNo = Number(MINI_FANTASY_ADMIN_STATE.matchNo || 0) || null;
+            if (!targetMatchNo) throw new Error('Choose a target match before clearing the live snapshot.');
+            await DUELS_BACKEND.deleteMiniFantasyLiveSnapshot({
+              currentUser: CURRENT_USER,
+              season: MINI_FANTASY_SEASON,
+              matchNo: targetMatchNo
+            });
+            removeRemoteMiniFantasyLiveSnapshot(targetMatchNo, MINI_FANTASY_SEASON);
+            applyHostedMiniFantasyLiveSnapshotRows(currentMiniFantasyLiveSnapshots());
+            MINI_FANTASY_ADMIN_STATE.inputText = seedMiniFantasyAdminInputForMatch(targetMatchNo, { preferSnapshot: false });
+            MINI_FANTASY_ADMIN_STATE.preview = null;
+            setMiniFantasyAdminNotice('good', `Hosted live snapshot cleared for Match ${targetMatchNo}.`);
+          } catch (error) {
+            noteMissingMiniFantasyLiveSnapshotTable(error);
+            setMiniFantasyAdminNotice('bad', error.message || 'Could not clear the live snapshot.');
+          }
+          renderMiniFantasySection();
+        };
+      }
+    }
+
     function renderMiniFantasyBuilder(){
       const panel = document.getElementById('miniFantasyBuilder');
       if (!panel) return;
@@ -10130,6 +10592,7 @@ function titleBandScore(pick, live){
           queueMiniFantasyPublicDataLoad().catch(() => {});
         }, 0);
       }
+      renderMiniFantasyAdminPanel();
       renderMiniFantasyFixtures();
       renderMiniFantasyBuilder();
       renderMiniFantasyLeaderboard();
@@ -10272,9 +10735,13 @@ function titleBandScore(pick, live){
       setRemoteMiniFantasyLeaderboardRows([]);
       setRemoteMiniFantasyProfiles([]);
       setRemoteMiniFantasyDailyBonuses([]);
+      setRemoteMiniFantasyLiveSnapshots([]);
       MINI_FANTASY_PUBLIC_DATA_STATUS = 'idle';
       MINI_FANTASY_PUBLIC_DATA_PROMISE = null;
       MINI_FANTASY_DAILY_BONUS_TABLE_AVAILABLE = true;
+      MINI_FANTASY_LIVE_SNAPSHOT_TABLE_AVAILABLE = true;
+      MINI_FANTASY_ADMIN_NOTICE = null;
+      MINI_FANTASY_ADMIN_STATE = { matchNo: null, inputText: '', preview: null };
       resetMiniFantasyDrafts();
       if (usesHostedDuelsBackend()) {
         try {
