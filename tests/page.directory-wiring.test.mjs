@@ -14,6 +14,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /id="manageDrawer"/);
   assert.match(html, /id="browseDrawer"/);
   assert.match(html, /id="miniFantasySection"/);
+  assert.match(html, /id="adminSection"/);
   assert.match(html, /id="miniFantasyAdminPanel"/);
   assert.match(html, /id="miniFantasyFixtures"/);
   assert.match(html, /id="miniFantasyBuilder"/);
@@ -94,6 +95,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /Only email \+ password are needed here\./);
   assert.match(html, /How Duel works/);
   assert.match(html, /How Mini Fantasy works/);
+  assert.match(html, /Admin control/);
   assert.match(html, /Admin live panel/);
   assert.match(html, /Paste the structured innings JSON here/);
   assert.match(html, /Mini Fantasy current pricing/);

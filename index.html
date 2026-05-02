@@ -1267,7 +1267,6 @@
                   </ul>
                 </div>
               </div>
-              <div id="miniFantasyAdminPanel"></div>
             </div>
             <div class="fantasy-top-builder-shell">
               <div class="section-title">Team builder</div>
@@ -1286,6 +1285,14 @@
               <div id="miniFantasyLeaderboard"></div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="adminSection" class="section-hidden">
+      <div class="grid">
+        <div class="span-12">
+          <div id="miniFantasyAdminPanel"></div>
         </div>
       </div>
     </div>
@@ -5396,6 +5403,15 @@ function titleBandScore(pick, live){
     }
 
     function renderActiveHeroHeader(){
+      if (activeView === 'admin') {
+        const titleEl = document.getElementById('leagueTitle');
+        const subtitleEl = document.getElementById('leagueSubtitle');
+        const pillEl = document.getElementById('leaguePill');
+        titleEl.textContent = `${ACTIVE_ROOM?.name || 'IPL 2026'} Admin control`;
+        subtitleEl.textContent = 'Manage hosted Mini Fantasy live provisional snapshots here. This editor is only visible to Senthil and does not change final scoring or duel history.';
+        pillEl.textContent = `Admin control: ${ACTIVE_ROOM?.name || SERIES_TAG}`;
+        return;
+      }
       if (activeView !== 'fantasy') {
         updateWarRoomHeader(ACTIVE_ROOM);
         return;
@@ -6996,6 +7012,12 @@ function titleBandScore(pick, live){
     let directoryFilter = 'all';
     let activeDrawer = null;
 
+    function ensureAllowedActiveView(){
+      if (activeView === 'admin' && !isMiniFantasyAdminUser()) {
+        activeView = 'fantasy';
+      }
+    }
+
     function canManageActiveDuel(bundle = activeCustomBundle()){
       if (!bundle || !CURRENT_USER) return false;
       const lifecycle = deriveCustomBundleLifecycle(bundle);
@@ -7099,6 +7121,7 @@ function titleBandScore(pick, live){
     }
 
     function renderTabs(){
+      ensureAllowedActiveView();
       const el = document.getElementById('tabs');
       const tabs = [
         { key:'warroom', label:'Duel', type:'warroom' },
@@ -7106,8 +7129,11 @@ function titleBandScore(pick, live){
         { key:'stats', label:'Nerd Room', type:'stats' },
         { key:'schedule', label:'Schedule', type:'schedule' }
       ];
+      if (isMiniFantasyAdminUser()) {
+        tabs.push({ key:'admin', label:'Admin control', type:'admin' });
+      }
       el.innerHTML = tabs.map(t => `
-        <button class="tab ${((t.type==='warroom' && activeView==='warroom') || (t.type==='fantasy' && activeView==='fantasy') || (t.type==='stats' && activeView==='stats') || (t.type==='schedule' && activeView==='schedule')) ? 'active' : ''}" data-key="${t.key}" data-type="${t.type}">${escapeHtml(t.label)}</button>
+        <button class="tab ${activeView === t.type ? 'active' : ''}" data-key="${t.key}" data-type="${t.type}">${escapeHtml(t.label)}</button>
       `).join('');
       el.querySelectorAll('.tab').forEach(btn => {
         btn.onclick = () => {
@@ -7120,6 +7146,8 @@ function titleBandScore(pick, live){
             activeView = 'stats';
           } else if (type === 'schedule') {
             activeView = 'schedule';
+          } else if (type === 'admin' && isMiniFantasyAdminUser()) {
+            activeView = 'admin';
           }
           render();
           if (activeView === 'fantasy') {
@@ -7415,9 +7443,18 @@ function titleBandScore(pick, live){
           <div class="pill">${activeFixture ? `Active match: #${escapeHtml(String(activeFixture.match_no))}` : 'No open match right now'}</div>
           ${nextOpening ? `<div class="pill">Next opening: #${escapeHtml(String(nextOpening.match_no))} on ${escapeHtml(formatDate(nextOpening.opens_at_utc))}</div>` : ''}
         `;
+      } else if (activeView === 'admin') {
+        const targetMatchNo = Number(MINI_FANTASY_ADMIN_STATE?.matchNo || 0) || defaultMiniFantasyAdminMatchNo() || 0;
+        const snapshotRow = targetMatchNo ? findMiniFantasyLiveSnapshotRow(targetMatchNo) : null;
+        nav.innerHTML = `
+          <div class="pill">Admin control</div>
+          <div class="pill">${targetMatchNo ? `Target match: #${escapeHtml(String(targetMatchNo))}` : 'No target match selected'}</div>
+          <div class="pill">${snapshotRow?.updatedAt ? `Published ${escapeHtml(formatTimestamp(snapshotRow.updatedAt))}` : 'No hosted live snapshot published yet'}</div>
+          <div class="pill">Mini Fantasy manual live ops</div>
+        `;
       }
       if (!ACTIVE_ROOM || !matchup || !MATCHUPS.length) {
-        if (activeView !== 'fantasy') nav.innerHTML = '';
+        if (!['fantasy', 'admin'].includes(activeView)) nav.innerHTML = '';
         summary.textContent = 'No public duels are available yet.';
         directory.innerHTML = '<div class="small">Add a duel fixture to populate the directory.</div>';
         return;
@@ -7429,7 +7466,7 @@ function titleBandScore(pick, live){
       const activeLabel = visibleDuelLabel(matchup);
       const statusLabel = matchup.lifecycle?.status === 'live' ? 'Live duel' : lifecycleHeadline(matchup.lifecycle);
       const fallbackTag = requestedDuelMissing ? 'Requested duel was not found, so this page fell back to the first available duel.' : '';
-      if (activeView !== 'fantasy') {
+      if (!['fantasy', 'admin'].includes(activeView)) {
         nav.innerHTML = `
           <div class="pill">Active duel: ${escapeHtml(activeLabel)}</div>
           <div class="pill">Status: ${escapeHtml(statusLabel)}</div>
@@ -10205,7 +10242,7 @@ function titleBandScore(pick, live){
           MINI_FANTASY_ADMIN_STATE.inputText = seedMiniFantasyAdminInputForMatch(MINI_FANTASY_ADMIN_STATE.matchNo);
           MINI_FANTASY_ADMIN_STATE.preview = null;
           setMiniFantasyAdminNotice(null);
-          renderMiniFantasySection();
+          render();
         };
       }
 
@@ -10222,7 +10259,7 @@ function titleBandScore(pick, live){
           MINI_FANTASY_ADMIN_STATE.inputText = seedMiniFantasyAdminInputForMatch(MINI_FANTASY_ADMIN_STATE.matchNo, { preferSnapshot: false });
           MINI_FANTASY_ADMIN_STATE.preview = null;
           setMiniFantasyAdminNotice('info', 'Fresh template loaded for the selected match.');
-          renderMiniFantasySection();
+          render();
         };
       }
 
@@ -10232,7 +10269,7 @@ function titleBandScore(pick, live){
           MINI_FANTASY_ADMIN_STATE.inputText = seedMiniFantasyAdminInputForMatch(MINI_FANTASY_ADMIN_STATE.matchNo, { preferSnapshot: true });
           MINI_FANTASY_ADMIN_STATE.preview = null;
           setMiniFantasyAdminNotice('info', 'Published hosted draft loaded back into the editor.');
-          renderMiniFantasySection();
+          render();
         };
       }
 
@@ -10250,7 +10287,7 @@ function titleBandScore(pick, live){
             MINI_FANTASY_ADMIN_STATE.preview = null;
             setMiniFantasyAdminNotice('bad', error.message || 'That draft did not validate.');
           }
-          renderMiniFantasySection();
+          render();
         };
       }
 
@@ -10282,7 +10319,7 @@ function titleBandScore(pick, live){
             noteMissingMiniFantasyLiveSnapshotTable(error);
             setMiniFantasyAdminNotice('bad', error.message || 'Could not publish the live snapshot.');
           }
-          renderMiniFantasySection();
+          render();
         };
       }
 
@@ -10306,7 +10343,7 @@ function titleBandScore(pick, live){
             noteMissingMiniFantasyLiveSnapshotTable(error);
             setMiniFantasyAdminNotice('bad', error.message || 'Could not clear the live snapshot.');
           }
-          renderMiniFantasySection();
+          render();
         };
       }
     }
@@ -10592,7 +10629,6 @@ function titleBandScore(pick, live){
           queueMiniFantasyPublicDataLoad().catch(() => {});
         }, 0);
       }
-      renderMiniFantasyAdminPanel();
       renderMiniFantasyFixtures();
       renderMiniFantasyBuilder();
       renderMiniFantasyLeaderboard();
@@ -10601,7 +10637,12 @@ function titleBandScore(pick, live){
       renderMiniFantasyPicker();
     }
 
+    function renderAdminSection(){
+      renderMiniFantasyAdminPanel();
+    }
+
     function render(){
+      ensureAllowedActiveView();
       renderTabs();
       renderActiveHeroHeader();
       renderPublicDuelLayer();
@@ -10609,10 +10650,13 @@ function titleBandScore(pick, live){
       renderPickPicker();
       document.getElementById('warRoomSection').classList.toggle('section-hidden', activeView !== 'warroom');
       document.getElementById('miniFantasySection').classList.toggle('section-hidden', activeView !== 'fantasy');
+      document.getElementById('adminSection').classList.toggle('section-hidden', activeView !== 'admin');
       document.getElementById('statsSection').classList.toggle('section-hidden', activeView !== 'stats');
       document.getElementById('scheduleSection').classList.toggle('section-hidden', activeView !== 'schedule');
       if (activeView === 'fantasy') {
         renderMiniFantasySection();
+      } else if (activeView === 'admin') {
+        renderAdminSection();
       } else {
         renderMiniFantasyPicker();
       }
