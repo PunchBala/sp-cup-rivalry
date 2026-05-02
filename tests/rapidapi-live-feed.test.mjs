@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   assessRapidApiPayload,
+  summarizeProbeReports,
   summarizeRapidApiPayload
 } from '../scripts/diagnose-rapidapi-live-feed.mjs';
 
@@ -53,4 +54,22 @@ test('RapidAPI live probe marks dot-ball-missing payloads as partial', () => {
   assert.equal(assessment.provisionalMiniFantasyReady, true);
   assert.equal(assessment.dotBallReady, false);
   assert.match(assessment.reasons.join(' '), /dot-ball/i);
+});
+
+test('RapidAPI live probe summarizes mixed endpoint results', () => {
+  const reports = [
+    { assessment: { suitability: 'strong' } },
+    { assessment: { suitability: 'partial' } },
+    { assessment: { suitability: 'poor' } }
+  ];
+
+  const summary = summarizeProbeReports(reports);
+
+  assert.deepEqual(summary, {
+    total: 3,
+    strong: 1,
+    partial: 1,
+    poor: 1,
+    overallSuitability: 'partial'
+  });
 });

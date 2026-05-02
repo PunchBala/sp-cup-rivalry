@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url';
 const DEFAULT_LABEL = 'RapidAPI live cricket feed probe';
 const DEFAULT_MAX_PATHS = 12;
 const DEFAULT_MAX_SAMPLES = 5;
+const DEFAULT_FAIL_ON_WEAK = false;
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
@@ -40,6 +41,22 @@ function summarizePrimitive(value) {
   if (typeof value === 'string') return value.slice(0, 120);
   if (typeof value === 'number' || typeof value === 'boolean') return value;
   return null;
+}
+
+function parseBoolean(value, fallback = false) {
+  if (typeof value === 'boolean') return value;
+  const text = trimString(value).toLowerCase();
+  if (!text) return fallback;
+  if (['1', 'true', 'yes', 'y', 'on'].includes(text)) return true;
+  if (['0', 'false', 'no', 'n', 'off'].includes(text)) return false;
+  return fallback;
+}
+
+function splitProbeUrls(value) {
+  return trimString(value)
+    .split(/[\r\n,]+/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 }
 
 function extractPlayerName(object) {
@@ -213,28 +230,36 @@ export function assessRapidApiPayload(summary) {
   };
 }
 
-async function loadProbePayload() {
-  const fixtureFile = process.env.RAPIDAPI_PROBE_FILE;
-  if (fixtureFile) {
-    const raw = await fs.readFile(fixtureFile, 'utf8');
-    return JSON.parse(raw);
+export function summarizeProbeReports(reports) {
+  const normalized = safeArray(reports);
+  const counts = {
+    total: normalized.length,
+    strong: 0,
+    partial: 0,
+    poor: 0
+  };
+
+  for (const report of normalized) {
+    const suitability = report?.assessment?.suitability;
+    if (suitability === 'strong') counts.strong += 1;
+    else if (suitability === 'partial') counts.partial += 1;
+    else counts.poor += 1;
   }
 
-  const requestUrl = process.env.RAPIDAPI_PROBE_URL || process.argv[2];
-  if (!requestUrl) {
-    throw new Error('Missing RAPIDAPI_PROBE_URL (or first CLI argument)');
+  let overallSuitability = 'poor';
+  if (counts.total > 0 && counts.poor === 0 && counts.partial === 0) {
+    overallSuitability = 'strong';
+  } else if (counts.strong > 0 || counts.partial > 0) {
+    overallSuitability = 'partial';
   }
 
-  const rapidApiKey = process.env.RAPIDAPI_KEY || process.env.LIVE_PROVISIONAL_RAPIDAPI_KEY;
-  if (!rapidApiKey) {
-    throw new Error('Missing RAPIDAPI_KEY or LIVE_PROVISIONAL_RAPIDAPI_KEY');
-  }
+  return {
+    ...counts,
+    overallSuitability
+  };
+}
 
-  const rapidApiHost = process.env.RAPIDAPI_HOST || process.env.LIVE_PROVISIONAL_RAPIDAPI_HOST || process.argv[3] || '';
-  if (!rapidApiHost) {
-    throw new Error('Missing RAPIDAPI_HOST or LIVE_PROVISIONAL_RAPIDAPI_HOST');
-  }
-
+async function fetchProbePayload({ requestUrl, rapidApiHost, rapidApiKey }) {
   const response = await fetch(requestUrl, {
     headers: {
       'Accept': 'application/json',
@@ -255,39 +280,91 @@ async function loadProbePayload() {
     throw new Error(`RapidAPI probe failed HTTP ${response.status}: ${JSON.stringify(parsed).slice(0, 300)}`);
   }
 
-  return {
-    requestUrl,
-    rapidApiHost,
-    payload: parsed
-  };
+  return parsed;
+}
+
+async function loadProbeTargets() {
+  const fixtureFile = process.env.RAPIDAPI_PROBE_FILE;
+  if (fixtureFile) {
+    const raw = await fs.readFile(fixtureFile, 'utf8');
+    return [{
+      requestUrl: fixtureFile,
+      rapidApiHost: null,
+      payload: JSON.parse(raw)
+    }];
+  }
+
+  const requestUrls = splitProbeUrls(
+    process.env.RAPIDAPI_PROBE_URLS
+    || process.env.RAPIDAPI_PROBE_URL
+    || process.argv.slice(2).join('\n')
+  );
+  if (requestUrls.length === 0) {
+    throw new Error('Missing RAPIDAPI_PROBE_URLS / RAPIDAPI_PROBE_URL (or CLI URL arguments)');
+  }
+
+  const rapidApiKey = process.env.RAPIDAPI_KEY || process.env.LIVE_PROVISIONAL_RAPIDAPI_KEY;
+  if (!rapidApiKey) {
+    throw new Error('Missing RAPIDAPI_KEY or LIVE_PROVISIONAL_RAPIDAPI_KEY');
+  }
+
+  const rapidApiHost = process.env.RAPIDAPI_HOST || process.env.LIVE_PROVISIONAL_RAPIDAPI_HOST || process.argv[3] || '';
+  if (!rapidApiHost) {
+    throw new Error('Missing RAPIDAPI_HOST or LIVE_PROVISIONAL_RAPIDAPI_HOST');
+  }
+
+  const targets = [];
+  for (const requestUrl of requestUrls) {
+    const payload = await fetchProbePayload({ requestUrl, rapidApiHost, rapidApiKey });
+    targets.push({
+      requestUrl,
+      rapidApiHost,
+      payload
+    });
+  }
+  return targets;
 }
 
 async function main() {
   const label = process.env.RAPIDAPI_PROBE_LABEL || DEFAULT_LABEL;
-  const loaded = await loadProbePayload();
-  const payload = loaded?.payload ?? loaded;
-  const summary = summarizeRapidApiPayload(payload);
-  const assessment = assessRapidApiPayload(summary);
+  const failOnWeak = parseBoolean(process.env.RAPIDAPI_PROBE_FAIL_ON_WEAK, DEFAULT_FAIL_ON_WEAK);
+  const loadedTargets = await loadProbeTargets();
+  const reports = loadedTargets.map((loaded) => {
+    const payload = loaded?.payload ?? loaded;
+    const summary = summarizeRapidApiPayload(payload);
+    const assessment = assessRapidApiPayload(summary);
+    return {
+      requestUrl: loaded?.requestUrl || null,
+      rapidApiHost: loaded?.rapidApiHost || null,
+      topLevelKeys: summary.topLevelKeys,
+      arraySummaries: summary.arraySummaries,
+      signals: summary.signals,
+      samples: summary.samples,
+      assessment
+    };
+  });
+  const probeSummary = summarizeProbeReports(reports);
 
   console.log(JSON.stringify({
     label,
-    requestUrl: loaded?.requestUrl || null,
-    rapidApiHost: loaded?.rapidApiHost || null,
-    topLevelKeys: summary.topLevelKeys,
-    arraySummaries: summary.arraySummaries,
-    signals: summary.signals,
-    samples: summary.samples,
-    assessment
+    failOnWeak,
+    summary: probeSummary,
+    reports
   }, null, 2));
 
-  if (assessment.suitability === 'poor') {
-    console.error('RapidAPI live feed probe failed: the payload does not look rich enough for provisional Mini Fantasy live scoring yet.');
-    process.exitCode = 1;
-  } else if (assessment.suitability === 'partial') {
-    console.error('RapidAPI live feed probe is only partial: player rows exist, but some scoring fields are missing.');
-    process.exitCode = 2;
-  } else {
+  if (probeSummary.overallSuitability === 'strong') {
     console.log('RapidAPI live feed probe looks strong enough to test provisional Mini Fantasy live scoring.');
+    return;
+  }
+
+  if (probeSummary.overallSuitability === 'partial') {
+    console.error('RapidAPI live feed probe found partially usable endpoints. Review the report before using them for provisional live scoring.');
+  } else {
+    console.error('RapidAPI live feed probe did not find a rich enough payload for provisional Mini Fantasy live scoring yet.');
+  }
+
+  if (failOnWeak) {
+    process.exitCode = 1;
   }
 }
 
