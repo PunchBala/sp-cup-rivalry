@@ -97,6 +97,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /How Mini Fantasy works/);
   assert.match(html, /Admin control/);
   assert.match(html, /Admin live panel/);
+  assert.match(html, /Live snapshot/);
   assert.match(html, /Paste the structured innings JSON here/);
   assert.match(html, /Mini Fantasy current pricing/);
   assert.match(html, /official IPL manual refresh/);

@@ -881,8 +881,11 @@
       line-height:1;
     }
     .fantasy-window-note{margin-top:12px;font-size:12px;color:#d7e7ff;line-height:1.55;padding:10px 12px;border-radius:12px;border:1px solid rgba(124,196,255,.14);background:rgba(124,196,255,.08)}
+    .fantasy-window-note.live-provisional{border-color:rgba(166,227,255,.30);background:linear-gradient(180deg, rgba(166,227,255,.18), rgba(95,240,200,.10));color:#f3fbff;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
     .fantasy-builder-card .fantasy-window-note{border-color:rgba(95,240,200,.18);background:rgba(95,240,200,.08);color:#d9fff4}
     .fantasy-viewer-card .fantasy-window-note{border-color:rgba(255,200,87,.18);background:rgba(255,200,87,.08);color:#ffe7bf}
+    .fantasy-builder-card .fantasy-window-note.live-provisional,
+    .fantasy-viewer-card .fantasy-window-note.live-provisional{border-color:rgba(166,227,255,.30);background:linear-gradient(180deg, rgba(166,227,255,.18), rgba(95,240,200,.10));color:#f3fbff}
     .fantasy-availability-list{display:flex;gap:8px;flex-wrap:wrap}
     .fantasy-availability-item{
       display:grid;
@@ -1009,6 +1012,7 @@
     .fantasy-saved-item{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid rgba(95,240,200,.14);background:linear-gradient(180deg, rgba(95,240,200,.08), rgba(11,20,40,.86))}
     .fantasy-leaderboard-list{display:grid;gap:8px;margin-top:14px}
     .fantasy-leaderboard-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .fantasy-leaderboard-row.live-provisional{border-color:rgba(166,227,255,.28);background:linear-gradient(180deg, rgba(166,227,255,.14), rgba(95,240,200,.06) 55%, rgba(255,255,255,.03));box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
     .fantasy-leaderboard-row.selectable{width:100%;appearance:none;text-align:left;color:inherit;font:inherit;cursor:pointer;transition:.18s ease}
     .fantasy-leaderboard-row.selectable:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.28)}
     .fantasy-leaderboard-row.active{border-color:rgba(95,240,200,.34);box-shadow:0 0 0 1px rgba(95,240,200,.18) inset}
@@ -1017,6 +1021,9 @@
     .fantasy-leaderboard-row.top-1{border-color:rgba(255,200,87,.34);background:rgba(255,200,87,.10)}
     .fantasy-leaderboard-row.top-2{border-color:rgba(209,220,237,.24);background:rgba(209,220,237,.08)}
     .fantasy-leaderboard-row.top-3{border-color:rgba(217,154,100,.26);background:rgba(217,154,100,.09)}
+    .fantasy-leaderboard-row.live-provisional.top-1{background:linear-gradient(180deg, rgba(255,220,126,.18), rgba(166,227,255,.12) 56%, rgba(95,240,200,.06))}
+    .fantasy-leaderboard-row.live-provisional.top-2{background:linear-gradient(180deg, rgba(209,220,237,.14), rgba(166,227,255,.12) 56%, rgba(95,240,200,.06))}
+    .fantasy-leaderboard-row.live-provisional.top-3{background:linear-gradient(180deg, rgba(217,154,100,.15), rgba(166,227,255,.12) 56%, rgba(95,240,200,.06))}
     .fantasy-leaderboard-copy{display:grid;gap:5px}
     .fantasy-leaderboard-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px;font-weight:900;color:#fff}
     .fantasy-leaderboard-rank{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:12px;font-weight:900;color:#fff}
@@ -1047,7 +1054,11 @@
     .fantasy-detail-points{font-size:26px;font-weight:900;color:#fff;line-height:1}
     .fantasy-detail-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
     .fantasy-summary-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid rgba(124,196,255,.14);background:rgba(255,255,255,.04);font-size:12px;color:#d7e7ff}
+    .fantasy-summary-chip.live-provisional{border-color:rgba(166,227,255,.30);background:rgba(166,227,255,.14);color:#f4fbff}
     .fantasy-did-not-lock{border-color:rgba(255,139,162,.26);background:rgba(255,139,162,.10);color:#ffd5de}
+    .fantasy-live-snapshot-strip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .fantasy-live-snapshot-text{font-size:12px;font-weight:800;color:#f3fbff;line-height:1.4}
+    .fantasy-live-snapshot-time{font-size:11px;color:#d9f3ff;line-height:1.4}
     .fantasy-recap-title{font-size:17px;font-weight:900;color:#fff}
     .fantasy-recap-grid{display:grid;gap:10px}
     .fantasy-recap-note{font-size:13px;color:var(--muted);line-height:1.5}
@@ -9658,7 +9669,7 @@ function titleBandScore(pick, live){
           <div class="fantasy-detail-header">
             <div>
               <div class="fantasy-recap-title">Match ${escapeHtml(String(recapEntry.matchNo || '?'))} - ${escapeHtml(recapEntry.fixtureLabel || formatFixtureLabel(recapFixture.fixture || `${recapFixture.away_team} vs ${recapFixture.home_team}`))}</div>
-              <div class="fantasy-recap-note">Saved ${escapeHtml(formatTimestamp(recapEntry.savedAt || recapEntry.updatedAt))}. ${liveProvisional ? `Manual live refresh updated ${escapeHtml(formatMiniFantasyAuditTimestamp(liveProvisional.provisional.updatedAtUtc || liveProvisional.provisional.generatedAtUtc || ''))}. ` : ''}${openEntry ? `Your next team for Match ${escapeHtml(String(activeFixture?.match_no || ''))} is already saved.` : activeFixture ? `You have not locked Match ${escapeHtml(String(activeFixture.match_no))} yet.` : 'No open fixture needs a pick right now.'}</div>
+              <div class="fantasy-recap-note">Saved ${escapeHtml(formatTimestamp(recapEntry.savedAt || recapEntry.updatedAt))}. ${liveProvisional ? `Live snapshot: ${escapeHtml(liveProvisional.provisional.status || 'Manual live refresh active')}${liveProvisional.provisional.updatedAtUtc || liveProvisional.provisional.generatedAtUtc ? ` (${escapeHtml(formatMiniFantasyAuditTimestamp(liveProvisional.provisional.updatedAtUtc || liveProvisional.provisional.generatedAtUtc || ''))})` : ''}. ` : ''}${openEntry ? `Your next team for Match ${escapeHtml(String(activeFixture?.match_no || ''))} is already saved.` : activeFixture ? `You have not locked Match ${escapeHtml(String(activeFixture.match_no))} yet.` : 'No open fixture needs a pick right now.'}</div>
             </div>
             <div>
               <div class="fantasy-detail-points">${escapeHtml(formatMiniFantasyPoints(detail.totalPoints))}</div>
@@ -9853,11 +9864,18 @@ function titleBandScore(pick, live){
       }
       panel.innerHTML = `
         <div class="fantasy-leaderboard-kicker">${escapeHtml(recentBoard.fixture ? `Pick rail for Match ${recentBoard.fixture.match_no}` : 'Leaderboard rail')}</div>
-        <div class="fantasy-window-note">${recentBoard.fixture ? (recentBoard.provisional ? `Manual live refresh is active for Match ${escapeHtml(String(recentBoard.fixture.match_no))}. The overall column now includes provisional fixture points until the final scorecard lands.` : `Click a user and keep your eyes on the locked-team stage. The rail always follows the fixture selected in the archive above, and right now it is showing Match ${escapeHtml(String(recentBoard.fixture.match_no))}.`) : 'Once the first fixture locks, this rail will become the fast way to inspect each user team without opening a new screen.'}</div>
+        <div class="fantasy-window-note ${recentBoard.provisional ? 'live-provisional' : ''}">${recentBoard.fixture ? (recentBoard.provisional ? `Manual live refresh is active for Match ${escapeHtml(String(recentBoard.fixture.match_no))}. The overall column now includes provisional fixture points until the final scorecard lands.` : `Click a user and keep your eyes on the locked-team stage. The rail always follows the fixture selected in the archive above, and right now it is showing Match ${escapeHtml(String(recentBoard.fixture.match_no))}.`) : 'Once the first fixture locks, this rail will become the fast way to inspect each user team without opening a new screen.'}</div>
+        ${recentBoard.provisional ? `
+          <div class="fantasy-live-snapshot-strip">
+            <span class="fantasy-summary-chip live-provisional">Live snapshot</span>
+            <span class="fantasy-live-snapshot-text">${escapeHtml(recentBoard.provisional.status || 'Manual live refresh active')}</span>
+            ${recentBoard.provisional.updatedAtUtc ? `<span class="fantasy-live-snapshot-time">Updated ${escapeHtml(formatMiniFantasyAuditTimestamp(recentBoard.provisional.updatedAtUtc))}</span>` : ''}
+          </div>
+        ` : ''}
         <div class="fantasy-leaderboard-scroll">
           <div class="fantasy-leaderboard-list">
             ${leaderboardRows.map((row) => `
-              <button type="button" class="fantasy-leaderboard-row selectable ${Number(row.displayRank || row.rank || 0) <= 3 ? `top-${Number(row.displayRank || row.rank || 0)}` : ''} ${normalizeOwnerId(selectedRow?.owner_handle || '') === normalizeOwnerId(row.owner_handle || '') ? 'active' : ''}" data-mini-leaderboard-owner="${escapeHtml(row.owner_handle)}" ${recentBoard.fixture ? '' : 'disabled'}>
+              <button type="button" class="fantasy-leaderboard-row selectable ${recentBoard.provisional ? 'live-provisional' : ''} ${Number(row.displayRank || row.rank || 0) <= 3 ? `top-${Number(row.displayRank || row.rank || 0)}` : ''} ${normalizeOwnerId(selectedRow?.owner_handle || '') === normalizeOwnerId(row.owner_handle || '') ? 'active' : ''}" data-mini-leaderboard-owner="${escapeHtml(row.owner_handle)}" ${recentBoard.fixture ? '' : 'disabled'}>
                 <div class="fantasy-leaderboard-copy">
                   <div class="fantasy-leaderboard-name">
                     <span class="fantasy-leaderboard-rank">#${escapeHtml(String(row.displayRank || row.rank || ''))}</span>
@@ -9980,6 +9998,12 @@ function titleBandScore(pick, live){
                   ${(activeOption?.missingCount || 0) ? `<span class="pill">${escapeHtml(String(activeOption.missingCount))} missed lock</span>` : '<span class="pill">Everyone submitted</span>'}
                   ${board.provisional?.updatedAtUtc ? `<span class="pill">Updated ${escapeHtml(formatMiniFantasyAuditTimestamp(board.provisional.updatedAtUtc))}</span>` : ''}
                 </div>
+                ${board.provisional ? `
+                  <div class="fantasy-live-snapshot-strip">
+                    <span class="fantasy-summary-chip live-provisional">Live snapshot</span>
+                    <span class="fantasy-live-snapshot-text">${escapeHtml(board.provisional.status || 'Manual live refresh active')}</span>
+                  </div>
+                ` : ''}
               </div>
             </div>
           </div>
@@ -10021,7 +10045,7 @@ function titleBandScore(pick, live){
               ${hasAuditLog && Number(selectedRow.fixtureSpentCredits || 0) > 0 ? `<span class="fantasy-summary-chip">Spent: ${escapeHtml(formatMiniFantasyPrice(selectedRow.fixtureSpentCredits))}</span>` : ''}
               ${hasAuditLog && selectedRow.fixtureSavedAt ? `<span class="fantasy-summary-chip">Saved: ${escapeHtml(formatMiniFantasyAuditTimestamp(selectedRow.fixtureSavedAt))}</span>` : ''}
             </div>
-            ${auditNote ? `<div class="fantasy-window-note">${escapeHtml(auditNote)}</div>` : ''}
+            ${auditNote ? `<div class="fantasy-window-note ${board.provisional ? 'live-provisional' : ''}">${escapeHtml(auditNote)}</div>` : ''}
           </div>
           ${selectedRow.fixtureStatus === 'did_not_lock'
             ? '<div class="fantasy-empty">No locked team exists for this user on the selected fixture.</div>'
