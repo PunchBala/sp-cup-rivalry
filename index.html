@@ -1063,6 +1063,45 @@
     .fantasy-recap-grid{display:grid;gap:10px}
     .fantasy-recap-note{font-size:13px;color:var(--muted);line-height:1.5}
     .fantasy-field-summary{display:grid;gap:10px}
+    .fantasy-spotlight-shell{
+      display:grid;
+      gap:10px;
+      padding:12px 13px;
+      border-radius:16px;
+      border:1px solid rgba(124,196,255,.18);
+      background:linear-gradient(180deg, rgba(18,28,61,.96), rgba(8,13,30,.94));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .fantasy-spotlight-shell.live-provisional{border-color:rgba(166,227,255,.30);background:linear-gradient(180deg, rgba(166,227,255,.16), rgba(11,23,46,.95))}
+    .fantasy-spotlight-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+    .fantasy-spotlight-note{font-size:12px;color:#dce9ff;line-height:1.4}
+    .fantasy-spotlight-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+    .fantasy-spotlight-item{
+      display:grid;
+      gap:3px;
+      padding:8px 9px;
+      border-radius:12px;
+      border:1px solid rgba(124,196,255,.14);
+      background:rgba(255,255,255,.04);
+    }
+    .fantasy-spotlight-row{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+    .fantasy-spotlight-rank{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#9cb7ff}
+    .fantasy-spotlight-name{font-size:13px;font-weight:800;color:#fff;line-height:1.3}
+    .fantasy-spotlight-points{font-size:16px;font-weight:900;color:#fff;line-height:1}
+    .fantasy-spotlight-meta{font-size:11px;color:#cfe0ff;line-height:1.35}
+    .fantasy-spotlight-hero{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(121,241,173,.20);
+      background:rgba(121,241,173,.08);
+    }
+    .fantasy-spotlight-hero-copy{font-size:12px;color:#def9ea;line-height:1.45}
+    .fantasy-spotlight-hero-points{font-size:15px;font-weight:900;color:#d5ffe5;line-height:1}
     .fantasy-story-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}
     .fantasy-story-card{
       display:grid;
@@ -9176,6 +9215,7 @@ function titleBandScore(pick, live){
         fixture,
         stage,
         rows,
+        pointsIndex,
         provisional: liveProvisional
           ? {
               updatedAtUtc: liveProvisional.provisional.updatedAtUtc || liveProvisional.provisional.generatedAtUtc || null,
@@ -9352,6 +9392,45 @@ function titleBandScore(pick, live){
           note: youNote
         }
       ];
+    }
+
+    function buildMiniFantasyFixtureSpotlight(board){
+      const fixture = board?.fixture || null;
+      const pointsIndex = board?.pointsIndex instanceof Map ? board.pointsIndex : null;
+      if (!fixture || !pointsIndex || !pointsIndex.size) {
+        return { leaders: [], differentialHero: null };
+      }
+      const playerPool = currentMiniFantasyPlayerPool(fixture);
+      if (!playerPool.length) {
+        return { leaders: [], differentialHero: null };
+      }
+      const ownershipCounts = new Map();
+      (Array.isArray(board?.rows) ? board.rows : []).forEach((row) => {
+        (row.fixturePlayers || []).forEach((player) => {
+          const playerId = normalizeTextValue(player?.playerId || player?.player_id || '');
+          if (!playerId) return;
+          ownershipCounts.set(playerId, (ownershipCounts.get(playerId) || 0) + 1);
+        });
+      });
+      const rankedPlayers = playerPool
+        .map((player) => {
+          const playerId = normalizeTextValue(player?.player_id || player?.playerId || '');
+          const points = roundMiniFantasyValue(Number(pointsIndex.get(playerId) || 0));
+          return {
+            playerId,
+            name: normalizeTextValue(player?.name || fallbackMiniFantasyPlayerName(playerId)) || fallbackMiniFantasyPlayerName(playerId),
+            team: normalizeTextValue(player?.team_code || player?.team || ''),
+            points,
+            ownedCount: ownershipCounts.get(playerId) || 0
+          };
+        })
+        .filter((player) => player.playerId && Number.isFinite(player.points))
+        .sort((a, b) => b.points - a.points || b.ownedCount - a.ownedCount || a.name.localeCompare(b.name));
+      const leaders = rankedPlayers
+        .filter((player) => board.stage !== 'locked' || player.ownedCount > 0 || player.points !== 0)
+        .slice(0, 5);
+      const differentialHero = rankedPlayers.find((player) => player.ownedCount === 1 && player.points > 0) || null;
+      return { leaders, differentialHero };
     }
 
     function miniFantasyLeaderboardData(){
@@ -9936,6 +10015,7 @@ function titleBandScore(pick, live){
       const captain = selectedRow.fixtureCaptain;
       const viewedName = selectedRow.display_name || selectedRow.owner_handle;
       const storyCards = buildMiniFantasyStoryCards(board, selectedRow);
+      const spotlight = buildMiniFantasyFixtureSpotlight(board);
       const fixtureOptions = miniFantasyRecentFixtureOptions(Array.isArray(board.rows) ? board.rows.length : 0);
       const activeOption = fixtureOptions.find((option) => option.isActive) || null;
       const hasAuditLog = selectedRow.fixtureStatus === 'locked_entry' && (selectedRow.fixtureSavedAt || Number(selectedRow.fixtureSpentCredits || 0) > 0 || detailPlayers.length);
@@ -10057,6 +10137,32 @@ function titleBandScore(pick, live){
                 `).join('')}
               </div>
             `}
+          ${(board.stage === 'live' || board.stage === 'final') && spotlight.leaders.length ? `
+            <div class="fantasy-spotlight-shell ${board.provisional ? 'live-provisional' : ''}">
+              <div class="fantasy-spotlight-head">
+                <div class="fantasy-story-label">Fixture top 5</div>
+                <div class="fantasy-spotlight-note">${escapeHtml(board.stage === 'live' ? 'Current leaders from this live fixture.' : 'Best scorers from the completed fixture.')}</div>
+              </div>
+              <div class="fantasy-spotlight-list">
+                ${spotlight.leaders.map((player, index) => `
+                  <div class="fantasy-spotlight-item">
+                    <div class="fantasy-spotlight-row">
+                      <span class="fantasy-spotlight-rank">#${escapeHtml(String(index + 1))}</span>
+                      <span class="fantasy-spotlight-points">${escapeHtml(formatMiniFantasyPoints(player.points))}</span>
+                    </div>
+                    <div class="fantasy-spotlight-name">${escapeHtml(player.name)}</div>
+                    <div class="fantasy-spotlight-meta">${escapeHtml(`${player.team || 'Player'} / ${player.ownedCount} team${player.ownedCount === 1 ? '' : 's'}`)}</div>
+                  </div>
+                `).join('')}
+              </div>
+              ${spotlight.differentialHero ? `
+                <div class="fantasy-spotlight-hero">
+                  <div class="fantasy-spotlight-hero-copy">Differential hero: ${escapeHtml(spotlight.differentialHero.name)} is only on 1 team and already swinging the rail.</div>
+                  <div class="fantasy-spotlight-hero-points">${escapeHtml(formatMiniFantasyPoints(spotlight.differentialHero.points))} pts</div>
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
           <div class="fantasy-field-summary">
             <div class="fantasy-story-grid">
               ${storyCards.map((card) => `
