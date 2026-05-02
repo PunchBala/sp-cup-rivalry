@@ -7,6 +7,7 @@ import {
   buildMiniFantasyEntryAuditLog,
   buildMiniFantasyLeaderboard,
   buildMiniFantasyFixturePointsIndex,
+  buildMiniFantasyPlayerRecordFromStats,
   buildMiniFantasyPlayerPointsIndex,
   buildMiniFantasyPlayerId,
   buildFixturePlayerPool,
@@ -109,6 +110,54 @@ test('getMiniFantasyWinningTeamCode treats super-over-decided ties as real winne
     getMiniFantasyWinningTeamCode({ liveData, schedule, matchNo: 38 }),
     'KKR'
   );
+});
+
+test('buildMiniFantasyPlayerRecordFromStats uses the same live scoring breakdown as the fixture engine', () => {
+  const record = buildMiniFantasyPlayerRecordFromStats({
+    runs: 52,
+    battingBalls: 28,
+    sixes: 3,
+    wickets: 2,
+    bowlingBalls: 24,
+    runsConceded: 18,
+    catches: 1,
+    dotBalls: 9,
+    dismissed: true
+  });
+
+  assert.equal(record.appeared, true);
+  assert.equal(record.points, 168);
+  assert.deepEqual(record.base_breakdown, {
+    runs: 52,
+    sixes: 3,
+    wickets: 2,
+    dot_balls: 9,
+    catches: 1,
+    stumpings: 0,
+    batting_balls: 28,
+    bowling_balls: 24,
+    bowling_runs_conceded: 18,
+    milestone_counts: {
+      batting50s: 1,
+      batting100s: 0,
+      impact30s: 1,
+      bowling3w: 0,
+      bowling4w: 0,
+      bowling5w: 0,
+      ducks: 0
+    },
+    runs_points: 52,
+    sixes_bonus_points: 6,
+    wicket_points: 50,
+    dot_ball_points: 18,
+    catch_points: 8,
+    stumping_points: 0,
+    strike_rate_bonus_points: 8,
+    economy_bonus_points: 8,
+    milestone_bonus_points: 18,
+    duck_penalty_points: 0,
+    total_points: 168
+  });
 });
 
 test('deriveCompletedMatchHistories ignores stale precomputed histories when scoreHistory has newer completed matches', () => {

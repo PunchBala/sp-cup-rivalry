@@ -19,6 +19,7 @@ import {
 export const MINI_FANTASY_ENGINE_VERSION = 'mini_fantasy_v1';
 export const MINI_FANTASY_PRICE_BOOK_VERSION = 'mini_fantasy_price_book_v1';
 export const MINI_FANTASY_OPEN_FIXTURE_PRICE_SNAPSHOT_VERSION = 'mini_fantasy_open_fixture_prices_v1';
+export const MINI_FANTASY_LIVE_PROVISIONAL_VERSION = 'mini_fantasy_live_provisional_v1';
 export const MINI_FANTASY_SEASON = 'IPL 2026';
 export const MINI_FANTASY_LAUNCH_AT_UTC = '2026-04-06T00:00:00Z';
 export const MINI_FANTASY_FIRST_OPEN_MATCH_NO = 14;
@@ -1545,6 +1546,114 @@ function calculateMiniFantasyEconomyBonusPoints(runsConceded = 0, ballsBowled = 
   if (economyRate < 8) return 2;
   if (economyRate > 10) return -5;
   return 0;
+}
+
+export function buildMiniFantasyPlayerRecordFromStats({
+  runs = 0,
+  battingBalls = 0,
+  sixes = 0,
+  wickets = 0,
+  bowlingBalls = 0,
+  runsConceded = 0,
+  catches = 0,
+  stumpings = 0,
+  dotBalls = 0,
+  dismissed = false
+} = {}) {
+  const numericRuns = Math.max(0, roundTo(toNumber(runs, 0), 2));
+  const numericBattingBalls = Math.max(0, Math.trunc(toNumber(battingBalls, 0)));
+  const numericSixes = Math.max(0, Math.trunc(toNumber(sixes, 0)));
+  const numericWickets = Math.max(0, Math.trunc(toNumber(wickets, 0)));
+  const numericBowlingBalls = Math.max(0, Math.trunc(toNumber(bowlingBalls, 0)));
+  const numericRunsConceded = Math.max(0, roundTo(toNumber(runsConceded, 0), 2));
+  const numericCatches = Math.max(0, Math.trunc(toNumber(catches, 0)));
+  const numericStumpings = Math.max(0, Math.trunc(toNumber(stumpings, 0)));
+  const numericDotBalls = Math.max(0, Math.trunc(toNumber(dotBalls, 0)));
+
+  const batting50s = numericRuns >= 50 ? 1 : 0;
+  const batting100s = numericRuns >= 100 ? 1 : 0;
+  const impact30s = numericRuns >= 30 ? 1 : 0;
+  const ducks = dismissed && numericRuns === 0 ? 1 : 0;
+  const bowling3w = numericWickets >= 3 ? 1 : 0;
+  const bowling4w = numericWickets >= 4 ? 1 : 0;
+  const bowling5w = numericWickets >= 5 ? 1 : 0;
+
+  const runsPoints = numericRuns;
+  const sixesBonusPoints = roundTo(numericSixes * 2, 2);
+  const wicketPoints = roundTo(numericWickets * MINI_FANTASY_WICKET_POINTS, 2);
+  const dotBallPoints = roundTo(numericDotBalls * MINI_FANTASY_DOT_BALL_POINTS, 2);
+  const catchPoints = roundTo(numericCatches * 8, 2);
+  const stumpingPoints = roundTo(numericStumpings * 12, 2);
+  const strikeRateBonusPoints = calculateMiniFantasyStrikeRateBonusPoints(numericRuns, numericBattingBalls);
+  const economyBonusPoints = calculateMiniFantasyEconomyBonusPoints(numericRunsConceded, numericBowlingBalls);
+  const milestoneBonusPoints = roundTo(
+    (batting50s * MINI_FANTASY_MILESTONE_POINTS.batting50) +
+    (batting100s * MINI_FANTASY_MILESTONE_POINTS.batting100) +
+    (impact30s * MINI_FANTASY_MILESTONE_POINTS.impact30) +
+    (bowling3w * MINI_FANTASY_MILESTONE_POINTS.bowling3w) +
+    (bowling4w * MINI_FANTASY_MILESTONE_POINTS.bowling4w) +
+    (bowling5w * MINI_FANTASY_MILESTONE_POINTS.bowling5w),
+    2
+  );
+  const duckPenaltyPoints = roundTo(ducks * MINI_FANTASY_DUCK_PENALTY, 2);
+  const totalPoints = roundTo(
+    runsPoints +
+    sixesBonusPoints +
+    wicketPoints +
+    dotBallPoints +
+    catchPoints +
+    stumpingPoints +
+    strikeRateBonusPoints +
+    economyBonusPoints +
+    milestoneBonusPoints +
+    duckPenaltyPoints,
+    2
+  );
+  const appeared = numericBattingBalls > 0
+    || numericBowlingBalls > 0
+    || numericCatches > 0
+    || numericStumpings > 0
+    || numericRuns > 0
+    || numericWickets > 0
+    || numericDotBalls > 0
+    || numericRunsConceded > 0
+    || Boolean(dismissed);
+
+  return {
+    points: totalPoints,
+    appeared,
+    base_breakdown: {
+      runs: numericRuns,
+      sixes: numericSixes,
+      wickets: numericWickets,
+      dot_balls: numericDotBalls,
+      catches: numericCatches,
+      stumpings: numericStumpings,
+      batting_balls: numericBattingBalls,
+      bowling_balls: numericBowlingBalls,
+      bowling_runs_conceded: numericRunsConceded,
+      milestone_counts: {
+        batting50s,
+        batting100s,
+        impact30s,
+        bowling3w,
+        bowling4w,
+        bowling5w,
+        ducks
+      },
+      runs_points: runsPoints,
+      sixes_bonus_points: sixesBonusPoints,
+      wicket_points: wicketPoints,
+      dot_ball_points: dotBallPoints,
+      catch_points: catchPoints,
+      stumping_points: stumpingPoints,
+      strike_rate_bonus_points: strikeRateBonusPoints,
+      economy_bonus_points: economyBonusPoints,
+      milestone_bonus_points: milestoneBonusPoints,
+      duck_penalty_points: duckPenaltyPoints,
+      total_points: totalPoints
+    }
+  };
 }
 
 function mergeSnapshotAggregateValue(existingValue, incomingValue) {

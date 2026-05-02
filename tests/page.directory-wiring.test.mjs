@@ -33,6 +33,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /duels-backend\.js/);
   assert.match(html, /mini-fantasy\/contest-engine\.js/);
   assert.match(html, /data\/mini_fantasy_open_fixture_price_snapshots\.json/);
+  assert.match(html, /data\/mini_fantasy_live_provisional\.json/);
   assert.match(html, /ipl_2026_player_availability\.json/);
   assert.match(html, /function sortedDirectoryDuels\(/);
     assert.match(html, /function buildDuelShareUrl\(/);
@@ -58,6 +59,8 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function upsertRemoteMiniFantasyEntry\(/);
   assert.match(html, /function loadPlayerAvailabilityData\(/);
   assert.match(html, /function loadMiniFantasyOpenFixturePriceSnapshots\(/);
+  assert.match(html, /function loadMiniFantasyLiveProvisional\(/);
+  assert.match(html, /function miniFantasyLiveProvisionalContext\(/);
   assert.match(html, /function miniFantasyAvailabilityBadgeLabel\(/);
   assert.match(html, /function formatMiniFantasyAuditTimestamp\(/);
   assert.match(html, /function formatMiniFantasyAuditBreakdown\(/);
@@ -89,6 +92,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /How Duel works/);
   assert.match(html, /How Mini Fantasy works/);
   assert.match(html, /Mini Fantasy current pricing/);
+  assert.match(html, /official IPL manual refresh/);
   assert.match(html, /Fixture-only scoring:/);
   assert.match(html, /Lineup total:/);
   assert.match(html, /scores 30\+ runs or faces 10\+ balls/);

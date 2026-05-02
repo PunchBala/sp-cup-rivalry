@@ -1468,6 +1468,7 @@
     let IPL_TEAM_ROLES = {};
     let MINI_FANTASY_PRICE_BOOK = null;
     let MINI_FANTASY_OPEN_FIXTURE_PRICE_SNAPSHOTS = null;
+    let MINI_FANTASY_LIVE_PROVISIONAL = null;
     let MINI_FANTASY_NOTICE = null;
     let MINI_FANTASY_DRAFTS = {};
     let MINI_FANTASY_ACTIVE_MATCH_NO = null;
@@ -4148,6 +4149,78 @@ function titleBandScore(pick, live){
         console.warn('Mini Fantasy open fixture snapshot fetch failed, falling back to live market only', err);
         MINI_FANTASY_OPEN_FIXTURE_PRICE_SNAPSHOTS = { fixtures: [] };
       }
+    }
+
+    function normalizeMiniFantasyLiveProvisionalPlayer(player = {}){
+      const baseBreakdown = player?.base_breakdown && typeof player.base_breakdown === 'object'
+        ? {
+            ...player.base_breakdown,
+            total_points: Number(player.base_breakdown.total_points ?? player.base_breakdown.totalPoints ?? player.points ?? 0) || 0
+          }
+        : null;
+      return {
+        playerId: normalizeTextValue(player?.player_id || player?.playerId || ''),
+        name: normalizeTextValue(player?.name || ''),
+        team: normalizeTextValue(player?.team || '').toUpperCase(),
+        role: normalizeTextValue(player?.role || ''),
+        appeared: Boolean(player?.appeared),
+        points: Number(player?.points || 0) || 0,
+        baseBreakdown
+      };
+    }
+
+    function normalizeMiniFantasyLiveProvisionalData(data){
+      if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+      const matchNo = Number(data.match_no || data.matchNo || 0) || null;
+      const players = (Array.isArray(data.players) ? data.players : [])
+        .map((player) => normalizeMiniFantasyLiveProvisionalPlayer(player))
+        .filter((player) => player.playerId && player.name);
+      if (!matchNo || !players.length) return null;
+      const fixtureRecordMap = new Map(
+        players.map((player) => [
+          player.playerId,
+          {
+            points: Number(player.points || 0) || 0,
+            appeared: Boolean(player.appeared),
+            base_breakdown: player.baseBreakdown ? { ...player.baseBreakdown } : null
+          }
+        ])
+      );
+      const pointsIndex = new Map(players.map((player) => [player.playerId, Number(player.points || 0) || 0]));
+      return {
+        version: normalizeTextValue(data.version || ''),
+        matchNo,
+        fixtureLabel: normalizeTextValue(data.fixture_label || data.fixtureLabel || ''),
+        homeTeamCode: normalizeTextValue(data.home_team_code || data.homeTeamCode || '').toUpperCase(),
+        awayTeamCode: normalizeTextValue(data.away_team_code || data.awayTeamCode || '').toUpperCase(),
+        source: normalizeTextValue(data.source || 'official_ipl_screenshot') || 'official_ipl_screenshot',
+        status: normalizeTextValue(data.status || '') || 'Manual live refresh',
+        note: normalizeTextValue(data.note || '') || 'Manual refresh from official IPL scorecard screenshot.',
+        generatedAtUtc: normalizeTextValue(data.generated_at_utc || data.generatedAtUtc || '') || null,
+        updatedAtUtc: normalizeTextValue(data.updated_at_utc || data.updatedAtUtc || '') || null,
+        winningTeamCode: normalizeTextValue(data.winning_team_code || data.winningTeamCode || '').toUpperCase(),
+        isNoResult: Boolean(data.is_no_result || data.isNoResult),
+        players,
+        fixtureRecordMap,
+        pointsIndex
+      };
+    }
+
+    async function loadMiniFantasyLiveProvisional(){
+      try {
+        const cacheBust = `t=${Date.now()}`;
+        const res = await fetch(`data/mini_fantasy_live_provisional.json?${cacheBust}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        MINI_FANTASY_LIVE_PROVISIONAL = normalizeMiniFantasyLiveProvisionalData(data);
+      } catch (err) {
+        console.warn('Mini Fantasy live provisional feed unavailable, falling back to authoritative data only', err);
+        MINI_FANTASY_LIVE_PROVISIONAL = null;
+      }
+      invalidateMiniFantasyComputedData();
     }
 
 
@@ -8295,6 +8368,27 @@ function titleBandScore(pick, live){
       };
     }
 
+    function miniFantasyLiveProvisionalForMatch(matchNo){
+      const target = Number(matchNo || 0) || null;
+      if (!target) return null;
+      return MINI_FANTASY_LIVE_PROVISIONAL && Number(MINI_FANTASY_LIVE_PROVISIONAL.matchNo || 0) === target
+        ? MINI_FANTASY_LIVE_PROVISIONAL
+        : null;
+    }
+
+    function miniFantasyLiveProvisionalContext(matchNo){
+      const provisional = miniFantasyLiveProvisionalForMatch(matchNo);
+      if (!provisional) return null;
+      return {
+        fixtureRecordMap: provisional.fixtureRecordMap,
+        pointsIndex: provisional.pointsIndex,
+        winningTeamCode: provisional.winningTeamCode || '',
+        noResult: Boolean(provisional.isNoResult),
+        completedMatchCount: Number(matchNo || 0) || 0,
+        provisional
+      };
+    }
+
     function miniFantasyFixtureByMatchNo(matchNo){
       const target = Number(matchNo || 0) || null;
       if (!target) return null;
@@ -8385,6 +8479,10 @@ function titleBandScore(pick, live){
     function formatMiniFantasyPoints(value){
       const amount = Number(value || 0) || 0;
       return Number.isInteger(amount) ? String(amount) : amount.toFixed(1);
+    }
+
+    function roundMiniFantasyValue(value){
+      return Number((Number(value || 0) || 0).toFixed(2));
     }
 
     function formatMiniFantasyAuditTimestamp(value){
@@ -8536,9 +8634,9 @@ function titleBandScore(pick, live){
         };
       }
 
-      function describeMiniFantasyEntry(entry, fixturePointsIndex = new Map()){
-        if (!entry) {
-          return {
+    function describeMiniFantasyEntry(entry, fixturePointsIndex = new Map(), scoreOverrides = null){
+      if (!entry) {
+        return {
           totalPoints: 0,
           pointsByPlayerId: {},
           scoredPointsByPlayerId: {},
@@ -8557,11 +8655,16 @@ function titleBandScore(pick, live){
       const selectedPlayerIds = Array.isArray(entry.selectedPlayerIds)
         ? entry.selectedPlayerIds.filter(Boolean)
         : (Array.isArray(entry.selected_player_ids) ? entry.selected_player_ids.filter(Boolean) : []);
+      const resolvedOverrides = scoreOverrides && typeof scoreOverrides === 'object' ? scoreOverrides : null;
       const score = scoreMiniFantasyEntry({
         entry,
         liveData: LIVE_2026,
         schedule: LEAGUE_STAGE_SCHEDULE,
-        squads: IPL_SQUADS
+        squads: IPL_SQUADS,
+        fixtureRecordMap: resolvedOverrides?.fixtureRecordMap || null,
+        winningTeamCode: resolvedOverrides?.winningTeamCode,
+        noResult: resolvedOverrides?.noResult,
+        completedMatchCount: resolvedOverrides?.completedMatchCount
       });
       const pointsByPlayerId = score.points_by_player_id || Object.fromEntries(selectedPlayerIds.map((playerId) => [playerId, Number(fixturePointsIndex.get(playerId) || 0)]));
       const auditLog = buildMiniFantasyEntryAuditLog({
@@ -8630,7 +8733,9 @@ function titleBandScore(pick, live){
         MINI_FANTASY_COMPUTE_REVISION,
         LIVE_2026?.fetchedAt || '',
         Number(LIVE_2026?.meta?.scoreHistory?.length || 0),
-        Number(MINI_FANTASY_RECENT_MATCH_NO || 0) || ''
+        Number(MINI_FANTASY_RECENT_MATCH_NO || 0) || '',
+        normalizeTextValue(MINI_FANTASY_LIVE_PROVISIONAL?.updatedAtUtc || MINI_FANTASY_LIVE_PROVISIONAL?.generatedAtUtc || ''),
+        Number(MINI_FANTASY_LIVE_PROVISIONAL?.matchNo || 0) || ''
       ].join('|');
       if (MINI_FANTASY_RECENT_BOARD_CACHE.key === cacheKey && MINI_FANTASY_RECENT_BOARD_CACHE.value) {
         return MINI_FANTASY_RECENT_BOARD_CACHE.value;
@@ -8645,23 +8750,24 @@ function titleBandScore(pick, live){
       }
       const matchNo = Number(fixture.match_no || 0) || null;
       const stage = miniFantasyRecentFixtureStage(fixture);
+      const liveProvisional = stage === 'live' ? miniFantasyLiveProvisionalContext(matchNo) : null;
       const entryRows = currentMiniFantasyLeaderboardEntries();
       const entryByOwner = new Map(
         entryRows
           .filter((entry) => Number(entry.matchNo || entry.match_no || 0) === matchNo)
           .map((entry) => [normalizeOwnerId(entry.ownerHandle || entry.owner_handle || ''), entry])
       );
-      const pointsIndex = buildMiniFantasyFixturePointsIndex({
+      const pointsIndex = liveProvisional?.pointsIndex || buildMiniFantasyFixturePointsIndex({
         liveData: LIVE_2026,
         schedule: LEAGUE_STAGE_SCHEDULE,
         squads: IPL_SQUADS,
         matchNo
       });
-      const rows = leaderboardRows.map((row) => {
+      const rankedRows = leaderboardRows.map((row) => {
         const ownerHandle = normalizeOwnerId(row.owner_handle || '');
         const fixtureEntry = entryByOwner.get(ownerHandle) || null;
         const matchSummary = (Array.isArray(row.matches) ? row.matches : []).find((item) => Number(item?.match_no || 0) === matchNo) || null;
-        const detail = fixtureEntry ? describeMiniFantasyEntry(fixtureEntry, pointsIndex) : null;
+        const detail = fixtureEntry ? describeMiniFantasyEntry(fixtureEntry, pointsIndex, liveProvisional) : null;
         const auditFallbackEntry = !fixtureEntry && matchSummary?.audit_log
           ? buildMiniFantasyEntryFromAuditLog(matchSummary.audit_log, matchSummary)
           : null;
@@ -8712,6 +8818,26 @@ function titleBandScore(pick, live){
           fixtureAuditLog
         };
       });
+      const rows = (stage === 'live' && liveProvisional)
+        ? rankedRows
+          .map((row) => ({
+            ...row,
+            displayTotalPoints: roundMiniFantasyValue(Number(row.total_points || 0) + Number(row.fixturePoints || 0)),
+            seasonRank: Number(row.rank || 0) || null
+          }))
+          .sort((a, b) => Number(b.displayTotalPoints || 0) - Number(a.displayTotalPoints || 0)
+            || Number(b.total_points || 0) - Number(a.total_points || 0)
+            || String(a.display_name || a.owner_handle || '').localeCompare(String(b.display_name || b.owner_handle || '')))
+          .map((row, index) => ({
+            ...row,
+            displayRank: index + 1
+          }))
+        : rankedRows.map((row) => ({
+            ...row,
+            displayTotalPoints: roundMiniFantasyValue(Number(row.total_points || 0)),
+            displayRank: Number(row.rank || 0) || 0,
+            seasonRank: Number(row.rank || 0) || null
+          }));
 
       const playerCounts = new Map();
       const captainCounts = new Map();
@@ -8737,7 +8863,18 @@ function titleBandScore(pick, live){
         fixture,
         stage,
         rows,
+        provisional: liveProvisional
+          ? {
+              updatedAtUtc: liveProvisional.provisional.updatedAtUtc || liveProvisional.provisional.generatedAtUtc || null,
+              status: liveProvisional.provisional.status,
+              note: liveProvisional.provisional.note,
+              source: liveProvisional.provisional.source
+            }
+          : null,
         summary: [
+          ...(liveProvisional
+            ? [`Manual live refresh: ${liveProvisional.provisional.status}${liveProvisional.provisional.updatedAtUtc || liveProvisional.provisional.generatedAtUtc ? ` (updated ${formatMiniFantasyAuditTimestamp(liveProvisional.provisional.updatedAtUtc || liveProvisional.provisional.generatedAtUtc)})` : ''}`]
+            : []),
           mostPicked ? `Most picked: ${mostPicked[0]} (${mostPicked[1]})` : 'Most picked: waiting for locks',
           mostPickedCaptain ? `Most picked captain: ${mostPickedCaptain[0]} (${mostPickedCaptain[1]})` : 'Most picked captain: waiting for locks',
           differential ? `Biggest differential: ${differential[0]} on 1 team` : 'Biggest differential: no solo picks yet',
@@ -9194,7 +9331,9 @@ function titleBandScore(pick, live){
         panel.innerHTML = `<div class="fantasy-empty">No Mini Fantasy team has been locked yet. ${activeFixture ? `Match ${escapeHtml(String(activeFixture.match_no))} is open now, and you ${openEntry ? 'already have a saved team for it.' : "haven't picked it yet."}` : 'The next open builder will appear here automatically.'}</div>`;
         return;
       }
-      const recapEntry = latestScored?.entry || latestLockedEntry;
+      const recapEntry = latestLockedEntry && (!latestScored?.entry || Number(latestLockedEntry.matchNo || 0) > Number(latestScored.entry.matchNo || 0))
+        ? latestLockedEntry
+        : (latestScored?.entry || latestLockedEntry);
       const recapFixture = miniFantasyFixtureByMatchNo(recapEntry.matchNo) || {
         match_no: recapEntry.matchNo,
         home_team: recapEntry.homeTeamCode,
@@ -9208,19 +9347,20 @@ function titleBandScore(pick, live){
         squads: IPL_SQUADS,
         matchNo: recapEntry.matchNo
       });
-      const detail = describeMiniFantasyEntry(recapEntry, pointsIndex);
       const stage = miniFantasyRecentFixtureStage(recapFixture);
+      const liveProvisional = stage === 'live' ? miniFantasyLiveProvisionalContext(recapEntry.matchNo) : null;
+      const detail = describeMiniFantasyEntry(recapEntry, liveProvisional?.pointsIndex || pointsIndex, liveProvisional);
       const bestPick = detail.bestPick;
       panel.innerHTML = `
         <div class="fantasy-recap-grid">
           <div class="fantasy-detail-header">
             <div>
               <div class="fantasy-recap-title">Match ${escapeHtml(String(recapEntry.matchNo || '?'))} - ${escapeHtml(recapEntry.fixtureLabel || formatFixtureLabel(recapFixture.fixture || `${recapFixture.away_team} vs ${recapFixture.home_team}`))}</div>
-              <div class="fantasy-recap-note">Saved ${escapeHtml(formatTimestamp(recapEntry.savedAt || recapEntry.updatedAt))}. ${openEntry ? `Your next team for Match ${escapeHtml(String(activeFixture?.match_no || ''))} is already saved.` : activeFixture ? `You have not locked Match ${escapeHtml(String(activeFixture.match_no))} yet.` : 'No open fixture needs a pick right now.'}</div>
+              <div class="fantasy-recap-note">Saved ${escapeHtml(formatTimestamp(recapEntry.savedAt || recapEntry.updatedAt))}. ${liveProvisional ? `Manual live refresh updated ${escapeHtml(formatMiniFantasyAuditTimestamp(liveProvisional.provisional.updatedAtUtc || liveProvisional.provisional.generatedAtUtc || ''))}. ` : ''}${openEntry ? `Your next team for Match ${escapeHtml(String(activeFixture?.match_no || ''))} is already saved.` : activeFixture ? `You have not locked Match ${escapeHtml(String(activeFixture.match_no))} yet.` : 'No open fixture needs a pick right now.'}</div>
             </div>
             <div>
               <div class="fantasy-detail-points">${escapeHtml(formatMiniFantasyPoints(detail.totalPoints))}</div>
-              <div class="small">${escapeHtml(stage === 'final' ? 'final pts' : stage === 'live' ? 'live pts' : 'locked')}</div>
+              <div class="small">${escapeHtml(stage === 'final' ? 'final pts' : stage === 'live' ? (liveProvisional ? 'live pts · manual refresh' : 'live pts') : 'locked')}</div>
             </div>
           </div>
           <div class="fantasy-summary-strip">
@@ -9324,7 +9464,7 @@ function titleBandScore(pick, live){
         return;
       }
       const fixtureLabel = formatFixtureLabel(board.fixture.fixture || `${board.fixture.away_team} vs ${board.fixture.home_team}`);
-      const statusLabel = board.stage === 'final' ? 'Final' : board.stage === 'live' ? 'Live' : 'Locked';
+      const statusLabel = board.stage === 'final' ? 'Final' : board.stage === 'live' ? (board.provisional ? 'Live (manual refresh)' : 'Live') : 'Locked';
       const detailPlayers = Array.isArray(selectedRow.fixturePlayers) ? selectedRow.fixturePlayers : [];
       const bestPick = selectedRow.fixtureBestPick;
       const captain = selectedRow.fixtureCaptain;
@@ -9411,14 +9551,14 @@ function titleBandScore(pick, live){
       }
       panel.innerHTML = `
         <div class="fantasy-leaderboard-kicker">${escapeHtml(recentBoard.fixture ? `Pick rail for Match ${recentBoard.fixture.match_no}` : 'Leaderboard rail')}</div>
-        <div class="fantasy-window-note">${recentBoard.fixture ? `Click a user and keep your eyes on the locked-team stage. The rail always follows the fixture selected in the archive above, and right now it is showing Match ${escapeHtml(String(recentBoard.fixture.match_no))}.` : 'Once the first fixture locks, this rail will become the fast way to inspect each user team without opening a new screen.'}</div>
+        <div class="fantasy-window-note">${recentBoard.fixture ? (recentBoard.provisional ? `Manual live refresh is active for Match ${escapeHtml(String(recentBoard.fixture.match_no))}. The overall column now includes provisional fixture points until the final scorecard lands.` : `Click a user and keep your eyes on the locked-team stage. The rail always follows the fixture selected in the archive above, and right now it is showing Match ${escapeHtml(String(recentBoard.fixture.match_no))}.`) : 'Once the first fixture locks, this rail will become the fast way to inspect each user team without opening a new screen.'}</div>
         <div class="fantasy-leaderboard-scroll">
           <div class="fantasy-leaderboard-list">
             ${leaderboardRows.map((row) => `
-              <button type="button" class="fantasy-leaderboard-row selectable ${row.rank <= 3 ? `top-${row.rank}` : ''} ${normalizeOwnerId(selectedRow?.owner_handle || '') === normalizeOwnerId(row.owner_handle || '') ? 'active' : ''}" data-mini-leaderboard-owner="${escapeHtml(row.owner_handle)}" ${recentBoard.fixture ? '' : 'disabled'}>
+              <button type="button" class="fantasy-leaderboard-row selectable ${Number(row.displayRank || row.rank || 0) <= 3 ? `top-${Number(row.displayRank || row.rank || 0)}` : ''} ${normalizeOwnerId(selectedRow?.owner_handle || '') === normalizeOwnerId(row.owner_handle || '') ? 'active' : ''}" data-mini-leaderboard-owner="${escapeHtml(row.owner_handle)}" ${recentBoard.fixture ? '' : 'disabled'}>
                 <div class="fantasy-leaderboard-copy">
                   <div class="fantasy-leaderboard-name">
-                    <span class="fantasy-leaderboard-rank">#${escapeHtml(String(row.rank))}</span>
+                    <span class="fantasy-leaderboard-rank">#${escapeHtml(String(row.displayRank || row.rank || ''))}</span>
                     <span>${escapeHtml(row.display_name || row.owner_handle)}</span>
                     ${row.medal ? `<span class="fantasy-medal ${escapeHtml(row.medal)}">${escapeHtml(miniFantasyMedalLabel(row.medal))}</span>` : ''}
                   </div>
@@ -9433,13 +9573,14 @@ function titleBandScore(pick, live){
                             ? `<span class="pill">New player baseline</span><span class="pill">${escapeHtml(formatMiniFantasyPoints(row.fixturePoints))} fixture pts</span>`
                             : row.fixtureStatus === 'no_locked_teams'
                               ? '<span class="pill">No teams locked</span><span class="pill">0 fixture pts</span>'
-                              : `<span class="pill">${escapeHtml(recentBoard.stage === 'final' ? 'Final' : recentBoard.stage === 'live' ? 'Live' : 'Locked')}</span><span class="pill">${escapeHtml(formatMiniFantasyPoints(row.fixturePoints))} fixture pts</span>`}
+                              : `<span class="pill">${escapeHtml(recentBoard.stage === 'final' ? 'Final' : recentBoard.stage === 'live' ? (recentBoard.provisional ? 'Live · manual' : 'Live') : 'Locked')}</span><span class="pill">${escapeHtml(formatMiniFantasyPoints(row.fixturePoints))} fixture pts</span>`}
+                      ${recentBoard.provisional && row.seasonRank ? `<span class="pill">Season rank #${escapeHtml(String(row.seasonRank))}</span>` : ''}
                     </div>
                   ` : ''}
                 </div>
                 <div class="fantasy-leaderboard-score">
-                  <div class="fantasy-leaderboard-points">${escapeHtml(String(row.total_points))}</div>
-                  <div class="small">overall</div>
+                  <div class="fantasy-leaderboard-points">${escapeHtml(formatMiniFantasyPoints(row.displayTotalPoints ?? row.total_points))}</div>
+                  <div class="small">${escapeHtml(recentBoard.provisional ? 'overall + live' : 'overall')}</div>
                 </div>
               </button>
             `).join('')}
@@ -9509,7 +9650,7 @@ function titleBandScore(pick, live){
         : board.stage === 'final'
           ? `${viewedName} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)}.` : ''}`
           : board.stage === 'live'
-            ? `${viewedName} is live on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} is currently worth ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}`
+            ? `${viewedName} is live on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} is currently worth ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${board.provisional?.updatedAtUtc ? ` Manual refresh updated ${formatMiniFantasyAuditTimestamp(board.provisional.updatedAtUtc)}.` : ''}`
             : `${viewedName} locked this team. Points will start updating once Match ${board.fixture.match_no} begins.`;
       panel.innerHTML = `
         <div class="fantasy-entry-team">
@@ -9535,6 +9676,7 @@ function titleBandScore(pick, live){
                   <span class="pill">${escapeHtml(statusLabel)}</span>
                   <span class="pill">${escapeHtml(String(activeOption?.lockedCount || 0))} locked team${Number(activeOption?.lockedCount || 0) === 1 ? '' : 's'}</span>
                   ${(activeOption?.missingCount || 0) ? `<span class="pill">${escapeHtml(String(activeOption.missingCount))} missed lock</span>` : '<span class="pill">Everyone submitted</span>'}
+                  ${board.provisional?.updatedAtUtc ? `<span class="pill">Updated ${escapeHtml(formatMiniFantasyAuditTimestamp(board.provisional.updatedAtUtc))}</span>` : ''}
                 </div>
               </div>
             </div>
@@ -9564,6 +9706,7 @@ function titleBandScore(pick, live){
               <span class="fantasy-summary-chip">Fixture: Match ${escapeHtml(String(board.fixture.match_no))} - ${escapeHtml(fixtureLabel)}</span>
               <span class="fantasy-summary-chip">${escapeHtml(board.fixture.home_team_code || teamShort(board.fixture.home_team || ''))} vs ${escapeHtml(board.fixture.away_team_code || teamShort(board.fixture.away_team || ''))}</span>
               <span class="fantasy-summary-chip">${escapeHtml(statusLabel)}</span>
+              ${board.provisional ? '<span class="fantasy-summary-chip">Source: official IPL manual refresh</span>' : ''}
               ${selectedRow.fixtureStatus === 'did_not_lock'
                 ? '<span class="fantasy-summary-chip fantasy-did-not-lock">Did not lock</span>'
                 : selectedRow.fixtureStatus === 'missed_lock_relief'
@@ -10157,6 +10300,7 @@ function titleBandScore(pick, live){
       await loadLiveData();
       await loadMiniFantasyPriceBook();
       await loadMiniFantasyOpenFixturePriceSnapshots();
+      await loadMiniFantasyLiveProvisional();
       render();
       setTimeout(() => {
         if (activeView === 'fantasy') {
