@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-05-03T17:43:21.594Z",
+    "as_of_utc": "2026-05-03T18:54:44.290Z",
     "price_min": 4.5,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -86,11 +86,41 @@
   "summary": {
     "total_players_received": 257,
     "eligible_players_ranked": 257,
-    "price_rises": 0,
-    "price_drops": 0,
-    "price_unchanged": 257
+    "price_rises": 11,
+    "price_drops": 14,
+    "price_unchanged": 232
   },
   "players": [
+    {
+      "player_id": "csk_akeal-hosein",
+      "name": "Akeal Hosein",
+      "team": "CSK",
+      "role": "bowler",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 8.5,
+      "initial_price": 8.5,
+      "target_price": 9,
+      "smoothed_price": 9,
+      "final_price": 9,
+      "price_change": 0.5,
+      "matches_played": 4,
+      "season_total_points": 200,
+      "season_avg_points": 50,
+      "recent_avg_points": 64,
+      "last_match_points": 20,
+      "score_basis": 59.33,
+      "reliability_factor": 1,
+      "adjusted_score": 59.33,
+      "percentile": 90.23,
+      "rank": 26,
+      "missed_fixture_streak": 1,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 26"
+      ],
+      "last_match_played_at_utc": "2026-04-26T10:00:00"
+    },
     {
       "player_id": "csk_ruturaj-gaikwad",
       "name": "Ruturaj Gaikwad",
@@ -112,8 +142,8 @@
       "score_basis": 62.59,
       "reliability_factor": 1,
       "adjusted_score": 62.59,
-      "percentile": 91.41,
-      "rank": 23,
+      "percentile": 92.58,
+      "rank": 20,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -141,42 +171,13 @@
       "score_basis": 66.26,
       "reliability_factor": 1,
       "adjusted_score": 66.26,
-      "percentile": 94.53,
-      "rank": 15,
+      "percentile": 94.92,
+      "rank": 14,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-02T14:00:00"
-    },
-    {
-      "player_id": "csk_akeal-hosein",
-      "name": "Akeal Hosein",
-      "team": "CSK",
-      "role": "bowler",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 8.5,
-      "initial_price": 8.5,
-      "target_price": 8.5,
-      "smoothed_price": 8.5,
-      "final_price": 8.5,
-      "price_change": 0,
-      "matches_played": 4,
-      "season_total_points": 200,
-      "season_avg_points": 50,
-      "recent_avg_points": 64,
-      "last_match_points": 20,
-      "score_basis": 59.33,
-      "reliability_factor": 1,
-      "adjusted_score": 59.33,
-      "percentile": 89.45,
-      "rank": 28,
-      "missed_fixture_streak": 1,
-      "calculation_notes": [
-        "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-26T10:00:00"
     },
     {
       "player_id": "csk_anshul-kamboj",
@@ -199,8 +200,8 @@
       "score_basis": 56.07,
       "reliability_factor": 1,
       "adjusted_score": 56.07,
-      "percentile": 88.67,
-      "rank": 30,
+      "percentile": 89.06,
+      "rank": 29,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -286,8 +287,8 @@
       "score_basis": 59.45,
       "reliability_factor": 1,
       "adjusted_score": 59.45,
-      "percentile": 89.84,
-      "rank": 27,
+      "percentile": 91.02,
+      "rank": 24,
       "missed_fixture_streak": 3,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -345,8 +346,8 @@
       "score_basis": 33.33,
       "reliability_factor": 1,
       "adjusted_score": 33.33,
-      "percentile": 74.02,
-      "rank": 67,
+      "percentile": 73.63,
+      "rank": 68,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -374,8 +375,8 @@
       "score_basis": 24.11,
       "reliability_factor": 1,
       "adjusted_score": 24.11,
-      "percentile": 61.33,
-      "rank": 100,
+      "percentile": 60.16,
+      "rank": 103,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -403,42 +404,13 @@
       "score_basis": 22.67,
       "reliability_factor": 1,
       "adjusted_score": 22.67,
-      "percentile": 58.59,
-      "rank": 107,
+      "percentile": 57.23,
+      "rank": 110,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-26T10:00:00"
-    },
-    {
-      "player_id": "csk_ramakrishna-ghosh",
-      "name": "Ramakrishna Ghosh",
-      "team": "CSK",
-      "role": "all_rounder",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
-      "target_price": 7.5,
-      "smoothed_price": 7.5,
-      "final_price": 7.5,
-      "price_change": 0,
-      "matches_played": 1,
-      "season_total_points": 45,
-      "season_avg_points": 45,
-      "recent_avg_points": 45,
-      "last_match_points": 45,
-      "score_basis": 45,
-      "reliability_factor": 0.5,
-      "adjusted_score": 22.5,
-      "percentile": 57.42,
-      "rank": 110,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-05-02T14:00:00"
     },
     {
       "player_id": "csk_shivam-dube",
@@ -461,8 +433,8 @@
       "score_basis": 22.76,
       "reliability_factor": 1,
       "adjusted_score": 22.76,
-      "percentile": 59.38,
-      "rank": 105,
+      "percentile": 58.2,
+      "rank": 108,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -490,8 +462,8 @@
       "score_basis": 25.5,
       "reliability_factor": 1,
       "adjusted_score": 25.5,
-      "percentile": 63.67,
-      "rank": 94,
+      "percentile": 62.5,
+      "rank": 97,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -519,11 +491,41 @@
       "score_basis": 21.67,
       "reliability_factor": 1,
       "adjusted_score": 21.67,
-      "percentile": 56.25,
-      "rank": 113,
+      "percentile": 55.08,
+      "rank": 116,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
+      ],
+      "last_match_played_at_utc": "2026-05-02T14:00:00"
+    },
+    {
+      "player_id": "csk_ramakrishna-ghosh",
+      "name": "Ramakrishna Ghosh",
+      "team": "CSK",
+      "role": "all_rounder",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 7.5,
+      "initial_price": 7.5,
+      "target_price": 7,
+      "smoothed_price": 7,
+      "final_price": 7,
+      "price_change": -0.5,
+      "matches_played": 1,
+      "season_total_points": 45,
+      "season_avg_points": 45,
+      "recent_avg_points": 45,
+      "last_match_points": 45,
+      "score_basis": 45,
+      "reliability_factor": 0.5,
+      "adjusted_score": 22.5,
+      "percentile": 55.86,
+      "rank": 114,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 114"
       ],
       "last_match_played_at_utc": "2026-05-02T14:00:00"
     },
@@ -548,8 +550,8 @@
       "score_basis": 16.18,
       "reliability_factor": 1,
       "adjusted_score": 16.18,
-      "percentile": 46.48,
-      "rank": 138,
+      "percentile": 46.09,
+      "rank": 139,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -577,8 +579,8 @@
       "score_basis": 21,
       "reliability_factor": 1,
       "adjusted_score": 21,
-      "percentile": 54.49,
-      "rank": 117,
+      "percentile": 54.1,
+      "rank": 118,
       "missed_fixture_streak": 3,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -607,8 +609,8 @@
       "score_basis": 14.98,
       "reliability_factor": 1,
       "adjusted_score": 14.98,
-      "percentile": 44.53,
-      "rank": 143,
+      "percentile": 44.14,
+      "rank": 144,
       "missed_fixture_streak": 4,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -637,8 +639,8 @@
       "score_basis": 17,
       "reliability_factor": 1,
       "adjusted_score": 17,
-      "percentile": 48.05,
-      "rank": 134,
+      "percentile": 47.66,
+      "rank": 135,
       "missed_fixture_streak": 6,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -667,8 +669,8 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 171,
+      "percentile": 17.97,
+      "rank": 172,
       "missed_fixture_streak": 9,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -697,8 +699,8 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 172,
+      "percentile": 17.97,
+      "rank": 173,
       "missed_fixture_streak": 9,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -727,8 +729,8 @@
       "score_basis": 3,
       "reliability_factor": 0.5,
       "adjusted_score": 1.5,
-      "percentile": 34.77,
-      "rank": 168,
+      "percentile": 34.38,
+      "rank": 169,
       "missed_fixture_streak": 7,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -757,8 +759,8 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 173,
+      "percentile": 17.97,
+      "rank": 174,
       "missed_fixture_streak": 9,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -787,8 +789,8 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 174,
+      "percentile": 17.97,
+      "rank": 175,
       "missed_fixture_streak": 9,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -817,8 +819,8 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 175,
+      "percentile": 17.97,
+      "rank": 176,
       "missed_fixture_streak": 9,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -876,8 +878,8 @@
       "score_basis": 111,
       "reliability_factor": 0.5,
       "adjusted_score": 55.5,
-      "percentile": 87.5,
-      "rank": 33,
+      "percentile": 87.89,
+      "rank": 32,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -905,8 +907,8 @@
       "score_basis": 53.57,
       "reliability_factor": 1,
       "adjusted_score": 53.57,
-      "percentile": 86.33,
-      "rank": 36,
+      "percentile": 87.11,
+      "rank": 34,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -934,8 +936,8 @@
       "score_basis": 33.33,
       "reliability_factor": 1,
       "adjusted_score": 33.33,
-      "percentile": 74.02,
-      "rank": 68,
+      "percentile": 73.63,
+      "rank": 69,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -963,8 +965,8 @@
       "score_basis": 38.14,
       "reliability_factor": 1,
       "adjusted_score": 38.14,
-      "percentile": 78.52,
-      "rank": 56,
+      "percentile": 78.13,
+      "rank": 57,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -992,8 +994,8 @@
       "score_basis": 22.96,
       "reliability_factor": 1,
       "adjusted_score": 22.96,
-      "percentile": 60.16,
-      "rank": 103,
+      "percentile": 58.98,
+      "rank": 106,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -1021,8 +1023,8 @@
       "score_basis": 30,
       "reliability_factor": 1,
       "adjusted_score": 30,
-      "percentile": 68.95,
-      "rank": 80,
+      "percentile": 68.75,
+      "rank": 81,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -1050,8 +1052,8 @@
       "score_basis": 25.33,
       "reliability_factor": 1,
       "adjusted_score": 25.33,
-      "percentile": 63.28,
-      "rank": 95,
+      "percentile": 62.11,
+      "rank": 98,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -1079,8 +1081,8 @@
       "score_basis": 30.61,
       "reliability_factor": 1,
       "adjusted_score": 30.61,
-      "percentile": 70.7,
-      "rank": 76,
+      "percentile": 70.31,
+      "rank": 77,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -1108,8 +1110,8 @@
       "score_basis": 28,
       "reliability_factor": 0.5,
       "adjusted_score": 14,
-      "percentile": 43.36,
-      "rank": 146,
+      "percentile": 42.97,
+      "rank": 147,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -1137,8 +1139,8 @@
       "score_basis": 12.03,
       "reliability_factor": 1,
       "adjusted_score": 12.03,
-      "percentile": 42.19,
-      "rank": 149,
+      "percentile": 41.41,
+      "rank": 151,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -1166,8 +1168,8 @@
       "score_basis": 16.41,
       "reliability_factor": 1,
       "adjusted_score": 16.41,
-      "percentile": 46.88,
-      "rank": 137,
+      "percentile": 46.48,
+      "rank": 138,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -1195,8 +1197,8 @@
       "score_basis": 13.45,
       "reliability_factor": 1,
       "adjusted_score": 13.45,
-      "percentile": 42.97,
-      "rank": 147,
+      "percentile": 41.8,
+      "rank": 150,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -1224,43 +1226,13 @@
       "score_basis": 0,
       "reliability_factor": 0.5,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 178,
+      "percentile": 17.97,
+      "rank": 179,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-27T14:00:00"
-    },
-    {
-      "player_id": "dc_mukesh-kumar",
-      "name": "Mukesh Kumar",
-      "team": "DC",
-      "role": "bowler",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 6.5,
-      "initial_price": 6.5,
-      "target_price": 6.5,
-      "smoothed_price": 6.5,
-      "final_price": 6.5,
-      "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 134,
-      "season_avg_points": 19.14,
-      "recent_avg_points": 5,
-      "last_match_points": -5,
-      "score_basis": 9.71,
-      "reliability_factor": 1,
-      "adjusted_score": 9.71,
-      "percentile": 40.23,
-      "rank": 154,
-      "missed_fixture_streak": 2,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Applied 0.5-credit missed-fixture penalty after 2 consecutive misses"
-      ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
     },
     {
       "player_id": "dc_vipraj-nigam",
@@ -1313,8 +1285,8 @@
       "score_basis": 7,
       "reliability_factor": 1,
       "adjusted_score": 7,
-      "percentile": 38.28,
-      "rank": 159,
+      "percentile": 37.89,
+      "rank": 160,
       "missed_fixture_streak": 2,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -1343,14 +1315,45 @@
       "score_basis": 18.56,
       "reliability_factor": 1,
       "adjusted_score": 18.56,
-      "percentile": 51.56,
-      "rank": 125,
+      "percentile": 51.17,
+      "rank": 126,
       "missed_fixture_streak": 3,
       "calculation_notes": [
         "Used old_price for smoothing",
         "Applied 1-credit missed-fixture penalty after 3 consecutive misses"
       ],
       "last_match_played_at_utc": "2026-04-21T14:00:00"
+    },
+    {
+      "player_id": "dc_mukesh-kumar",
+      "name": "Mukesh Kumar",
+      "team": "DC",
+      "role": "bowler",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 6.5,
+      "initial_price": 6.5,
+      "target_price": 6,
+      "smoothed_price": 6,
+      "final_price": 6,
+      "price_change": -0.5,
+      "matches_played": 7,
+      "season_total_points": 134,
+      "season_avg_points": 19.14,
+      "recent_avg_points": 5,
+      "last_match_points": -5,
+      "score_basis": 9.71,
+      "reliability_factor": 1,
+      "adjusted_score": 9.71,
+      "percentile": 39.45,
+      "rank": 156,
+      "missed_fixture_streak": 2,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 156",
+        "Applied 0.5-credit missed-fixture penalty after 2 consecutive misses"
+      ],
+      "last_match_played_at_utc": "2026-04-25T10:00:00"
     },
     {
       "player_id": "dc_ajay-mandal",
@@ -1373,8 +1376,8 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 176,
+      "percentile": 17.97,
+      "rank": 177,
       "missed_fixture_streak": 9,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -1403,8 +1406,8 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 177,
+      "percentile": 17.97,
+      "rank": 178,
       "missed_fixture_streak": 9,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -1433,8 +1436,8 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 179,
+      "percentile": 17.97,
+      "rank": 180,
       "missed_fixture_streak": 9,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -1463,8 +1466,8 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 180,
+      "percentile": 17.97,
+      "rank": 181,
       "missed_fixture_streak": 9,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -1493,8 +1496,8 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 181,
+      "percentile": 17.97,
+      "rank": 182,
       "missed_fixture_streak": 9,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -1523,8 +1526,8 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 182,
+      "percentile": 17.97,
+      "rank": 183,
       "missed_fixture_streak": 9,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -1592,65 +1595,6 @@
       "last_match_played_at_utc": "2026-04-27T14:00:00"
     },
     {
-      "player_id": "gt_sai-sudharsan",
-      "name": "Sai Sudharsan",
-      "team": "GT",
-      "role": "batter",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 10,
-      "initial_price": 10,
-      "target_price": 10,
-      "smoothed_price": 10,
-      "final_price": 10,
-      "price_change": 0,
-      "matches_played": 9,
-      "season_total_points": 492,
-      "season_avg_points": 54.67,
-      "recent_avg_points": 103.33,
-      "last_match_points": 23,
-      "score_basis": 87.11,
-      "reliability_factor": 1,
-      "adjusted_score": 87.11,
-      "percentile": 99.22,
-      "rank": 3,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-30T14:00:00"
-    },
-    {
-      "player_id": "gt_mohd-arshad-khan",
-      "name": "Mohd. Arshad Khan",
-      "team": "GT",
-      "role": "all_rounder",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 9.5,
-      "initial_price": 9.5,
-      "target_price": 9.5,
-      "smoothed_price": 9.5,
-      "final_price": 9.5,
-      "price_change": 0,
-      "matches_played": 2,
-      "season_total_points": 159,
-      "season_avg_points": 79.5,
-      "recent_avg_points": 79.5,
-      "last_match_points": 114,
-      "score_basis": 79.5,
-      "reliability_factor": 1,
-      "adjusted_score": 79.5,
-      "percentile": 98.83,
-      "rank": 4,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Uncapped player price ceiling applied at 9.5 credits"
-      ],
-      "last_match_played_at_utc": "2026-04-30T14:00:00"
-    },
-    {
       "player_id": "gt_jason-holder",
       "name": "Jason Holder",
       "team": "GT",
@@ -1659,25 +1603,57 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 9,
-      "smoothed_price": 9,
-      "final_price": 9,
-      "price_change": 0,
-      "matches_played": 3,
-      "season_total_points": 191,
-      "season_avg_points": 63.67,
-      "recent_avg_points": 63.67,
-      "last_match_points": 106,
-      "score_basis": 63.67,
+      "target_price": 10,
+      "smoothed_price": 9.5,
+      "final_price": 9.5,
+      "price_change": 0.5,
+      "matches_played": 4,
+      "season_total_points": 333,
+      "season_avg_points": 83.25,
+      "recent_avg_points": 90.67,
+      "last_match_points": 142,
+      "score_basis": 88.2,
       "reliability_factor": 1,
-      "adjusted_score": 63.67,
-      "percentile": 92.97,
-      "rank": 19,
+      "adjusted_score": 88.2,
+      "percentile": 99.61,
+      "rank": 2,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 2",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-30T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
+    },
+    {
+      "player_id": "gt_sai-sudharsan",
+      "name": "Sai Sudharsan",
+      "team": "GT",
+      "role": "batter",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 10,
+      "initial_price": 10,
+      "target_price": 9.5,
+      "smoothed_price": 9.5,
+      "final_price": 9.5,
+      "price_change": -0.5,
+      "matches_played": 10,
+      "season_total_points": 568,
+      "season_avg_points": 56.8,
+      "recent_avg_points": 74,
+      "last_match_points": 76,
+      "score_basis": 68.27,
+      "reliability_factor": 1,
+      "adjusted_score": 68.27,
+      "percentile": 96.09,
+      "rank": 11,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 11"
+      ],
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
       "player_id": "gt_jos-buttler",
@@ -1688,54 +1664,87 @@
       "pricing_eligible": true,
       "old_price": 8.5,
       "initial_price": 8.5,
-      "target_price": 8.5,
-      "smoothed_price": 8.5,
-      "final_price": 8.5,
-      "price_change": 0,
-      "matches_played": 9,
-      "season_total_points": 519,
-      "season_avg_points": 57.67,
-      "recent_avg_points": 53.33,
-      "last_match_points": 65,
-      "score_basis": 54.78,
+      "target_price": 9,
+      "smoothed_price": 9,
+      "final_price": 9,
+      "price_change": 0.5,
+      "matches_played": 10,
+      "season_total_points": 574,
+      "season_avg_points": 57.4,
+      "recent_avg_points": 60.33,
+      "last_match_points": 55,
+      "score_basis": 59.35,
       "reliability_factor": 1,
-      "adjusted_score": 54.78,
-      "percentile": 87.11,
-      "rank": 34,
+      "adjusted_score": 59.35,
+      "percentile": 90.63,
+      "rank": 25,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 25"
       ],
-      "last_match_played_at_utc": "2026-04-30T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
-      "player_id": "gt_rashid-khan",
-      "name": "Rashid Khan",
+      "player_id": "gt_kagiso-rabada",
+      "name": "Kagiso Rabada",
       "team": "GT",
-      "role": "all_rounder",
+      "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 8.5,
-      "initial_price": 8.5,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 9,
+      "smoothed_price": 8.5,
+      "final_price": 8.5,
+      "price_change": 0.5,
+      "matches_played": 10,
+      "season_total_points": 501,
+      "season_avg_points": 50.1,
+      "recent_avg_points": 63.33,
+      "last_match_points": 58,
+      "score_basis": 58.92,
+      "reliability_factor": 1,
+      "adjusted_score": 58.92,
+      "percentile": 89.84,
+      "rank": 27,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 27",
+        "Applied smoothing against the target price"
+      ],
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
+    },
+    {
+      "player_id": "gt_mohd-arshad-khan",
+      "name": "Mohd. Arshad Khan",
+      "team": "GT",
+      "role": "all_rounder",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 9.5,
+      "initial_price": 9.5,
       "target_price": 8.5,
       "smoothed_price": 8.5,
       "final_price": 8.5,
-      "price_change": 0,
-      "matches_played": 9,
-      "season_total_points": 372,
-      "season_avg_points": 41.33,
-      "recent_avg_points": 52.33,
-      "last_match_points": 112,
-      "score_basis": 48.66,
+      "price_change": -1,
+      "matches_played": 3,
+      "season_total_points": 168,
+      "season_avg_points": 56,
+      "recent_avg_points": 56,
+      "last_match_points": 9,
+      "score_basis": 56,
       "reliability_factor": 1,
-      "adjusted_score": 48.66,
-      "percentile": 84.38,
-      "rank": 41,
+      "adjusted_score": 56,
+      "percentile": 88.48,
+      "rank": 30,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 30"
       ],
-      "last_match_played_at_utc": "2026-04-30T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
       "player_id": "gt_shubman-gill",
@@ -1750,50 +1759,21 @@
       "smoothed_price": 8.5,
       "final_price": 8.5,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 548,
-      "season_avg_points": 68.5,
-      "recent_avg_points": 49.67,
-      "last_match_points": 61,
-      "score_basis": 55.95,
-      "reliability_factor": 1,
-      "adjusted_score": 55.95,
-      "percentile": 87.89,
-      "rank": 32,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-30T14:00:00"
-    },
-    {
-      "player_id": "gt_kagiso-rabada",
-      "name": "Kagiso Rabada",
-      "team": "GT",
-      "role": "bowler",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 8,
-      "initial_price": 8,
-      "target_price": 8,
-      "smoothed_price": 8,
-      "final_price": 8,
-      "price_change": 0,
       "matches_played": 9,
-      "season_total_points": 443,
-      "season_avg_points": 49.22,
-      "recent_avg_points": 42.33,
-      "last_match_points": 40,
-      "score_basis": 44.63,
+      "season_total_points": 562,
+      "season_avg_points": 62.44,
+      "recent_avg_points": 41.67,
+      "last_match_points": 14,
+      "score_basis": 48.59,
       "reliability_factor": 1,
-      "adjusted_score": 44.63,
-      "percentile": 81.64,
-      "rank": 48,
+      "adjusted_score": 48.59,
+      "percentile": 84.38,
+      "rank": 41,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-30T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
       "player_id": "gt_mohammed-siraj",
@@ -1808,21 +1788,51 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0,
-      "matches_played": 9,
-      "season_total_points": 289,
-      "season_avg_points": 32.11,
-      "recent_avg_points": 35.67,
-      "last_match_points": 49,
-      "score_basis": 34.48,
+      "matches_played": 10,
+      "season_total_points": 341,
+      "season_avg_points": 34.1,
+      "recent_avg_points": 44.67,
+      "last_match_points": 52,
+      "score_basis": 41.15,
       "reliability_factor": 1,
-      "adjusted_score": 34.48,
-      "percentile": 75.39,
-      "rank": 64,
+      "adjusted_score": 41.15,
+      "percentile": 79.69,
+      "rank": 53,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-30T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
+    },
+    {
+      "player_id": "gt_rashid-khan",
+      "name": "Rashid Khan",
+      "team": "GT",
+      "role": "all_rounder",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 8.5,
+      "initial_price": 8.5,
+      "target_price": 8,
+      "smoothed_price": 8,
+      "final_price": 8,
+      "price_change": -0.5,
+      "matches_played": 10,
+      "season_total_points": 397,
+      "season_avg_points": 39.7,
+      "recent_avg_points": 45.67,
+      "last_match_points": 25,
+      "score_basis": 43.68,
+      "reliability_factor": 1,
+      "adjusted_score": 43.68,
+      "percentile": 81.64,
+      "rank": 48,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 48"
+      ],
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
       "player_id": "gt_manav-suthar",
@@ -1837,51 +1847,82 @@
       "smoothed_price": 7.5,
       "final_price": 7.5,
       "price_change": 0,
-      "matches_played": 2,
-      "season_total_points": 60,
-      "season_avg_points": 30,
-      "recent_avg_points": 30,
-      "last_match_points": 27,
-      "score_basis": 30,
+      "matches_played": 3,
+      "season_total_points": 68,
+      "season_avg_points": 22.67,
+      "recent_avg_points": 22.67,
+      "last_match_points": 8,
+      "score_basis": 22.67,
       "reliability_factor": 1,
-      "adjusted_score": 30,
-      "percentile": 68.95,
-      "rank": 81,
-      "missed_fixture_streak": 1,
+      "adjusted_score": 22.67,
+      "percentile": 57.23,
+      "rank": 111,
+      "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-26T10:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
-      "player_id": "gt_prasidh-krishna",
-      "name": "Prasidh Krishna",
+      "player_id": "gt_washington-sundar",
+      "name": "Washington Sundar",
       "team": "GT",
-      "role": "bowler",
+      "role": "all_rounder",
       "is_uncapped": false,
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
+      "target_price": 7.5,
+      "smoothed_price": 7.5,
+      "final_price": 7.5,
+      "price_change": 0.5,
+      "matches_played": 10,
+      "season_total_points": 342,
+      "season_avg_points": 34.2,
+      "recent_avg_points": 26,
+      "last_match_points": 63,
+      "score_basis": 28.73,
+      "reliability_factor": 1,
+      "adjusted_score": 28.73,
+      "percentile": 67.58,
+      "rank": 84,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 84"
+      ],
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
+    },
+    {
+      "player_id": "gt_nishant-sindhu",
+      "name": "Nishant Sindhu",
+      "team": "GT",
+      "role": "all_rounder",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 5,
+      "initial_price": 5,
       "target_price": 7,
       "smoothed_price": 7,
       "final_price": 7,
-      "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 336,
-      "season_avg_points": 48,
-      "recent_avg_points": 13.33,
-      "last_match_points": -5,
-      "score_basis": 24.89,
-      "reliability_factor": 1,
-      "adjusted_score": 24.89,
-      "percentile": 62.11,
-      "rank": 98,
-      "missed_fixture_streak": 2,
+      "price_change": 2,
+      "matches_played": 1,
+      "season_total_points": 27,
+      "season_avg_points": 27,
+      "recent_avg_points": 27,
+      "last_match_points": 27,
+      "score_basis": 27,
+      "reliability_factor": 0.5,
+      "adjusted_score": 13.5,
+      "percentile": 42.19,
+      "rank": 149,
+      "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 0.5-credit missed-fixture penalty after 2 consecutive misses"
+        "Recovered real match history from a previously blank price; used the corrected target price immediately",
+        "Target price assigned from rank bucket at rank 149"
       ],
-      "last_match_played_at_utc": "2026-04-24T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
       "player_id": "gt_rahul-tewatia",
@@ -1896,110 +1937,52 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 102,
-      "season_avg_points": 14.57,
-      "recent_avg_points": 15.67,
-      "last_match_points": 36,
-      "score_basis": 15.3,
+      "matches_played": 8,
+      "season_total_points": 104,
+      "season_avg_points": 13,
+      "recent_avg_points": 14,
+      "last_match_points": 2,
+      "score_basis": 13.67,
       "reliability_factor": 1,
-      "adjusted_score": 15.3,
-      "percentile": 45.31,
-      "rank": 141,
+      "adjusted_score": 13.67,
+      "percentile": 42.58,
+      "rank": 148,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-30T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
-      "player_id": "gt_washington-sundar",
-      "name": "Washington Sundar",
+      "player_id": "gt_prasidh-krishna",
+      "name": "Prasidh Krishna",
       "team": "GT",
-      "role": "all_rounder",
+      "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
       "old_price": 7,
       "initial_price": 7,
-      "target_price": 7,
-      "smoothed_price": 7,
-      "final_price": 7,
-      "price_change": 0,
-      "matches_played": 9,
-      "season_total_points": 279,
-      "season_avg_points": 31,
-      "recent_avg_points": 16.67,
-      "last_match_points": 14,
-      "score_basis": 21.45,
-      "reliability_factor": 1,
-      "adjusted_score": 21.45,
-      "percentile": 55.86,
-      "rank": 114,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-30T14:00:00"
-    },
-    {
-      "player_id": "gt_ashok-sharma",
-      "name": "Ashok Sharma",
-      "team": "GT",
-      "role": "bowler",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 6.5,
-      "initial_price": 6.5,
       "target_price": 6.5,
       "smoothed_price": 6.5,
       "final_price": 6.5,
-      "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 139,
-      "season_avg_points": 23.17,
-      "recent_avg_points": 30.33,
-      "last_match_points": -4,
-      "score_basis": 27.94,
+      "price_change": -0.5,
+      "matches_played": 7,
+      "season_total_points": 336,
+      "season_avg_points": 48,
+      "recent_avg_points": 13.33,
+      "last_match_points": -5,
+      "score_basis": 24.89,
       "reliability_factor": 1,
-      "adjusted_score": 27.94,
-      "percentile": 67.19,
-      "rank": 85,
+      "adjusted_score": 24.89,
+      "percentile": 60.94,
+      "rank": 101,
       "missed_fixture_streak": 3,
       "calculation_notes": [
         "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 101",
         "Applied 1-credit missed-fixture penalty after 3 consecutive misses"
       ],
-      "last_match_played_at_utc": "2026-04-20T14:00:00"
-    },
-    {
-      "player_id": "gt_glenn-phillips",
-      "name": "Glenn Phillips",
-      "team": "GT",
-      "role": "wicket_keeper",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 6.5,
-      "initial_price": 6.5,
-      "target_price": 6.5,
-      "smoothed_price": 6.5,
-      "final_price": 6.5,
-      "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 141,
-      "season_avg_points": 23.5,
-      "recent_avg_points": 22.33,
-      "last_match_points": 14,
-      "score_basis": 22.72,
-      "reliability_factor": 1,
-      "adjusted_score": 22.72,
-      "percentile": 58.98,
-      "rank": 106,
-      "missed_fixture_streak": 3,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Applied 1-credit missed-fixture penalty after 3 consecutive misses"
-      ],
-      "last_match_played_at_utc": "2026-04-20T14:00:00"
+      "last_match_played_at_utc": "2026-04-24T14:00:00"
     },
     {
       "player_id": "gt_shahrukh-khan",
@@ -2022,13 +2005,75 @@
       "score_basis": 8.72,
       "reliability_factor": 1,
       "adjusted_score": 8.72,
-      "percentile": 39.45,
-      "rank": 156,
-      "missed_fixture_streak": 0,
+      "percentile": 39.06,
+      "rank": 157,
+      "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-04-30T14:00:00"
+    },
+    {
+      "player_id": "gt_ashok-sharma",
+      "name": "Ashok Sharma",
+      "team": "GT",
+      "role": "bowler",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 6.5,
+      "initial_price": 6.5,
+      "target_price": 6,
+      "smoothed_price": 6,
+      "final_price": 6,
+      "price_change": -0.5,
+      "matches_played": 6,
+      "season_total_points": 139,
+      "season_avg_points": 23.17,
+      "recent_avg_points": 30.33,
+      "last_match_points": -4,
+      "score_basis": 27.94,
+      "reliability_factor": 1,
+      "adjusted_score": 27.94,
+      "percentile": 66.41,
+      "rank": 87,
+      "missed_fixture_streak": 4,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 87",
+        "Applied 1.5-credit missed-fixture penalty after 4 consecutive misses"
+      ],
+      "last_match_played_at_utc": "2026-04-20T14:00:00"
+    },
+    {
+      "player_id": "gt_glenn-phillips",
+      "name": "Glenn Phillips",
+      "team": "GT",
+      "role": "wicket_keeper",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 6.5,
+      "initial_price": 6.5,
+      "target_price": 6,
+      "smoothed_price": 6,
+      "final_price": 6,
+      "price_change": -0.5,
+      "matches_played": 6,
+      "season_total_points": 141,
+      "season_avg_points": 23.5,
+      "recent_avg_points": 22.33,
+      "last_match_points": 14,
+      "score_basis": 22.72,
+      "reliability_factor": 1,
+      "adjusted_score": 22.72,
+      "percentile": 57.81,
+      "rank": 109,
+      "missed_fixture_streak": 4,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 109",
+        "Applied 1.5-credit missed-fixture penalty after 4 consecutive misses"
+      ],
+      "last_match_played_at_utc": "2026-04-20T14:00:00"
     },
     {
       "player_id": "gt_kumar-kushagra",
@@ -2051,12 +2096,12 @@
       "score_basis": 29,
       "reliability_factor": 0.5,
       "adjusted_score": 14.5,
-      "percentile": 44.14,
-      "rank": 144,
-      "missed_fixture_streak": 7,
+      "percentile": 43.75,
+      "rank": 145,
+      "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 7 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 8 consecutive misses"
       ],
       "last_match_played_at_utc": "2026-04-04T00:00:00"
     },
@@ -2081,12 +2126,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 183,
-      "missed_fixture_streak": 9,
+      "percentile": 17.97,
+      "rank": 184,
+      "missed_fixture_streak": 10,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 9 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 10 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -2111,12 +2156,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 184,
-      "missed_fixture_streak": 9,
+      "percentile": 17.97,
+      "rank": 185,
+      "missed_fixture_streak": 10,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 9 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 10 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -2141,12 +2186,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 185,
-      "missed_fixture_streak": 9,
+      "percentile": 17.97,
+      "rank": 186,
+      "missed_fixture_streak": 10,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 9 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 10 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -2171,12 +2216,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 186,
-      "missed_fixture_streak": 9,
+      "percentile": 17.97,
+      "rank": 187,
+      "missed_fixture_streak": 10,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 9 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 10 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -2201,12 +2246,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 187,
-      "missed_fixture_streak": 9,
+      "percentile": 17.97,
+      "rank": 188,
+      "missed_fixture_streak": 10,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 9 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 10 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -2231,12 +2276,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 188,
-      "missed_fixture_streak": 9,
+      "percentile": 17.97,
+      "rank": 189,
+      "missed_fixture_streak": 10,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 9 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 10 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -2261,42 +2306,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
-      "rank": 189,
-      "missed_fixture_streak": 9,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 9 consecutive misses"
-      ],
-      "last_match_played_at_utc": null
-    },
-    {
-      "player_id": "gt_nishant-sindhu",
-      "name": "Nishant Sindhu",
-      "team": "GT",
-      "role": "all_rounder",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 5,
-      "initial_price": 5,
-      "target_price": 5,
-      "smoothed_price": 5,
-      "final_price": 5,
-      "price_change": 0,
-      "matches_played": 0,
-      "season_total_points": 0,
-      "season_avg_points": 0,
-      "recent_avg_points": 0,
-      "last_match_points": 0,
-      "score_basis": 0,
-      "reliability_factor": 0,
-      "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 190,
-      "missed_fixture_streak": 9,
+      "missed_fixture_streak": 10,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 9 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 10 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -2321,12 +2336,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 191,
-      "missed_fixture_streak": 9,
+      "missed_fixture_streak": 10,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 9 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 10 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -2351,12 +2366,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 192,
-      "missed_fixture_streak": 9,
+      "missed_fixture_streak": 10,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 9 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 10 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -2381,8 +2396,8 @@
       "score_basis": 73.54,
       "reliability_factor": 1,
       "adjusted_score": 73.54,
-      "percentile": 96.48,
-      "rank": 10,
+      "percentile": 96.88,
+      "rank": 9,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -2410,8 +2425,8 @@
       "score_basis": 65.03,
       "reliability_factor": 1,
       "adjusted_score": 65.03,
-      "percentile": 93.75,
-      "rank": 17,
+      "percentile": 94.14,
+      "rank": 16,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -2439,8 +2454,8 @@
       "score_basis": 48.93,
       "reliability_factor": 1,
       "adjusted_score": 48.93,
-      "percentile": 84.77,
-      "rank": 40,
+      "percentile": 85.16,
+      "rank": 39,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -2468,8 +2483,8 @@
       "score_basis": 50.24,
       "reliability_factor": 1,
       "adjusted_score": 50.24,
-      "percentile": 85.16,
-      "rank": 39,
+      "percentile": 85.55,
+      "rank": 38,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -2526,8 +2541,8 @@
       "score_basis": 38.67,
       "reliability_factor": 1,
       "adjusted_score": 38.67,
-      "percentile": 78.91,
-      "rank": 55,
+      "percentile": 78.52,
+      "rank": 56,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -2584,8 +2599,8 @@
       "score_basis": 26.81,
       "reliability_factor": 1,
       "adjusted_score": 26.81,
-      "percentile": 65.63,
-      "rank": 89,
+      "percentile": 64.84,
+      "rank": 91,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -2613,8 +2628,8 @@
       "score_basis": 61,
       "reliability_factor": 1,
       "adjusted_score": 61,
-      "percentile": 90.82,
-      "rank": 24,
+      "percentile": 91.6,
+      "rank": 22,
       "missed_fixture_streak": 6,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -2643,8 +2658,8 @@
       "score_basis": 30.26,
       "reliability_factor": 1,
       "adjusted_score": 30.26,
-      "percentile": 69.53,
-      "rank": 79,
+      "percentile": 69.14,
+      "rank": 80,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -2672,8 +2687,8 @@
       "score_basis": 21,
       "reliability_factor": 1,
       "adjusted_score": 21,
-      "percentile": 54.49,
-      "rank": 118,
+      "percentile": 54.1,
+      "rank": 119,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -2701,8 +2716,8 @@
       "score_basis": 19.16,
       "reliability_factor": 1,
       "adjusted_score": 19.16,
-      "percentile": 52.73,
-      "rank": 122,
+      "percentile": 51.95,
+      "rank": 124,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -2730,8 +2745,8 @@
       "score_basis": 20.06,
       "reliability_factor": 1,
       "adjusted_score": 20.06,
-      "percentile": 53.52,
-      "rank": 120,
+      "percentile": 52.73,
+      "rank": 122,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -2759,8 +2774,8 @@
       "score_basis": 14.33,
       "reliability_factor": 1,
       "adjusted_score": 14.33,
-      "percentile": 43.75,
-      "rank": 145,
+      "percentile": 43.36,
+      "rank": 146,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -2788,7 +2803,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 193,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -2818,8 +2833,8 @@
       "score_basis": 8,
       "reliability_factor": 0.5,
       "adjusted_score": 4,
-      "percentile": 36.52,
-      "rank": 163,
+      "percentile": 36.13,
+      "rank": 164,
       "missed_fixture_streak": 7,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -2848,7 +2863,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 194,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -2908,7 +2923,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 195,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -2938,7 +2953,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 196,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -2968,7 +2983,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 197,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -2998,7 +3013,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 198,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3028,7 +3043,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 199,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3058,7 +3073,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 200,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3088,7 +3103,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 201,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3118,8 +3133,8 @@
       "score_basis": 87.33,
       "reliability_factor": 1,
       "adjusted_score": 87.33,
-      "percentile": 99.61,
-      "rank": 2,
+      "percentile": 99.22,
+      "rank": 3,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -3177,8 +3192,8 @@
       "score_basis": 37.28,
       "reliability_factor": 1,
       "adjusted_score": 37.28,
-      "percentile": 76.56,
-      "rank": 61,
+      "percentile": 76.17,
+      "rank": 62,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -3293,37 +3308,8 @@
       "score_basis": 26.5,
       "reliability_factor": 1,
       "adjusted_score": 26.5,
-      "percentile": 65.23,
-      "rank": 90,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-26T14:00:00"
-    },
-    {
-      "player_id": "lsg_george-linde",
-      "name": "George Linde",
-      "team": "LSG",
-      "role": "all_rounder",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
-      "target_price": 7.5,
-      "smoothed_price": 7.5,
-      "final_price": 7.5,
-      "price_change": 0,
-      "matches_played": 3,
-      "season_total_points": 67,
-      "season_avg_points": 22.33,
-      "recent_avg_points": 22.33,
-      "last_match_points": 35,
-      "score_basis": 22.33,
-      "reliability_factor": 1,
-      "adjusted_score": 22.33,
-      "percentile": 57.03,
-      "rank": 111,
+      "percentile": 64.45,
+      "rank": 92,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -3351,8 +3337,8 @@
       "score_basis": 37.67,
       "reliability_factor": 1,
       "adjusted_score": 37.67,
-      "percentile": 77.73,
-      "rank": 58,
+      "percentile": 77.34,
+      "rank": 59,
       "missed_fixture_streak": 2,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -3381,14 +3367,44 @@
       "score_basis": 22.65,
       "reliability_factor": 1,
       "adjusted_score": 22.65,
-      "percentile": 58.2,
-      "rank": 108,
+      "percentile": 56.64,
+      "rank": 112,
       "missed_fixture_streak": 2,
       "calculation_notes": [
         "Used old_price for smoothing",
         "Applied 0.5-credit missed-fixture penalty after 2 consecutive misses"
       ],
       "last_match_played_at_utc": "2026-04-19T14:00:00"
+    },
+    {
+      "player_id": "lsg_george-linde",
+      "name": "George Linde",
+      "team": "LSG",
+      "role": "all_rounder",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 7.5,
+      "initial_price": 7.5,
+      "target_price": 7,
+      "smoothed_price": 7,
+      "final_price": 7,
+      "price_change": -0.5,
+      "matches_played": 3,
+      "season_total_points": 67,
+      "season_avg_points": 22.33,
+      "recent_avg_points": 22.33,
+      "last_match_points": 35,
+      "score_basis": 22.33,
+      "reliability_factor": 1,
+      "adjusted_score": 22.33,
+      "percentile": 55.47,
+      "rank": 115,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 115"
+      ],
+      "last_match_played_at_utc": "2026-04-26T14:00:00"
     },
     {
       "player_id": "lsg_himmat-singh",
@@ -3411,8 +3427,8 @@
       "score_basis": 15.64,
       "reliability_factor": 1,
       "adjusted_score": 15.64,
-      "percentile": 45.7,
-      "rank": 140,
+      "percentile": 45.31,
+      "rank": 141,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -3440,8 +3456,8 @@
       "score_basis": 18.71,
       "reliability_factor": 1,
       "adjusted_score": 18.71,
-      "percentile": 51.95,
-      "rank": 124,
+      "percentile": 51.56,
+      "rank": 125,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -3469,8 +3485,8 @@
       "score_basis": 15.68,
       "reliability_factor": 1,
       "adjusted_score": 15.68,
-      "percentile": 46.09,
-      "rank": 139,
+      "percentile": 45.7,
+      "rank": 140,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -3498,8 +3514,8 @@
       "score_basis": 8.33,
       "reliability_factor": 1,
       "adjusted_score": 8.33,
-      "percentile": 39.06,
-      "rank": 157,
+      "percentile": 38.67,
+      "rank": 158,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -3527,8 +3543,8 @@
       "score_basis": 1,
       "reliability_factor": 0.5,
       "adjusted_score": 0.5,
-      "percentile": 33.98,
-      "rank": 170,
+      "percentile": 33.59,
+      "rank": 171,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -3556,8 +3572,8 @@
       "score_basis": 8.2,
       "reliability_factor": 1,
       "adjusted_score": 8.2,
-      "percentile": 38.67,
-      "rank": 158,
+      "percentile": 38.28,
+      "rank": 159,
       "missed_fixture_streak": 3,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -3586,7 +3602,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 202,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3616,7 +3632,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 203,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3676,7 +3692,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 204,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3706,7 +3722,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 205,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3736,7 +3752,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 206,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3766,7 +3782,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 207,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3796,7 +3812,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 208,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3826,7 +3842,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 209,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3856,7 +3872,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 210,
       "missed_fixture_streak": 8,
       "calculation_notes": [
@@ -3886,8 +3902,8 @@
       "score_basis": 77.78,
       "reliability_factor": 1,
       "adjusted_score": 77.78,
-      "percentile": 98.44,
-      "rank": 5,
+      "percentile": 98.83,
+      "rank": 4,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -3915,8 +3931,8 @@
       "score_basis": 61,
       "reliability_factor": 1,
       "adjusted_score": 61,
-      "percentile": 90.82,
-      "rank": 25,
+      "percentile": 91.6,
+      "rank": 23,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -3944,8 +3960,8 @@
       "score_basis": 75,
       "reliability_factor": 1,
       "adjusted_score": 75,
-      "percentile": 97.66,
-      "rank": 7,
+      "percentile": 98.05,
+      "rank": 6,
       "missed_fixture_streak": 2,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -4032,8 +4048,8 @@
       "score_basis": 37.41,
       "reliability_factor": 1,
       "adjusted_score": 37.41,
-      "percentile": 76.95,
-      "rank": 60,
+      "percentile": 76.56,
+      "rank": 61,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -4061,8 +4077,8 @@
       "score_basis": 38,
       "reliability_factor": 1,
       "adjusted_score": 38,
-      "percentile": 78.13,
-      "rank": 57,
+      "percentile": 77.73,
+      "rank": 58,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -4090,8 +4106,8 @@
       "score_basis": 25,
       "reliability_factor": 1,
       "adjusted_score": 25,
-      "percentile": 62.7,
-      "rank": 96,
+      "percentile": 61.52,
+      "rank": 99,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -4119,8 +4135,8 @@
       "score_basis": 39.22,
       "reliability_factor": 1,
       "adjusted_score": 39.22,
-      "percentile": 79.3,
-      "rank": 54,
+      "percentile": 78.91,
+      "rank": 55,
       "missed_fixture_streak": 2,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -4149,8 +4165,8 @@
       "score_basis": 26.37,
       "reliability_factor": 1,
       "adjusted_score": 26.37,
-      "percentile": 64.84,
-      "rank": 91,
+      "percentile": 64.06,
+      "rank": 93,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -4187,35 +4203,6 @@
       "last_match_played_at_utc": "2026-05-02T14:00:00"
     },
     {
-      "player_id": "mi_trent-boult",
-      "name": "Trent Boult",
-      "team": "MI",
-      "role": "bowler",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
-      "target_price": 7.5,
-      "smoothed_price": 7.5,
-      "final_price": 7.5,
-      "price_change": 0,
-      "matches_played": 5,
-      "season_total_points": 78,
-      "season_avg_points": 15.6,
-      "recent_avg_points": 26,
-      "last_match_points": 14,
-      "score_basis": 22.53,
-      "reliability_factor": 1,
-      "adjusted_score": 22.53,
-      "percentile": 57.81,
-      "rank": 109,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-05-02T14:00:00"
-    },
-    {
       "player_id": "mi_raghu-sharma",
       "name": "Raghu Sharma",
       "team": "MI",
@@ -4236,11 +4223,41 @@
       "score_basis": 21,
       "reliability_factor": 0.5,
       "adjusted_score": 10.5,
-      "percentile": 40.63,
-      "rank": 153,
+      "percentile": 39.84,
+      "rank": 155,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
+      ],
+      "last_match_played_at_utc": "2026-05-02T14:00:00"
+    },
+    {
+      "player_id": "mi_trent-boult",
+      "name": "Trent Boult",
+      "team": "MI",
+      "role": "bowler",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 7.5,
+      "initial_price": 7.5,
+      "target_price": 7,
+      "smoothed_price": 7,
+      "final_price": 7,
+      "price_change": -0.5,
+      "matches_played": 5,
+      "season_total_points": 78,
+      "season_avg_points": 15.6,
+      "recent_avg_points": 26,
+      "last_match_points": 14,
+      "score_basis": 22.53,
+      "reliability_factor": 1,
+      "adjusted_score": 22.53,
+      "percentile": 56.25,
+      "rank": 113,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 113"
       ],
       "last_match_played_at_utc": "2026-05-02T14:00:00"
     },
@@ -4265,8 +4282,8 @@
       "score_basis": 6.33,
       "reliability_factor": 1,
       "adjusted_score": 6.33,
-      "percentile": 37.5,
-      "rank": 161,
+      "percentile": 37.11,
+      "rank": 162,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -4294,8 +4311,8 @@
       "score_basis": 3.5,
       "reliability_factor": 1,
       "adjusted_score": 3.5,
-      "percentile": 35.55,
-      "rank": 166,
+      "percentile": 35.16,
+      "rank": 167,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -4383,8 +4400,8 @@
       "score_basis": 5.33,
       "reliability_factor": 1,
       "adjusted_score": 5.33,
-      "percentile": 37.11,
-      "rank": 162,
+      "percentile": 36.72,
+      "rank": 163,
       "missed_fixture_streak": 2,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -4413,8 +4430,8 @@
       "score_basis": 33,
       "reliability_factor": 0.5,
       "adjusted_score": 16.5,
-      "percentile": 47.27,
-      "rank": 136,
+      "percentile": 46.88,
+      "rank": 137,
       "missed_fixture_streak": 7,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -4443,8 +4460,8 @@
       "score_basis": 11,
       "reliability_factor": 1,
       "adjusted_score": 11,
-      "percentile": 41.41,
-      "rank": 151,
+      "percentile": 40.63,
+      "rank": 153,
       "missed_fixture_streak": 4,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -4473,8 +4490,8 @@
       "score_basis": 8,
       "reliability_factor": 0.5,
       "adjusted_score": 4,
-      "percentile": 36.52,
-      "rank": 164,
+      "percentile": 36.13,
+      "rank": 165,
       "missed_fixture_streak": 3,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -4503,8 +4520,8 @@
       "score_basis": 1,
       "reliability_factor": 1,
       "adjusted_score": 1,
-      "percentile": 34.38,
-      "rank": 169,
+      "percentile": 33.98,
+      "rank": 170,
       "missed_fixture_streak": 5,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -4533,7 +4550,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 211,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -4593,7 +4610,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 212,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -4623,7 +4640,7 @@
       "score_basis": 0,
       "reliability_factor": 0.5,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 213,
       "missed_fixture_streak": 4,
       "calculation_notes": [
@@ -4653,7 +4670,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 214,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -4661,64 +4678,6 @@
         "Applied 1.5-credit missed-fixture penalty after 9 consecutive misses"
       ],
       "last_match_played_at_utc": null
-    },
-    {
-      "player_id": "pbks_priyansh-arya",
-      "name": "Priyansh Arya",
-      "team": "PBKS",
-      "role": "batter",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 9.5,
-      "initial_price": 9.5,
-      "target_price": 9.5,
-      "smoothed_price": 9.5,
-      "final_price": 9.5,
-      "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 424,
-      "season_avg_points": 60.57,
-      "recent_avg_points": 80,
-      "last_match_points": 44,
-      "score_basis": 73.52,
-      "reliability_factor": 1,
-      "adjusted_score": 73.52,
-      "percentile": 96.09,
-      "rank": 11,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-28T14:00:00"
-    },
-    {
-      "player_id": "pbks_cooper-connolly",
-      "name": "Cooper Connolly",
-      "team": "PBKS",
-      "role": "all_rounder",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
-      "target_price": 9,
-      "smoothed_price": 9,
-      "final_price": 9,
-      "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 402,
-      "season_avg_points": 57.43,
-      "recent_avg_points": 68.67,
-      "last_match_points": 54,
-      "score_basis": 64.92,
-      "reliability_factor": 1,
-      "adjusted_score": 64.92,
-      "percentile": 93.36,
-      "rank": 18,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-28T14:00:00"
     },
     {
       "player_id": "pbks_prabhsimran-singh",
@@ -4729,25 +4688,26 @@
       "pricing_eligible": true,
       "old_price": 9,
       "initial_price": 9,
-      "target_price": 9,
-      "smoothed_price": 9,
-      "final_price": 9,
-      "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 523,
-      "season_avg_points": 65.38,
-      "recent_avg_points": 67.67,
-      "last_match_points": 79,
-      "score_basis": 66.91,
+      "target_price": 9.5,
+      "smoothed_price": 9.5,
+      "final_price": 9.5,
+      "price_change": 0.5,
+      "matches_played": 9,
+      "season_total_points": 540,
+      "season_avg_points": 60,
+      "recent_avg_points": 72.33,
+      "last_match_points": 17,
+      "score_basis": 68.22,
       "reliability_factor": 1,
-      "adjusted_score": 66.91,
-      "percentile": 94.92,
-      "rank": 14,
+      "adjusted_score": 68.22,
+      "percentile": 95.7,
+      "rank": 12,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 12"
       ],
-      "last_match_played_at_utc": "2026-04-28T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
       "player_id": "pbks_shreyas-iyer",
@@ -4762,21 +4722,21 @@
       "smoothed_price": 9,
       "final_price": 9,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 480,
-      "season_avg_points": 68.57,
-      "recent_avg_points": 56,
-      "last_match_points": 41,
-      "score_basis": 60.19,
+      "matches_played": 8,
+      "season_total_points": 505,
+      "season_avg_points": 63.13,
+      "recent_avg_points": 60,
+      "last_match_points": 25,
+      "score_basis": 61.04,
       "reliability_factor": 1,
-      "adjusted_score": 60.19,
-      "percentile": 90.23,
-      "rank": 26,
+      "adjusted_score": 61.04,
+      "percentile": 92.19,
+      "rank": 21,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-28T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
       "player_id": "pbks_marcus-stoinis",
@@ -4787,54 +4747,118 @@
       "pricing_eligible": true,
       "old_price": 8,
       "initial_price": 8,
-      "target_price": 8,
-      "smoothed_price": 8,
-      "final_price": 8,
-      "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 165,
-      "season_avg_points": 27.5,
-      "recent_avg_points": 49,
-      "last_match_points": 96,
-      "score_basis": 41.83,
+      "target_price": 8.5,
+      "smoothed_price": 8.5,
+      "final_price": 8.5,
+      "price_change": 0.5,
+      "matches_played": 7,
+      "season_total_points": 237,
+      "season_avg_points": 33.86,
+      "recent_avg_points": 56,
+      "last_match_points": 72,
+      "score_basis": 48.62,
       "reliability_factor": 1,
-      "adjusted_score": 41.83,
+      "adjusted_score": 48.62,
+      "percentile": 84.77,
+      "rank": 40,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 40"
+      ],
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
+    },
+    {
+      "player_id": "pbks_priyansh-arya",
+      "name": "Priyansh Arya",
+      "team": "PBKS",
+      "role": "batter",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 9.5,
+      "initial_price": 9.5,
+      "target_price": 8,
+      "smoothed_price": 8.5,
+      "final_price": 8.5,
+      "price_change": -1,
+      "matches_played": 8,
+      "season_total_points": 426,
+      "season_avg_points": 53.25,
+      "recent_avg_points": 36.33,
+      "last_match_points": 2,
+      "score_basis": 41.97,
+      "reliability_factor": 1,
+      "adjusted_score": 41.97,
       "percentile": 80.47,
       "rank": 51,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 51",
+        "Applied smoothing against the target price"
       ],
-      "last_match_played_at_utc": "2026-04-28T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
-      "player_id": "pbks_yuzvendra-chahal",
-      "name": "Yuzvendra Chahal",
+      "player_id": "pbks_cooper-connolly",
+      "name": "Cooper Connolly",
       "team": "PBKS",
-      "role": "bowler",
+      "role": "all_rounder",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 8,
-      "initial_price": 8,
+      "old_price": 9,
+      "initial_price": 9,
       "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 192,
-      "season_avg_points": 27.43,
-      "recent_avg_points": 35.67,
-      "last_match_points": 87,
-      "score_basis": 32.92,
+      "price_change": -1,
+      "matches_played": 8,
+      "season_total_points": 413,
+      "season_avg_points": 51.63,
+      "recent_avg_points": 30,
+      "last_match_points": 11,
+      "score_basis": 37.21,
       "reliability_factor": 1,
-      "adjusted_score": 32.92,
-      "percentile": 73.44,
-      "rank": 69,
+      "adjusted_score": 37.21,
+      "percentile": 75.78,
+      "rank": 63,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 63"
       ],
-      "last_match_played_at_utc": "2026-04-28T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
+    },
+    {
+      "player_id": "pbks_suryansh-shedge",
+      "name": "Suryansh Shedge",
+      "team": "PBKS",
+      "role": "all_rounder",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 7,
+      "initial_price": 7,
+      "target_price": 8.5,
+      "smoothed_price": 8,
+      "final_price": 8,
+      "price_change": 1,
+      "matches_played": 2,
+      "season_total_points": 107,
+      "season_avg_points": 53.5,
+      "recent_avg_points": 53.5,
+      "last_match_points": 88,
+      "score_basis": 53.5,
+      "reliability_factor": 1,
+      "adjusted_score": 53.5,
+      "percentile": 86.72,
+      "rank": 35,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 35",
+        "Applied smoothing against the target price"
+      ],
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
       "player_id": "pbks_arshdeep-singh",
@@ -4849,50 +4873,81 @@
       "smoothed_price": 7.5,
       "final_price": 7.5,
       "price_change": 0,
-      "matches_played": 8,
-      "season_total_points": 214,
-      "season_avg_points": 26.75,
-      "recent_avg_points": 20,
-      "last_match_points": 20,
-      "score_basis": 22.25,
+      "matches_played": 9,
+      "season_total_points": 270,
+      "season_avg_points": 30,
+      "recent_avg_points": 32,
+      "last_match_points": 56,
+      "score_basis": 31.33,
       "reliability_factor": 1,
-      "adjusted_score": 22.25,
-      "percentile": 56.64,
-      "rank": 112,
+      "adjusted_score": 31.33,
+      "percentile": 70.7,
+      "rank": 76,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-28T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
-      "player_id": "pbks_shashank-singh",
-      "name": "Shashank Singh",
+      "player_id": "pbks_vyshak-vijaykumar",
+      "name": "Vyshak Vijaykumar",
       "team": "PBKS",
-      "role": "all_rounder",
+      "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
+      "old_price": 7,
+      "initial_price": 7,
       "target_price": 7.5,
       "smoothed_price": 7.5,
       "final_price": 7.5,
-      "price_change": 0,
-      "matches_played": 6,
-      "season_total_points": 180,
+      "price_change": 0.5,
+      "matches_played": 7,
+      "season_total_points": 210,
       "season_avg_points": 30,
-      "recent_avg_points": 28.67,
-      "last_match_points": 31,
-      "score_basis": 29.11,
+      "recent_avg_points": 27.67,
+      "last_match_points": 61,
+      "score_basis": 28.45,
       "reliability_factor": 1,
-      "adjusted_score": 29.11,
-      "percentile": 68.36,
-      "rank": 82,
-      "missed_fixture_streak": 1,
+      "adjusted_score": 28.45,
+      "percentile": 67.19,
+      "rank": 85,
+      "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 85"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
+    },
+    {
+      "player_id": "pbks_yuzvendra-chahal",
+      "name": "Yuzvendra Chahal",
+      "team": "PBKS",
+      "role": "bowler",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 7.5,
+      "smoothed_price": 7.5,
+      "final_price": 7.5,
+      "price_change": -0.5,
+      "matches_played": 8,
+      "season_total_points": 192,
+      "season_avg_points": 24,
+      "recent_avg_points": 27.33,
+      "last_match_points": 0,
+      "score_basis": 26.22,
+      "reliability_factor": 1,
+      "adjusted_score": 26.22,
+      "percentile": 63.48,
+      "rank": 94,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 94"
+      ],
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
       "player_id": "pbks_marco-jansen",
@@ -4907,21 +4962,21 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 151,
-      "season_avg_points": 21.57,
-      "recent_avg_points": 16.33,
-      "last_match_points": 3,
-      "score_basis": 18.08,
+      "matches_played": 8,
+      "season_total_points": 207,
+      "season_avg_points": 25.88,
+      "recent_avg_points": 18,
+      "last_match_points": 56,
+      "score_basis": 20.63,
       "reliability_factor": 1,
-      "adjusted_score": 18.08,
-      "percentile": 50.78,
-      "rank": 127,
+      "adjusted_score": 20.63,
+      "percentile": 53.52,
+      "rank": 120,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-28T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
       "player_id": "pbks_nehal-wadhera",
@@ -4936,77 +4991,50 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 5,
-      "season_total_points": 98,
-      "season_avg_points": 19.6,
-      "recent_avg_points": 22.33,
-      "last_match_points": 35,
-      "score_basis": 21.42,
+      "matches_played": 6,
+      "season_total_points": 93,
+      "season_avg_points": 15.5,
+      "recent_avg_points": 15.33,
+      "last_match_points": -5,
+      "score_basis": 15.39,
       "reliability_factor": 1,
-      "adjusted_score": 21.42,
-      "percentile": 55.47,
-      "rank": 115,
-      "missed_fixture_streak": 1,
-      "calculation_notes": [
-        "Used old_price for smoothing"
-      ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
-    },
-    {
-      "player_id": "pbks_suryansh-shedge",
-      "name": "Suryansh Shedge",
-      "team": "PBKS",
-      "role": "all_rounder",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
-      "target_price": 7,
-      "smoothed_price": 7,
-      "final_price": 7,
-      "price_change": 0,
-      "matches_played": 1,
-      "season_total_points": 19,
-      "season_avg_points": 19,
-      "recent_avg_points": 19,
-      "last_match_points": 19,
-      "score_basis": 19,
-      "reliability_factor": 0.5,
-      "adjusted_score": 9.5,
-      "percentile": 39.84,
-      "rank": 155,
+      "adjusted_score": 15.39,
+      "percentile": 44.92,
+      "rank": 142,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-28T14:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
-      "player_id": "pbks_vyshak-vijaykumar",
-      "name": "Vyshak Vijaykumar",
+      "player_id": "pbks_shashank-singh",
+      "name": "Shashank Singh",
       "team": "PBKS",
-      "role": "bowler",
+      "role": "all_rounder",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
+      "old_price": 7.5,
+      "initial_price": 7.5,
       "target_price": 7,
       "smoothed_price": 7,
       "final_price": 7,
-      "price_change": 0,
+      "price_change": -0.5,
       "matches_played": 6,
-      "season_total_points": 149,
-      "season_avg_points": 24.83,
-      "recent_avg_points": 5.67,
-      "last_match_points": -5,
-      "score_basis": 12.06,
+      "season_total_points": 180,
+      "season_avg_points": 30,
+      "recent_avg_points": 28.67,
+      "last_match_points": 31,
+      "score_basis": 29.11,
       "reliability_factor": 1,
-      "adjusted_score": 12.06,
-      "percentile": 42.58,
-      "rank": 148,
-      "missed_fixture_streak": 1,
+      "adjusted_score": 29.11,
+      "percentile": 68.36,
+      "rank": 82,
+      "missed_fixture_streak": 2,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 82",
+        "Applied 0.5-credit missed-fixture penalty after 2 consecutive misses"
       ],
       "last_match_played_at_utc": "2026-04-25T10:00:00"
     },
@@ -5023,21 +5051,21 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0,
-      "matches_played": 7,
-      "season_total_points": 174,
-      "season_avg_points": 24.86,
-      "recent_avg_points": 15.67,
-      "last_match_points": 20,
-      "score_basis": 18.73,
+      "matches_played": 8,
+      "season_total_points": 185,
+      "season_avg_points": 23.13,
+      "recent_avg_points": 14,
+      "last_match_points": 11,
+      "score_basis": 17.04,
       "reliability_factor": 1,
-      "adjusted_score": 18.73,
-      "percentile": 52.34,
-      "rank": 123,
-      "missed_fixture_streak": 1,
+      "adjusted_score": 17.04,
+      "percentile": 48.05,
+      "rank": 134,
+      "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
-      "last_match_played_at_utc": "2026-04-25T10:00:00"
+      "last_match_played_at_utc": "2026-05-03T14:00:00"
     },
     {
       "player_id": "pbks_harpreet-brar",
@@ -5060,9 +5088,9 @@
       "score_basis": 5,
       "reliability_factor": 0.5,
       "adjusted_score": 2.5,
-      "percentile": 35.16,
-      "rank": 167,
-      "missed_fixture_streak": 0,
+      "percentile": 34.77,
+      "rank": 168,
+      "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -5089,12 +5117,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 215,
-      "missed_fixture_streak": 7,
+      "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 7 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 8 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -5119,12 +5147,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 216,
-      "missed_fixture_streak": 7,
+      "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 7 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 8 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -5149,12 +5177,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 217,
-      "missed_fixture_streak": 7,
+      "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 7 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 8 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -5181,7 +5209,7 @@
       "adjusted_score": -2.5,
       "percentile": 0.78,
       "rank": 256,
-      "missed_fixture_streak": 0,
+      "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
       ],
@@ -5208,12 +5236,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 218,
-      "missed_fixture_streak": 7,
+      "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 7 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 8 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -5238,12 +5266,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 219,
-      "missed_fixture_streak": 7,
+      "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 7 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 8 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -5268,12 +5296,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 220,
-      "missed_fixture_streak": 7,
+      "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 7 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 8 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -5298,12 +5326,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 221,
-      "missed_fixture_streak": 7,
+      "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 7 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 8 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -5328,12 +5356,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 222,
-      "missed_fixture_streak": 7,
+      "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 7 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 8 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -5358,12 +5386,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 223,
-      "missed_fixture_streak": 7,
+      "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 7 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 8 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -5388,12 +5416,12 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 224,
-      "missed_fixture_streak": 7,
+      "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Applied 1.5-credit missed-fixture penalty after 7 consecutive misses"
+        "Applied 1.5-credit missed-fixture penalty after 8 consecutive misses"
       ],
       "last_match_played_at_utc": null
     },
@@ -5406,10 +5434,10 @@
       "pricing_eligible": true,
       "old_price": 9.5,
       "initial_price": 9.5,
-      "target_price": 9.5,
-      "smoothed_price": 9.5,
-      "final_price": 9.5,
-      "price_change": 0,
+      "target_price": 10,
+      "smoothed_price": 10,
+      "final_price": 10,
+      "price_change": 0.5,
       "matches_played": 9,
       "season_total_points": 564,
       "season_avg_points": 62.67,
@@ -5418,11 +5446,12 @@
       "score_basis": 76.44,
       "reliability_factor": 1,
       "adjusted_score": 76.44,
-      "percentile": 98.05,
-      "rank": 6,
+      "percentile": 98.44,
+      "rank": 5,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing"
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 5"
       ],
       "last_match_played_at_utc": "2026-04-30T14:00:00"
     },
@@ -5447,8 +5476,8 @@
       "score_basis": 72.26,
       "reliability_factor": 1,
       "adjusted_score": 72.26,
-      "percentile": 95.7,
-      "rank": 12,
+      "percentile": 96.48,
+      "rank": 10,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -5476,8 +5505,8 @@
       "score_basis": 65.29,
       "reliability_factor": 1,
       "adjusted_score": 65.29,
-      "percentile": 94.14,
-      "rank": 16,
+      "percentile": 94.53,
+      "rank": 15,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -5505,8 +5534,8 @@
       "score_basis": 56.17,
       "reliability_factor": 1,
       "adjusted_score": 56.17,
-      "percentile": 89.06,
-      "rank": 29,
+      "percentile": 89.45,
+      "rank": 28,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -5564,8 +5593,8 @@
       "score_basis": 26.22,
       "reliability_factor": 1,
       "adjusted_score": 26.22,
-      "percentile": 64.45,
-      "rank": 92,
+      "percentile": 63.48,
+      "rank": 95,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -5593,8 +5622,8 @@
       "score_basis": 26.89,
       "reliability_factor": 1,
       "adjusted_score": 26.89,
-      "percentile": 66.02,
-      "rank": 88,
+      "percentile": 65.23,
+      "rank": 90,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -5622,8 +5651,8 @@
       "score_basis": 28.15,
       "reliability_factor": 1,
       "adjusted_score": 28.15,
-      "percentile": 67.58,
-      "rank": 84,
+      "percentile": 66.8,
+      "rank": 86,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -5651,8 +5680,8 @@
       "score_basis": 27.3,
       "reliability_factor": 1,
       "adjusted_score": 27.3,
-      "percentile": 66.8,
-      "rank": 86,
+      "percentile": 66.02,
+      "rank": 88,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -5680,8 +5709,8 @@
       "score_basis": 24.78,
       "reliability_factor": 1,
       "adjusted_score": 24.78,
-      "percentile": 61.72,
-      "rank": 99,
+      "percentile": 60.55,
+      "rank": 102,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -5709,8 +5738,8 @@
       "score_basis": 25,
       "reliability_factor": 1,
       "adjusted_score": 25,
-      "percentile": 62.7,
-      "rank": 97,
+      "percentile": 61.52,
+      "rank": 100,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -5738,8 +5767,8 @@
       "score_basis": 18.39,
       "reliability_factor": 1,
       "adjusted_score": 18.39,
-      "percentile": 51.17,
-      "rank": 126,
+      "percentile": 50.78,
+      "rank": 127,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -5767,7 +5796,7 @@
       "score_basis": 56,
       "reliability_factor": 1,
       "adjusted_score": 56,
-      "percentile": 88.28,
+      "percentile": 88.48,
       "rank": 31,
       "missed_fixture_streak": 5,
       "calculation_notes": [
@@ -5855,8 +5884,8 @@
       "score_basis": 27,
       "reliability_factor": 1,
       "adjusted_score": 27,
-      "percentile": 66.41,
-      "rank": 87,
+      "percentile": 65.63,
+      "rank": 89,
       "missed_fixture_streak": 6,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -5885,7 +5914,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 225,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -5915,7 +5944,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 226,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -5945,7 +5974,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 227,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -5975,7 +6004,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 228,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -6005,7 +6034,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 229,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -6035,7 +6064,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 230,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -6065,7 +6094,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 231,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -6095,7 +6124,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 232,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -6125,7 +6154,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 233,
       "missed_fixture_streak": 9,
       "calculation_notes": [
@@ -6155,8 +6184,8 @@
       "score_basis": 74.79,
       "reliability_factor": 1,
       "adjusted_score": 74.79,
-      "percentile": 96.88,
-      "rank": 9,
+      "percentile": 97.27,
+      "rank": 8,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6184,8 +6213,8 @@
       "score_basis": 74.85,
       "reliability_factor": 1,
       "adjusted_score": 74.85,
-      "percentile": 97.27,
-      "rank": 8,
+      "percentile": 97.66,
+      "rank": 7,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6213,8 +6242,8 @@
       "score_basis": 51.95,
       "reliability_factor": 1,
       "adjusted_score": 51.95,
-      "percentile": 85.55,
-      "rank": 38,
+      "percentile": 85.94,
+      "rank": 37,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6242,8 +6271,8 @@
       "score_basis": 52.82,
       "reliability_factor": 1,
       "adjusted_score": 52.82,
-      "percentile": 85.94,
-      "rank": 37,
+      "percentile": 86.33,
+      "rank": 36,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6300,8 +6329,8 @@
       "score_basis": 37.5,
       "reliability_factor": 1,
       "adjusted_score": 37.5,
-      "percentile": 77.34,
-      "rank": 59,
+      "percentile": 76.95,
+      "rank": 60,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6329,8 +6358,8 @@
       "score_basis": 36.88,
       "reliability_factor": 1,
       "adjusted_score": 36.88,
-      "percentile": 76.17,
-      "rank": 62,
+      "percentile": 75.39,
+      "rank": 64,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6358,8 +6387,8 @@
       "score_basis": 25.97,
       "reliability_factor": 1,
       "adjusted_score": 25.97,
-      "percentile": 64.06,
-      "rank": 93,
+      "percentile": 62.89,
+      "rank": 96,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6387,8 +6416,8 @@
       "score_basis": 30.33,
       "reliability_factor": 1,
       "adjusted_score": 30.33,
-      "percentile": 69.92,
-      "rank": 78,
+      "percentile": 69.53,
+      "rank": 79,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6416,8 +6445,8 @@
       "score_basis": 30.4,
       "reliability_factor": 1,
       "adjusted_score": 30.4,
-      "percentile": 70.31,
-      "rank": 77,
+      "percentile": 69.92,
+      "rank": 78,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6474,8 +6503,8 @@
       "score_basis": 15.01,
       "reliability_factor": 1,
       "adjusted_score": 15.01,
-      "percentile": 44.92,
-      "rank": 142,
+      "percentile": 44.53,
+      "rank": 143,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6503,8 +6532,8 @@
       "score_basis": 19.33,
       "reliability_factor": 1,
       "adjusted_score": 19.33,
-      "percentile": 53.13,
-      "rank": 121,
+      "percentile": 52.34,
+      "rank": 123,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6532,8 +6561,8 @@
       "score_basis": 16.89,
       "reliability_factor": 1,
       "adjusted_score": 16.89,
-      "percentile": 47.66,
-      "rank": 135,
+      "percentile": 47.27,
+      "rank": 136,
       "missed_fixture_streak": 2,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -6562,8 +6591,8 @@
       "score_basis": 22.95,
       "reliability_factor": 1,
       "adjusted_score": 22.95,
-      "percentile": 59.77,
-      "rank": 104,
+      "percentile": 58.59,
+      "rank": 107,
       "missed_fixture_streak": 5,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -6592,7 +6621,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 234,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -6622,7 +6651,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 235,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -6652,7 +6681,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 236,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -6682,7 +6711,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 237,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -6712,7 +6741,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 238,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -6772,7 +6801,7 @@
       "score_basis": 0,
       "reliability_factor": 0.5,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 239,
       "missed_fixture_streak": 3,
       "calculation_notes": [
@@ -6802,7 +6831,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 240,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -6832,7 +6861,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 241,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -6862,7 +6891,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 242,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -6892,8 +6921,8 @@
       "score_basis": 63.02,
       "reliability_factor": 1,
       "adjusted_score": 63.02,
-      "percentile": 92.19,
-      "rank": 21,
+      "percentile": 93.36,
+      "rank": 18,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6921,8 +6950,8 @@
       "score_basis": 63.3,
       "reliability_factor": 1,
       "adjusted_score": 63.3,
-      "percentile": 92.58,
-      "rank": 20,
+      "percentile": 93.75,
+      "rank": 17,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6950,8 +6979,8 @@
       "score_basis": 62.9,
       "reliability_factor": 1,
       "adjusted_score": 62.9,
-      "percentile": 91.8,
-      "rank": 22,
+      "percentile": 92.97,
+      "rank": 19,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -6979,8 +7008,8 @@
       "score_basis": 54.18,
       "reliability_factor": 1,
       "adjusted_score": 54.18,
-      "percentile": 86.72,
-      "rank": 35,
+      "percentile": 87.5,
+      "rank": 33,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -7037,8 +7066,8 @@
       "score_basis": 34.79,
       "reliability_factor": 1,
       "adjusted_score": 34.79,
-      "percentile": 75.78,
-      "rank": 63,
+      "percentile": 75,
+      "rank": 65,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -7066,8 +7095,8 @@
       "score_basis": 33.4,
       "reliability_factor": 1,
       "adjusted_score": 33.4,
-      "percentile": 74.61,
-      "rank": 66,
+      "percentile": 74.22,
+      "rank": 67,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -7095,8 +7124,8 @@
       "score_basis": 40.7,
       "reliability_factor": 1,
       "adjusted_score": 40.7,
-      "percentile": 79.69,
-      "rank": 53,
+      "percentile": 79.3,
+      "rank": 54,
       "missed_fixture_streak": 1,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -7124,8 +7153,8 @@
       "score_basis": 33.44,
       "reliability_factor": 1,
       "adjusted_score": 33.44,
-      "percentile": 75,
-      "rank": 65,
+      "percentile": 74.61,
+      "rank": 66,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -7153,8 +7182,8 @@
       "score_basis": 24,
       "reliability_factor": 1,
       "adjusted_score": 24,
-      "percentile": 60.94,
-      "rank": 101,
+      "percentile": 59.77,
+      "rank": 104,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -7182,8 +7211,8 @@
       "score_basis": 10.63,
       "reliability_factor": 1,
       "adjusted_score": 10.63,
-      "percentile": 41.02,
-      "rank": 152,
+      "percentile": 40.23,
+      "rank": 154,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -7211,8 +7240,8 @@
       "score_basis": 21.33,
       "reliability_factor": 1,
       "adjusted_score": 21.33,
-      "percentile": 55.08,
-      "rank": 116,
+      "percentile": 54.69,
+      "rank": 117,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -7240,8 +7269,8 @@
       "score_basis": 11.63,
       "reliability_factor": 1,
       "adjusted_score": 11.63,
-      "percentile": 41.8,
-      "rank": 150,
+      "percentile": 41.02,
+      "rank": 152,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -7269,8 +7298,8 @@
       "score_basis": 3.75,
       "reliability_factor": 1,
       "adjusted_score": 3.75,
-      "percentile": 35.94,
-      "rank": 165,
+      "percentile": 35.55,
+      "rank": 166,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -7328,8 +7357,8 @@
       "score_basis": 13,
       "reliability_factor": 0.5,
       "adjusted_score": 6.5,
-      "percentile": 37.89,
-      "rank": 160,
+      "percentile": 37.5,
+      "rank": 161,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
@@ -7357,8 +7386,8 @@
       "score_basis": 23,
       "reliability_factor": 1,
       "adjusted_score": 23,
-      "percentile": 60.55,
-      "rank": 102,
+      "percentile": 59.38,
+      "rank": 105,
       "missed_fixture_streak": 8,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -7387,8 +7416,8 @@
       "score_basis": 41,
       "reliability_factor": 0.5,
       "adjusted_score": 20.5,
-      "percentile": 53.91,
-      "rank": 119,
+      "percentile": 53.13,
+      "rank": 121,
       "missed_fixture_streak": 3,
       "calculation_notes": [
         "Used old_price for smoothing",
@@ -7447,7 +7476,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 243,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -7477,7 +7506,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 244,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -7507,7 +7536,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 245,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -7537,7 +7566,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 246,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -7567,7 +7596,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 247,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -7597,7 +7626,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 248,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -7627,7 +7656,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 249,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -7657,7 +7686,7 @@
       "score_basis": 0,
       "reliability_factor": 0,
       "adjusted_score": 0,
-      "percentile": 18.16,
+      "percentile": 17.97,
       "rank": 250,
       "missed_fixture_streak": 10,
       "calculation_notes": [
@@ -7667,5 +7696,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-05-03T17:43:21.594Z"
+  "generated_at_utc": "2026-05-03T18:54:44.290Z"
 }
