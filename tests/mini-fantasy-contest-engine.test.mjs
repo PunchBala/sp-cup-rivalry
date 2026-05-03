@@ -116,6 +116,7 @@ test('buildMiniFantasyPlayerRecordFromStats uses the same live scoring breakdown
   const record = buildMiniFantasyPlayerRecordFromStats({
     runs: 52,
     battingBalls: 28,
+    fours: 4,
     sixes: 3,
     wickets: 2,
     bowlingBalls: 24,
@@ -126,9 +127,10 @@ test('buildMiniFantasyPlayerRecordFromStats uses the same live scoring breakdown
   });
 
   assert.equal(record.appeared, true);
-  assert.equal(record.points, 168);
+  assert.equal(record.points, 172);
   assert.deepEqual(record.base_breakdown, {
     runs: 52,
+    fours: 4,
     sixes: 3,
     wickets: 2,
     dot_balls: 9,
@@ -147,6 +149,7 @@ test('buildMiniFantasyPlayerRecordFromStats uses the same live scoring breakdown
       ducks: 0
     },
     runs_points: 52,
+    four_bonus_points: 4,
     sixes_bonus_points: 6,
     wicket_points: 50,
     dot_ball_points: 18,
@@ -156,7 +159,7 @@ test('buildMiniFantasyPlayerRecordFromStats uses the same live scoring breakdown
     economy_bonus_points: 8,
     milestone_bonus_points: 18,
     duck_penalty_points: 0,
-    total_points: 168
+    total_points: 172
   });
 });
 

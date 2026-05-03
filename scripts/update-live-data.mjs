@@ -39,8 +39,9 @@ const IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES = parseEnvInt(process.env.IPLT20_MOST
 const IPLT20_MOST_DOTS_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/284-mostdotballsbowledtournament.js?callback=onmostdotballsbowledtournament';
 const IPLT20_FAIRPLAY_ENABLED = parseEnvBool(process.env.IPLT20_FAIRPLAY_ENABLED, true);
 const IPLT20_FAIRPLAY_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/2026-fairplayList.js?callback=onFairplayAward';
-const AGGREGATE_SCHEMA_VERSION = 4;
+const AGGREGATE_SCHEMA_VERSION = 5;
 const LEAST_MVP_MIN_MATCHES = 5;
+const MVP_FOUR_POINTS = 1;
 const MVP_WICKET_POINTS = 25;
 const MVP_DOT_BALL_POINTS = 2;
 const UNCAPPED_MVP_PLAYERS = [
@@ -433,6 +434,7 @@ function createEmptyAggregates() {
   return {
     battingRuns: {},
     battingBalls: {},
+    battingFours: {},
     battingSixes: {},
     bowlingWickets: {},
     bowlingBalls: {},
@@ -1087,6 +1089,7 @@ function playerCandidateNames(agg) {
     ...Object.keys(agg.bowlingWickets || {}),
     ...Object.keys(agg.bestBowlingFigures || {}),
     ...Object.keys(agg.battingRuns || {}),
+    ...Object.keys(agg.battingFours || {}),
     ...Object.keys(agg.catches || {}),
     ...Object.keys(agg.stumpings || {})
   ].filter(Boolean))];
@@ -1578,6 +1581,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
       const balls = Number(bat?.b || 0);
       addNumberMap(aggregates.battingRuns, batter, runs);
       addNumberMap(aggregates.battingBalls, batter, balls);
+      addNumberMap(aggregates.battingFours, batter, bat?.['4s'] || 0);
       addNumberMap(aggregates.battingSixes, batter, bat?.['6s'] || 0);
       if (runs >= 100) incrementCountMap(aggregates.battingHundreds, batter);
       if (runs >= 50) incrementCountMap(aggregates.battingFifties, batter);
@@ -1682,7 +1686,7 @@ function combineAggregates(baseAgg, overlayAgg) {
   const out = clone(baseAgg);
   if (!overlayAgg) return out;
 
-  for (const key of ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'stumpings', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
+  for (const key of ['battingRuns', 'battingBalls', 'battingFours', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'stumpings', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches']) {
     out[key] = out[key] || {};
     for (const [name, value] of Object.entries(overlayAgg[key] || {})) {
       out[key][name] = (out[key][name] || 0) + Number(value || 0);
@@ -1850,6 +1854,7 @@ function aggregateParticipantSet(matchAggregate = {}) {
     'playerMatches',
     'battingRuns',
     'battingBalls',
+    'battingFours',
     'battingSixes',
     'bowlingWickets',
     'bowlingBalls',
@@ -2026,7 +2031,7 @@ function buildHistoricalAggregateOverlay(baseLive, processedMatchCount, processe
   const currentAgg = historySnapshotAggregate(currentEntry);
   const previousAgg = historySnapshotAggregate(previousEntry);
   const overlay = createEmptyAggregates();
-  const playerAggregateKeys = ['battingRuns', 'battingBalls', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'stumpings', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches'];
+  const playerAggregateKeys = ['battingRuns', 'battingBalls', 'battingFours', 'battingSixes', 'bowlingWickets', 'bowlingBalls', 'bowlingRunsConceded', 'catches', 'stumpings', 'bowlingDots', 'battingFifties', 'battingHundreds', 'battingImpact30s', 'battingDucks', 'bowling3w', 'bowling4w', 'bowling5w', 'playerMatches'];
   const displayNameMap = buildHistoricalPlayerDisplayNameMap(
     ...playerAggregateKeys.flatMap((key) => [currentAgg[key], previousAgg[key]])
   );
@@ -2151,6 +2156,7 @@ function bowlingEconomyBonus(runsConceded, balls) {
 function buildMvpRanking(agg, dotsValues) {
   const players = [...new Set([
     ...Object.keys(agg.battingRuns || {}),
+    ...Object.keys(agg.battingFours || {}),
     ...Object.keys(agg.battingSixes || {}),
     ...Object.keys(agg.bowlingWickets || {}),
     ...Object.keys(dotsValues || {}),
@@ -2161,6 +2167,7 @@ function buildMvpRanking(agg, dotsValues) {
   const rows = players.map((player) => {
     const runs = Number(agg.battingRuns[player] || 0);
     const balls = Number(agg.battingBalls[player] || 0);
+    const fours = Number(agg.battingFours[player] || 0);
     const sixes = Number(agg.battingSixes[player] || 0);
     const wickets = Number(agg.bowlingWickets[player] || 0);
     const dotBalls = Number(dotsValues[player] || 0);
@@ -2169,7 +2176,7 @@ function buildMvpRanking(agg, dotsValues) {
     const runsConceded = Number(agg.bowlingRunsConceded[player] || 0);
     const duckPenalty = Number(agg.battingDucks?.[player] || 0) * -5;
 
-    const battingBase = runs + (sixes * 2);
+    const battingBase = runs + (fours * MVP_FOUR_POINTS) + (sixes * 2);
     const bowlingBase = (wickets * MVP_WICKET_POINTS) + (dotBalls * MVP_DOT_BALL_POINTS);
     const fieldingBase = (catches * 8) + (stumpings * 12);
     const srBonus = battingStrikeRateBonus(runs, balls);
@@ -2187,6 +2194,7 @@ function buildMvpRanking(agg, dotsValues) {
     return [player, {
       score: Number(score.toFixed(2)),
       runs,
+      fours,
       sixes,
       wickets,
       dotBalls,
@@ -3033,7 +3041,7 @@ async function main() {
     titleWinner: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     tableBottom: { ok: true, source: 'CricketData scorecards', method: 'computed standings from completed matches' },
     mostDots: dotsReport,
-    mvp: { ok: true, source: 'CricketData + IPLT20 official Most Dots', method: 'custom formula using runs, sixes, wickets, dot balls, catches, stumpings, strike-rate bonus, economy bonus and milestone bonuses' },
+    mvp: { ok: true, source: 'CricketData + IPLT20 official Most Dots', method: 'custom formula using runs, fours, sixes, wickets, dot balls, catches, stumpings, strike-rate bonus, economy bonus and milestone bonuses' },
     uncappedMvp: { ok: true, source: 'custom MVP ranking', method: 'filtered to the provided uncapped player pool, then compares picks by their positions in the custom MVP ranking' },
     fairPlay: fairPlayReport,
     leastMvp: { ok: true, source: 'custom MVP ranking', method: `lower in custom MVP ranking wins, filtered to players with minimum ${LEAST_MVP_MIN_MATCHES} matches` },

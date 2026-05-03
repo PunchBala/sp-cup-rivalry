@@ -68,7 +68,7 @@ const DEFAULT_PRICE_JOB_META = Object.freeze({
   }),
   missed_fixture_penalties: DEFAULT_MISSED_FIXTURE_PENALTIES,
   default_initial_price: 6,
-  scoring_source: 'existing_mvp_points_formula_v1',
+  scoring_source: 'existing_mvp_points_formula_v2_fours_bonus',
   notes: 'Daily pricing refresh after all completed matches for the day'
 });
 
@@ -188,6 +188,7 @@ const MINI_FANTASY_MILESTONE_POINTS = Object.freeze({
 });
 
 const MINI_FANTASY_DUCK_PENALTY = -5;
+const MINI_FANTASY_FOUR_BONUS_POINTS = 1;
 const MINI_FANTASY_WICKET_POINTS = 25;
 const MINI_FANTASY_DOT_BALL_POINTS = 2;
 
@@ -1417,6 +1418,7 @@ function mergeMvpValuePayload(existingPayload = {}, incomingPayload = {}) {
   return {
     score: mergeMvpStatValue(existingPayload?.score, incomingPayload?.score),
     runs: mergeMvpStatValue(existingPayload?.runs, incomingPayload?.runs),
+    fours: mergeMvpStatValue(existingPayload?.fours, incomingPayload?.fours),
     sixes: mergeMvpStatValue(existingPayload?.sixes, incomingPayload?.sixes),
     wickets: mergeMvpStatValue(existingPayload?.wickets, incomingPayload?.wickets),
     dotBalls: mergeMvpStatValue(existingPayload?.dotBalls, incomingPayload?.dotBalls),
@@ -1447,6 +1449,7 @@ function signedDelta(currentValue, previousValue) {
 
 function buildMiniFantasyBaseBreakdown(currentPayload = {}, previousPayload = {}) {
   const runs = positiveDelta(currentPayload?.runs, previousPayload?.runs);
+  const fours = positiveDelta(currentPayload?.fours, previousPayload?.fours);
   const sixes = positiveDelta(currentPayload?.sixes, previousPayload?.sixes);
   const wickets = positiveDelta(currentPayload?.wickets, previousPayload?.wickets);
   const dotBalls = positiveDelta(currentPayload?.dotBalls, previousPayload?.dotBalls);
@@ -1465,6 +1468,7 @@ function buildMiniFantasyBaseBreakdown(currentPayload = {}, previousPayload = {}
   const ducks = positiveDelta(currentPayload?.bonuses?.ducks, previousPayload?.bonuses?.ducks);
 
   const runsPoints = runs;
+  const fourBonusPoints = roundTo(fours * MINI_FANTASY_FOUR_BONUS_POINTS, 2);
   const sixesBonusPoints = roundTo(sixes * 2, 2);
   const wicketPoints = roundTo(wickets * MINI_FANTASY_WICKET_POINTS, 2);
   const dotBallPoints = roundTo(dotBalls * MINI_FANTASY_DOT_BALL_POINTS, 2);
@@ -1482,6 +1486,7 @@ function buildMiniFantasyBaseBreakdown(currentPayload = {}, previousPayload = {}
   const duckPenaltyPoints = roundTo(ducks * MINI_FANTASY_DUCK_PENALTY, 2);
   const totalPoints = roundTo(
     runsPoints +
+    fourBonusPoints +
     sixesBonusPoints +
     wicketPoints +
     dotBallPoints +
@@ -1496,6 +1501,7 @@ function buildMiniFantasyBaseBreakdown(currentPayload = {}, previousPayload = {}
 
   return {
     runs,
+    fours,
     sixes,
     wickets,
     dot_balls: dotBalls,
@@ -1511,6 +1517,7 @@ function buildMiniFantasyBaseBreakdown(currentPayload = {}, previousPayload = {}
       ducks
     },
     runs_points: runsPoints,
+    four_bonus_points: fourBonusPoints,
     sixes_bonus_points: sixesBonusPoints,
     wicket_points: wicketPoints,
     dot_ball_points: dotBallPoints,
@@ -1551,6 +1558,7 @@ function calculateMiniFantasyEconomyBonusPoints(runsConceded = 0, ballsBowled = 
 export function buildMiniFantasyPlayerRecordFromStats({
   runs = 0,
   battingBalls = 0,
+  fours = 0,
   sixes = 0,
   wickets = 0,
   bowlingBalls = 0,
@@ -1562,6 +1570,7 @@ export function buildMiniFantasyPlayerRecordFromStats({
 } = {}) {
   const numericRuns = Math.max(0, roundTo(toNumber(runs, 0), 2));
   const numericBattingBalls = Math.max(0, Math.trunc(toNumber(battingBalls, 0)));
+  const numericFours = Math.max(0, Math.trunc(toNumber(fours, 0)));
   const numericSixes = Math.max(0, Math.trunc(toNumber(sixes, 0)));
   const numericWickets = Math.max(0, Math.trunc(toNumber(wickets, 0)));
   const numericBowlingBalls = Math.max(0, Math.trunc(toNumber(bowlingBalls, 0)));
@@ -1579,6 +1588,7 @@ export function buildMiniFantasyPlayerRecordFromStats({
   const bowling5w = numericWickets >= 5 ? 1 : 0;
 
   const runsPoints = numericRuns;
+  const fourBonusPoints = roundTo(numericFours * MINI_FANTASY_FOUR_BONUS_POINTS, 2);
   const sixesBonusPoints = roundTo(numericSixes * 2, 2);
   const wicketPoints = roundTo(numericWickets * MINI_FANTASY_WICKET_POINTS, 2);
   const dotBallPoints = roundTo(numericDotBalls * MINI_FANTASY_DOT_BALL_POINTS, 2);
@@ -1598,6 +1608,7 @@ export function buildMiniFantasyPlayerRecordFromStats({
   const duckPenaltyPoints = roundTo(ducks * MINI_FANTASY_DUCK_PENALTY, 2);
   const totalPoints = roundTo(
     runsPoints +
+    fourBonusPoints +
     sixesBonusPoints +
     wicketPoints +
     dotBallPoints +
@@ -1624,6 +1635,7 @@ export function buildMiniFantasyPlayerRecordFromStats({
     appeared,
     base_breakdown: {
       runs: numericRuns,
+      fours: numericFours,
       sixes: numericSixes,
       wickets: numericWickets,
       dot_balls: numericDotBalls,
@@ -1642,6 +1654,7 @@ export function buildMiniFantasyPlayerRecordFromStats({
         ducks
       },
       runs_points: runsPoints,
+      four_bonus_points: fourBonusPoints,
       sixes_bonus_points: sixesBonusPoints,
       wicket_points: wicketPoints,
       dot_ball_points: dotBallPoints,
@@ -1677,6 +1690,7 @@ function buildMiniFantasyAggregateBreakdownLookup(currentSnapshot = {}, previous
   const aggregateKeys = [
     'battingRuns',
     'battingBalls',
+    'battingFours',
     'battingSixes',
     'bowlingWickets',
     'bowlingBalls',
@@ -1705,6 +1719,7 @@ function buildMiniFantasyAggregateBreakdownLookup(currentSnapshot = {}, previous
   canonicalNames.forEach((canonicalName) => {
     const runs = positiveDelta(currentLookups.battingRuns.get(canonicalName), previousLookups.battingRuns.get(canonicalName));
     const battingBalls = positiveDelta(currentLookups.battingBalls.get(canonicalName), previousLookups.battingBalls.get(canonicalName));
+    const fours = positiveDelta(currentLookups.battingFours.get(canonicalName), previousLookups.battingFours.get(canonicalName));
     const sixes = positiveDelta(currentLookups.battingSixes.get(canonicalName), previousLookups.battingSixes.get(canonicalName));
     const wickets = positiveDelta(currentLookups.bowlingWickets.get(canonicalName), previousLookups.bowlingWickets.get(canonicalName));
     const bowlingBalls = positiveDelta(currentLookups.bowlingBalls.get(canonicalName), previousLookups.bowlingBalls.get(canonicalName));
@@ -1721,6 +1736,7 @@ function buildMiniFantasyAggregateBreakdownLookup(currentSnapshot = {}, previous
     const bowling5w = positiveDelta(currentLookups.bowling5w.get(canonicalName), previousLookups.bowling5w.get(canonicalName));
 
     const runsPoints = runs;
+    const fourBonusPoints = roundTo(fours * MINI_FANTASY_FOUR_BONUS_POINTS, 2);
     const sixesBonusPoints = roundTo(sixes * 2, 2);
     const wicketPoints = roundTo(wickets * MINI_FANTASY_WICKET_POINTS, 2);
     const dotBallPoints = roundTo(dotBalls * MINI_FANTASY_DOT_BALL_POINTS, 2);
@@ -1740,6 +1756,7 @@ function buildMiniFantasyAggregateBreakdownLookup(currentSnapshot = {}, previous
     const duckPenaltyPoints = roundTo(ducks * MINI_FANTASY_DUCK_PENALTY, 2);
     const totalPoints = roundTo(
       runsPoints +
+      fourBonusPoints +
       sixesBonusPoints +
       wicketPoints +
       dotBallPoints +
@@ -1755,6 +1772,7 @@ function buildMiniFantasyAggregateBreakdownLookup(currentSnapshot = {}, previous
     const hasSignal = [
       runs,
       battingBalls,
+      fours,
       sixes,
       wickets,
       bowlingBalls,
@@ -1774,6 +1792,7 @@ function buildMiniFantasyAggregateBreakdownLookup(currentSnapshot = {}, previous
 
     breakdownLookup.set(canonicalName, {
       runs,
+      fours,
       sixes,
       wickets,
       dot_balls: dotBalls,
@@ -1792,6 +1811,7 @@ function buildMiniFantasyAggregateBreakdownLookup(currentSnapshot = {}, previous
         ducks
       },
       runs_points: runsPoints,
+      four_bonus_points: fourBonusPoints,
       sixes_bonus_points: sixesBonusPoints,
       wicket_points: wicketPoints,
       dot_ball_points: dotBallPoints,

@@ -32,7 +32,7 @@ function createJob(players, overrides = {}) {
         target_price_weight: 0.6
       },
       default_initial_price: 6,
-      scoring_source: 'existing_mvp_points_formula_v1',
+      scoring_source: 'existing_mvp_points_formula_v2_fours_bonus',
       ...overrides
     },
     players
