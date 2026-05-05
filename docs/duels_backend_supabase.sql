@@ -207,6 +207,26 @@ for update
 using (auth.uid() = created_by_user_id)
 with check (auth.uid() = created_by_user_id);
 
+drop policy if exists "duel creators delete their duel rows" on public.duels;
+create policy "duel creators delete their duel rows"
+on public.duels
+for delete
+using (auth.uid() = created_by_user_id);
+
+drop policy if exists "senthil deletes public duel rows" on public.duels;
+create policy "senthil deletes public duel rows"
+on public.duels
+for delete
+using (
+  visibility = 'public'
+  and exists (
+    select 1
+    from public.profiles
+    where profiles.id = auth.uid()
+      and lower(profiles.handle) = 'senthil'
+  )
+);
+
 drop policy if exists "public duel entries are readable" on public.duel_entries;
 create policy "public duel entries are readable"
 on public.duel_entries

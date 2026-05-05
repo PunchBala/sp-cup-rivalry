@@ -22,6 +22,7 @@ test('backend config, adapter, and setup docs are present for real auth + duel a
   assert.match(backendJs, /signUp/);
   assert.match(backendJs, /signIn/);
   assert.match(backendJs, /listPublicBundles/);
+  assert.match(backendJs, /deletePublicDuel/);
   assert.match(backendJs, /createPublicDuel/);
   assert.match(backendJs, /claimOpenEntry/);
   assert.match(backendJs, /function buildBundleLabel\(/);
@@ -44,6 +45,8 @@ test('backend config, adapter, and setup docs are present for real auth + duel a
   assert.match(schemaSql, /create table if not exists public\.profiles/i);
   assert.match(schemaSql, /create table if not exists public\.duels/i);
   assert.match(schemaSql, /create table if not exists public\.duel_entries/i);
+  assert.match(schemaSql, /create policy "duel creators delete their duel rows"/i);
+  assert.match(schemaSql, /create policy "senthil deletes public duel rows"/i);
   assert.match(schemaSql, /create table if not exists public\.mini_fantasy_entries/i);
   assert.match(schemaSql, /spent_credits\s+numeric\(5,2\)/i);
   assert.match(schemaSql, /create table if not exists public\.mini_fantasy_leaderboard_rows/i);

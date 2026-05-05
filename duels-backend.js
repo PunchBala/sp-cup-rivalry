@@ -131,6 +131,10 @@
     return normalizeWhitespace(duelRow?.label || names.join(' vs '));
   }
 
+  function isSenthilHandle(value) {
+    return normalizeSlug(value || '') === 'senthil';
+  }
+
   function makeBundleFromRows(duelRow, entryRows) {
     if (!duelRow) return null;
     const duelSlug = normalizeSlug(duelRow.slug || duelRow.id || '');
@@ -192,6 +196,7 @@
       async signIn() { throw disabledError(); },
       async signOut() { return true; },
       async listPublicBundles() { return []; },
+        async deletePublicDuel() { throw disabledError(); },
         async createPublicDuel() { throw disabledError(); },
         async claimOpenEntry() { throw disabledError(); },
         async saveOwnedEntry() { throw disabledError(); },
@@ -668,6 +673,37 @@ function normalizeMiniFantasyEntryRow(row) {
         return duelRows
           .map((duelRow) => makeBundleFromRows(duelRow, entriesByDuel.get(duelRow.id) || []))
           .filter(Boolean);
+      },
+
+      async deletePublicDuel({ duelSlug, currentUser }) {
+        const activeSession = await ensureFreshSession();
+        if (!activeSession?.access_token || !currentUser?.userId) {
+          throw new Error('Sign in with a backend account before deleting a persisted duel.');
+        }
+        const safeDuelSlug = normalizeSlug(duelSlug || '');
+        if (!safeDuelSlug) {
+          throw new Error('A duel code is required before deleting a persisted duel.');
+        }
+        const currentHandle = normalizeSlug(currentUser?.ownerId || '');
+        const loaded = await loadBundleRowsBySlug(safeDuelSlug, activeSession.access_token);
+        if (!loaded?.duelRow?.id) return false;
+        if (
+          !isSenthilHandle(currentHandle)
+          && loaded.duelRow.created_by_user_id !== currentUser.userId
+          && normalizeSlug(loaded.duelRow.created_by_handle || '') !== currentHandle
+        ) {
+          throw new Error('Only the duel creator or Senthil can delete this persisted duel.');
+        }
+        await restRequest(config.tables.duels, {
+          method: 'DELETE',
+          query: {
+            id: `eq.${loaded.duelRow.id}`,
+            select: 'id,slug'
+          },
+          accessToken: activeSession.access_token,
+          prefer: 'return=representation'
+        });
+        return true;
       },
 
       async createPublicDuel({ roomSlug, duelSlug, currentUser }) {

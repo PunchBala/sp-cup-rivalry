@@ -1628,6 +1628,7 @@
     const LOCAL_CUSTOM_DUELS_STORAGE_KEY = 'sp-cup-duels-custom-v1';
     const LOCAL_MINI_FANTASY_ENTRIES_STORAGE_KEY = 'sp-cup-mini-fantasy-entries-v1';
     const MINI_FANTASY_ADMIN_HANDLE = 'senthil';
+    const STALE_DUEL_MAX_AGE_MS = 4 * 24 * 60 * 60 * 1000;
     const EMPTY_CUSTOM_DUEL_STORE = { version: 1, rooms: {} };
     let BASE_ROOM = null;
     let ACTIVE_ROOM = null;
@@ -4714,7 +4715,7 @@ function titleBandScore(pick, live){
     }
 
     function isMiniFantasyAdminUser(){
-      return normalizeOwnerId(CURRENT_USER?.ownerId || '') === MINI_FANTASY_ADMIN_HANDLE;
+      return isSenthilAdminUser(CURRENT_USER);
     }
 
     function queueMiniFantasyPublicDataLoad({ force = false } = {}){
@@ -5020,6 +5021,21 @@ function titleBandScore(pick, live){
       writeStoredJson(LOCAL_CUSTOM_DUELS_STORAGE_KEY, CUSTOM_DUEL_STORE);
     }
 
+    function removeStoredCustomBundle(roomSlug, duelId){
+      const slug = getWarRoomModelApi().normalizeSlug(roomSlug || '');
+      const targetDuelId = getWarRoomModelApi().normalizeSlug(duelId || '');
+      if (!slug || !targetDuelId) return false;
+      const nextStore = cloneJson(CUSTOM_DUEL_STORE || emptyCustomDuelStore());
+      const roomEntry = nextStore.rooms?.[slug];
+      if (!roomEntry?.bundles?.length) return false;
+      const nextBundles = roomEntry.bundles.filter((entry) => normalizeOwnerId(entry?.duelRecord?.id) !== targetDuelId);
+      if (nextBundles.length === roomEntry.bundles.length) return false;
+      nextStore.rooms[slug].bundles = nextBundles;
+      CUSTOM_DUEL_STORE = nextStore;
+      persistStoredCustomDuels();
+      return true;
+    }
+
     function remoteBundlesForRoom(roomSlug){
       const slug = getWarRoomModelApi().normalizeSlug(roomSlug || '');
       return cloneJson(REMOTE_DUEL_STORE.rooms?.[slug]?.bundles || []);
@@ -5037,6 +5053,20 @@ function titleBandScore(pick, live){
       };
       REMOTE_DUEL_STORE = nextStore;
       return cloneJson(REMOTE_DUEL_STORE.rooms[slug].bundles);
+    }
+
+    function removeRemoteBundle(roomSlug, duelId){
+      const slug = getWarRoomModelApi().normalizeSlug(roomSlug || '');
+      const targetDuelId = getWarRoomModelApi().normalizeSlug(duelId || '');
+      if (!slug || !targetDuelId) return false;
+      const nextStore = cloneJson(REMOTE_DUEL_STORE || emptyCustomDuelStore());
+      const roomEntry = nextStore.rooms?.[slug];
+      if (!roomEntry?.bundles?.length) return false;
+      const nextBundles = roomEntry.bundles.filter((entry) => normalizeOwnerId(entry?.duelRecord?.id) !== targetDuelId);
+      if (nextBundles.length === roomEntry.bundles.length) return false;
+      nextStore.rooms[slug].bundles = nextBundles;
+      REMOTE_DUEL_STORE = nextStore;
+      return true;
     }
 
     function upsertRemoteBundle(bundle, roomReference = BASE_ROOM){
@@ -5076,6 +5106,10 @@ function titleBandScore(pick, live){
       AUTH_PANEL_NOTICE = typeof payload === 'string'
         ? { type, text: payload }
         : { type, ...payload };
+    }
+
+    function isSenthilAdminUser(user = CURRENT_USER){
+      return normalizeOwnerId(user?.ownerId || '') === MINI_FANTASY_ADMIN_HANDLE;
     }
 
     function createEmptyPicks(){
@@ -5152,6 +5186,59 @@ function titleBandScore(pick, live){
         scoreStartCount,
         liveAt: live ? (duelRecord.liveAt || startsScoringAt || currentNowDate().toISOString()) : null
       };
+    }
+
+    function bundleCreatedAtMs(bundle){
+      const timestamp = normalizeTextValue(bundle?.duelRecord?.createdAt || '');
+      const parsed = timestamp ? Date.parse(timestamp) : Number.NaN;
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function isStaleNeverLiveBundle(bundle, nowMs = currentNowMs()){
+      if (!bundle) return false;
+      const createdAtMs = bundleCreatedAtMs(bundle);
+      if (!Number.isFinite(createdAtMs)) return false;
+      const lifecycle = deriveCustomBundleLifecycle(bundle);
+      if (lifecycle?.status === 'live') return false;
+      return (nowMs - createdAtMs) >= STALE_DUEL_MAX_AGE_MS;
+    }
+
+    async function cleanupStaleDuelBundlesForRoom(roomSlug, roomReference = BASE_ROOM){
+      const slug = getWarRoomModelApi().normalizeSlug(roomSlug || roomReference?.slug || '');
+      if (!slug) {
+        return { localRemoved: 0, remoteHidden: 0, remoteDeleted: 0, remoteDeleteFailures: 0 };
+      }
+      const nowMs = currentNowMs();
+      const staleLocalBundles = localCustomBundlesForRoom(slug).filter((bundle) => isStaleNeverLiveBundle(bundle, nowMs));
+      const staleRemoteBundles = remoteBundlesForRoom(slug).filter((bundle) => isStaleNeverLiveBundle(bundle, nowMs));
+      let localRemoved = 0;
+      let remoteHidden = 0;
+      let remoteDeleted = 0;
+      let remoteDeleteFailures = 0;
+
+      staleLocalBundles.forEach((bundle) => {
+        if (removeStoredCustomBundle(slug, bundle?.duelRecord?.id)) localRemoved += 1;
+      });
+      staleRemoteBundles.forEach((bundle) => {
+        if (removeRemoteBundle(slug, bundle?.duelRecord?.id)) remoteHidden += 1;
+      });
+
+      if (staleRemoteBundles.length && usesHostedDuelsBackend() && isSenthilAdminUser()) {
+        for (const bundle of staleRemoteBundles) {
+          try {
+            await DUELS_BACKEND.deletePublicDuel({
+              duelSlug: bundle?.duelRecord?.id,
+              currentUser: CURRENT_USER
+            });
+            remoteDeleted += 1;
+          } catch (error) {
+            remoteDeleteFailures += 1;
+            console.warn('Could not delete stale hosted duel', bundle?.duelRecord?.id, error);
+          }
+        }
+      }
+
+      return { localRemoved, remoteHidden, remoteDeleted, remoteDeleteFailures };
     }
 
     function orderedBundleEntries(bundle){
@@ -5321,7 +5408,18 @@ function titleBandScore(pick, live){
       if (!slug) return [];
       try {
         const bundles = await DUELS_BACKEND.listPublicBundles(slug);
-        return setRemoteBundlesForRoom(slug, bundles, roomReference);
+        setRemoteBundlesForRoom(slug, bundles, roomReference);
+        const cleanup = await cleanupStaleDuelBundlesForRoom(slug, roomReference);
+        if ((cleanup.localRemoved + cleanup.remoteHidden) > 0 && isSenthilAdminUser()) {
+          const deletedCount = cleanup.remoteDeleted || 0;
+          const hiddenOnlyCount = Math.max(0, cleanup.remoteHidden - deletedCount);
+          const fragments = [];
+          if (deletedCount) fragments.push(`${deletedCount} hosted`);
+          if (cleanup.localRemoved) fragments.push(`${cleanup.localRemoved} local`);
+          if (hiddenOnlyCount) fragments.push(`${hiddenOnlyCount} hidden pending delete rights`);
+          setStudioNotice('info', `Cleared ${cleanup.localRemoved + cleanup.remoteHidden} stale duel${(cleanup.localRemoved + cleanup.remoteHidden) === 1 ? '' : 's'} older than 4 days${fragments.length ? ` (${fragments.join(', ')})` : ''}.`);
+        }
+        return remoteBundlesForRoom(slug);
       } catch (error) {
         console.error('Hosted duel load failed:', error);
         setStudioNotice('bad', `Could not load hosted public duels from ${currentAuthLabel()}. The shipped fixture and local fallbacks are still available.`);

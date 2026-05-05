@@ -58,6 +58,8 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /function claimActiveOpenSlot\(/);
   assert.match(html, /function renderPickPicker\(/);
   assert.match(html, /function deriveCustomBundleLifecycle\(/);
+  assert.match(html, /function isStaleNeverLiveBundle\(/);
+  assert.match(html, /function cleanupStaleDuelBundlesForRoom\(/);
   assert.match(html, /function withFreshLifecycle\(/);
   assert.match(html, /function syncRemoteBundlesForRoom\(/);
   assert.match(html, /function syncMiniFantasyEntries\(/);
@@ -110,6 +112,7 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /Zero Mercy/);
   assert.match(html, /Early Bird/);
   assert.match(html, /Admin control/);
+  assert.match(html, /older than 4 days/);
   assert.match(html, /Admin live panel/);
   assert.match(html, /Live snapshot/);
   assert.match(html, /Paste the structured innings JSON here/);
