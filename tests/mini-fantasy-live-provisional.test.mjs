@@ -60,14 +60,14 @@ test('buildMiniFantasyLiveProvisionalPayload converts official-style innings int
   assert.equal(payload.players.length, 3);
   assert.deepEqual(payload.players.map((player) => [player.name, player.points]), [
     ['Travis Head', 52],
-    ['Trent Boult', 29],
+    ['Trent Boult', 28],
     ['Ryan Rickelton', 8]
   ]);
 
   const boult = payload.players.find((player) => player.name === 'Trent Boult');
   assert.ok(boult);
   assert.equal(boult.base_breakdown.wicket_points, 25);
-  assert.equal(boult.base_breakdown.dot_ball_points, 4);
+  assert.equal(boult.base_breakdown.dot_ball_points, 3);
 
   const rickelton = payload.players.find((player) => player.name === 'Ryan Rickelton');
   assert.ok(rickelton);

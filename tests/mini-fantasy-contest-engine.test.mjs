@@ -127,7 +127,7 @@ test('buildMiniFantasyPlayerRecordFromStats uses the same live scoring breakdown
   });
 
   assert.equal(record.appeared, true);
-  assert.equal(record.points, 172);
+  assert.equal(record.points, 167.5);
   assert.deepEqual(record.base_breakdown, {
     runs: 52,
     fours: 4,
@@ -152,14 +152,14 @@ test('buildMiniFantasyPlayerRecordFromStats uses the same live scoring breakdown
     four_bonus_points: 4,
     sixes_bonus_points: 6,
     wicket_points: 50,
-    dot_ball_points: 18,
+    dot_ball_points: 13.5,
     catch_points: 8,
     stumping_points: 0,
     strike_rate_bonus_points: 8,
     economy_bonus_points: 8,
     milestone_bonus_points: 18,
     duck_penalty_points: 0,
-    total_points: 172
+    total_points: 167.5
   });
 });
 
@@ -1944,7 +1944,7 @@ test('buildMiniFantasyEntryAuditLog resolves aggregate breakdowns across Mohamme
 
   assert.equal(audit.players[0].points, 38);
   assert.equal(audit.players[0].base_breakdown.wicket_points, 25);
-  assert.equal(audit.players[0].base_breakdown.dot_ball_points, 24);
+  assert.equal(audit.players[0].base_breakdown.dot_ball_points, 18);
   assert.equal(audit.players[0].base_breakdown.economy_bonus_points, 0);
   assert.equal(audit.players[0].base_breakdown.total_points, 38);
 });

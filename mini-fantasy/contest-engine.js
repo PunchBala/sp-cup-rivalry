@@ -190,7 +190,7 @@ const MINI_FANTASY_MILESTONE_POINTS = Object.freeze({
 const MINI_FANTASY_DUCK_PENALTY = -5;
 const MINI_FANTASY_FOUR_BONUS_POINTS = 1;
 const MINI_FANTASY_WICKET_POINTS = 25;
-const MINI_FANTASY_DOT_BALL_POINTS = 2;
+const MINI_FANTASY_DOT_BALL_POINTS = 1.5;
 
 // Keep a conservative alias map for common score-feed spelling drift.
 const NAME_TOKEN_ALIASES = Object.freeze({

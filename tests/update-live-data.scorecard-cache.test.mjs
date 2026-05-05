@@ -1029,7 +1029,7 @@ test('historical mini fantasy replay canonicalizes split player aliases before d
     }
   );
 
-  assert.equal(histories['mohammad shami']?.points_by_match_no?.[32], 90);
+  assert.equal(histories['mohammad shami']?.points_by_match_no?.[32], 82.5);
   assert.equal(histories['mohammad shami']?.matches_played, 1);
   assert.equal(histories['mohammed shami'], undefined);
 });
@@ -1224,7 +1224,7 @@ test('historical mini fantasy replay ignores contaminated pre-match dot snapshot
   );
 
   assert.equal(histories['pat cummins']?.points_by_match_no?.[35], undefined);
-  assert.equal(histories['pat cummins']?.points_by_match_no?.[36], 54);
+  assert.equal(histories['pat cummins']?.points_by_match_no?.[36], 48);
   assert.equal(histories['pat cummins']?.matches_played, 1);
 });
 

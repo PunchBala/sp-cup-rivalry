@@ -43,7 +43,7 @@ const AGGREGATE_SCHEMA_VERSION = 5;
 const LEAST_MVP_MIN_MATCHES = 5;
 const MVP_FOUR_POINTS = 1;
 const MVP_WICKET_POINTS = 25;
-const MVP_DOT_BALL_POINTS = 2;
+const MVP_DOT_BALL_POINTS = 1.5;
 const UNCAPPED_MVP_PLAYERS = [
   'Ayush Mhatre', 'Kartik Sharma', 'Urvil Patel', 'Ramakrishna Ghosh', 'Prashant Veer', 'Aman Khan',
   'Anshul Kamboj', 'Mukesh Choudhary', 'Shreyas Gopal', 'Gurjapneet Singh', 'Mahendra Singh Dhoni',
