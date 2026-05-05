@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-05-05T19:14:05.559Z",
+    "as_of_utc": "2026-05-05T20:59:20.835Z",
     "price_min": 4.5,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -86,9 +86,9 @@
   "summary": {
     "total_players_received": 257,
     "eligible_players_ranked": 257,
-    "price_rises": 5,
-    "price_drops": 1,
-    "price_unchanged": 251
+    "price_rises": 2,
+    "price_drops": 0,
+    "price_unchanged": 255
   },
   "players": [
     {
@@ -153,7 +153,7 @@
       "player_id": "csk_anshul-kamboj",
       "name": "Anshul Kamboj",
       "team": "CSK",
-      "role": "all_rounder",
+      "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 8.5,
@@ -863,12 +863,12 @@
       "role": "wicket_keeper",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
+      "old_price": 8.5,
+      "initial_price": 8.5,
       "target_price": 8.5,
       "smoothed_price": 8.5,
       "final_price": 8.5,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 10,
       "season_total_points": 662,
       "season_avg_points": 66.2,
@@ -881,8 +881,7 @@
       "rank": 36,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 36"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-05T14:00:00"
     },
@@ -948,7 +947,7 @@
       "player_id": "dc_ashutosh-sharma",
       "name": "Ashutosh Sharma",
       "team": "DC",
-      "role": "all_rounder",
+      "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 7.5,
@@ -1038,12 +1037,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
+      "old_price": 7.5,
+      "initial_price": 7.5,
       "target_price": 7.5,
       "smoothed_price": 7.5,
       "final_price": 7.5,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 7,
       "season_total_points": 227,
       "season_avg_points": 32.43,
@@ -1056,8 +1055,7 @@
       "rank": 81,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 81"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-05T14:00:00"
     },
@@ -2804,7 +2802,7 @@
       "player_id": "kkr_daksh-kamra",
       "name": "Daksh Kamra",
       "team": "KKR",
-      "role": "all_rounder",
+      "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 4.5,
@@ -3253,12 +3251,12 @@
       "role": "wicket_keeper",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 9,
       "season_total_points": 205,
       "season_avg_points": 22.78,
@@ -3271,8 +3269,7 @@
       "rank": 59,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 59"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-04T14:00:00"
     },
@@ -3309,7 +3306,7 @@
       "player_id": "lsg_ayush-badoni",
       "name": "Ayush Badoni",
       "team": "LSG",
-      "role": "all_rounder",
+      "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 7.5,
@@ -3600,7 +3597,7 @@
       "player_id": "lsg_abdul-samad",
       "name": "Abdul Samad",
       "team": "LSG",
-      "role": "all_rounder",
+      "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 5,
@@ -3956,6 +3953,36 @@
       "last_match_played_at_utc": "2026-04-29T14:00:00"
     },
     {
+      "player_id": "mi_corbin-bosch",
+      "name": "Corbin Bosch",
+      "team": "MI",
+      "role": "all_rounder",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 8.5,
+      "smoothed_price": 8.5,
+      "final_price": 8.5,
+      "price_change": 0.5,
+      "matches_played": 2,
+      "season_total_points": 90.5,
+      "season_avg_points": 45.25,
+      "recent_avg_points": 45.25,
+      "last_match_points": 57.5,
+      "score_basis": 45.25,
+      "reliability_factor": 1,
+      "adjusted_score": 45.25,
+      "percentile": 82.42,
+      "rank": 46,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 46"
+      ],
+      "last_match_played_at_utc": "2026-05-04T14:00:00"
+    },
+    {
       "player_id": "mi_naman-dhir",
       "name": "Naman Dhir",
       "team": "MI",
@@ -3981,6 +4008,36 @@
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
+      ],
+      "last_match_played_at_utc": "2026-05-04T14:00:00"
+    },
+    {
+      "player_id": "mi_rohit-sharma",
+      "name": "Rohit Sharma",
+      "team": "MI",
+      "role": "batter",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 8.5,
+      "smoothed_price": 8.5,
+      "final_price": 8.5,
+      "price_change": 0.5,
+      "matches_played": 5,
+      "season_total_points": 310,
+      "season_avg_points": 62,
+      "recent_avg_points": 50.67,
+      "last_match_points": 122,
+      "score_basis": 54.45,
+      "reliability_factor": 1,
+      "adjusted_score": 54.45,
+      "percentile": 88.67,
+      "rank": 30,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 30"
       ],
       "last_match_played_at_utc": "2026-05-04T14:00:00"
     },
@@ -4014,37 +4071,6 @@
       "last_match_played_at_utc": "2026-05-04T14:00:00"
     },
     {
-      "player_id": "mi_corbin-bosch",
-      "name": "Corbin Bosch",
-      "team": "MI",
-      "role": "all_rounder",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
-      "target_price": 8.5,
-      "smoothed_price": 8,
-      "final_price": 8,
-      "price_change": 0.5,
-      "matches_played": 2,
-      "season_total_points": 90.5,
-      "season_avg_points": 45.25,
-      "recent_avg_points": 45.25,
-      "last_match_points": 57.5,
-      "score_basis": 45.25,
-      "reliability_factor": 1,
-      "adjusted_score": 45.25,
-      "percentile": 82.42,
-      "rank": 46,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 46",
-        "Applied smoothing against the target price"
-      ],
-      "last_match_played_at_utc": "2026-05-04T14:00:00"
-    },
-    {
       "player_id": "mi_hardik-pandya",
       "name": "Hardik Pandya",
       "team": "MI",
@@ -4072,37 +4098,6 @@
         "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-02T14:00:00"
-    },
-    {
-      "player_id": "mi_rohit-sharma",
-      "name": "Rohit Sharma",
-      "team": "MI",
-      "role": "batter",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
-      "target_price": 8.5,
-      "smoothed_price": 8,
-      "final_price": 8,
-      "price_change": 0.5,
-      "matches_played": 5,
-      "season_total_points": 310,
-      "season_avg_points": 62,
-      "recent_avg_points": 50.67,
-      "last_match_points": 122,
-      "score_basis": 54.45,
-      "reliability_factor": 1,
-      "adjusted_score": 54.45,
-      "percentile": 88.67,
-      "rank": 30,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 30",
-        "Applied smoothing against the target price"
-      ],
-      "last_match_played_at_utc": "2026-05-04T14:00:00"
     },
     {
       "player_id": "mi_will-jacks",
@@ -4315,12 +4310,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
+      "old_price": 6.5,
+      "initial_price": 6.5,
       "target_price": 6.5,
       "smoothed_price": 6.5,
       "final_price": 6.5,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 4,
       "season_total_points": 35.5,
       "season_avg_points": 8.88,
@@ -4333,8 +4328,7 @@
       "rank": 165,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 165"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-04T14:00:00"
     },
@@ -4757,7 +4751,7 @@
       "player_id": "pbks_suryansh-shedge",
       "name": "Suryansh Shedge",
       "team": "PBKS",
-      "role": "all_rounder",
+      "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 8.5,
@@ -4989,7 +4983,7 @@
       "player_id": "pbks_shashank-singh",
       "name": "Shashank Singh",
       "team": "PBKS",
-      "role": "all_rounder",
+      "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 7,
@@ -5226,7 +5220,7 @@
       "player_id": "pbks_musheer-khan",
       "name": "Musheer Khan",
       "team": "PBKS",
-      "role": "all_rounder",
+      "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 4.5,
@@ -5933,7 +5927,7 @@
       "player_id": "rcb_mangesh-yadav",
       "name": "Mangesh Yadav",
       "team": "RCB",
-      "role": "all_rounder",
+      "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 4.5,
@@ -5993,7 +5987,7 @@
       "player_id": "rcb_satvik-deswal",
       "name": "Satvik Deswal",
       "team": "RCB",
-      "role": "all_rounder",
+      "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 4.5,
@@ -6880,7 +6874,7 @@
       "player_id": "srh_abhishek-sharma",
       "name": "Abhishek Sharma",
       "team": "SRH",
-      "role": "all_rounder",
+      "role": "batter",
       "is_uncapped": false,
       "pricing_eligible": true,
       "old_price": 9,
@@ -7054,7 +7048,7 @@
       "player_id": "srh_harsh-dubey",
       "name": "Harsh Dubey",
       "team": "SRH",
-      "role": "all_rounder",
+      "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 8,
@@ -7672,5 +7666,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-05-05T19:14:05.559Z"
+  "generated_at_utc": "2026-05-05T20:59:20.835Z"
 }
