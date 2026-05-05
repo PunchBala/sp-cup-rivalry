@@ -1731,6 +1731,31 @@ function buildHistoricalPlayerDisplayNameMap(...maps) {
   return out;
 }
 
+function buildAggregatePlayerDisplayNameMap(agg = {}, ...extraMaps) {
+  return buildHistoricalPlayerDisplayNameMap(
+    agg?.bowlingWickets,
+    agg?.bestBowlingFigures,
+    agg?.battingRuns,
+    agg?.battingBalls,
+    agg?.battingFours,
+    agg?.battingSixes,
+    agg?.bowlingBalls,
+    agg?.bowlingRunsConceded,
+    agg?.catches,
+    agg?.stumpings,
+    agg?.battingFifties,
+    agg?.battingHundreds,
+    agg?.battingImpact30s,
+    agg?.battingDucks,
+    agg?.bowling3w,
+    agg?.bowling4w,
+    agg?.bowling5w,
+    agg?.playerMatches,
+    agg?.bowlingDots,
+    ...extraMaps
+  );
+}
+
 function canonicalizePlayerNumericMap(mapObj = {}, displayNameMap = null) {
   const out = {};
   for (const [playerName, value] of Object.entries(mapObj || {})) {
@@ -1909,8 +1934,10 @@ function buildHistoricalDotOverlay(baseLive, processedMatchCountValue, { display
   return overlay;
 }
 
-function createMostDotsPayloadFromValues(values = {}, source = null) {
-  const payloadValues = cloneJson(values || {});
+function createMostDotsPayloadFromValues(values = {}, source = null, displayNameMap = null) {
+  const payloadValues = displayNameMap
+    ? canonicalizePlayerNumericMap(cloneJson(values || {}), displayNameMap)
+    : cloneJson(values || {});
   const ranking = rankDotsValues(payloadValues);
   if (!ranking.length) return null;
   return {
@@ -2154,40 +2181,60 @@ function bowlingEconomyBonus(runsConceded, balls) {
 }
 
 function buildMvpRanking(agg, dotsValues) {
+  const displayNameMap = buildAggregatePlayerDisplayNameMap(agg, dotsValues);
+  const battingRuns = canonicalizePlayerNumericMap(agg.battingRuns || {}, displayNameMap);
+  const battingBalls = canonicalizePlayerNumericMap(agg.battingBalls || {}, displayNameMap);
+  const battingFours = canonicalizePlayerNumericMap(agg.battingFours || {}, displayNameMap);
+  const battingSixes = canonicalizePlayerNumericMap(agg.battingSixes || {}, displayNameMap);
+  const bowlingWickets = canonicalizePlayerNumericMap(agg.bowlingWickets || {}, displayNameMap);
+  const normalizedDotsValues = canonicalizePlayerNumericMap(dotsValues || {}, displayNameMap);
+  const catchesMap = canonicalizePlayerNumericMap(agg.catches || {}, displayNameMap);
+  const stumpingsMap = canonicalizePlayerNumericMap(agg.stumpings || {}, displayNameMap);
+  const bowlingRunsConceded = canonicalizePlayerNumericMap(agg.bowlingRunsConceded || {}, displayNameMap);
+  const bowlingBalls = canonicalizePlayerNumericMap(agg.bowlingBalls || {}, displayNameMap);
+  const battingDucks = canonicalizePlayerNumericMap(agg.battingDucks || {}, displayNameMap);
+  const battingFifties = canonicalizePlayerNumericMap(agg.battingFifties || {}, displayNameMap);
+  const battingHundreds = canonicalizePlayerNumericMap(agg.battingHundreds || {}, displayNameMap);
+  const battingImpact30s = canonicalizePlayerNumericMap(agg.battingImpact30s || {}, displayNameMap);
+  const bowling3w = canonicalizePlayerNumericMap(agg.bowling3w || {}, displayNameMap);
+  const bowling4w = canonicalizePlayerNumericMap(agg.bowling4w || {}, displayNameMap);
+  const bowling5w = canonicalizePlayerNumericMap(agg.bowling5w || {}, displayNameMap);
+  const playerMatches = canonicalizePlayerNumericMap(agg.playerMatches || {}, displayNameMap);
+
   const players = [...new Set([
-    ...Object.keys(agg.battingRuns || {}),
-    ...Object.keys(agg.battingFours || {}),
-    ...Object.keys(agg.battingSixes || {}),
-    ...Object.keys(agg.bowlingWickets || {}),
-    ...Object.keys(dotsValues || {}),
-    ...Object.keys(agg.catches || {}),
-    ...Object.keys(agg.stumpings || {})
+    ...Object.keys(battingRuns),
+    ...Object.keys(battingFours),
+    ...Object.keys(battingSixes),
+    ...Object.keys(bowlingWickets),
+    ...Object.keys(normalizedDotsValues),
+    ...Object.keys(catchesMap),
+    ...Object.keys(stumpingsMap)
   ])].filter(Boolean);
 
   const rows = players.map((player) => {
-    const runs = Number(agg.battingRuns[player] || 0);
-    const balls = Number(agg.battingBalls[player] || 0);
-    const fours = Number(agg.battingFours[player] || 0);
-    const sixes = Number(agg.battingSixes[player] || 0);
-    const wickets = Number(agg.bowlingWickets[player] || 0);
-    const dotBalls = Number(dotsValues[player] || 0);
-    const catches = Number(agg.catches[player] || 0);
-    const stumpings = Number(agg.stumpings?.[player] || 0);
-    const runsConceded = Number(agg.bowlingRunsConceded[player] || 0);
-    const duckPenalty = Number(agg.battingDucks?.[player] || 0) * -5;
+    const runs = Number(battingRuns[player] || 0);
+    const balls = Number(battingBalls[player] || 0);
+    const fours = Number(battingFours[player] || 0);
+    const sixes = Number(battingSixes[player] || 0);
+    const wickets = Number(bowlingWickets[player] || 0);
+    const dotBalls = Number(normalizedDotsValues[player] || 0);
+    const catches = Number(catchesMap[player] || 0);
+    const stumpings = Number(stumpingsMap[player] || 0);
+    const runsConceded = Number(bowlingRunsConceded[player] || 0);
+    const duckPenalty = Number(battingDucks[player] || 0) * -5;
 
     const battingBase = runs + (fours * MVP_FOUR_POINTS) + (sixes * 2);
     const bowlingBase = (wickets * MVP_WICKET_POINTS) + (dotBalls * MVP_DOT_BALL_POINTS);
     const fieldingBase = (catches * 8) + (stumpings * 12);
     const srBonus = battingStrikeRateBonus(runs, balls);
-    const econBonus = bowlingEconomyBonus(runsConceded, Number(agg.bowlingBalls[player] || 0));
+    const econBonus = bowlingEconomyBonus(runsConceded, Number(bowlingBalls[player] || 0));
     const milestoneBonus =
-      (Number(agg.battingFifties[player] || 0) * 10) +
-      (Number(agg.battingHundreds[player] || 0) * 25) +
-      (Number(agg.battingImpact30s[player] || 0) * 8) +
-      (Number(agg.bowling3w[player] || 0) * 12) +
-      (Number(agg.bowling4w[player] || 0) * 20) +
-      (Number(agg.bowling5w[player] || 0) * 30);
+      (Number(battingFifties[player] || 0) * 10) +
+      (Number(battingHundreds[player] || 0) * 25) +
+      (Number(battingImpact30s[player] || 0) * 8) +
+      (Number(bowling3w[player] || 0) * 12) +
+      (Number(bowling4w[player] || 0) * 20) +
+      (Number(bowling5w[player] || 0) * 30);
 
     const score = battingBase + bowlingBase + fieldingBase + srBonus + econBonus + milestoneBonus + duckPenalty;
 
@@ -2201,18 +2248,18 @@ function buildMvpRanking(agg, dotsValues) {
       catches,
       stumpings,
       battingStrikeRate: balls > 0 ? Number(((100 * runs) / balls).toFixed(2)) : null,
-      economy: Number(agg.bowlingBalls[player] || 0) > 0 ? Number((((runsConceded * 6) / Number(agg.bowlingBalls[player] || 0))).toFixed(2)) : null,
-      matches: Number(agg.playerMatches[player] || 0),
+      economy: Number(bowlingBalls[player] || 0) > 0 ? Number((((runsConceded * 6) / Number(bowlingBalls[player] || 0))).toFixed(2)) : null,
+      matches: Number(playerMatches[player] || 0),
       bonuses: {
         sr: srBonus,
         economy: econBonus,
-        ducks: Number(agg.battingDucks?.[player] || 0),
-        batting50s: Number(agg.battingFifties[player] || 0),
-        batting100s: Number(agg.battingHundreds[player] || 0),
-        impact30s: Number(agg.battingImpact30s[player] || 0),
-        bowling3w: Number(agg.bowling3w[player] || 0),
-        bowling4w: Number(agg.bowling4w[player] || 0),
-        bowling5w: Number(agg.bowling5w[player] || 0)
+        ducks: Number(battingDucks[player] || 0),
+        batting50s: Number(battingFifties[player] || 0),
+        batting100s: Number(battingHundreds[player] || 0),
+        impact30s: Number(battingImpact30s[player] || 0),
+        bowling3w: Number(bowling3w[player] || 0),
+        bowling4w: Number(bowling4w[player] || 0),
+        bowling5w: Number(bowling5w[player] || 0)
       }
     }];
   });
@@ -2231,11 +2278,13 @@ function cloneJson(value) {
 function createScoreHistorySnapshotFromAggregates(agg, baseLive = null, { processedMatchCount = null } = {}) {
   const snapshot = createEmptyLive();
   snapshot.meta.aggregates = cloneJson(agg || createEmptyAggregates());
+  const displayNameMap = buildAggregatePlayerDisplayNameMap(snapshot.meta.aggregates);
   const historicalDots = createMostDotsPayloadFromValues(
     Object.keys(snapshot.meta.aggregates.bowlingDots || {}).length
       ? snapshot.meta.aggregates.bowlingDots
       : resolveHistoricalCumulativeDots(baseLive, processedMatchCount),
-    baseLive?.mostDots?.source || null
+    baseLive?.mostDots?.source || null,
+    displayNameMap
   );
   fillDerivedOutputs(
     snapshot,
@@ -2429,6 +2478,9 @@ function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = nul
   const standings = buildStandingsRanking(agg);
   const striker = buildStrikerRanking(agg);
   const dots = dotsPayload?.extendedRanking?.length ? dotsPayload : (live.mostDots || { ranking: [], extendedRanking: [], values: {} });
+  const displayNameMap = buildAggregatePlayerDisplayNameMap(agg, dots.values || {});
+  const normalizedDotsValues = canonicalizePlayerNumericMap(dots.values || {}, displayNameMap);
+  const normalizedDotsRanking = rankDotsValues(normalizedDotsValues);
 
   live.orangeCap = { ranking: orange.slice(0, 10), extendedRanking: orange };
   live.mostSixes = { ranking: sixes.slice(0, 10), extendedRanking: sixes };
@@ -2455,13 +2507,15 @@ function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = nul
   };
   live.tableBottom = { ranking: standings.slice(0, 10), extendedRanking: standings };
   live.mostDots = {
-    ranking: safeArray(dots.ranking).slice(0, 10),
-    extendedRanking: safeArray(dots.extendedRanking),
-    values: dots.values || {}
+    ranking: normalizedDotsRanking.slice(0, 10),
+    extendedRanking: normalizedDotsRanking,
+    values: normalizedDotsValues
   };
-  const mvp = buildMvpRanking(agg, dots.values || {});
+  if (dots?.updatedAt) live.mostDots.updatedAt = dots.updatedAt;
+  if (dots?.source) live.mostDots.source = dots.source;
+  const mvp = buildMvpRanking(agg, normalizedDotsValues);
   const mvpExtendedRanking = safeArray(mvp.ranking);
-  const leastMvpExtendedRanking = mvpExtendedRanking.filter((player) => Number(agg.playerMatches?.[player] || 0) >= LEAST_MVP_MIN_MATCHES);
+  const leastMvpExtendedRanking = mvpExtendedRanking.filter((player) => Number(mvp.values?.[player]?.matches || 0) >= LEAST_MVP_MIN_MATCHES);
   const leastMvpValues = Object.fromEntries(
     leastMvpExtendedRanking
       .filter((player) => mvp.values && mvp.values[player])

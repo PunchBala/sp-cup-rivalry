@@ -8,6 +8,7 @@ import {
   createScheduleDecision,
   needsScoreHistoryBackfill,
   nextScheduledRefreshAt,
+  refreshDerivedOutputs,
   readLeagueStageSchedule
 } from '../scripts/update-live-data.mjs';
 
@@ -90,4 +91,53 @@ test('score-history backfill is required when a completed-game checkpoint is mis
   };
 
   assert.equal(needsScoreHistoryBackfill(live), true);
+});
+
+test('refreshDerivedOutputs merges lowercase dot totals into display-name MVP rows', () => {
+  const live = {
+    mostDots: {
+      ranking: ['anshul kamboj', 'bhuvneshwar kumar'],
+      extendedRanking: ['anshul kamboj', 'bhuvneshwar kumar'],
+      values: {
+        'anshul kamboj': 94,
+        'bhuvneshwar kumar': 94
+      }
+    },
+    meta: {
+      aggregates: {
+        battingRuns: { 'Bhuvneshwar Kumar': 27, 'Anshul Kamboj': 39 },
+        battingBalls: { 'Bhuvneshwar Kumar': 24, 'Anshul Kamboj': 30 },
+        battingFours: { 'Bhuvneshwar Kumar': 3, 'Anshul Kamboj': 2 },
+        battingSixes: { 'Bhuvneshwar Kumar': 0, 'Anshul Kamboj': 2 },
+        bowlingWickets: { 'Bhuvneshwar Kumar': 17, 'Anshul Kamboj': 17 },
+        bowlingBalls: { 'Bhuvneshwar Kumar': 167, 'Anshul Kamboj': 102 },
+        bowlingRunsConceded: { 'Bhuvneshwar Kumar': 210, 'Anshul Kamboj': 214 },
+        catches: { 'Bhuvneshwar Kumar': 1, 'Anshul Kamboj': 2 },
+        stumpings: {},
+        bowlingDots: { 'bhuvneshwar kumar': 94, 'anshul kamboj': 94 },
+        battingFifties: {},
+        battingHundreds: {},
+        battingImpact30s: {},
+        battingDucks: {},
+        bowling3w: { 'Bhuvneshwar Kumar': 5, 'Anshul Kamboj': 5 },
+        bowling4w: {},
+        bowling5w: {},
+        playerMatches: { 'Bhuvneshwar Kumar': 9, 'Anshul Kamboj': 10 },
+        teamHighestScore: {},
+        standings: {},
+        bestBowlingFigures: {}
+      }
+    }
+  };
+
+  refreshDerivedOutputs(live);
+
+  assert.equal(live.mostDots.values['Bhuvneshwar Kumar'], 94);
+  assert.equal(live.mostDots.values['Anshul Kamboj'], 94);
+  assert.equal(live.mostDots.values['bhuvneshwar kumar'], undefined);
+  assert.equal(live.mostDots.values['anshul kamboj'], undefined);
+  assert.equal(live.mvp.values['Bhuvneshwar Kumar']?.dotBalls, 94);
+  assert.equal(live.mvp.values['Anshul Kamboj']?.dotBalls, 94);
+  assert.equal(live.mvp.values['bhuvneshwar kumar'], undefined);
+  assert.equal(live.mvp.values['anshul kamboj'], undefined);
 });
