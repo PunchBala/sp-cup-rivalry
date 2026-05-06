@@ -468,6 +468,15 @@ export function convertOfficialScorecardInputToProviderShape(manualInput, matchR
   return providerScorecard;
 }
 
+export function markManualBackfillMatchRefEnded(matchRef, providerScorecard) {
+  if (!matchRef || typeof matchRef !== 'object') return matchRef;
+  matchRef.matchStarted = true;
+  matchRef.matchEnded = true;
+  const status = normalizeName(providerScorecard?.status);
+  if (status) matchRef.status = status;
+  return matchRef;
+}
+
 function buildMostDotsPayload(values = {}, source = 'Manual official scorecard backfill') {
   const normalizedValues = Object.fromEntries(
     Object.entries(values || {})
@@ -625,6 +634,7 @@ async function main() {
     return;
   }
 
+  markManualBackfillMatchRefEnded(matchRef, providerScorecard);
   await writeCachedScorecard(providerScorecard.id, providerScorecard, { cacheDir: SCORECARD_CACHE_DIR });
   await updateLiveFromManualCache(live, { inputPath });
   await fs.writeFile(DATA_FILE, `${JSON.stringify(live, null, 2)}\n`, 'utf8');

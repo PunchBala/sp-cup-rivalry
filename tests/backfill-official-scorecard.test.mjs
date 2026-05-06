@@ -4,7 +4,10 @@ import fs from 'node:fs/promises';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { convertOfficialScorecardInputToProviderShape } from '../scripts/backfill-official-scorecard.mjs';
+import {
+  convertOfficialScorecardInputToProviderShape,
+  markManualBackfillMatchRefEnded
+} from '../scripts/backfill-official-scorecard.mjs';
 import {
   buildMiniFantasyPlayerHistoriesFromProcessedMatches,
   rebuildHistoricalState,
@@ -194,4 +197,28 @@ test('direct dot balls in cached scorecards flow into manual backfill history re
   );
 
   assert.equal(rebuilt.aggregates.bowlingDots['pat cummins'], 12);
+});
+
+test('manual official backfill marks stale match refs as ended before replay', () => {
+  const matchRef = {
+    id: 'match-49',
+    status: 'Match starts at May 06, 14:00 GMT',
+    matchStarted: false,
+    matchEnded: false,
+    matchNo: 49
+  };
+
+  const providerScorecard = {
+    id: 'match-49',
+    status: 'Sunrisers Hyderabad won by 33 runs',
+    matchStarted: true,
+    matchEnded: true
+  };
+
+  const result = markManualBackfillMatchRefEnded(matchRef, providerScorecard);
+
+  assert.equal(result, matchRef);
+  assert.equal(matchRef.matchStarted, true);
+  assert.equal(matchRef.matchEnded, true);
+  assert.equal(matchRef.status, 'Sunrisers Hyderabad won by 33 runs');
 });
