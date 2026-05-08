@@ -104,6 +104,8 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /badge cabinet/i);
   assert.match(html, /Host Mode/);
   assert.match(html, /Game On/);
+  assert.match(html, /Wooden Spoon/);
+  assert.match(html, /Captain Curse/);
   assert.match(html, /Should've Stayed in Bed/);
   assert.match(html, /Main Character/);
   assert.match(html, /Cooked/);

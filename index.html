@@ -6302,6 +6302,20 @@ function titleBandScore(pick, live){
         emoji: '🐦',
         description: 'Locked the team early and still won the room.',
         rule: 'Save your team 6+ hours before lock and still finish #1 in that fixture.'
+      },
+      {
+        key: 'wooden_spoon',
+        name: 'Wooden Spoon',
+        emoji: 'ðŸ¥„',
+        description: 'Somebody had to bring up the rear.',
+        rule: 'Finish last in a completed Mini Fantasy fixture.'
+      },
+      {
+        key: 'captain_curse',
+        name: 'Captain Curse',
+        emoji: 'âš°ï¸',
+        description: 'The armband pick came back to haunt you.',
+        rule: 'Have your captain finish as the lowest scorer in your team.'
       }
     ];
 
@@ -6503,6 +6517,20 @@ function titleBandScore(pick, live){
         return savedAtMs <= (lockAtMs - (6 * 60 * 60 * 1000));
       }) || null;
 
+      const woodenSpoonRecord = badgeFixtures.find((record) => {
+        const ownPoints = Number(record.ownItem?.detail?.totalPoints || 0) || 0;
+        const floorPoints = record.lockedFieldEntries.reduce((worst, item) => Math.min(worst, Number(item.detail?.totalPoints || 0) || 0), Infinity);
+        return Number.isFinite(floorPoints) && ownPoints <= floorPoints;
+      }) || null;
+
+      const captainCurseRecord = badgeFixtures.find((record) => {
+        const players = Array.isArray(record.ownItem?.detail?.players) ? record.ownItem.detail.players : [];
+        const captain = record.ownItem?.detail?.captain || null;
+        if (!captain || !players.length) return false;
+        const teamLow = players.reduce((worst, player) => Math.min(worst, Number(player.scoredPoints ?? player.points ?? 0)), Infinity);
+        return Number.isFinite(teamLow) && Number(captain.scoredPoints ?? captain.points ?? 0) <= teamLow;
+      }) || null;
+
       const playedDuel = profile.myDuels.find((item) => {
         const ownEntry = currentUserMatchupEntry(item.matchup);
         return Boolean(ownEntry?.submittedAt) || ['armed', 'live', 'clash'].includes(item.status);
@@ -6522,7 +6550,9 @@ function titleBandScore(pick, live){
         budget_bandit: budgetBanditRecord ? { unlocked: true, note: `Match ${budgetBanditRecord.matchNo}: ${formatMiniFantasyPoints(budgetBanditRecord.ownItem.detail.totalPoints)} on ${formatMiniFantasyPrice(budgetBanditRecord.ownItem.detail.spentCredits)} credits.` } : { unlocked: false },
         full_send: fullSendRecord ? { unlocked: true, note: `All four picks cleared 50 in Match ${fullSendRecord.matchNo}.` } : { unlocked: false },
         zero_mercy: zeroMercyRecord ? { unlocked: true, note: `Match ${zeroMercyRecord.matchNo}: won by ${formatMiniFantasyPoints(Number(zeroMercyRecord.ownItem.detail.totalPoints || 0) - Number(zeroMercyRecord.secondEntryPoints || 0))} points.` } : { unlocked: false },
-        early_bird: earlyBirdRecord ? { unlocked: true, note: `Match ${earlyBirdRecord.matchNo}: early lock, late victory.` } : { unlocked: false }
+        early_bird: earlyBirdRecord ? { unlocked: true, note: `Match ${earlyBirdRecord.matchNo}: early lock, late victory.` } : { unlocked: false },
+        wooden_spoon: woodenSpoonRecord ? { unlocked: true, note: `Match ${woodenSpoonRecord.matchNo}: finished at the bottom.` } : { unlocked: false },
+        captain_curse: captainCurseRecord ? { unlocked: true, note: `${captainCurseRecord.ownItem.detail.captain?.name || 'Captain'} sank Match ${captainCurseRecord.matchNo}.` } : { unlocked: false }
       };
     }
 
