@@ -13,6 +13,7 @@ import {
   buildFixturePlayerPool,
   generateMiniFantasyOpenFixturePriceSnapshots,
   calculateMiniFantasyMissedLockPoints,
+  calculateMiniFantasyMissedLockPointsForPlayedFixture,
   deriveCompletedMatchHistories,
   generateMiniFantasyPriceBook,
   getMiniFantasyFixtureOpenAtUtc,
@@ -2234,6 +2235,27 @@ test('calculateMiniFantasyMissedLockPoints lowers the cap after the third missed
     cap: 30,
     total: 30
   });
+});
+
+test('calculateMiniFantasyMissedLockPointsForPlayedFixture uses prior missed locks before the target match', () => {
+  const matches = [
+    { match_no: 18, source: 'locked_entry' },
+    { match_no: 21, source: 'missed_lock_relief' },
+    { match_no: 27, source: 'missed_lock_relief' },
+    { match_no: 33, source: 'locked_entry' },
+    { match_no: 41, source: 'missed_lock_relief' },
+    { match_no: 50, source: 'locked_entry' }
+  ];
+
+  assert.deepEqual(
+    calculateMiniFantasyMissedLockPointsForPlayedFixture(matches, 200, 50),
+    { cap: 30, total: 30 }
+  );
+
+  assert.deepEqual(
+    calculateMiniFantasyMissedLockPointsForPlayedFixture(matches, 60, 33),
+    { cap: 50, total: 24 }
+  );
 });
 
 test('scoreMiniFantasyEntry applies appearance and winning bonuses before captain multiplier and zeroes no-result fixtures', () => {

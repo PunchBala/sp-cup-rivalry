@@ -1588,7 +1588,7 @@
       buildMiniFantasyLeaderboard,
       buildMiniFantasyEntryAuditLog,
       buildEntryPriceSnapshot,
-      calculateMiniFantasyMissedLockPoints,
+      calculateMiniFantasyMissedLockPointsForPlayedFixture,
       formatDateKeyInTimeZone,
       buildFixturePlayerPool,
       generateMiniFantasyPriceBook,
@@ -6385,6 +6385,7 @@ function titleBandScore(pick, live){
       const leaderboardRows = Array.isArray(miniFantasyLeaderboardData()?.rows) ? miniFantasyLeaderboardData().rows : [];
       const ownRow = leaderboardRows.find((row) => normalizeOwnerId(row.owner_handle || '') === ownHandle) || null;
       if (!ownRow) return [];
+      const ownMatches = Array.isArray(ownRow.matches) ? ownRow.matches : [];
       const fieldMatchesByNo = new Map();
       leaderboardRows.forEach((row) => {
         (Array.isArray(row.matches) ? row.matches : []).forEach((matchSummary) => {
@@ -6439,7 +6440,7 @@ function titleBandScore(pick, live){
             secondEntryPoints: lockedFieldEntries
               .map((item) => Number(item.detail?.totalPoints || 0) || 0)
               .sort((a, b) => b - a)[1] || 0,
-            standardRelief: calculateMiniFantasyMissedLockPoints(averageLockedScore, 1)
+            standardRelief: calculateMiniFantasyMissedLockPointsForPlayedFixture(ownMatches, averageLockedScore, matchNo)
           };
         })
         .filter(Boolean);

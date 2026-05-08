@@ -711,6 +711,17 @@ export function calculateMiniFantasyMissedLockPoints(averageLockedScore, missedL
   };
 }
 
+export function calculateMiniFantasyMissedLockPointsForPlayedFixture(matches = [], averageLockedScore, targetMatchNo) {
+  const matchNo = Number(targetMatchNo || 0) || 0;
+  const priorMissedLockCount = (Array.isArray(matches) ? matches : []).filter((match) => {
+    const priorMatchNo = Number(match?.match_no || 0) || 0;
+    return priorMatchNo > 0
+      && (!matchNo || priorMatchNo < matchNo)
+      && String(match?.source || '').trim().toLowerCase() === 'missed_lock_relief';
+  }).length;
+  return calculateMiniFantasyMissedLockPoints(averageLockedScore, priorMissedLockCount + 1);
+}
+
 function participantIdentityKey({ ownerHandle = '', userId = '' } = {}) {
   const safeHandle = normalizeWhitespace(ownerHandle).toLowerCase();
   if (safeHandle) return `handle:${safeHandle}`;
