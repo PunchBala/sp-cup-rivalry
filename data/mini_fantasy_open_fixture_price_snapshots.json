@@ -1,8 +1,8 @@
 {
   "version": "mini_fantasy_open_fixture_prices_v1",
   "season": "IPL 2026",
-  "generated_at_utc": "2026-05-09T18:55:31.149Z",
-  "source_price_book_generated_at_utc": "2026-05-09T18:55:31.149Z",
+  "generated_at_utc": "2026-05-09T19:56:27.733Z",
+  "source_price_book_generated_at_utc": "2026-05-09T19:56:27.733Z",
   "fixtures": [
     {
       "season": "IPL 2026",
@@ -394,15 +394,6 @@
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "lsg_mukul-choudhary": {
-          "player_id": "lsg_mukul-choudhary",
-          "name": "Mukul Choudhary",
-          "team": "LSG",
-          "role": "wicket_keeper",
-          "final_price": 6.5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
         "lsg_mayank-yadav": {
           "player_id": "lsg_mayank-yadav",
           "name": "Mayank Yadav",
@@ -410,6 +401,15 @@
           "role": "bowler",
           "final_price": 6,
           "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "lsg_mukul-choudhary": {
+          "player_id": "lsg_mukul-choudhary",
+          "name": "Mukul Choudhary",
+          "team": "LSG",
+          "role": "wicket_keeper",
+          "final_price": 6.5,
+          "is_uncapped": true,
           "pricing_eligible": true
         },
         "lsg_abdul-samad": {
@@ -786,20 +786,20 @@
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "rcb_romario-shepherd": {
-          "player_id": "rcb_romario-shepherd",
-          "name": "Romario Shepherd",
-          "team": "RCB",
-          "role": "all_rounder",
-          "final_price": 8,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
         "rcb_virat-kohli": {
           "player_id": "rcb_virat-kohli",
           "name": "Virat Kohli",
           "team": "RCB",
           "role": "batter",
+          "final_price": 8,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "rcb_romario-shepherd": {
+          "player_id": "rcb_romario-shepherd",
+          "name": "Romario Shepherd",
+          "team": "RCB",
+          "role": "all_rounder",
           "final_price": 8,
           "is_uncapped": false,
           "pricing_eligible": true
