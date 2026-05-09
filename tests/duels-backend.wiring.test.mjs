@@ -36,6 +36,8 @@ test('backend config, adapter, and setup docs are present for real auth + duel a
   assert.match(backendJs, /fixture_datetime_utc:\s*`lte\.\$\{publicVisibleAtUtc\}`/);
   assert.match(backendJs, /power_boost_key/);
   assert.match(backendJs, /boosted_player_id/);
+  assert.match(backendJs, /isMiniFantasyPowerBoostColumnError/);
+  assert.match(backendJs, /Season boosts need the latest Supabase SQL before they can be saved from the hosted site\./);
   assert.match(backendJs, /upsertMiniFantasyEntry/);
   assert.match(backendJs, /upsertMiniFantasyLiveSnapshot/);
   assert.match(backendJs, /deleteMiniFantasyLiveSnapshot/);

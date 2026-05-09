@@ -71,6 +71,9 @@
     return Math.round(numeric * 100) / 100;
   }
 
+  const MINI_FANTASY_ENTRY_LEGACY_SELECT = 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at';
+  const MINI_FANTASY_ENTRY_POWER_SELECT = 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,power_boost_key,boosted_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at';
+
   function readStoredJson(key, fallback = null) {
     try {
       const raw = window.localStorage.getItem(key);
@@ -121,6 +124,11 @@
       || payload.error
       || payload.hint
       || fallback;
+  }
+
+  function isMiniFantasyPowerBoostColumnError(error) {
+    const message = normalizeWhitespace(error?.message || error || '').toLowerCase();
+    return message.includes('power_boost_key') || message.includes('boosted_player_id');
   }
 
   function buildBundleLabel(duelRow, orderedEntries) {
@@ -388,6 +396,60 @@
           owner_handle: normalizeSlug(profile.handle || row?.owner_handle || '')
         };
       });
+    }
+
+    function buildMiniFantasyEntryPayload(entry, currentUser, safeSeason, matchNo, { includePowerBoostFields = true } = {}) {
+      const payload = {
+        user_id: currentUser.userId,
+        owner_handle: currentUser.ownerId,
+        display_name: normalizeWhitespace(entry?.displayName || currentUser.displayName || currentUser.ownerId || ''),
+        season: safeSeason,
+        match_no: matchNo,
+        home_team_code: normalizeWhitespace(entry?.homeTeamCode || ''),
+        away_team_code: normalizeWhitespace(entry?.awayTeamCode || ''),
+        fixture_label: normalizeWhitespace(entry?.fixtureLabel || ''),
+        fixture_datetime_utc: entry?.fixtureDatetimeUtc || null,
+        selected_player_ids: cloneJson(entry?.selectedPlayerIds || []),
+        captain_player_id: normalizeWhitespace(entry?.captainPlayerId || '') || null,
+        price_snapshot: cloneJson(entry?.priceSnapshot || {}),
+        spent_credits: roundCreditAmount(entry?.spentCredits || 0),
+        saved_at: entry?.savedAt || new Date().toISOString()
+      };
+      if (includePowerBoostFields) {
+        payload.power_boost_key = normalizeWhitespace(entry?.powerBoostKey || '') || null;
+        payload.boosted_player_id = normalizeWhitespace(entry?.boostedPlayerId || '') || null;
+      }
+      return payload;
+    }
+
+    async function requestMiniFantasyEntryRows({
+      method = 'GET',
+      query = null,
+      body = null,
+      accessToken = null,
+      prefer = null,
+      allowLegacyFallback = false,
+      legacyBody = null
+    } = {}) {
+      const fullQuery = { ...(query || {}), select: MINI_FANTASY_ENTRY_POWER_SELECT };
+      try {
+        return await restRequest(config.tables.miniFantasyEntries, {
+          method,
+          query: fullQuery,
+          body,
+          accessToken,
+          prefer
+        });
+      } catch (error) {
+        if (!allowLegacyFallback || !isMiniFantasyPowerBoostColumnError(error)) throw error;
+        return restRequest(config.tables.miniFantasyEntries, {
+          method,
+          query: { ...(query || {}), select: MINI_FANTASY_ENTRY_LEGACY_SELECT },
+          body: legacyBody ?? body,
+          accessToken,
+          prefer
+        });
+      }
     }
 
     async function currentUserProfile() {
@@ -878,15 +940,15 @@ function normalizeMiniFantasyEntryRow(row) {
           return [];
         }
         const safeSeason = normalizeWhitespace(season || '');
-        const rows = await restRequest(config.tables.miniFantasyEntries, {
+        const rows = await requestMiniFantasyEntryRows({
           method: 'GET',
           query: {
-            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,power_boost_key,boosted_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
             user_id: `eq.${currentUser.userId}`,
             ...(safeSeason ? { season: `eq.${safeSeason}` } : {}),
             order: 'fixture_datetime_utc.asc.nullslast,match_no.asc'
           },
-          accessToken: activeSession.access_token
+          accessToken: activeSession.access_token,
+          allowLegacyFallback: true
         });
         const enrichedRows = await enrichMiniFantasyEntriesWithProfiles(rows, activeSession.access_token);
         return enrichedRows.map(normalizeMiniFantasyEntryRow).filter(Boolean);
@@ -896,15 +958,15 @@ function normalizeMiniFantasyEntryRow(row) {
         const activeSession = await ensureFreshSession();
         const safeSeason = normalizeWhitespace(season || '');
         const publicVisibleAtUtc = new Date(Date.now() + 60 * 1000).toISOString();
-        const rows = await restRequest(config.tables.miniFantasyEntries, {
+        const rows = await requestMiniFantasyEntryRows({
           method: 'GET',
           query: {
-            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,power_boost_key,boosted_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
             ...(safeSeason ? { season: `eq.${safeSeason}` } : {}),
             fixture_datetime_utc: `lte.${publicVisibleAtUtc}`,
             order: 'saved_at.desc.nullslast,fixture_datetime_utc.asc.nullslast,match_no.asc'
           },
-          accessToken: activeSession?.access_token || currentUser?.accessToken || null
+          accessToken: activeSession?.access_token || currentUser?.accessToken || null,
+          allowLegacyFallback: true
         });
         const enrichedRows = await enrichMiniFantasyEntriesWithProfiles(rows, activeSession?.access_token || currentUser?.accessToken || null);
         return enrichedRows.map(normalizeMiniFantasyEntryRow).filter(Boolean);
@@ -1008,33 +1070,27 @@ function normalizeMiniFantasyEntryRow(row) {
         if (!safeSeason || !matchNo) {
           throw new Error('Mini Fantasy save needs a season and match number.');
         }
-        const rows = await restRequest(config.tables.miniFantasyEntries, {
-          method: 'POST',
-          query: {
-            on_conflict: 'user_id,season,match_no',
-            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,power_boost_key,boosted_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at'
-          },
-          body: {
-            user_id: currentUser.userId,
-            owner_handle: currentUser.ownerId,
-            display_name: normalizeWhitespace(entry?.displayName || currentUser.displayName || currentUser.ownerId || ''),
-            season: safeSeason,
-            match_no: matchNo,
-            home_team_code: normalizeWhitespace(entry?.homeTeamCode || ''),
-            away_team_code: normalizeWhitespace(entry?.awayTeamCode || ''),
-            fixture_label: normalizeWhitespace(entry?.fixtureLabel || ''),
-            fixture_datetime_utc: entry?.fixtureDatetimeUtc || null,
-            selected_player_ids: cloneJson(entry?.selectedPlayerIds || []),
-            captain_player_id: normalizeWhitespace(entry?.captainPlayerId || '') || null,
-            power_boost_key: normalizeWhitespace(entry?.powerBoostKey || '') || null,
-            boosted_player_id: normalizeWhitespace(entry?.boostedPlayerId || '') || null,
-            price_snapshot: cloneJson(entry?.priceSnapshot || {}),
-            spent_credits: roundCreditAmount(entry?.spentCredits || 0),
-            saved_at: entry?.savedAt || new Date().toISOString()
-          },
-          accessToken: activeSession.access_token,
-          prefer: 'resolution=merge-duplicates,return=representation'
-        });
+        const powerBoostKey = normalizeWhitespace(entry?.powerBoostKey || '');
+        const boostedPlayerId = normalizeWhitespace(entry?.boostedPlayerId || '');
+        let rows;
+        try {
+          rows = await requestMiniFantasyEntryRows({
+            method: 'POST',
+            query: {
+              on_conflict: 'user_id,season,match_no'
+            },
+            body: buildMiniFantasyEntryPayload(entry, currentUser, safeSeason, matchNo, { includePowerBoostFields: true }),
+            legacyBody: buildMiniFantasyEntryPayload(entry, currentUser, safeSeason, matchNo, { includePowerBoostFields: false }),
+            accessToken: activeSession.access_token,
+            prefer: 'resolution=merge-duplicates,return=representation',
+            allowLegacyFallback: !(powerBoostKey || boostedPlayerId)
+          });
+        } catch (error) {
+          if (isMiniFantasyPowerBoostColumnError(error) && (powerBoostKey || boostedPlayerId)) {
+            throw new Error('Season boosts need the latest Supabase SQL before they can be saved from the hosted site.');
+          }
+          throw error;
+        }
         return normalizeMiniFantasyEntryRow(firstArrayItem(rows));
       },
 
