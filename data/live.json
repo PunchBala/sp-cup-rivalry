@@ -2,7 +2,7 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-05-09T19:56:27.733Z",
+  "fetchedAt": "2026-05-09T20:42:07.346Z",
   "scrapeStatus": "ok (52 processed matches, 0 scorecard calls this run)",
   "scrapeReport": {
     "orangeCap": {
@@ -73,11 +73,11 @@
       "method": "filtered to the provided uncapped player pool, then compares picks by their positions in the custom MVP ranking"
     },
     "fairPlay": {
-      "ok": false,
+      "ok": true,
       "source": "IPLT20 official fairplay feed",
       "method": "parsed JSONP fairplayTotal table from Sports Mechanic stats feed",
-      "error": "jsonp-callback-not-found",
-      "fallback": "kept previous fairPlay snapshot"
+      "rows": 10,
+      "updatedAt": "10-05-2026 : 01:00:01"
     },
     "leastMvp": {
       "ok": true,
@@ -110,19 +110,19 @@
       "dayKey": "2026-05-09",
       "quietRefreshesUsed": 0,
       "lastQuietRefreshAt": null,
-      "lastLiveRefreshAt": "2026-05-09T19:56:26.904Z",
-      "lastSeriesInfoAt": "2026-05-09T19:56:26.904Z",
+      "lastLiveRefreshAt": "2026-05-09T20:42:06.561Z",
+      "lastSeriesInfoAt": "2026-05-09T20:42:06.561Z",
       "lastDecision": {
-        "at": "2026-05-09T19:56:25.853Z",
+        "at": "2026-05-09T20:42:05.477Z",
         "shouldRefresh": true,
         "mode": "scheduled_window",
         "reason": "inside planned refresh window",
-        "nextPlannedAt": "2026-05-09T20:00:00.000Z"
+        "nextPlannedAt": "2026-05-09T21:00:00.000Z"
       },
-      "nextPlannedRefreshAt": "2026-05-09T20:00:00.000Z",
+      "nextPlannedRefreshAt": "2026-05-09T21:00:00.000Z",
       "nextPlannedMode": "scheduled_window",
       "nextPlannedReason": "league-stage refresh plan",
-      "nextPlannedCalculatedAt": "2026-05-09T19:56:26.904Z"
+      "nextPlannedCalculatedAt": "2026-05-09T20:42:06.562Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -521007,7 +521007,7 @@
       },
       {
         "processedMatchCount": 52,
-        "fetchedAt": "2026-05-09T19:56:27.733Z",
+        "fetchedAt": "2026-05-09T20:42:07.346Z",
         "snapshot": {
           "season": 2026,
           "provider": "CricketData.org",
@@ -530977,10 +530977,10 @@
               "Chennai Super Kings",
               "Mumbai Indians",
               "Punjab Kings",
-              "Rajasthan Royals",
               "Gujarat Titans",
               "Sunrisers Hyderabad",
               "Lucknow Super Giants",
+              "Rajasthan Royals",
               "Kolkata Knight Riders",
               "Royal Challengers Bengaluru",
               "Delhi Capitals"
@@ -530989,10 +530989,10 @@
               "Chennai Super Kings",
               "Mumbai Indians",
               "Punjab Kings",
-              "Rajasthan Royals",
               "Gujarat Titans",
               "Sunrisers Hyderabad",
               "Lucknow Super Giants",
+              "Rajasthan Royals",
               "Kolkata Knight Riders",
               "Royal Challengers Bengaluru",
               "Delhi Capitals"
@@ -531049,27 +531049,10 @@
                   "AvePoints": "10.00"
                 }
               },
-              "Rajasthan Royals": {
-                "matches": 11,
-                "average": null,
-                "points": 109,
-                "raw": {
-                  "TeamID": "12",
-                  "TeamName": "RR",
-                  "TeamFullName": "Rajasthan Royals",
-                  "No": "11",
-                  "HM": "6",
-                  "HP": "60",
-                  "AM": "5",
-                  "AP": "49",
-                  "Points": "109",
-                  "AvePoints": "9.91"
-                }
-              },
               "Gujarat Titans": {
                 "matches": 11,
                 "average": null,
-                "points": 108,
+                "points": 109,
                 "raw": {
                   "TeamID": "26",
                   "TeamName": "GT",
@@ -531078,9 +531061,9 @@
                   "HM": "5",
                   "HP": "49",
                   "AM": "6",
-                  "AP": "59",
-                  "Points": "108",
-                  "AvePoints": "9.82"
+                  "AP": "60",
+                  "Points": "109",
+                  "AvePoints": "9.91"
                 }
               },
               "Sunrisers Hyderabad": {
@@ -531115,6 +531098,23 @@
                   "AP": "48",
                   "Points": "98",
                   "AvePoints": "9.80"
+                }
+              },
+              "Rajasthan Royals": {
+                "matches": 11,
+                "average": null,
+                "points": 107,
+                "raw": {
+                  "TeamID": "12",
+                  "TeamName": "RR",
+                  "TeamFullName": "Rajasthan Royals",
+                  "No": "11",
+                  "HM": "6",
+                  "HP": "58",
+                  "AM": "5",
+                  "AP": "49",
+                  "Points": "107",
+                  "AvePoints": "9.73"
                 }
               },
               "Kolkata Knight Riders": {
@@ -531169,7 +531169,7 @@
                 }
               }
             },
-            "updatedAt": "09-05-2026 : 23:21:59",
+            "updatedAt": "10-05-2026 : 01:00:01",
             "source": "IPLT20 official fairplay feed"
           },
           "highestScoreTeam": {
@@ -541900,7 +541900,7 @@
     },
     "liveOverlay": {
       "matchId": null,
-      "generatedAt": "2026-05-09T19:56:26.922Z",
+      "generatedAt": "2026-05-09T20:42:06.580Z",
       "aggregates": null,
       "status": null,
       "source": null
@@ -541956,7 +541956,7 @@
     "aggregateSchemaVersion": 5,
     "providerStatus": {
       "state": "ok",
-      "lastAttemptAt": "2026-05-09T19:56:25.849Z",
+      "lastAttemptAt": "2026-05-09T20:42:05.473Z",
       "lastErrorAt": null,
       "reason": null,
       "hitsToday": null,
@@ -549309,10 +549309,10 @@
       "Chennai Super Kings",
       "Mumbai Indians",
       "Punjab Kings",
-      "Rajasthan Royals",
       "Gujarat Titans",
       "Sunrisers Hyderabad",
       "Lucknow Super Giants",
+      "Rajasthan Royals",
       "Kolkata Knight Riders",
       "Royal Challengers Bengaluru",
       "Delhi Capitals"
@@ -549321,10 +549321,10 @@
       "Chennai Super Kings",
       "Mumbai Indians",
       "Punjab Kings",
-      "Rajasthan Royals",
       "Gujarat Titans",
       "Sunrisers Hyderabad",
       "Lucknow Super Giants",
+      "Rajasthan Royals",
       "Kolkata Knight Riders",
       "Royal Challengers Bengaluru",
       "Delhi Capitals"
@@ -549381,27 +549381,10 @@
           "AvePoints": "10.00"
         }
       },
-      "Rajasthan Royals": {
-        "matches": 11,
-        "average": null,
-        "points": 109,
-        "raw": {
-          "TeamID": "12",
-          "TeamName": "RR",
-          "TeamFullName": "Rajasthan Royals",
-          "No": "11",
-          "HM": "6",
-          "HP": "60",
-          "AM": "5",
-          "AP": "49",
-          "Points": "109",
-          "AvePoints": "9.91"
-        }
-      },
       "Gujarat Titans": {
         "matches": 11,
         "average": null,
-        "points": 108,
+        "points": 109,
         "raw": {
           "TeamID": "26",
           "TeamName": "GT",
@@ -549410,9 +549393,9 @@
           "HM": "5",
           "HP": "49",
           "AM": "6",
-          "AP": "59",
-          "Points": "108",
-          "AvePoints": "9.82"
+          "AP": "60",
+          "Points": "109",
+          "AvePoints": "9.91"
         }
       },
       "Sunrisers Hyderabad": {
@@ -549447,6 +549430,23 @@
           "AP": "48",
           "Points": "98",
           "AvePoints": "9.80"
+        }
+      },
+      "Rajasthan Royals": {
+        "matches": 11,
+        "average": null,
+        "points": 107,
+        "raw": {
+          "TeamID": "12",
+          "TeamName": "RR",
+          "TeamFullName": "Rajasthan Royals",
+          "No": "11",
+          "HM": "6",
+          "HP": "58",
+          "AM": "5",
+          "AP": "49",
+          "Points": "107",
+          "AvePoints": "9.73"
         }
       },
       "Kolkata Knight Riders": {
@@ -549501,7 +549501,7 @@
         }
       }
     },
-    "updatedAt": "09-05-2026 : 23:21:59",
+    "updatedAt": "10-05-2026 : 01:00:01",
     "source": "IPLT20 official fairplay feed"
   },
   "highestScoreTeam": {
