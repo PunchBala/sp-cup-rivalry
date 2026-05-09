@@ -945,6 +945,8 @@
       gap:6px;
       cursor:pointer;
       transition:.18s ease;
+      position:relative;
+      overflow:hidden;
     }
     .fantasy-power-button:hover{transform:translateY(-1px);border-color:rgba(124,196,255,.24)}
     .fantasy-power-button.active{
@@ -961,7 +963,48 @@
       border-style:dashed;
       background:rgba(255,255,255,.035);
     }
+    .fantasy-power-button.mini-boost-all-in{
+      border-color:rgba(255,178,87,.24);
+      background:
+        radial-gradient(circle at top right, rgba(255,134,61,.14), transparent 42%),
+        linear-gradient(180deg, rgba(61,34,18,.96), rgba(24,13,8,.92));
+    }
+    .fantasy-power-button.mini-boost-x-factor{
+      border-color:rgba(179,129,255,.22);
+      background:
+        radial-gradient(circle at top right, rgba(179,129,255,.18), transparent 42%),
+        linear-gradient(180deg, rgba(34,19,59,.96), rgba(14,10,28,.92));
+    }
+    .fantasy-power-button.mini-boost-deep-pockets{
+      border-color:rgba(112,235,187,.22);
+      background:
+        radial-gradient(circle at top right, rgba(112,235,187,.18), transparent 42%),
+        linear-gradient(180deg, rgba(14,49,40,.96), rgba(8,23,19,.92));
+    }
+    .fantasy-power-button.active.mini-boost-all-in{
+      border-color:rgba(255,193,118,.46);
+      background:
+        radial-gradient(circle at top right, rgba(255,170,87,.24), transparent 42%),
+        linear-gradient(180deg, rgba(104,58,27,.96), rgba(39,19,8,.92));
+      box-shadow:0 0 0 1px rgba(255,193,118,.16) inset, 0 10px 30px rgba(255,132,58,.14);
+    }
+    .fantasy-power-button.active.mini-boost-x-factor{
+      border-color:rgba(194,155,255,.44);
+      background:
+        radial-gradient(circle at top right, rgba(194,155,255,.24), transparent 42%),
+        linear-gradient(180deg, rgba(57,26,96,.96), rgba(20,12,43,.92));
+      box-shadow:0 0 0 1px rgba(194,155,255,.16) inset, 0 10px 30px rgba(137,82,255,.14);
+    }
+    .fantasy-power-button.active.mini-boost-deep-pockets{
+      border-color:rgba(112,235,187,.4);
+      background:
+        radial-gradient(circle at top right, rgba(112,235,187,.22), transparent 42%),
+        linear-gradient(180deg, rgba(21,78,60,.96), rgba(9,29,23,.92));
+      box-shadow:0 0 0 1px rgba(112,235,187,.14) inset, 0 10px 30px rgba(56,193,140,.13);
+    }
     .fantasy-power-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+    .fantasy-power-title{display:flex;align-items:center;gap:8px}
+    .fantasy-power-emoji{font-size:20px;line-height:1;filter:drop-shadow(0 1px 0 rgba(0,0,0,.24))}
     .fantasy-power-name{font-size:15px;font-weight:900;color:#fff}
     .fantasy-power-short{font-size:11px;font-weight:800;color:#9fd6ff;text-transform:uppercase;letter-spacing:.06em}
     .fantasy-power-detail{font-size:12px;line-height:1.45;color:#d5e7ff}
@@ -987,6 +1030,42 @@
       border-color:rgba(124,196,255,.22);
       background:rgba(124,196,255,.10);
       color:#d6e9ff;
+    }
+    .pill.mini-boost-pill,
+    .fantasy-summary-chip.mini-boost-pill,
+    .fantasy-boost-tag.mini-boost-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-weight:900;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .pill.mini-boost-pill.mini-boost-none,
+    .fantasy-summary-chip.mini-boost-pill.mini-boost-none{
+      border-color:rgba(124,196,255,.14);
+      background:rgba(255,255,255,.04);
+      color:#d7e7ff;
+    }
+    .pill.mini-boost-pill.mini-boost-all-in,
+    .fantasy-summary-chip.mini-boost-pill.mini-boost-all-in,
+    .fantasy-boost-tag.mini-boost-all-in{
+      border-color:rgba(255,186,108,.34);
+      background:linear-gradient(180deg, rgba(255,186,108,.22), rgba(110,57,20,.18));
+      color:#fff1ca;
+    }
+    .pill.mini-boost-pill.mini-boost-x-factor,
+    .fantasy-summary-chip.mini-boost-pill.mini-boost-x-factor,
+    .fantasy-boost-tag.mini-boost-x-factor{
+      border-color:rgba(196,160,255,.32);
+      background:linear-gradient(180deg, rgba(196,160,255,.22), rgba(65,35,118,.18));
+      color:#f1e6ff;
+    }
+    .pill.mini-boost-pill.mini-boost-deep-pockets,
+    .fantasy-summary-chip.mini-boost-pill.mini-boost-deep-pockets,
+    .fantasy-boost-tag.mini-boost-deep-pockets{
+      border-color:rgba(112,235,187,.3);
+      background:linear-gradient(180deg, rgba(112,235,187,.2), rgba(17,78,57,.16));
+      color:#e6fff2;
     }
     .fantasy-slot-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
     @media (max-width:760px){.fantasy-slot-grid{grid-template-columns:1fr}}
@@ -9179,18 +9258,21 @@ function titleBandScore(pick, live){
         {
           key: 'all_in',
           name: 'All In',
+          emoji: '⚡',
           short: '1.5x full team',
           detail: 'Applies a 1.5x multiplier across your whole team for one fixture and replaces the captain slot.'
         },
         {
           key: 'x_factor',
           name: 'X-Factor',
+          emoji: '🃏',
           short: '2x one non-captain',
           detail: 'Doubles one selected non-captain player for one fixture.'
         },
         {
           key: 'deep_pockets',
           name: 'Deep Pockets',
+          emoji: '💰',
           short: `Budget ${MINI_FANTASY_DEEP_POCKETS_BUDGET}`,
           detail: `Raises your budget from ${MINI_FANTASY_BUDGET} to ${MINI_FANTASY_DEEP_POCKETS_BUDGET} for one fixture.`
         }
@@ -9208,7 +9290,15 @@ function titleBandScore(pick, live){
 
     function miniFantasyPowerBoostLabel(value = ''){
       const definition = getMiniFantasyPowerBoostDefinition(value);
-      return definition?.name || '';
+      if (!definition) return '';
+      const localDefinition = miniFantasyPowerBoostDefinitions().find((item) => item.key === definition.key);
+      return `${localDefinition?.emoji || ''} ${definition.name}`.trim();
+    }
+
+    function miniFantasyPowerBoostToneClass(powerBoostKey = ''){
+      const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
+      if (!key) return 'mini-boost-none';
+      return `mini-boost-${key.replace(/_/g, '-')}`;
     }
 
     function miniFantasyPowerBoostNarrative(powerBoostKey = '', boostedPlayerName = ''){
@@ -9229,9 +9319,9 @@ function titleBandScore(pick, live){
     function miniFantasyPowerBoostChipText(powerBoostKey = '', boostedPlayerName = ''){
       const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
       if (!key) return 'Boost: none';
-      if (key === 'all_in') return 'Boost: All In (captain off)';
-      if (key === 'x_factor' && boostedPlayerName) return `Boost: X-Factor on ${boostedPlayerName}`;
-      if (key === 'deep_pockets') return `Boost: Deep Pockets (${MINI_FANTASY_DEEP_POCKETS_BUDGET} cr)`;
+      if (key === 'all_in') return '⚡ Boost: All In (captain off)';
+      if (key === 'x_factor' && boostedPlayerName) return `🃏 Boost: X-Factor on ${boostedPlayerName}`;
+      if (key === 'deep_pockets') return `💰 Boost: Deep Pockets (${MINI_FANTASY_DEEP_POCKETS_BUDGET} cr)`;
       return `Boost: ${miniFantasyPowerBoostLabel(key)}`;
     }
 
@@ -10616,7 +10706,7 @@ function titleBandScore(pick, live){
           <div class="fantasy-summary-strip">
             <span class="pill">${detail.captain ? `Captain: ${detail.captain.name}` : 'Captain pending'}</span>
             <span class="pill">Spent: ${escapeHtml(String(recapEntry.spentCredits || 0))} / ${escapeHtml(String(recapBudget))}</span>
-            <span class="pill">${escapeHtml(miniFantasyPowerBoostChipText(detail.powerBoostKey || recapEntry.powerBoostKey || recapEntry.power_boost_key || '', detail.boostedPlayerName || ''))}</span>
+            <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(detail.powerBoostKey || recapEntry.powerBoostKey || recapEntry.power_boost_key || '')}">${escapeHtml(miniFantasyPowerBoostChipText(detail.powerBoostKey || recapEntry.powerBoostKey || recapEntry.power_boost_key || '', detail.boostedPlayerName || ''))}</span>
             ${bestPick ? `<span class="pill">Best pick: ${escapeHtml(bestPick.name)} ${escapeHtml(formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points))} pts</span>` : ''}
           </div>
           <div class="fantasy-window-note">${escapeHtml(detail.isNoResult
@@ -10749,7 +10839,7 @@ function titleBandScore(pick, live){
             <span class="fantasy-summary-chip">Fixture: ${escapeHtml(statusLabel)}</span>
             <span class="fantasy-summary-chip">${escapeHtml(board.fixture.home_team_code || teamShort(board.fixture.home_team || ''))} vs ${escapeHtml(board.fixture.away_team_code || teamShort(board.fixture.away_team || ''))}</span>
             ${selectedRow.fixtureStatus === 'did_not_lock' ? '<span class="fantasy-summary-chip fantasy-did-not-lock">Did not lock</span>' : captain ? `<span class="fantasy-summary-chip">Captain: ${escapeHtml(captain.name)}</span>` : ''}
-            ${selectedRow.fixtureStatus !== 'did_not_lock' ? `<span class="fantasy-summary-chip">${escapeHtml(miniFantasyPowerBoostChipText(selectedRow.fixturePowerBoostKey || '', selectedRow.fixtureBoostedPlayerName || ''))}</span>` : ''}
+            ${selectedRow.fixtureStatus !== 'did_not_lock' ? `<span class="fantasy-summary-chip mini-boost-pill ${miniFantasyPowerBoostToneClass(selectedRow.fixturePowerBoostKey || '')}">${escapeHtml(miniFantasyPowerBoostChipText(selectedRow.fixturePowerBoostKey || '', selectedRow.fixtureBoostedPlayerName || ''))}</span>` : ''}
           </div>
           <div class="fantasy-entry-summary">
             ${board.summary.map((line) => `<div class="fantasy-window-note">${escapeHtml(line)}</div>`).join('')}
@@ -11405,7 +11495,7 @@ function titleBandScore(pick, live){
             <span class="pill">Spent: ${escapeHtml(String(spentCredits))} / ${escapeHtml(String(entryBudget))}</span>
             <span class="pill">Left: ${escapeHtml(String(budgetRemaining))}</span>
             <span class="pill">Captain: ${captainDisabledByAllIn ? 'Replaced by All In' : (draft.captainPlayerId ? 'Set' : 'Pick 1')}</span>
-            <span class="pill">${escapeHtml(miniFantasyPowerBoostChipText(selectedPowerBoost, boostedPlayer?.name || ''))}</span>
+            <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(selectedPowerBoost)}">${escapeHtml(miniFantasyPowerBoostChipText(selectedPowerBoost, boostedPlayer?.name || ''))}</span>
             ${entry ? '<span class="pill">Saved entry</span>' : '<span class="pill">Not picked yet</span>'}
           </div>
         </div>
@@ -11416,7 +11506,7 @@ function titleBandScore(pick, live){
         <div class="fantasy-power-shell">
           <div class="fantasy-slot-kicker">Season boosts (one use each)</div>
           <div class="fantasy-power-grid">
-            <button class="fantasy-power-button clear ${selectedPowerBoost ? '' : 'active'}" type="button" data-mini-power-boost="" ${locked ? 'disabled' : ''}>
+            <button class="fantasy-power-button clear mini-boost-none ${selectedPowerBoost ? '' : 'active'}" type="button" data-mini-power-boost="" ${locked ? 'disabled' : ''}>
               <div class="fantasy-power-top">
                 <div class="fantasy-power-name">No boost</div>
                 <span class="pill">${selectedPowerBoost ? 'Available' : 'Active'}</span>
@@ -11427,10 +11517,13 @@ function titleBandScore(pick, live){
               const isActive = definition.key === selectedPowerBoost;
               const disabled = locked || (!definition.available && !isActive);
               return `
-                <button class="fantasy-power-button ${isActive ? 'active' : ''} ${disabled && !isActive ? 'unavailable' : ''}" type="button" data-mini-power-boost="${escapeHtml(definition.key)}" ${disabled ? 'disabled' : ''}>
+                <button class="fantasy-power-button ${miniFantasyPowerBoostToneClass(definition.key)} ${isActive ? 'active' : ''} ${disabled && !isActive ? 'unavailable' : ''}" type="button" data-mini-power-boost="${escapeHtml(definition.key)}" ${disabled ? 'disabled' : ''}>
                   <div class="fantasy-power-top">
                     <div>
-                      <div class="fantasy-power-name">${escapeHtml(definition.name)}</div>
+                      <div class="fantasy-power-title">
+                        <span class="fantasy-power-emoji" aria-hidden="true">${escapeHtml(definition.emoji || '')}</span>
+                        <div class="fantasy-power-name">${escapeHtml(definition.name)}</div>
+                      </div>
                       <div class="fantasy-power-short">${escapeHtml(definition.short)}</div>
                     </div>
                     <span class="pill">${escapeHtml(isActive ? 'Armed' : definition.available ? 'Ready' : 'Used')}</span>
@@ -11462,9 +11555,9 @@ function titleBandScore(pick, live){
                   <span class="pill">${escapeHtml(player.team)}</span>
                   <span class="pill">${escapeHtml(player.role.replace('_', ' '))}</span>
                   <span class="pill">${escapeHtml(String(player.final_price))} cr</span>
-                  ${selectedPowerBoost === 'x_factor' && draft.boostedPlayerId === player.player_id ? '<span class="fantasy-boost-tag">X-Factor target</span>' : ''}
-                  ${selectedPowerBoost === 'deep_pockets' ? '<span class="fantasy-boost-tag pending">Deep Pockets active</span>' : ''}
-                  ${selectedPowerBoost === 'all_in' ? '<span class="fantasy-boost-tag pending">All In active</span>' : ''}
+                  ${selectedPowerBoost === 'x_factor' && draft.boostedPlayerId === player.player_id ? '<span class="fantasy-boost-tag mini-boost-pill mini-boost-x-factor">🃏 X-Factor target</span>' : ''}
+                  ${selectedPowerBoost === 'deep_pockets' ? '<span class="fantasy-boost-tag pending mini-boost-pill mini-boost-deep-pockets">💰 Deep Pockets active</span>' : ''}
+                  ${selectedPowerBoost === 'all_in' ? '<span class="fantasy-boost-tag pending mini-boost-pill mini-boost-all-in">⚡ All In active</span>' : ''}
                 </div>
               ` : `
                 <div class="fantasy-slot-empty">Pick from ${escapeHtml(teamShort(fixture.home_team))} or ${escapeHtml(teamShort(fixture.away_team))}. Keep 4 total players, at least 1 batter or wicket keeper, at least 1 bowler, and at least 1 player from each team.</div>
@@ -11613,7 +11706,7 @@ function titleBandScore(pick, live){
           <span class="pill">Credits: ${escapeHtml(String(pickerValidation.total_cost))} / ${escapeHtml(String(pickerBudget))}</span>
           <span class="pill">Left: ${escapeHtml(String(pickerValidation.budget_remaining))}</span>
           <span class="pill">Captain: ${captainDisabledByAllIn ? 'Replaced by All In' : (draft.captainPlayerId ? 'Set' : 'Pick 1')}</span>
-          <span class="pill">${escapeHtml(selectedPowerBoostDefinition ? miniFantasyPowerBoostChipText(selectedPowerBoost, pickerBoostedPlayer?.name || '') : 'Boost: none')}</span>
+          <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(selectedPowerBoost)}">${escapeHtml(selectedPowerBoostDefinition ? miniFantasyPowerBoostChipText(selectedPowerBoost, pickerBoostedPlayer?.name || '') : 'Boost: none')}</span>
         </div>
       `;
       body.innerHTML = filtered.length
