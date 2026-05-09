@@ -26,6 +26,7 @@ export const MINI_FANTASY_FIRST_OPEN_MATCH_NO = 14;
 export const MINI_FANTASY_FIRST_MATCH_OPEN_AT_UTC = '2026-04-06T00:00:00Z';
 export const MINI_FANTASY_TEAM_SIZE = 4;
 export const MINI_FANTASY_BUDGET = 31;
+export const MINI_FANTASY_DEEP_POCKETS_BUDGET = 34;
 export const MINI_FANTASY_CAPTAIN_MULTIPLIER = 1.5;
 export const MINI_FANTASY_WINNING_TEAM_PLAYER_BONUS = 5;
 export const MINI_FANTASY_APPEARANCE_PLAYER_BONUS = 2;
@@ -37,6 +38,24 @@ export const MINI_FANTASY_MISSED_LOCK_RATE = 0.4;
 export const MINI_FANTASY_MISSED_LOCK_FIRST_CAP = 50;
 export const MINI_FANTASY_MISSED_LOCK_LATE_CAP = 30;
 export const MINI_FANTASY_MISSED_LOCK_FIRST_COUNT = 3;
+
+export const MINI_FANTASY_POWER_BOOST_DEFINITIONS = Object.freeze({
+  all_in: Object.freeze({
+    key: 'all_in',
+    name: 'All In',
+    description: '1.5x on your full team for one fixture.'
+  }),
+  x_factor: Object.freeze({
+    key: 'x_factor',
+    name: 'X-Factor',
+    description: '2x on one non-captain player for one fixture.'
+  }),
+  deep_pockets: Object.freeze({
+    key: 'deep_pockets',
+    name: 'Deep Pockets',
+    description: `Raises your squad budget to ${MINI_FANTASY_DEEP_POCKETS_BUDGET} for one fixture.`
+  })
+});
 
 export const TEAM_CODE_TO_NAME = Object.freeze({
   MI: 'Mumbai Indians',
@@ -1254,6 +1273,22 @@ export function applyPriceSnapshotToPool(playerPool = [], priceSnapshot = {}) {
   });
 }
 
+export function normalizeMiniFantasyPowerBoostKey(value = '') {
+  const key = normalizeWhitespace(value).toLowerCase().replace(/[^a-z]+/g, '_').replace(/^_+|_+$/g, '');
+  return Object.prototype.hasOwnProperty.call(MINI_FANTASY_POWER_BOOST_DEFINITIONS, key) ? key : '';
+}
+
+export function getMiniFantasyPowerBoostDefinition(value = '') {
+  const key = normalizeMiniFantasyPowerBoostKey(value);
+  return key ? MINI_FANTASY_POWER_BOOST_DEFINITIONS[key] : null;
+}
+
+export function getMiniFantasyEntryBudget(powerBoostKey = '') {
+  return normalizeMiniFantasyPowerBoostKey(powerBoostKey) === 'deep_pockets'
+    ? MINI_FANTASY_DEEP_POCKETS_BUDGET
+    : MINI_FANTASY_BUDGET;
+}
+
 export function isFixtureLocked(fixture, now = new Date(), lockOffsetMinutes = MINI_FANTASY_LOCK_OFFSET_MINUTES) {
   const startMs = Date.parse(fixture?.datetime_utc || fixture?.starts_at_utc || '');
   if (!Number.isFinite(startMs)) return true;
@@ -1265,12 +1300,19 @@ export function validateMiniFantasyEntry({
   selectedPlayerIds = [],
   captainPlayerId = '',
   playerPool = [],
-  budget = MINI_FANTASY_BUDGET
+  budget = undefined,
+  powerBoostKey = '',
+  boostedPlayerId = ''
 } = {}) {
   const errors = [];
   const poolById = new Map((Array.isArray(playerPool) ? playerPool : []).map((player) => [player.player_id, player]));
   const uniqueSelectedIds = [...new Set((Array.isArray(selectedPlayerIds) ? selectedPlayerIds : []).filter(Boolean))];
   const selectedPlayers = uniqueSelectedIds.map((playerId) => poolById.get(playerId)).filter(Boolean);
+  const resolvedPowerBoostKey = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
+  const resolvedBoostedPlayerId = normalizeWhitespace(boostedPlayerId);
+  const resolvedBudget = Number.isFinite(Number(budget))
+    ? Number(budget)
+    : getMiniFantasyEntryBudget(resolvedPowerBoostKey);
 
   if (uniqueSelectedIds.length !== MINI_FANTASY_TEAM_SIZE) {
     errors.push(`Pick exactly ${MINI_FANTASY_TEAM_SIZE} players.`);
@@ -1285,8 +1327,8 @@ export function validateMiniFantasyEntry({
   }
 
   const totalCost = roundTo(selectedPlayers.reduce((sum, player) => sum + Number(player.final_price || 0), 0), 2);
-  if (totalCost > budget) {
-    errors.push(`Squad budget exceeded: ${totalCost} / ${budget} credits.`);
+  if (totalCost > resolvedBudget) {
+    errors.push(`Squad budget exceeded: ${totalCost} / ${resolvedBudget} credits.`);
   }
 
   const fixtureTeams = new Set([
@@ -1315,20 +1357,35 @@ export function validateMiniFantasyEntry({
     errors.push('Pick at least one bowler.');
   }
 
+  if (resolvedPowerBoostKey === 'x_factor') {
+    if (!resolvedBoostedPlayerId || !uniqueSelectedIds.includes(resolvedBoostedPlayerId)) {
+      errors.push('Choose one non-captain player for X-Factor.');
+    } else if (resolvedBoostedPlayerId === captainPlayerId) {
+      errors.push('X-Factor must target a non-captain player.');
+    }
+  } else if (resolvedBoostedPlayerId) {
+    errors.push('Only X-Factor can target an individual player.');
+  }
+
   return {
     valid: errors.length === 0,
     errors,
     selected_players: selectedPlayers,
     total_cost: totalCost,
-    budget_remaining: roundTo(budget - totalCost, 2),
+    budget_remaining: roundTo(resolvedBudget - totalCost, 2),
+    budget: resolvedBudget,
     team_counts: teamCounts,
-    role_counts: roleCounts
+    role_counts: roleCounts,
+    power_boost_key: resolvedPowerBoostKey,
+    boosted_player_id: resolvedBoostedPlayerId || null
   };
 }
 
 export function scoreMiniFantasyLineup({
   selectedPlayerIds = [],
   captainPlayerId = '',
+  powerBoostKey = '',
+  boostedPlayerId = '',
   pointsByPlayerId = {},
   appearedByPlayerId = {},
   playerTeamById = {},
@@ -1341,6 +1398,8 @@ export function scoreMiniFantasyLineup({
   const resolvedWinningTeamCode = resolveFixtureTeamCode(winningTeamCode);
   const winnerBonusPerPlayer = toNumber(winningPlayerBonus, 0);
   const appearanceBonusPerPlayer = toNumber(appearancePlayerBonus, 0);
+  const resolvedPowerBoostKey = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
+  const resolvedBoostedPlayerId = normalizeWhitespace(boostedPlayerId);
   let total = 0;
   selected.forEach((playerId) => {
     const rawPoints = noResult ? 0 : toNumber(pointsByPlayerId[playerId], 0);
@@ -1349,7 +1408,11 @@ export function scoreMiniFantasyLineup({
     const appearanceBonus = appeared ? appearanceBonusPerPlayer : 0;
     const winnerBonus = resolvedWinningTeamCode && playerTeamCode === resolvedWinningTeamCode ? winnerBonusPerPlayer : 0;
     const eligiblePoints = rawPoints + appearanceBonus + winnerBonus;
-    const multiplier = playerId === captainPlayerId ? MINI_FANTASY_CAPTAIN_MULTIPLIER : 1;
+    const captainMultiplier = playerId === captainPlayerId ? MINI_FANTASY_CAPTAIN_MULTIPLIER : 1;
+    const powerBoostMultiplier = resolvedPowerBoostKey === 'all_in'
+      ? 1.5
+      : (resolvedPowerBoostKey === 'x_factor' && playerId === resolvedBoostedPlayerId ? 2 : 1);
+    const multiplier = captainMultiplier * powerBoostMultiplier;
     total += eligiblePoints * multiplier;
   });
   return roundTo(total, 2);
@@ -2198,6 +2261,8 @@ export function scoreMiniFantasyEntry({
     : getCompletedMiniFantasyMatchCount(liveData);
   const selectedPlayerIds = Array.isArray(entry?.selectedPlayerIds) ? entry.selectedPlayerIds : (Array.isArray(entry?.selected_player_ids) ? entry?.selected_player_ids : []);
   const captainPlayerId = entry?.captainPlayerId || entry?.captain_player_id || '';
+  const powerBoostKey = normalizeMiniFantasyPowerBoostKey(entry?.powerBoostKey || entry?.power_boost_key || '');
+  const boostedPlayerId = normalizeWhitespace(entry?.boostedPlayerId || entry?.boosted_player_id || '');
   const resolvedFixtureRecordMap = fixtureRecordMap instanceof Map
     ? fixtureRecordMap
     : buildMiniFantasyFixturePlayerRecordMap({
@@ -2224,6 +2289,8 @@ export function scoreMiniFantasyEntry({
     ? scoreMiniFantasyLineup({
         selectedPlayerIds,
         captainPlayerId,
+        powerBoostKey,
+        boostedPlayerId,
         pointsByPlayerId,
         appearedByPlayerId,
         playerTeamById,
@@ -2236,6 +2303,8 @@ export function scoreMiniFantasyEntry({
   const winnerBonusByPlayerId = {};
   const eligiblePointsByPlayerId = {};
   const baseBreakdownByPlayerId = {};
+  const powerBoostBonusByPlayerId = {};
+  const powerBoostMultiplierByPlayerId = {};
   selectedPlayerIds.forEach((playerId) => {
     const basePoints = resolvedNoResult ? 0 : toNumber(pointsByPlayerId[playerId], 0);
     const appeared = resolvedNoResult ? false : Boolean(appearedByPlayerId[playerId]);
@@ -2244,12 +2313,17 @@ export function scoreMiniFantasyEntry({
       ? MINI_FANTASY_WINNING_TEAM_PLAYER_BONUS
       : 0;
     const eligiblePoints = basePoints + appearanceBonus + winnerBonus;
-    const multiplier = playerId === captainPlayerId ? MINI_FANTASY_CAPTAIN_MULTIPLIER : 1;
+    const captainMultiplier = playerId === captainPlayerId ? MINI_FANTASY_CAPTAIN_MULTIPLIER : 1;
+    const powerBoostMultiplier = powerBoostKey === 'all_in'
+      ? 1.5
+      : (powerBoostKey === 'x_factor' && playerId === boostedPlayerId ? 2 : 1);
     const recordBreakdown = resolvedFixtureRecordMap.get(playerId)?.base_breakdown;
     appearanceBonusByPlayerId[playerId] = appearanceBonus;
     winnerBonusByPlayerId[playerId] = winnerBonus;
     eligiblePointsByPlayerId[playerId] = eligiblePoints;
-    scoredPointsByPlayerId[playerId] = roundTo(eligiblePoints * multiplier, 2);
+    powerBoostMultiplierByPlayerId[playerId] = powerBoostMultiplier;
+    powerBoostBonusByPlayerId[playerId] = roundTo(eligiblePoints * captainMultiplier * (powerBoostMultiplier - 1), 2);
+    scoredPointsByPlayerId[playerId] = roundTo(eligiblePoints * captainMultiplier * powerBoostMultiplier, 2);
     baseBreakdownByPlayerId[playerId] = recordBreakdown && typeof recordBreakdown === 'object'
       ? {
           ...recordBreakdown,
@@ -2269,6 +2343,11 @@ export function scoreMiniFantasyEntry({
     eligible_points_by_player_id: eligiblePointsByPlayerId,
     scored_points_by_player_id: scoredPointsByPlayerId,
     base_breakdown_by_player_id: baseBreakdownByPlayerId,
+    power_boost_key: powerBoostKey || null,
+    boosted_player_id: boostedPlayerId || null,
+    power_boost_bonus_by_player_id: powerBoostBonusByPlayerId,
+    power_boost_multiplier_by_player_id: powerBoostMultiplierByPlayerId,
+    power_boost_bonus_points: roundTo(Object.values(powerBoostBonusByPlayerId).reduce((sum, value) => sum + toNumber(value, 0), 0), 2),
     winning_team_code: resolvedWinningTeamCode || null,
     winner_bonus_points: calculateMiniFantasyWinningTeamBonus({
       selectedPlayerIds,
@@ -2298,6 +2377,8 @@ export function buildMiniFantasyEntryAuditLog({
     ? entry.selectedPlayerIds.filter(Boolean)
     : (Array.isArray(entry?.selected_player_ids) ? entry?.selected_player_ids.filter(Boolean) : []);
   const captainPlayerId = normalizeWhitespace(entry?.captainPlayerId || entry?.captain_player_id || '');
+  const powerBoostKey = normalizeMiniFantasyPowerBoostKey(entry?.powerBoostKey || entry?.power_boost_key || '');
+  const boostedPlayerId = normalizeWhitespace(entry?.boostedPlayerId || entry?.boosted_player_id || '');
   const priceSnapshot = entry?.priceSnapshot && typeof entry.priceSnapshot === 'object'
     ? entry.priceSnapshot
     : (entry?.price_snapshot && typeof entry.price_snapshot === 'object' ? entry.price_snapshot : {});
@@ -2320,6 +2401,8 @@ export function buildMiniFantasyEntryAuditLog({
   const eligiblePointsByPlayerId = resolvedScore?.eligible_points_by_player_id || {};
   const scoredPointsByPlayerId = resolvedScore?.scored_points_by_player_id || {};
   const baseBreakdownByPlayerId = resolvedScore?.base_breakdown_by_player_id || {};
+  const powerBoostBonusByPlayerId = resolvedScore?.power_boost_bonus_by_player_id || {};
+  const powerBoostMultiplierByPlayerId = resolvedScore?.power_boost_multiplier_by_player_id || {};
 
   const players = selectedPlayerIds.map((playerId) => {
     const snapshot = priceSnapshot?.[playerId] || {};
@@ -2332,9 +2415,10 @@ export function buildMiniFantasyEntryAuditLog({
       ? Number(eligiblePointsByPlayerId[playerId])
       : roundTo(basePoints + appearanceBonus + winnerBonus, 2);
     const captainMultiplier = isCaptain ? MINI_FANTASY_CAPTAIN_MULTIPLIER : 1;
+    const powerBoostMultiplier = Number(powerBoostMultiplierByPlayerId?.[playerId] ?? 1) || 1;
     const scoredPoints = Number.isFinite(Number(scoredPointsByPlayerId[playerId]))
       ? Number(scoredPointsByPlayerId[playerId])
-      : roundTo(eligiblePoints * captainMultiplier, 2);
+      : roundTo(eligiblePoints * captainMultiplier * powerBoostMultiplier, 2);
     const baseBreakdown = baseBreakdownByPlayerId?.[playerId] && typeof baseBreakdownByPlayerId[playerId] === 'object'
       ? {
           ...baseBreakdownByPlayerId[playerId],
@@ -2353,21 +2437,27 @@ export function buildMiniFantasyEntryAuditLog({
       winner_bonus: winnerBonus,
       eligible_points: eligiblePoints,
       captain_multiplier: captainMultiplier,
+      power_boost_multiplier: powerBoostMultiplier,
+      power_boost_bonus: toNumber(powerBoostBonusByPlayerId[playerId], 0),
       scored_points: scoredPoints,
-      is_captain: isCaptain
+      is_captain: isCaptain,
+      is_power_boost_target: Boolean(powerBoostKey === 'x_factor' && playerId === boostedPlayerId)
     };
   });
 
   const bestPick = [...players].sort((a, b) => b.scored_points - a.scored_points || a.name.localeCompare(b.name))[0] || null;
 
   return {
-    version: 'mini_fantasy_entry_audit_v1',
+    version: 'mini_fantasy_entry_audit_v2',
     match_no: Number(entry?.matchNo || entry?.match_no || 0) || null,
     total_points: toNumber(resolvedScore?.total_points, 0),
     spent_credits: toNumber(entry?.spentCredits ?? entry?.spent_credits, 0),
     saved_at: entry?.savedAt || entry?.saved_at || entry?.updatedAt || entry?.updated_at || null,
     selected_player_ids: selectedPlayerIds,
     captain_player_id: captainPlayerId || null,
+    power_boost_key: powerBoostKey || null,
+    boosted_player_id: boostedPlayerId || null,
+    power_boost_bonus_points: toNumber(resolvedScore?.power_boost_bonus_points, 0),
     winning_team_code: normalizeWhitespace(resolvedScore?.winning_team_code || '') || null,
     is_no_result: Boolean(resolvedScore?.is_no_result),
     appearance_bonus_points: toNumber(resolvedScore?.appearance_bonus_points, 0),
@@ -2515,6 +2605,8 @@ export function buildMiniFantasyLeaderboard({
           ? entry.selectedPlayerIds.filter(Boolean)
           : (Array.isArray(entry?.selected_player_ids) ? entry.selected_player_ids.filter(Boolean) : []),
         captain_player_id: entry?.captainPlayerId || entry?.captain_player_id || null,
+        power_boost_key: normalizeMiniFantasyPowerBoostKey(entry?.powerBoostKey || entry?.power_boost_key || ''),
+        boosted_player_id: normalizeWhitespace(entry?.boostedPlayerId || entry?.boosted_player_id || '') || null,
         price_snapshot: entry?.priceSnapshot && typeof entry.priceSnapshot === 'object'
           ? entry.priceSnapshot
           : (entry?.price_snapshot && typeof entry.price_snapshot === 'object' ? entry.price_snapshot : {}),
@@ -2572,6 +2664,8 @@ export function buildMiniFantasyLeaderboard({
             match_no: entry.match_no,
             selected_player_ids: entry.selected_player_ids,
             captain_player_id: entry.captain_player_id,
+            power_boost_key: entry.power_boost_key,
+            boosted_player_id: entry.boosted_player_id,
             price_snapshot: entry.price_snapshot,
             spent_credits: entry.spent_credits,
             saved_at: entry.saved_at
@@ -2584,6 +2678,8 @@ export function buildMiniFantasyLeaderboard({
           is_scored: true,
           source: 'locked_entry',
           captain_player_id: entry.captain_player_id,
+          power_boost_key: entry.power_boost_key || null,
+          boosted_player_id: entry.boosted_player_id || null,
           is_no_result: entry.is_no_result,
           spent_credits: auditLog?.spent_credits ?? 0,
           saved_at: auditLog?.saved_at || null,

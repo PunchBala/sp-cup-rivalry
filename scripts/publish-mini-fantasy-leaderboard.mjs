@@ -139,7 +139,7 @@ async function main() {
 
   const [entries, profiles, dailyBonuses] = await Promise.all([
     fetchAllRows(supabaseUrl, serviceRoleKey, 'mini_fantasy_entries', {
-      select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
+      select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,power_boost_key,boosted_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
       season: `eq.${season}`,
       fixture_datetime_utc: `lte.${publicVisibleAtUtc}`,
       order: 'saved_at.desc.nullslast,fixture_datetime_utc.asc.nullslast,match_no.asc'

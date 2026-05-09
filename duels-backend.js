@@ -442,6 +442,8 @@ function normalizeMiniFantasyEntryRow(row) {
         fixtureDatetimeUtc: row.fixture_datetime_utc || null,
         selectedPlayerIds: Array.isArray(row.selected_player_ids) ? row.selected_player_ids.filter(Boolean) : [],
         captainPlayerId: normalizeWhitespace(row.captain_player_id || '') || null,
+        powerBoostKey: normalizeWhitespace(row.power_boost_key || '') || null,
+        boostedPlayerId: normalizeWhitespace(row.boosted_player_id || '') || null,
         priceSnapshot: cloneJson(row.price_snapshot || {}),
         spentCredits: roundCreditAmount(row.spent_credits || 0),
         savedAt: row.saved_at || null,
@@ -879,7 +881,7 @@ function normalizeMiniFantasyEntryRow(row) {
         const rows = await restRequest(config.tables.miniFantasyEntries, {
           method: 'GET',
           query: {
-            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
+            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,power_boost_key,boosted_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
             user_id: `eq.${currentUser.userId}`,
             ...(safeSeason ? { season: `eq.${safeSeason}` } : {}),
             order: 'fixture_datetime_utc.asc.nullslast,match_no.asc'
@@ -897,7 +899,7 @@ function normalizeMiniFantasyEntryRow(row) {
         const rows = await restRequest(config.tables.miniFantasyEntries, {
           method: 'GET',
           query: {
-            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
+            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,power_boost_key,boosted_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at',
             ...(safeSeason ? { season: `eq.${safeSeason}` } : {}),
             fixture_datetime_utc: `lte.${publicVisibleAtUtc}`,
             order: 'saved_at.desc.nullslast,fixture_datetime_utc.asc.nullslast,match_no.asc'
@@ -1010,7 +1012,7 @@ function normalizeMiniFantasyEntryRow(row) {
           method: 'POST',
           query: {
             on_conflict: 'user_id,season,match_no',
-            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at'
+            select: 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,power_boost_key,boosted_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at'
           },
           body: {
             user_id: currentUser.userId,
@@ -1024,6 +1026,8 @@ function normalizeMiniFantasyEntryRow(row) {
             fixture_datetime_utc: entry?.fixtureDatetimeUtc || null,
             selected_player_ids: cloneJson(entry?.selectedPlayerIds || []),
             captain_player_id: normalizeWhitespace(entry?.captainPlayerId || '') || null,
+            power_boost_key: normalizeWhitespace(entry?.powerBoostKey || '') || null,
+            boosted_player_id: normalizeWhitespace(entry?.boostedPlayerId || '') || null,
             price_snapshot: cloneJson(entry?.priceSnapshot || {}),
             spent_credits: roundCreditAmount(entry?.spentCredits || 0),
             saved_at: entry?.savedAt || new Date().toISOString()

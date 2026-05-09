@@ -118,6 +118,10 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /Admin live panel/);
   assert.match(html, /Live snapshot/);
   assert.match(html, /Paste the structured innings JSON here/);
+  assert.match(html, /Season boosts \(one use each\)/);
+  assert.match(html, /All In/);
+  assert.match(html, /X-Factor/);
+  assert.match(html, /Deep Pockets/);
   assert.match(html, /Mini Fantasy current pricing/);
   assert.match(html, /official IPL manual refresh/);
   assert.match(html, /Fixture-only scoring:/);

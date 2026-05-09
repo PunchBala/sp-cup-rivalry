@@ -55,6 +55,8 @@ create table if not exists public.mini_fantasy_entries (
   fixture_datetime_utc timestamptz not null,
   selected_player_ids jsonb not null default '[]'::jsonb,
   captain_player_id text,
+  power_boost_key text,
+  boosted_player_id text,
   price_snapshot jsonb not null default '{}'::jsonb,
   spent_credits numeric(5,2) not null default 0,
   saved_at timestamptz not null default timezone('utc', now()),
@@ -121,6 +123,12 @@ create table if not exists public.mini_fantasy_live_provisional_snapshots (
 
 alter table public.mini_fantasy_entries
   add column if not exists display_name text not null default '';
+
+alter table public.mini_fantasy_entries
+  add column if not exists power_boost_key text;
+
+alter table public.mini_fantasy_entries
+  add column if not exists boosted_player_id text;
 
 create or replace function public.set_updated_at()
 returns trigger

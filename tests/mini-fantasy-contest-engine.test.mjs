@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   MINI_FANTASY_BUDGET,
+  MINI_FANTASY_DEEP_POCKETS_BUDGET,
   MINI_FANTASY_NEW_PLAYER_BASELINE_POINTS,
   buildMiniFantasyEntryAuditLog,
   buildMiniFantasyLeaderboard,
@@ -878,6 +879,35 @@ test('validateMiniFantasyEntry enforces budget, team split, and role minimums', 
   assert.equal(halfCreditValid.total_cost, 30.5);
   assert.equal(halfCreditValid.budget_remaining, 0.5);
 
+  const deepPocketsValid = validateMiniFantasyEntry({
+    fixture,
+    selectedPlayerIds: ['dc_a', 'dc_b', 'gt_a', 'gt_c'],
+    captainPlayerId: 'dc_a',
+    playerPool: [
+      ...pool.filter((player) => !['dc_a', 'dc_b', 'gt_a', 'gt_c'].includes(player.player_id)),
+      { player_id: 'dc_a', name: 'DC Batter', team: 'DC', role: 'batter', final_price: 9, pricing_eligible: true },
+      { player_id: 'dc_b', name: 'DC Bowler', team: 'DC', role: 'bowler', final_price: 8.5, pricing_eligible: true },
+      { player_id: 'gt_a', name: 'GT All-rounder', team: 'GT', role: 'all_rounder', final_price: 8, pricing_eligible: true },
+      { player_id: 'gt_c', name: 'GT Bowler', team: 'GT', role: 'bowler', final_price: 8.5, pricing_eligible: true }
+    ],
+    powerBoostKey: 'deep_pockets'
+  });
+  assert.equal(deepPocketsValid.valid, true);
+  assert.equal(deepPocketsValid.budget, MINI_FANTASY_DEEP_POCKETS_BUDGET);
+  assert.equal(deepPocketsValid.total_cost, 34);
+  assert.equal(deepPocketsValid.budget_remaining, 0);
+
+  const invalidXFactorCaptain = validateMiniFantasyEntry({
+    fixture,
+    selectedPlayerIds: ['dc_b', 'gt_a', 'gt_b', 'gt_c'],
+    captainPlayerId: 'gt_b',
+    playerPool: pool,
+    powerBoostKey: 'x_factor',
+    boostedPlayerId: 'gt_b'
+  });
+  assert.equal(invalidXFactorCaptain.valid, false);
+  assert.match(invalidXFactorCaptain.errors.join(' | '), /X-Factor must target a non-captain player/i);
+
   const invalid = validateMiniFantasyEntry({
     fixture,
     selectedPlayerIds: ['dc_b', 'dc_c', 'gt_a', 'gt_c'],
@@ -1628,6 +1658,8 @@ test('buildMiniFantasyEntryAuditLog includes per-player score breakdown, captain
       buildMiniFantasyPlayerId('GT', 'GT Keeper')
     ],
     captainPlayerId: buildMiniFantasyPlayerId('DC', 'DC Batter'),
+    powerBoostKey: 'x_factor',
+    boostedPlayerId: buildMiniFantasyPlayerId('GT', 'GT Keeper'),
     priceSnapshot: {
       [buildMiniFantasyPlayerId('DC', 'DC Batter')]: { name: 'DC Batter', team: 'DC', role: 'batter', final_price: 9 },
       [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: { name: 'DC Bowler', team: 'DC', role: 'bowler', final_price: 7 },
@@ -1636,7 +1668,7 @@ test('buildMiniFantasyEntryAuditLog includes per-player score breakdown, captain
     }
   };
   const score = {
-    total_points: 123.5,
+    total_points: 137.5,
     is_no_result: false,
     winning_team_code: 'DC',
     appearance_bonus_points: 8,
@@ -1669,8 +1701,21 @@ test('buildMiniFantasyEntryAuditLog includes per-player score breakdown, captain
       [buildMiniFantasyPlayerId('DC', 'DC Batter')]: 70.5,
       [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: 27,
       [buildMiniFantasyPlayerId('GT', 'GT Bowler')]: 12,
+      [buildMiniFantasyPlayerId('GT', 'GT Keeper')]: 28
+    },
+    power_boost_bonus_by_player_id: {
+      [buildMiniFantasyPlayerId('DC', 'DC Batter')]: 0,
+      [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: 0,
+      [buildMiniFantasyPlayerId('GT', 'GT Bowler')]: 0,
       [buildMiniFantasyPlayerId('GT', 'GT Keeper')]: 14
     },
+    power_boost_multiplier_by_player_id: {
+      [buildMiniFantasyPlayerId('DC', 'DC Batter')]: 1,
+      [buildMiniFantasyPlayerId('DC', 'DC Bowler')]: 1,
+      [buildMiniFantasyPlayerId('GT', 'GT Bowler')]: 1,
+      [buildMiniFantasyPlayerId('GT', 'GT Keeper')]: 2
+    },
+    power_boost_bonus_points: 14,
     base_breakdown_by_player_id: {
       [buildMiniFantasyPlayerId('DC', 'DC Batter')]: {
         runs_points: 40,
@@ -1690,10 +1735,13 @@ test('buildMiniFantasyEntryAuditLog includes per-player score breakdown, captain
 
   const audit = buildMiniFantasyEntryAuditLog({ entry, score });
 
-  assert.equal(audit.version, 'mini_fantasy_entry_audit_v1');
+  assert.equal(audit.version, 'mini_fantasy_entry_audit_v2');
   assert.equal(audit.spent_credits, 30.5);
   assert.equal(audit.saved_at, '2026-04-08T13:58:00Z');
   assert.equal(audit.captain_player_id, buildMiniFantasyPlayerId('DC', 'DC Batter'));
+  assert.equal(audit.power_boost_key, 'x_factor');
+  assert.equal(audit.boosted_player_id, buildMiniFantasyPlayerId('GT', 'GT Keeper'));
+  assert.equal(audit.power_boost_bonus_points, 14);
   assert.equal(audit.best_pick_player_id, buildMiniFantasyPlayerId('DC', 'DC Batter'));
   assert.equal(audit.players[0].name, 'DC Batter');
   assert.equal(audit.players[0].appearance_bonus, 2);
@@ -1703,6 +1751,9 @@ test('buildMiniFantasyEntryAuditLog includes per-player score breakdown, captain
   assert.equal(audit.players[0].scored_points, 70.5);
   assert.equal(audit.players[0].base_breakdown.runs_points, 40);
   assert.equal(audit.players[0].base_breakdown.total_points, 40);
+  assert.equal(audit.players[3].power_boost_multiplier, 2);
+  assert.equal(audit.players[3].power_boost_bonus, 14);
+  assert.equal(audit.players[3].is_power_boost_target, true);
 });
 
 test('buildMiniFantasyEntryAuditLog derives base breakdown from score history snapshots when score detail is absent', () => {
@@ -2355,4 +2406,88 @@ test('scoreMiniFantasyEntry applies appearance and winning bonuses before captai
   assert.equal(noResult.winning_team_code, null);
   assert.equal(noResult.is_no_result, true);
   assert.equal(noResult.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 0);
+});
+
+test('scoreMiniFantasyEntry applies All In and X-Factor multipliers on top of normal scoring', () => {
+  const baseEntry = {
+    matchNo: 14,
+    selectedPlayerIds: [
+      buildMiniFantasyPlayerId('DC', 'DC Batter'),
+      buildMiniFantasyPlayerId('DC', 'DC Bowler'),
+      buildMiniFantasyPlayerId('GT', 'GT Bowler'),
+      buildMiniFantasyPlayerId('GT', 'GT Keeper')
+    ],
+    captainPlayerId: buildMiniFantasyPlayerId('DC', 'DC Batter')
+  };
+  const schedule = [
+    { match_no: 14, datetime_utc: '2026-04-08T14:00:00Z', home_team: 'Delhi Capitals', away_team: 'Gujarat Titans' }
+  ];
+  const squads = {
+    DC: ['DC Batter', 'DC Bowler'],
+    GT: ['GT Bowler', 'GT Keeper']
+  };
+  const liveData = {
+    meta: {
+      cache: {
+        matchList: [
+          {
+            matchNo: 14,
+            status: 'Delhi Capitals won by 6 wkts',
+            teams: ['Delhi Capitals', 'Gujarat Titans']
+          }
+        ]
+      },
+      scoreHistory: [
+        {
+          processedMatchCount: 14,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'DC Batter': 1,
+                  'DC Bowler': 1,
+                  'GT Bowler': 1,
+                  'GT Keeper': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'DC Batter': { score: 40 },
+                'DC Bowler': { score: 20 },
+                'GT Bowler': { score: 10 },
+                'GT Keeper': { score: 12 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  const allIn = scoreMiniFantasyEntry({
+    entry: { ...baseEntry, powerBoostKey: 'all_in' },
+    liveData,
+    schedule,
+    squads
+  });
+  assert.equal(allIn.total_points, 185.25);
+  assert.equal(allIn.power_boost_bonus_points, 61.75);
+  assert.equal(allIn.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 105.75);
+  assert.equal(allIn.power_boost_multiplier_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Bowler')], 1.5);
+
+  const xFactor = scoreMiniFantasyEntry({
+    entry: {
+      ...baseEntry,
+      powerBoostKey: 'x_factor',
+      boostedPlayerId: buildMiniFantasyPlayerId('GT', 'GT Keeper')
+    },
+    liveData,
+    schedule,
+    squads
+  });
+  assert.equal(xFactor.total_points, 137.5);
+  assert.equal(xFactor.power_boost_bonus_points, 14);
+  assert.equal(xFactor.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 28);
+  assert.equal(xFactor.power_boost_multiplier_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 2);
 });

@@ -34,6 +34,8 @@ test('backend config, adapter, and setup docs are present for real auth + duel a
   assert.match(backendJs, /listMiniFantasyLeaderboardRows/);
   assert.match(backendJs, /listPublicMiniFantasyLiveSnapshots/);
   assert.match(backendJs, /fixture_datetime_utc:\s*`lte\.\$\{publicVisibleAtUtc\}`/);
+  assert.match(backendJs, /power_boost_key/);
+  assert.match(backendJs, /boosted_player_id/);
   assert.match(backendJs, /upsertMiniFantasyEntry/);
   assert.match(backendJs, /upsertMiniFantasyLiveSnapshot/);
   assert.match(backendJs, /deleteMiniFantasyLiveSnapshot/);
@@ -49,6 +51,8 @@ test('backend config, adapter, and setup docs are present for real auth + duel a
   assert.match(schemaSql, /create policy "senthil deletes public duel rows"/i);
   assert.match(schemaSql, /create table if not exists public\.mini_fantasy_entries/i);
   assert.match(schemaSql, /spent_credits\s+numeric\(5,2\)/i);
+  assert.match(schemaSql, /power_boost_key\s+text/i);
+  assert.match(schemaSql, /boosted_player_id\s+text/i);
   assert.match(schemaSql, /create table if not exists public\.mini_fantasy_leaderboard_rows/i);
   assert.match(schemaSql, /create table if not exists public\.mini_fantasy_live_provisional_snapshots/i);
   assert.match(schemaSql, /create policy "users read their own mini fantasy entries"/i);
