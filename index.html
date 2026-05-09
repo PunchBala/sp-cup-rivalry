@@ -1462,8 +1462,8 @@
                     <li><strong>Bowling economy bonus:</strong> minimum 2 overs, then economy below 6 = +8, below 7 = +5, below 8 = +2, above 10 = -5.</li>
                     <li><strong>Milestone bonuses:</strong> fifty +10, hundred +25, quick 30 under 15 balls +8, 3 wickets +12, 4 wickets +20, 5 wickets +30, and a duck penalty of -5 when a batter is dismissed for 0.</li>
                     <li><strong>Mini Fantasy extras:</strong> each selected player who appears in the fixture gets <code>+2</code>. Each selected player from the winning side gets <code>+5</code> once the result is final.</li>
-                    <li><strong>Season boosts:</strong> <code>All In</code> gives 1.5x to the whole team for one fixture, <code>X-Factor</code> gives 2x to one non-captain, and <code>Deep Pockets</code> lifts one lineup budget to <code>34</code>. Each boost can only be used once all season.</li>
-                    <li><strong>Captain + no-result rule:</strong> your captain gets <code>1.5x</code> of every eligible point, including appearance and winner bonuses. If a fixture ends with no result, every Mini Fantasy player score for that match becomes <code>0</code>.</li>
+                    <li><strong>Season boosts:</strong> <code>All In</code> gives 1.5x to the whole team for one fixture and replaces the captain slot, <code>X-Factor</code> gives 2x to one non-captain, and <code>Deep Pockets</code> lifts one lineup budget to <code>34</code>. Each boost can only be used once all season.</li>
+                    <li><strong>Captain + no-result rule:</strong> your captain gets <code>1.5x</code> of every eligible point, including appearance and winner bonuses, unless <code>All In</code> is active instead. If a fixture ends with no result, every Mini Fantasy player score for that match becomes <code>0</code>.</li>
                     <li><strong>Missed-lock safety net:</strong> if you miss a completed fixture after joining, you receive <code>40%</code> of the average locked score for that fixture. Your first 3 missed locks are capped at <code>50</code> points each, then the cap drops to <code>30</code> from the 4th missed lock onward. If nobody locked a team for that fixture, nobody gets any fallback points.</li>
                     <li><strong>Fixture-day visit bonus:</strong> signed-in users who open the app on an India fixture day receive <code>+5</code> once for that calendar day in <code>Asia/Kolkata</code>.</li>
                     <li><strong>New-player catch-up:</strong> if you join after Mini Fantasy has already launched, each completed earlier fixture starts you with <code>40</code> baseline points so you do not begin from 0.</li>
@@ -9180,7 +9180,7 @@ function titleBandScore(pick, live){
           key: 'all_in',
           name: 'All In',
           short: '1.5x full team',
-          detail: 'Applies a 1.5x multiplier across your whole team for one fixture.'
+          detail: 'Applies a 1.5x multiplier across your whole team for one fixture and replaces the captain slot.'
         },
         {
           key: 'x_factor',
@@ -9214,7 +9214,7 @@ function titleBandScore(pick, live){
     function miniFantasyPowerBoostNarrative(powerBoostKey = '', boostedPlayerName = ''){
       const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
       if (!key) return 'No season power boost is armed.';
-      if (key === 'all_in') return 'All In is armed for this fixture.';
+      if (key === 'all_in') return 'All In is armed for this fixture and replaces the captain slot.';
       if (key === 'x_factor') {
         return boostedPlayerName
           ? `X-Factor is armed on ${boostedPlayerName}.`
@@ -9229,6 +9229,7 @@ function titleBandScore(pick, live){
     function miniFantasyPowerBoostChipText(powerBoostKey = '', boostedPlayerName = ''){
       const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
       if (!key) return 'Boost: none';
+      if (key === 'all_in') return 'Boost: All In (captain off)';
       if (key === 'x_factor' && boostedPlayerName) return `Boost: X-Factor on ${boostedPlayerName}`;
       if (key === 'deep_pockets') return `Boost: Deep Pockets (${MINI_FANTASY_DEEP_POCKETS_BUDGET} cr)`;
       return `Boost: ${miniFantasyPowerBoostLabel(key)}`;
@@ -9310,6 +9311,7 @@ function titleBandScore(pick, live){
             }
           : emptyMiniFantasyDraft();
         while (fromSaved.selectedPlayerIds.length < 4) fromSaved.selectedPlayerIds.push('');
+        if (fromSaved.powerBoostKey === 'all_in') fromSaved.captainPlayerId = '';
         if (fromSaved.powerBoostKey !== 'x_factor') fromSaved.boostedPlayerId = '';
         MINI_FANTASY_DRAFTS[target] = fromSaved;
       }
@@ -9702,8 +9704,10 @@ function titleBandScore(pick, live){
       }));
       const pointsByPlayerId = Object.fromEntries(players.map((player) => [player.playerId, player.points]));
       const scoredPointsByPlayerId = Object.fromEntries(players.map((player) => [player.playerId, player.scoredPoints]));
-      const captainPlayerId = normalizeTextValue(auditLog.captain_player_id || auditLog.captainPlayerId || '');
       const powerBoostKey = normalizeMiniFantasyPowerBoostKey(auditLog.power_boost_key || auditLog.powerBoostKey || '');
+      const captainPlayerId = powerBoostKey === 'all_in'
+        ? ''
+        : normalizeTextValue(auditLog.captain_player_id || auditLog.captainPlayerId || '');
       const boostedPlayerId = normalizeTextValue(auditLog.boosted_player_id || auditLog.boostedPlayerId || '');
       const captain = players.find((player) => player.isCaptain || player.playerId === captainPlayerId) || null;
       const boostedPlayer = players.find((player) => player.playerId === boostedPlayerId) || null;
@@ -9730,7 +9734,9 @@ function titleBandScore(pick, live){
           ? 'This fixture ended with no result, so no Mini Fantasy points were awarded.'
           : captain
             ? `${captain.name} carries the captain armband. ${miniFantasyPowerBoostNarrative(powerBoostKey, boostedPlayer?.name || '')}`
-            : 'Captain is not set on this saved team.',
+            : (powerBoostKey === 'all_in'
+                ? miniFantasyPowerBoostNarrative(powerBoostKey, boostedPlayer?.name || '')
+                : 'Captain is not set on this saved team.'),
         isNoResult: Boolean(auditLog.is_no_result ?? auditLog.isNoResult),
         auditLog
         };
@@ -9741,12 +9747,23 @@ function titleBandScore(pick, live){
         const selectedPlayerIds = Array.isArray(auditLog.selected_player_ids)
           ? auditLog.selected_player_ids.filter(Boolean)
           : (Array.isArray(auditLog.selectedPlayerIds) ? auditLog.selectedPlayerIds.filter(Boolean) : []);
-        const captainPlayerId = normalizeTextValue(
-          auditLog.captain_player_id
-          || auditLog.captainPlayerId
-          || matchSummary?.captain_player_id
-          || matchSummary?.captainPlayerId
+        const resolvedPowerBoostKey = normalizeMiniFantasyPowerBoostKey(
+          matchSummary?.power_boost_key
+          || matchSummary?.powerBoostKey
+          || auditLog.power_boost_key
+          || auditLog.powerBoostKey
           || ''
+        );
+        const captainPlayerId = normalizeTextValue(
+          resolvedPowerBoostKey === 'all_in'
+            ? ''
+            : (
+              auditLog.captain_player_id
+              || auditLog.captainPlayerId
+              || matchSummary?.captain_player_id
+              || matchSummary?.captainPlayerId
+              || ''
+            )
         );
         const players = Array.isArray(auditLog.players) ? auditLog.players : [];
         const fallbackSelectedPlayerIds = players
@@ -9770,13 +9787,7 @@ function titleBandScore(pick, live){
           match_no: Number(matchSummary?.match_no || auditLog.match_no || auditLog.matchNo || 0) || null,
           selected_player_ids: resolvedPlayerIds,
           captain_player_id: captainPlayerId || null,
-          power_boost_key: normalizeMiniFantasyPowerBoostKey(
-            matchSummary?.power_boost_key
-            || matchSummary?.powerBoostKey
-            || auditLog.power_boost_key
-            || auditLog.powerBoostKey
-            || ''
-          ) || null,
+          power_boost_key: resolvedPowerBoostKey || null,
           boosted_player_id: normalizeTextValue(
             matchSummary?.boosted_player_id
             || matchSummary?.boostedPlayerId
@@ -10341,7 +10352,10 @@ function titleBandScore(pick, live){
     function setMiniFantasyDraftPowerBoost(matchNo, powerBoostKey = ''){
       const draft = ensureMiniFantasyDraft(matchNo);
       draft.powerBoostKey = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
-      if (draft.powerBoostKey !== 'x_factor') {
+      if (draft.powerBoostKey === 'all_in') {
+        draft.captainPlayerId = '';
+        draft.boostedPlayerId = '';
+      } else if (draft.powerBoostKey !== 'x_factor') {
         draft.boostedPlayerId = '';
       } else if (draft.boostedPlayerId && (!draft.selectedPlayerIds.includes(draft.boostedPlayerId) || draft.boostedPlayerId === draft.captainPlayerId)) {
         draft.boostedPlayerId = '';
@@ -11102,7 +11116,7 @@ function titleBandScore(pick, live){
         fixtureLabel: formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`),
         fixtureDatetimeUtc: fixture.datetime_utc,
         selectedPlayerIds,
-        captainPlayerId: draft.captainPlayerId,
+        captainPlayerId: selectedPowerBoost === 'all_in' ? null : draft.captainPlayerId,
         powerBoostKey: selectedPowerBoost || null,
         boostedPlayerId: selectedPowerBoost === 'x_factor' ? (draft.boostedPlayerId || null) : null,
         priceSnapshot,
@@ -11120,7 +11134,7 @@ function titleBandScore(pick, live){
         if (saved) {
           MINI_FANTASY_DRAFTS[fixture.match_no] = {
             selectedPlayerIds: [...selectedPlayerIds, '', '', '', ''].slice(0, 4),
-            captainPlayerId: draft.captainPlayerId,
+            captainPlayerId: selectedPowerBoost === 'all_in' ? '' : draft.captainPlayerId,
             powerBoostKey: selectedPowerBoost || '',
             boostedPlayerId: selectedPowerBoost === 'x_factor' ? (draft.boostedPlayerId || '') : ''
           };
@@ -11132,7 +11146,7 @@ function titleBandScore(pick, live){
       } catch (error) {
         setMiniFantasyNotice('bad', {
           title: 'That team was not saved',
-          text: 'Please try again. If the match has locked, the lineup can no longer change.'
+          text: error?.message || 'Please try again. If the match has locked, the lineup can no longer change.'
         });
       }
       render();
@@ -11364,6 +11378,7 @@ function titleBandScore(pick, live){
       const boostedPlayer = selectedPowerBoost === 'x_factor'
         ? (poolById.get(draft.boostedPlayerId || '') || null)
         : null;
+      const captainDisabledByAllIn = selectedPowerBoost === 'all_in';
       const availableBoosts = miniFantasyPowerBoostDefinitions().map((definition) => ({
         ...definition,
         available: powerBoostAvailability.get(definition.key)?.available !== false
@@ -11389,14 +11404,14 @@ function titleBandScore(pick, live){
           <div class="fantasy-summary-grid">
             <span class="pill">Spent: ${escapeHtml(String(spentCredits))} / ${escapeHtml(String(entryBudget))}</span>
             <span class="pill">Left: ${escapeHtml(String(budgetRemaining))}</span>
-            <span class="pill">Captain: ${draft.captainPlayerId ? 'Set' : 'Pick 1'}</span>
+            <span class="pill">Captain: ${captainDisabledByAllIn ? 'Replaced by All In' : (draft.captainPlayerId ? 'Set' : 'Pick 1')}</span>
             <span class="pill">${escapeHtml(miniFantasyPowerBoostChipText(selectedPowerBoost, boostedPlayer?.name || ''))}</span>
             ${entry ? '<span class="pill">Saved entry</span>' : '<span class="pill">Not picked yet</span>'}
           </div>
         </div>
         <div class="fantasy-builder-status">
           <div class="fantasy-window-note">${escapeHtml(statusLine)}</div>
-          ${missingOpenTeam ? '<div class="studio-alert info"><div class="studio-alert-title">No team saved yet</div><div class="studio-alert-detail">Choose 4 players, lock a captain, and save this open fixture before it locks.</div></div>' : ''}
+          ${missingOpenTeam ? `<div class="studio-alert info"><div class="studio-alert-title">No team saved yet</div><div class="studio-alert-detail">${escapeHtml(captainDisabledByAllIn ? 'Choose 4 players, arm All In if you want it, and save this open fixture before it locks.' : 'Choose 4 players, lock a captain, and save this open fixture before it locks.')}</div></div>` : ''}
         </div>
         <div class="fantasy-power-shell">
           <div class="fantasy-slot-kicker">Season boosts (one use each)</div>
@@ -11426,7 +11441,9 @@ function titleBandScore(pick, live){
             }).join('')}
           </div>
           <div class="fantasy-power-note">${
-            selectedPowerBoost === 'x_factor'
+            selectedPowerBoost === 'all_in'
+              ? escapeHtml('All In replaces your captain for this fixture, so no extra captain selection is used on top of it.')
+              : selectedPowerBoost === 'x_factor'
               ? escapeHtml(boostedPlayer
                 ? `X-Factor is armed on ${boostedPlayer.name}. If you move the captain onto that player, the target will clear automatically.`
                 : 'Choose one non-captain from your four picks below to arm X-Factor before you save.')
@@ -11455,7 +11472,7 @@ function titleBandScore(pick, live){
               <div class="fantasy-slot-actions">
                 <button class="studio-button ${player ? 'ghost' : ''}" type="button" data-mini-pick="${slotIndex}" ${locked ? 'disabled' : ''}>${player ? 'Change player' : 'Choose player'}</button>
                 <button class="studio-button ghost" type="button" data-mini-clear="${slotIndex}" ${player && !locked ? '' : 'disabled'}>Clear</button>
-                <button class="studio-button secondary" type="button" data-mini-captain="${slotIndex}" ${player && !locked ? '' : 'disabled'}>${draft.captainPlayerId === player?.player_id ? 'Captain locked' : 'Make captain'}</button>
+                <button class="studio-button secondary" type="button" data-mini-captain="${slotIndex}" ${player && !locked && !captainDisabledByAllIn ? '' : 'disabled'}>${captainDisabledByAllIn ? 'All In replaces captain' : (draft.captainPlayerId === player?.player_id ? 'Captain locked' : 'Make captain')}</button>
                 ${selectedPowerBoost === 'x_factor' ? `<button class="studio-button ghost" type="button" data-mini-boost-target="${slotIndex}" ${player && !locked && draft.captainPlayerId !== player.player_id ? '' : 'disabled'}>${draft.boostedPlayerId === player?.player_id ? 'Clear X-Factor' : (player ? (draft.captainPlayerId === player.player_id ? 'Captain cannot take it' : 'Make X-Factor') : 'Pick player first')}</button>` : ''}
               </div>
             </div>
@@ -11469,10 +11486,10 @@ function titleBandScore(pick, live){
           ${locked
             ? 'This fixture is locked. Your saved lineup is now read-only and will score once the match begins.'
             : validation.valid
-              ? `Lineup ready. You have ${budgetRemaining} credits left, the captain boost is set for ${draft.captainPlayerId ? escapeHtml((poolById.get(draft.captainPlayerId) || {}).name || 'your captain') : 'nobody yet'}, and ${escapeHtml(miniFantasyPowerBoostNarrative(selectedPowerBoost, boostedPlayer?.name || '').replace(/\.$/, '').toLowerCase())}.`
+              ? `Lineup ready. You have ${budgetRemaining} credits left, ${captainDisabledByAllIn ? 'All In is replacing your captain for this fixture' : `the captain boost is set for ${draft.captainPlayerId ? escapeHtml((poolById.get(draft.captainPlayerId) || {}).name || 'your captain') : 'nobody yet'}`}, and ${escapeHtml(miniFantasyPowerBoostNarrative(selectedPowerBoost, boostedPlayer?.name || '').replace(/\.$/, '').toLowerCase())}.`
               : validation.errors.length
                 ? escapeHtml(validation.errors.join(' '))
-                : 'Build your lineup, keep one player from each team, take at least 1 batter or wicket keeper and 1 bowler, lock the 1.5x captain, and arm one optional season boost if you want.'}
+                : 'Build your lineup, keep one player from each team, take at least 1 batter or wicket keeper and 1 bowler, lock the 1.5x captain unless All In replaces it, and arm one optional season boost if you want.'}
         </div>
         <div class="studio-actions">
           <button class="studio-button" type="button" id="saveMiniFantasyButton" ${locked ? 'disabled' : ''}>${entry ? 'Update team' : 'Save team'}</button>
@@ -11491,6 +11508,11 @@ function titleBandScore(pick, live){
       });
       panel.querySelectorAll('[data-mini-captain]').forEach((button) => {
         button.onclick = () => {
+          if (draft.powerBoostKey === 'all_in') {
+            setMiniFantasyNotice('bad', 'All In already replaces the captain slot for this fixture.');
+            render();
+            return;
+          }
           const slotIndex = Number(button.dataset.miniCaptain || 0);
           const playerId = draft.selectedPlayerIds[slotIndex] || '';
           if (!playerId) return;
@@ -11563,6 +11585,7 @@ function titleBandScore(pick, live){
       const selectedPowerBoost = normalizeMiniFantasyPowerBoostKey(draft.powerBoostKey || '');
       const selectedPowerBoostDefinition = getMiniFantasyPowerBoostDefinition(selectedPowerBoost);
       const pickerBudget = Number(pickerValidation.budget || getMiniFantasyEntryBudget(selectedPowerBoost)) || getMiniFantasyEntryBudget(selectedPowerBoost);
+      const captainDisabledByAllIn = selectedPowerBoost === 'all_in';
       const pickerBoostedPlayer = selectedPowerBoost === 'x_factor'
         ? (playerPool.find((player) => player.player_id === draft.boostedPlayerId) || null)
         : null;
@@ -11589,6 +11612,7 @@ function titleBandScore(pick, live){
           <span class="pill">Selected: ${escapeHtml(String(selectedPlayerIds.length))} / 4</span>
           <span class="pill">Credits: ${escapeHtml(String(pickerValidation.total_cost))} / ${escapeHtml(String(pickerBudget))}</span>
           <span class="pill">Left: ${escapeHtml(String(pickerValidation.budget_remaining))}</span>
+          <span class="pill">Captain: ${captainDisabledByAllIn ? 'Replaced by All In' : (draft.captainPlayerId ? 'Set' : 'Pick 1')}</span>
           <span class="pill">${escapeHtml(selectedPowerBoostDefinition ? miniFantasyPowerBoostChipText(selectedPowerBoost, pickerBoostedPlayer?.name || '') : 'Boost: none')}</span>
         </div>
       `;
@@ -11603,7 +11627,7 @@ function titleBandScore(pick, live){
                 <div class="fantasy-picker-row">
                   <div>
                     <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
-                    <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml(player.role.replace('_', ' '))} - ${escapeHtml(formatMiniFantasyPoints(player.season_total_points || 0))} pts total${player.matches_played ? ` - ${escapeHtml(formatMiniFantasyPoints(player.last_match_points || 0))} pts last match - ${escapeHtml(String(player.matches_played))} matches` : ''}${draft.captainPlayerId === player.player_id ? ' - captain' : ''}</div>
+                    <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml(player.role.replace('_', ' '))} - ${escapeHtml(formatMiniFantasyPoints(player.season_total_points || 0))} pts total${player.matches_played ? ` - ${escapeHtml(formatMiniFantasyPoints(player.last_match_points || 0))} pts last match - ${escapeHtml(String(player.matches_played))} matches` : ''}${!captainDisabledByAllIn && draft.captainPlayerId === player.player_id ? ' - captain' : ''}</div>
                     ${(player.availabilityStatus || player.pickedInOtherSlot || player.selectedInCurrentSlot || player.selectedSlotIndex !== -1) ? `
                       <div class="fantasy-picker-meta-row">
                         <div class="fantasy-picker-meta-badges">
@@ -11611,7 +11635,7 @@ function titleBandScore(pick, live){
                           ${player.pickedInOtherSlot ? `<div class="fantasy-picker-badge">Picked in slot ${player.selectedSlotIndex + 1} - tap to unselect</div>` : ''}
                           ${player.selectedInCurrentSlot ? '<div class="fantasy-picker-badge current">Selected in this slot - tap to unselect</div>' : ''}
                         </div>
-                        ${player.selectedSlotIndex !== -1 ? `
+                        ${player.selectedSlotIndex !== -1 && !captainDisabledByAllIn ? `
                           <span
                             class="fantasy-picker-captain-btn ${draft.captainPlayerId === player.player_id ? 'is-captain' : ''}"
                             data-mini-picker-captain="${escapeHtml(player.player_id)}"
@@ -11659,6 +11683,11 @@ function titleBandScore(pick, live){
       body.querySelectorAll('[data-mini-picker-captain]').forEach((button) => {
         button.onclick = (event) => {
           event.stopPropagation();
+          if (selectedPowerBoost === 'all_in') {
+            setMiniFantasyNotice('bad', 'All In already replaces the captain slot for this fixture.');
+            render();
+            return;
+          }
           const playerId = button.dataset.miniPickerCaptain || '';
           if (!playerId) return;
           const pickerDraft = ensureMiniFantasyDraft(fixture.match_no);

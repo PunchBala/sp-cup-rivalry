@@ -897,6 +897,25 @@ test('validateMiniFantasyEntry enforces budget, team split, and role minimums', 
   assert.equal(deepPocketsValid.total_cost, 34);
   assert.equal(deepPocketsValid.budget_remaining, 0);
 
+  const allInValid = validateMiniFantasyEntry({
+    fixture,
+    selectedPlayerIds: ['dc_b', 'gt_a', 'gt_b', 'gt_c'],
+    captainPlayerId: '',
+    playerPool: pool,
+    powerBoostKey: 'all_in'
+  });
+  assert.equal(allInValid.valid, true);
+
+  const invalidAllInCaptain = validateMiniFantasyEntry({
+    fixture,
+    selectedPlayerIds: ['dc_b', 'gt_a', 'gt_b', 'gt_c'],
+    captainPlayerId: 'gt_b',
+    playerPool: pool,
+    powerBoostKey: 'all_in'
+  });
+  assert.equal(invalidAllInCaptain.valid, false);
+  assert.match(invalidAllInCaptain.errors.join(' | '), /All In replaces your captain/i);
+
   const invalidXFactorCaptain = validateMiniFantasyEntry({
     fixture,
     selectedPlayerIds: ['dc_b', 'gt_a', 'gt_b', 'gt_c'],
@@ -2408,7 +2427,7 @@ test('scoreMiniFantasyEntry applies appearance and winning bonuses before captai
   assert.equal(noResult.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 0);
 });
 
-test('scoreMiniFantasyEntry applies All In and X-Factor multipliers on top of normal scoring', () => {
+test('scoreMiniFantasyEntry applies All In and X-Factor multipliers without stacking captain on All In', () => {
   const baseEntry = {
     matchNo: 14,
     selectedPlayerIds: [
@@ -2471,9 +2490,9 @@ test('scoreMiniFantasyEntry applies All In and X-Factor multipliers on top of no
     schedule,
     squads
   });
-  assert.equal(allIn.total_points, 185.25);
-  assert.equal(allIn.power_boost_bonus_points, 61.75);
-  assert.equal(allIn.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 105.75);
+  assert.equal(allIn.total_points, 150);
+  assert.equal(allIn.power_boost_bonus_points, 50);
+  assert.equal(allIn.scored_points_by_player_id[buildMiniFantasyPlayerId('DC', 'DC Batter')], 70.5);
   assert.equal(allIn.power_boost_multiplier_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Bowler')], 1.5);
 
   const xFactor = scoreMiniFantasyEntry({

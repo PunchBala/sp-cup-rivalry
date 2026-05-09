@@ -43,7 +43,7 @@ export const MINI_FANTASY_POWER_BOOST_DEFINITIONS = Object.freeze({
   all_in: Object.freeze({
     key: 'all_in',
     name: 'All In',
-    description: '1.5x on your full team for one fixture.'
+    description: '1.5x on your full team for one fixture, replacing the captain slot.'
   }),
   x_factor: Object.freeze({
     key: 'x_factor',
@@ -1289,6 +1289,12 @@ export function getMiniFantasyEntryBudget(powerBoostKey = '') {
     : MINI_FANTASY_BUDGET;
 }
 
+function resolveMiniFantasyEffectiveCaptainPlayerId(captainPlayerId = '', powerBoostKey = '') {
+  return normalizeMiniFantasyPowerBoostKey(powerBoostKey) === 'all_in'
+    ? ''
+    : normalizeWhitespace(captainPlayerId);
+}
+
 export function isFixtureLocked(fixture, now = new Date(), lockOffsetMinutes = MINI_FANTASY_LOCK_OFFSET_MINUTES) {
   const startMs = Date.parse(fixture?.datetime_utc || fixture?.starts_at_utc || '');
   if (!Number.isFinite(startMs)) return true;
@@ -1310,6 +1316,7 @@ export function validateMiniFantasyEntry({
   const selectedPlayers = uniqueSelectedIds.map((playerId) => poolById.get(playerId)).filter(Boolean);
   const resolvedPowerBoostKey = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
   const resolvedBoostedPlayerId = normalizeWhitespace(boostedPlayerId);
+  const resolvedCaptainPlayerId = normalizeWhitespace(captainPlayerId);
   const resolvedBudget = Number.isFinite(Number(budget))
     ? Number(budget)
     : getMiniFantasyEntryBudget(resolvedPowerBoostKey);
@@ -1322,7 +1329,11 @@ export function validateMiniFantasyEntry({
     errors.push('All selected players must come from the fixture pool.');
   }
 
-  if (!captainPlayerId || !uniqueSelectedIds.includes(captainPlayerId)) {
+  if (resolvedPowerBoostKey === 'all_in') {
+    if (resolvedCaptainPlayerId) {
+      errors.push('All In replaces your captain, so leave the captain slot empty.');
+    }
+  } else if (!resolvedCaptainPlayerId || !uniqueSelectedIds.includes(resolvedCaptainPlayerId)) {
     errors.push('Choose one captain from your four picks.');
   }
 
@@ -1360,7 +1371,7 @@ export function validateMiniFantasyEntry({
   if (resolvedPowerBoostKey === 'x_factor') {
     if (!resolvedBoostedPlayerId || !uniqueSelectedIds.includes(resolvedBoostedPlayerId)) {
       errors.push('Choose one non-captain player for X-Factor.');
-    } else if (resolvedBoostedPlayerId === captainPlayerId) {
+    } else if (resolvedBoostedPlayerId === resolvedCaptainPlayerId) {
       errors.push('X-Factor must target a non-captain player.');
     }
   } else if (resolvedBoostedPlayerId) {
@@ -1400,6 +1411,7 @@ export function scoreMiniFantasyLineup({
   const appearanceBonusPerPlayer = toNumber(appearancePlayerBonus, 0);
   const resolvedPowerBoostKey = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
   const resolvedBoostedPlayerId = normalizeWhitespace(boostedPlayerId);
+  const resolvedCaptainPlayerId = resolveMiniFantasyEffectiveCaptainPlayerId(captainPlayerId, resolvedPowerBoostKey);
   let total = 0;
   selected.forEach((playerId) => {
     const rawPoints = noResult ? 0 : toNumber(pointsByPlayerId[playerId], 0);
@@ -1408,7 +1420,7 @@ export function scoreMiniFantasyLineup({
     const appearanceBonus = appeared ? appearanceBonusPerPlayer : 0;
     const winnerBonus = resolvedWinningTeamCode && playerTeamCode === resolvedWinningTeamCode ? winnerBonusPerPlayer : 0;
     const eligiblePoints = rawPoints + appearanceBonus + winnerBonus;
-    const captainMultiplier = playerId === captainPlayerId ? MINI_FANTASY_CAPTAIN_MULTIPLIER : 1;
+    const captainMultiplier = playerId === resolvedCaptainPlayerId ? MINI_FANTASY_CAPTAIN_MULTIPLIER : 1;
     const powerBoostMultiplier = resolvedPowerBoostKey === 'all_in'
       ? 1.5
       : (resolvedPowerBoostKey === 'x_factor' && playerId === resolvedBoostedPlayerId ? 2 : 1);
@@ -2260,8 +2272,8 @@ export function scoreMiniFantasyEntry({
     ? Number(completedMatchCount)
     : getCompletedMiniFantasyMatchCount(liveData);
   const selectedPlayerIds = Array.isArray(entry?.selectedPlayerIds) ? entry.selectedPlayerIds : (Array.isArray(entry?.selected_player_ids) ? entry?.selected_player_ids : []);
-  const captainPlayerId = entry?.captainPlayerId || entry?.captain_player_id || '';
   const powerBoostKey = normalizeMiniFantasyPowerBoostKey(entry?.powerBoostKey || entry?.power_boost_key || '');
+  const captainPlayerId = resolveMiniFantasyEffectiveCaptainPlayerId(entry?.captainPlayerId || entry?.captain_player_id || '', powerBoostKey);
   const boostedPlayerId = normalizeWhitespace(entry?.boostedPlayerId || entry?.boosted_player_id || '');
   const resolvedFixtureRecordMap = fixtureRecordMap instanceof Map
     ? fixtureRecordMap
@@ -2376,8 +2388,8 @@ export function buildMiniFantasyEntryAuditLog({
   const selectedPlayerIds = Array.isArray(entry?.selectedPlayerIds)
     ? entry.selectedPlayerIds.filter(Boolean)
     : (Array.isArray(entry?.selected_player_ids) ? entry?.selected_player_ids.filter(Boolean) : []);
-  const captainPlayerId = normalizeWhitespace(entry?.captainPlayerId || entry?.captain_player_id || '');
   const powerBoostKey = normalizeMiniFantasyPowerBoostKey(entry?.powerBoostKey || entry?.power_boost_key || '');
+  const captainPlayerId = resolveMiniFantasyEffectiveCaptainPlayerId(entry?.captainPlayerId || entry?.captain_player_id || '', powerBoostKey);
   const boostedPlayerId = normalizeWhitespace(entry?.boostedPlayerId || entry?.boosted_player_id || '');
   const priceSnapshot = entry?.priceSnapshot && typeof entry.priceSnapshot === 'object'
     ? entry.priceSnapshot
