@@ -19,7 +19,7 @@ Earlier season data is still used to seed player prices, but user-facing entry w
 2. Open the `Mini Fantasy` tab.
 3. See which fixtures are open for submission now and which one opens next.
 4. Open one fixture and build a 4-player lineup.
-5. Stay under or equal to `31` credits.
+5. Stay under or equal to `31` credits by default, unless `Deep Pockets` is active for that fixture.
 6. Include at least one player from each real team.
 7. Include at least one batter and one bowler.
 8. Choose one captain for a `1.5x` multiplier.

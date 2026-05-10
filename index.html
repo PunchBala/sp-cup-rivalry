@@ -1541,7 +1541,7 @@
                     <li><strong>Bowling economy bonus:</strong> minimum 2 overs, then economy below 6 = +8, below 7 = +5, below 8 = +2, above 10 = -5.</li>
                     <li><strong>Milestone bonuses:</strong> fifty +10, hundred +25, quick 30 under 15 balls +8, 3 wickets +12, 4 wickets +20, 5 wickets +30, and a duck penalty of -5 when a batter is dismissed for 0.</li>
                     <li><strong>Mini Fantasy extras:</strong> each selected player who appears in the fixture gets <code>+2</code>. Each selected player from the winning side gets <code>+5</code> once the result is final.</li>
-                    <li><strong>Season boosts:</strong> <code>All In</code> gives 1.5x to the whole team for one fixture and replaces the captain slot, <code>X-Factor</code> gives 2x to one non-captain, and <code>Deep Pockets</code> lifts one lineup budget to <code>34</code>. Each boost can only be used once all season.</li>
+                    <li><strong>Season boosts:</strong> <code>All In</code> gives 1.5x to the whole team for one fixture and replaces the captain slot, <code>X-Factor</code> gives 2x to one non-captain, and <code>Deep Pockets</code> removes the lineup credit cap for one fixture with an <code>&infin;</code> budget. Each boost can only be used once all season.</li>
                     <li><strong>Captain + no-result rule:</strong> your captain gets <code>1.5x</code> of every eligible point, including appearance and winner bonuses, unless <code>All In</code> is active instead. If a fixture ends with no result, every Mini Fantasy player score for that match becomes <code>0</code>.</li>
                     <li><strong>Missed-lock safety net:</strong> if you miss a completed fixture after joining, you receive <code>40%</code> of the average locked score for that fixture. Your first 3 missed locks are capped at <code>50</code> points each, then the cap drops to <code>30</code> from the 4th missed lock onward. If nobody locked a team for that fixture, nobody gets any fallback points.</li>
                     <li><strong>Fixture-day visit bonus:</strong> signed-in users who open the app on an India fixture day receive <code>+5</code> once for that calendar day in <code>Asia/Kolkata</code>.</li>
@@ -1737,6 +1737,7 @@
       buildEntryPriceSnapshot,
       calculateMiniFantasyMissedLockPointsForPlayedFixture,
       formatDateKeyInTimeZone,
+      formatMiniFantasyBudgetValue,
       buildFixturePlayerPool,
       generateMiniFantasyPriceBook,
       getCompletedMiniFantasyMatchCount,
@@ -5827,7 +5828,7 @@ function titleBandScore(pick, live){
       const openMatches = launchData.fixtures.map((fixture) => `Match ${fixture.match_no}`).join(', ');
       titleEl.textContent = `${ACTIVE_ROOM?.name || 'IPL 2026'} Mini Fantasy`;
       subtitleEl.textContent = openCount
-        ? `${openMatches} ${openCount === 1 ? 'is' : 'are'} open for submission right now. Later matches unlock from the day before, every lineup is 4 players inside 31 credits, and saved teams keep their own frozen price snapshot.`
+        ? `${openMatches} ${openCount === 1 ? 'is' : 'are'} open for submission right now. Later matches unlock from the day before, every lineup is 4 players inside 31 credits by default, and saved teams keep their own frozen price snapshot.`
         : `${nextOpening ? `No match is open right now. Match ${nextOpening.match_no} opens on ${formatDate(nextOpening.opens_at_utc)}.` : 'No Mini Fantasy match is currently open.'} Build one team per match, captain one player for 1.5x, and rankings update from completed fixtures.`;
       pillEl.textContent = `Mini Fantasy: ${ACTIVE_ROOM?.name || SERIES_TAG}`;
     }
@@ -9273,8 +9274,8 @@ function titleBandScore(pick, live){
           key: 'deep_pockets',
           name: 'Deep Pockets',
           emoji: '💰',
-          short: `Budget ${MINI_FANTASY_DEEP_POCKETS_BUDGET}`,
-          detail: `Raises your budget from ${MINI_FANTASY_BUDGET} to ${MINI_FANTASY_DEEP_POCKETS_BUDGET} for one fixture.`
+          short: 'No cap',
+          detail: `Removes the ${formatMiniFantasyBudgetValue(MINI_FANTASY_BUDGET)}-credit budget cap for one fixture with an \u221E limit.`
         }
       ];
     }
@@ -9311,13 +9312,14 @@ function titleBandScore(pick, live){
           : 'X-Factor is armed for one non-captain player.';
       }
       if (key === 'deep_pockets') {
-        return `Deep Pockets lifted the squad budget to ${MINI_FANTASY_DEEP_POCKETS_BUDGET} credits for this fixture.`;
+        return 'Deep Pockets removed the squad budget cap for this fixture.';
       }
       return `${miniFantasyPowerBoostLabel(key)} is armed for this fixture.`;
     }
 
     function miniFantasyPowerBoostChipText(powerBoostKey = '', boostedPlayerName = ''){
       const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
+      if (key === 'deep_pockets') return '\u{1F4B0} Boost: Deep Pockets (\u221E)';
       if (!key) return 'Boost: none';
       if (key === 'all_in') return '⚡ Boost: All In (captain off)';
       if (key === 'x_factor' && boostedPlayerName) return `🃏 Boost: X-Factor on ${boostedPlayerName}`;
@@ -10705,7 +10707,7 @@ function titleBandScore(pick, live){
           </div>
           <div class="fantasy-summary-strip">
             <span class="pill">${detail.captain ? `Captain: ${detail.captain.name}` : 'Captain pending'}</span>
-            <span class="pill">Spent: ${escapeHtml(String(recapEntry.spentCredits || 0))} / ${escapeHtml(String(recapBudget))}</span>
+            <span class="pill">Spent: ${escapeHtml(formatMiniFantasyBudgetValue(recapEntry.spentCredits || 0))} / ${escapeHtml(formatMiniFantasyBudgetValue(recapBudget))}</span>
             <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(detail.powerBoostKey || recapEntry.powerBoostKey || recapEntry.power_boost_key || '')}">${escapeHtml(miniFantasyPowerBoostChipText(detail.powerBoostKey || recapEntry.powerBoostKey || recapEntry.power_boost_key || '', detail.boostedPlayerName || ''))}</span>
             ${bestPick ? `<span class="pill">Best pick: ${escapeHtml(bestPick.name)} ${escapeHtml(formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points))} pts</span>` : ''}
           </div>
@@ -11492,8 +11494,8 @@ function titleBandScore(pick, live){
             <div class="small">${escapeHtml(formatFixtureLabel(fixture.fixture || `${fixture.away_team} vs ${fixture.home_team}`))}</div>
           </div>
           <div class="fantasy-summary-grid">
-            <span class="pill">Spent: ${escapeHtml(String(spentCredits))} / ${escapeHtml(String(entryBudget))}</span>
-            <span class="pill">Left: ${escapeHtml(String(budgetRemaining))}</span>
+            <span class="pill">Spent: ${escapeHtml(formatMiniFantasyBudgetValue(spentCredits))} / ${escapeHtml(formatMiniFantasyBudgetValue(entryBudget))}</span>
+            <span class="pill">Left: ${escapeHtml(formatMiniFantasyBudgetValue(budgetRemaining))}</span>
             <span class="pill">Captain: ${captainDisabledByAllIn ? 'Replaced by All In' : (draft.captainPlayerId ? 'Set' : 'Pick 1')}</span>
             <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(selectedPowerBoost)}">${escapeHtml(miniFantasyPowerBoostChipText(selectedPowerBoost, boostedPlayer?.name || ''))}</span>
             ${entry ? '<span class="pill">Saved entry</span>' : '<span class="pill">Not picked yet</span>'}
@@ -11579,7 +11581,7 @@ function titleBandScore(pick, live){
           ${locked
             ? 'This fixture is locked. Your saved lineup is now read-only and will score once the match begins.'
             : validation.valid
-              ? `Lineup ready. You have ${budgetRemaining} credits left, ${captainDisabledByAllIn ? 'All In is replacing your captain for this fixture' : `the captain boost is set for ${draft.captainPlayerId ? escapeHtml((poolById.get(draft.captainPlayerId) || {}).name || 'your captain') : 'nobody yet'}`}, and ${escapeHtml(miniFantasyPowerBoostNarrative(selectedPowerBoost, boostedPlayer?.name || '').replace(/\.$/, '').toLowerCase())}.`
+              ? `Lineup ready. You have ${escapeHtml(formatMiniFantasyBudgetValue(budgetRemaining))} ${Number.isFinite(Number(budgetRemaining)) ? 'credits left' : 'budget headroom left'}, ${captainDisabledByAllIn ? 'All In is replacing your captain for this fixture' : `the captain boost is set for ${draft.captainPlayerId ? escapeHtml((poolById.get(draft.captainPlayerId) || {}).name || 'your captain') : 'nobody yet'}`}, and ${escapeHtml(miniFantasyPowerBoostNarrative(selectedPowerBoost, boostedPlayer?.name || '').replace(/\.$/, '').toLowerCase())}.`
               : validation.errors.length
                 ? escapeHtml(validation.errors.join(' '))
                 : 'Build your lineup, keep one player from each team, take at least 1 batter or wicket keeper and 1 bowler, lock the 1.5x captain unless All In replaces it, and arm one optional season boost if you want.'}
@@ -11703,8 +11705,8 @@ function titleBandScore(pick, live){
         </div>
         <div class="fantasy-summary-grid">
           <span class="pill">Selected: ${escapeHtml(String(selectedPlayerIds.length))} / 4</span>
-          <span class="pill">Credits: ${escapeHtml(String(pickerValidation.total_cost))} / ${escapeHtml(String(pickerBudget))}</span>
-          <span class="pill">Left: ${escapeHtml(String(pickerValidation.budget_remaining))}</span>
+          <span class="pill">Credits: ${escapeHtml(formatMiniFantasyBudgetValue(pickerValidation.total_cost))} / ${escapeHtml(formatMiniFantasyBudgetValue(pickerBudget))}</span>
+          <span class="pill">Left: ${escapeHtml(formatMiniFantasyBudgetValue(pickerValidation.budget_remaining))}</span>
           <span class="pill">Captain: ${captainDisabledByAllIn ? 'Replaced by All In' : (draft.captainPlayerId ? 'Set' : 'Pick 1')}</span>
           <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(selectedPowerBoost)}">${escapeHtml(selectedPowerBoostDefinition ? miniFantasyPowerBoostChipText(selectedPowerBoost, pickerBoostedPlayer?.name || '') : 'Boost: none')}</span>
         </div>
@@ -11748,7 +11750,7 @@ function titleBandScore(pick, live){
             `).join('')}
           </div>`
         : '<div class="fantasy-empty">No player matches the current search and team filter.</div>';
-      count.textContent = `${filtered.length} option${filtered.length === 1 ? '' : 's'} - ${selectedPlayerIds.length} selected - ${pickerValidation.total_cost}/${pickerBudget} credits`;
+      count.textContent = `${filtered.length} option${filtered.length === 1 ? '' : 's'} - ${selectedPlayerIds.length} selected - ${formatMiniFantasyBudgetValue(pickerValidation.total_cost)}/${formatMiniFantasyBudgetValue(pickerBudget)} credits`;
 
       const searchInput = document.getElementById('miniFantasyPickerSearch');
       if (searchInput) {

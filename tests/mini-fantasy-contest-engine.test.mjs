@@ -885,17 +885,17 @@ test('validateMiniFantasyEntry enforces budget, team split, and role minimums', 
     captainPlayerId: 'dc_a',
     playerPool: [
       ...pool.filter((player) => !['dc_a', 'dc_b', 'gt_a', 'gt_c'].includes(player.player_id)),
-      { player_id: 'dc_a', name: 'DC Batter', team: 'DC', role: 'batter', final_price: 9, pricing_eligible: true },
-      { player_id: 'dc_b', name: 'DC Bowler', team: 'DC', role: 'bowler', final_price: 8.5, pricing_eligible: true },
-      { player_id: 'gt_a', name: 'GT All-rounder', team: 'GT', role: 'all_rounder', final_price: 8, pricing_eligible: true },
+      { player_id: 'dc_a', name: 'DC Batter', team: 'DC', role: 'batter', final_price: 10.5, pricing_eligible: true },
+      { player_id: 'dc_b', name: 'DC Bowler', team: 'DC', role: 'bowler', final_price: 9.5, pricing_eligible: true },
+      { player_id: 'gt_a', name: 'GT All-rounder', team: 'GT', role: 'all_rounder', final_price: 9, pricing_eligible: true },
       { player_id: 'gt_c', name: 'GT Bowler', team: 'GT', role: 'bowler', final_price: 8.5, pricing_eligible: true }
     ],
     powerBoostKey: 'deep_pockets'
   });
   assert.equal(deepPocketsValid.valid, true);
   assert.equal(deepPocketsValid.budget, MINI_FANTASY_DEEP_POCKETS_BUDGET);
-  assert.equal(deepPocketsValid.total_cost, 34);
-  assert.equal(deepPocketsValid.budget_remaining, 0);
+  assert.equal(deepPocketsValid.total_cost, 37.5);
+  assert.equal(Number.isFinite(deepPocketsValid.budget_remaining), false);
 
   const allInValid = validateMiniFantasyEntry({
     fixture,

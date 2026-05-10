@@ -26,7 +26,7 @@ export const MINI_FANTASY_FIRST_OPEN_MATCH_NO = 14;
 export const MINI_FANTASY_FIRST_MATCH_OPEN_AT_UTC = '2026-04-06T00:00:00Z';
 export const MINI_FANTASY_TEAM_SIZE = 4;
 export const MINI_FANTASY_BUDGET = 31;
-export const MINI_FANTASY_DEEP_POCKETS_BUDGET = 34;
+export const MINI_FANTASY_DEEP_POCKETS_BUDGET = Number.POSITIVE_INFINITY;
 export const MINI_FANTASY_CAPTAIN_MULTIPLIER = 1.5;
 export const MINI_FANTASY_WINNING_TEAM_PLAYER_BONUS = 5;
 export const MINI_FANTASY_APPEARANCE_PLAYER_BONUS = 2;
@@ -53,7 +53,7 @@ export const MINI_FANTASY_POWER_BOOST_DEFINITIONS = Object.freeze({
   deep_pockets: Object.freeze({
     key: 'deep_pockets',
     name: 'Deep Pockets',
-    description: `Raises your squad budget to ${MINI_FANTASY_DEEP_POCKETS_BUDGET} for one fixture.`
+    description: 'Removes your squad budget cap for one fixture.'
   })
 });
 
@@ -1283,6 +1283,23 @@ export function getMiniFantasyPowerBoostDefinition(value = '') {
   return key ? MINI_FANTASY_POWER_BOOST_DEFINITIONS[key] : null;
 }
 
+export function isMiniFantasyUnlimitedBudgetValue(value = '') {
+  const numeric = Number(value);
+  return !Number.isNaN(numeric) && numeric > 0 && !Number.isFinite(numeric);
+}
+
+export function formatMiniFantasyBudgetValue(value = '', { includeUnit = false } = {}) {
+  if (isMiniFantasyUnlimitedBudgetValue(value)) {
+    return includeUnit ? '\u221E cr' : '\u221E';
+  }
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return includeUnit ? '\u2014 cr' : '\u2014';
+  }
+  const compact = Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(1);
+  return includeUnit ? `${compact} cr` : compact;
+}
+
 export function getMiniFantasyEntryBudget(powerBoostKey = '') {
   return normalizeMiniFantasyPowerBoostKey(powerBoostKey) === 'deep_pockets'
     ? MINI_FANTASY_DEEP_POCKETS_BUDGET
@@ -1338,7 +1355,7 @@ export function validateMiniFantasyEntry({
   }
 
   const totalCost = roundTo(selectedPlayers.reduce((sum, player) => sum + Number(player.final_price || 0), 0), 2);
-  if (totalCost > resolvedBudget) {
+  if (Number.isFinite(resolvedBudget) && totalCost > resolvedBudget) {
     errors.push(`Squad budget exceeded: ${totalCost} / ${resolvedBudget} credits.`);
   }
 
@@ -1383,7 +1400,9 @@ export function validateMiniFantasyEntry({
     errors,
     selected_players: selectedPlayers,
     total_cost: totalCost,
-    budget_remaining: roundTo(resolvedBudget - totalCost, 2),
+    budget_remaining: Number.isFinite(resolvedBudget)
+      ? roundTo(resolvedBudget - totalCost, 2)
+      : MINI_FANTASY_DEEP_POCKETS_BUDGET,
     budget: resolvedBudget,
     team_counts: teamCounts,
     role_counts: roleCounts,
