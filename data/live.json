@@ -2,7 +2,7 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-05-10T16:50:45.498Z",
+  "fetchedAt": "2026-05-10T17:48:49.129Z",
   "scrapeStatus": "ok (53 processed matches, live match tracked, 0 scorecard calls this run)",
   "scrapeReport": {
     "orangeCap": {
@@ -56,10 +56,11 @@
       "method": "computed standings from completed matches"
     },
     "mostDots": {
-      "ok": true,
+      "ok": false,
       "source": "IPLT20 official most dots feed",
       "method": "parsed JSONP mostdotballsbowledtournament feed from Sports Mechanic stats feed",
-      "rows": 109
+      "reason": "refresh interval not reached",
+      "cachedRows": 109
     },
     "mvp": {
       "ok": true,
@@ -109,19 +110,19 @@
       "dayKey": "2026-05-10",
       "quietRefreshesUsed": 0,
       "lastQuietRefreshAt": null,
-      "lastLiveRefreshAt": "2026-05-10T16:50:43.174Z",
-      "lastSeriesInfoAt": "2026-05-10T16:50:43.174Z",
+      "lastLiveRefreshAt": "2026-05-10T17:48:48.038Z",
+      "lastSeriesInfoAt": "2026-05-10T17:48:48.038Z",
       "lastDecision": {
-        "at": "2026-05-10T16:50:42.036Z",
+        "at": "2026-05-10T17:48:46.901Z",
         "shouldRefresh": true,
         "mode": "scheduled_window",
         "reason": "inside planned refresh window",
-        "nextPlannedAt": "2026-05-10T17:00:00.000Z"
+        "nextPlannedAt": "2026-05-10T18:00:00.000Z"
       },
-      "nextPlannedRefreshAt": "2026-05-10T17:00:00.000Z",
+      "nextPlannedRefreshAt": "2026-05-10T18:00:00.000Z",
       "nextPlannedMode": "scheduled_window",
       "nextPlannedReason": "league-stage refresh plan",
-      "nextPlannedCalculatedAt": "2026-05-10T16:50:43.174Z"
+      "nextPlannedCalculatedAt": "2026-05-10T17:48:48.039Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -174,7 +175,7 @@
         {
           "id": "02d3614d-9727-43c5-a80c-0bf46c7499c6",
           "name": "Royal Challengers Bengaluru vs Mumbai Indians, 54th Match, Indian Premier League 2026",
-          "status": "Royal Challengers Bengaluru need 110 runs in 70 balls",
+          "status": "Royal Challengers Bengaluru need 30 runs in 17 balls",
           "dateTimeGMT": "2026-05-10T14:00:00",
           "teams": [
             "Royal Challengers Bengaluru",
@@ -535346,7 +535347,7 @@
       },
       {
         "processedMatchCount": 53,
-        "fetchedAt": "2026-05-10T16:50:45.498Z",
+        "fetchedAt": "2026-05-10T17:48:49.129Z",
         "snapshot": {
           "season": 2026,
           "provider": "CricketData.org",
@@ -556378,9 +556379,9 @@
     },
     "liveOverlay": {
       "matchId": "02d3614d-9727-43c5-a80c-0bf46c7499c6",
-      "generatedAt": "2026-05-10T16:50:43.194Z",
+      "generatedAt": "2026-05-10T17:48:48.057Z",
       "aggregates": null,
-      "status": "Royal Challengers Bengaluru need 110 runs in 70 balls",
+      "status": "Royal Challengers Bengaluru need 30 runs in 17 balls",
       "source": "series_info only"
     },
     "scorecardBudget": {
@@ -556434,7 +556435,7 @@
     "aggregateSchemaVersion": 5,
     "providerStatus": {
       "state": "ok",
-      "lastAttemptAt": "2026-05-10T16:50:42.031Z",
+      "lastAttemptAt": "2026-05-10T17:48:46.897Z",
       "lastErrorAt": null,
       "reason": null,
       "hitsToday": null,
