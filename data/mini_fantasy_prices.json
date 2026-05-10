@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-05-10T20:55:29.399Z",
+    "as_of_utc": "2026-05-10T21:43:56.376Z",
     "price_min": 4.5,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -86,9 +86,9 @@
   "summary": {
     "total_players_received": 257,
     "eligible_players_ranked": 257,
-    "price_rises": 2,
+    "price_rises": 0,
     "price_drops": 0,
-    "price_unchanged": 255
+    "price_unchanged": 257
   },
   "players": [
     {
@@ -3874,12 +3874,12 @@
       "role": "all_rounder",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 9.5,
-      "initial_price": 9.5,
+      "old_price": 10,
+      "initial_price": 10,
       "target_price": 10,
       "smoothed_price": 10,
       "final_price": 10,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 3,
       "season_total_points": 253.5,
       "season_avg_points": 84.5,
@@ -3892,8 +3892,7 @@
       "rank": 5,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 5"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-10T14:00:00"
     },
@@ -4138,12 +4137,12 @@
       "role": "all_rounder",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
+      "old_price": 7.5,
+      "initial_price": 7.5,
       "target_price": 7.5,
       "smoothed_price": 7.5,
       "final_price": 7.5,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 2,
       "season_total_points": 59,
       "season_avg_points": 29.5,
@@ -4156,8 +4155,7 @@
       "rank": 92,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 92"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-10T14:00:00"
     },
@@ -7673,5 +7671,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-05-10T20:55:29.399Z"
+  "generated_at_utc": "2026-05-10T21:43:56.376Z"
 }
