@@ -2,7 +2,7 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-05-11T19:42:32.459Z",
+  "fetchedAt": "2026-05-11T21:13:43.434Z",
   "scrapeStatus": "ok (55 processed matches, 0 scorecard calls this run)",
   "scrapeReport": {
     "orangeCap": {
@@ -56,10 +56,11 @@
       "method": "computed standings from completed matches"
     },
     "mostDots": {
-      "ok": true,
+      "ok": false,
       "source": "IPLT20 official most dots feed",
       "method": "parsed JSONP mostdotballsbowledtournament feed from Sports Mechanic stats feed",
-      "rows": 113
+      "reason": "refresh interval not reached",
+      "cachedRows": 113
     },
     "mvp": {
       "ok": true,
@@ -109,19 +110,19 @@
       "dayKey": "2026-05-11",
       "quietRefreshesUsed": 0,
       "lastQuietRefreshAt": null,
-      "lastLiveRefreshAt": "2026-05-11T19:42:30.453Z",
-      "lastSeriesInfoAt": "2026-05-11T19:42:30.453Z",
+      "lastLiveRefreshAt": "2026-05-11T21:13:42.585Z",
+      "lastSeriesInfoAt": "2026-05-11T21:13:42.585Z",
       "lastDecision": {
-        "at": "2026-05-11T19:42:29.425Z",
+        "at": "2026-05-11T21:13:41.575Z",
         "shouldRefresh": true,
         "mode": "scheduled_window",
         "reason": "inside planned refresh window",
-        "nextPlannedAt": "2026-05-11T20:00:00.000Z"
+        "nextPlannedAt": "2026-05-12T13:00:00.000Z"
       },
-      "nextPlannedRefreshAt": "2026-05-11T20:00:00.000Z",
+      "nextPlannedRefreshAt": "2026-05-12T13:00:00.000Z",
       "nextPlannedMode": "scheduled_window",
       "nextPlannedReason": "league-stage refresh plan",
-      "nextPlannedCalculatedAt": "2026-05-11T19:42:30.454Z"
+      "nextPlannedCalculatedAt": "2026-05-11T21:13:42.586Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -563945,7 +563946,7 @@
       },
       {
         "processedMatchCount": 55,
-        "fetchedAt": "2026-05-11T19:42:32.459Z",
+        "fetchedAt": "2026-05-11T21:13:43.434Z",
         "snapshot": {
           "season": 2026,
           "provider": "CricketData.org",
@@ -585561,7 +585562,7 @@
     },
     "liveOverlay": {
       "matchId": null,
-      "generatedAt": "2026-05-11T19:42:30.471Z",
+      "generatedAt": "2026-05-11T21:13:42.604Z",
       "aggregates": null,
       "status": null,
       "source": null
@@ -585617,7 +585618,7 @@
     "aggregateSchemaVersion": 5,
     "providerStatus": {
       "state": "ok",
-      "lastAttemptAt": "2026-05-11T19:42:29.422Z",
+      "lastAttemptAt": "2026-05-11T21:13:41.572Z",
       "lastErrorAt": null,
       "reason": null,
       "hitsToday": null,
