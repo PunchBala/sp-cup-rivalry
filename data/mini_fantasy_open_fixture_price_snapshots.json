@@ -1,475 +1,493 @@
 {
   "version": "mini_fantasy_open_fixture_prices_v1",
   "season": "IPL 2026",
-  "generated_at_utc": "2026-05-10T21:43:56.376Z",
-  "source_price_book_generated_at_utc": "2026-05-10T21:43:56.376Z",
+  "generated_at_utc": "2026-05-11T19:42:32.459Z",
+  "source_price_book_generated_at_utc": "2026-05-11T19:42:32.459Z",
   "fixtures": [
     {
       "season": "IPL 2026",
-      "match_no": 55,
-      "fixture_label": "Delhi Capitals vs Punjab Kings",
-      "home_team_code": "PBKS",
-      "away_team_code": "DC",
-      "opens_at_utc": "2026-05-10T00:00:00.000Z",
-      "locks_at_utc": "2026-05-11T13:59:00.000Z",
-      "snapshot_created_at_utc": "2026-05-10T14:18:52.766Z",
-      "source_price_book_generated_at_utc": "2026-05-10T14:18:52.766Z",
-      "player_count": 51,
+      "match_no": 56,
+      "fixture_label": "Sunrisers Hyderabad vs Gujarat Titans",
+      "home_team_code": "GT",
+      "away_team_code": "SRH",
+      "opens_at_utc": "2026-05-11T00:00:00.000Z",
+      "locks_at_utc": "2026-05-12T13:59:00.000Z",
+      "snapshot_created_at_utc": "2026-05-11T19:42:32.459Z",
+      "source_price_book_generated_at_utc": "2026-05-11T19:42:32.459Z",
+      "player_count": 53,
       "price_snapshot": {
-        "dc_kl-rahul": {
-          "player_id": "dc_kl-rahul",
-          "name": "KL Rahul",
-          "team": "DC",
-          "role": "wicket_keeper",
-          "final_price": 9,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_pathum-nissanka": {
-          "player_id": "dc_pathum-nissanka",
-          "name": "Pathum Nissanka",
-          "team": "DC",
-          "role": "batter",
-          "final_price": 9,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_ashutosh-sharma": {
-          "player_id": "dc_ashutosh-sharma",
-          "name": "Ashutosh Sharma",
-          "team": "DC",
-          "role": "batter",
-          "final_price": 8,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "dc_axar-patel": {
-          "player_id": "dc_axar-patel",
-          "name": "Axar Patel",
-          "team": "DC",
+        "gt_jason-holder": {
+          "player_id": "gt_jason-holder",
+          "name": "Jason Holder",
+          "team": "GT",
           "role": "all_rounder",
-          "final_price": 8,
+          "final_price": 10,
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "dc_mitchell-starc": {
-          "player_id": "dc_mitchell-starc",
-          "name": "Mitchell Starc",
-          "team": "DC",
-          "role": "bowler",
-          "final_price": 8,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_nitish-rana": {
-          "player_id": "dc_nitish-rana",
-          "name": "Nitish Rana",
-          "team": "DC",
-          "role": "batter",
-          "final_price": 7.5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_sameer-rizvi": {
-          "player_id": "dc_sameer-rizvi",
-          "name": "Sameer Rizvi",
-          "team": "DC",
-          "role": "batter",
-          "final_price": 7.5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "dc_tristan-stubbs": {
-          "player_id": "dc_tristan-stubbs",
-          "name": "Tristan Stubbs",
-          "team": "DC",
-          "role": "wicket_keeper",
-          "final_price": 7.5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_kyle-jamieson": {
-          "player_id": "dc_kyle-jamieson",
-          "name": "Kyle Jamieson",
-          "team": "DC",
-          "role": "bowler",
-          "final_price": 7,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_lungisani-ngidi": {
-          "player_id": "dc_lungisani-ngidi",
-          "name": "Lungisani Ngidi",
-          "team": "DC",
-          "role": "bowler",
-          "final_price": 7,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_t-natarajan": {
-          "player_id": "dc_t-natarajan",
-          "name": "T. Natarajan",
-          "team": "DC",
-          "role": "bowler",
-          "final_price": 7,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_vipraj-nigam": {
-          "player_id": "dc_vipraj-nigam",
-          "name": "Vipraj Nigam",
-          "team": "DC",
-          "role": "bowler",
-          "final_price": 7,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "dc_karun-nair": {
-          "player_id": "dc_karun-nair",
-          "name": "Karun Nair",
-          "team": "DC",
-          "role": "batter",
-          "final_price": 6.5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_kuldeep-yadav": {
-          "player_id": "dc_kuldeep-yadav",
-          "name": "Kuldeep Yadav",
-          "team": "DC",
-          "role": "bowler",
-          "final_price": 6.5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_mukesh-kumar": {
-          "player_id": "dc_mukesh-kumar",
-          "name": "Mukesh Kumar",
-          "team": "DC",
-          "role": "bowler",
-          "final_price": 6.5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_abishek-porel": {
-          "player_id": "dc_abishek-porel",
-          "name": "Abishek Porel",
-          "team": "DC",
-          "role": "wicket_keeper",
-          "final_price": 6,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "dc_david-miller": {
-          "player_id": "dc_david-miller",
-          "name": "David Miller",
-          "team": "DC",
-          "role": "batter",
-          "final_price": 5.5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_dushmantha-chameera": {
-          "player_id": "dc_dushmantha-chameera",
-          "name": "Dushmantha Chameera",
-          "team": "DC",
-          "role": "bowler",
-          "final_price": 5.5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_ajay-mandal": {
-          "player_id": "dc_ajay-mandal",
-          "name": "Ajay Mandal",
-          "team": "DC",
-          "role": "all_rounder",
-          "final_price": 5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "dc_auqib-nabi": {
-          "player_id": "dc_auqib-nabi",
-          "name": "Auqib Nabi",
-          "team": "DC",
-          "role": "all_rounder",
-          "final_price": 5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "dc_ben-duckett": {
-          "player_id": "dc_ben-duckett",
-          "name": "Ben Duckett",
-          "team": "DC",
-          "role": "batter",
-          "final_price": 5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_madhav-tiwari": {
-          "player_id": "dc_madhav-tiwari",
-          "name": "Madhav Tiwari",
-          "team": "DC",
-          "role": "all_rounder",
-          "final_price": 5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "dc_prithvi-shaw": {
-          "player_id": "dc_prithvi-shaw",
-          "name": "Prithvi Shaw",
-          "team": "DC",
-          "role": "batter",
-          "final_price": 5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_rehan-ahmed": {
-          "player_id": "dc_rehan-ahmed",
-          "name": "Rehan Ahmed",
-          "team": "DC",
-          "role": "bowler",
-          "final_price": 5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "dc_tripurana-vijay": {
-          "player_id": "dc_tripurana-vijay",
-          "name": "Tripurana Vijay",
-          "team": "DC",
-          "role": "all_rounder",
-          "final_price": 5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "dc_sahil-parakh": {
-          "player_id": "dc_sahil-parakh",
-          "name": "Sahil Parakh",
-          "team": "DC",
-          "role": "batter",
-          "final_price": 4.5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "pbks_cooper-connolly": {
-          "player_id": "pbks_cooper-connolly",
-          "name": "Cooper Connolly",
-          "team": "PBKS",
+        "gt_rashid-khan": {
+          "player_id": "gt_rashid-khan",
+          "name": "Rashid Khan",
+          "team": "GT",
           "role": "all_rounder",
           "final_price": 9.5,
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "pbks_marcus-stoinis": {
-          "player_id": "pbks_marcus-stoinis",
-          "name": "Marcus Stoinis",
-          "team": "PBKS",
-          "role": "all_rounder",
+        "gt_sai-sudharsan": {
+          "player_id": "gt_sai-sudharsan",
+          "name": "Sai Sudharsan",
+          "team": "GT",
+          "role": "batter",
           "final_price": 9,
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "pbks_suryansh-shedge": {
-          "player_id": "pbks_suryansh-shedge",
-          "name": "Suryansh Shedge",
-          "team": "PBKS",
+        "gt_shubman-gill": {
+          "player_id": "gt_shubman-gill",
+          "name": "Shubman Gill",
+          "team": "GT",
           "role": "batter",
-          "final_price": 8.5,
-          "is_uncapped": true,
+          "final_price": 9,
+          "is_uncapped": false,
           "pricing_eligible": true
         },
-        "pbks_prabhsimran-singh": {
-          "player_id": "pbks_prabhsimran-singh",
-          "name": "Prabhsimran Singh",
-          "team": "PBKS",
+        "gt_jos-buttler": {
+          "player_id": "gt_jos-buttler",
+          "name": "Jos Buttler",
+          "team": "GT",
           "role": "wicket_keeper",
-          "final_price": 8,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "pbks_shreyas-iyer": {
-          "player_id": "pbks_shreyas-iyer",
-          "name": "Shreyas Iyer",
-          "team": "PBKS",
-          "role": "batter",
-          "final_price": 8,
+          "final_price": 8.5,
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "pbks_yuzvendra-chahal": {
-          "player_id": "pbks_yuzvendra-chahal",
-          "name": "Yuzvendra Chahal",
-          "team": "PBKS",
+        "gt_kagiso-rabada": {
+          "player_id": "gt_kagiso-rabada",
+          "name": "Kagiso Rabada",
+          "team": "GT",
           "role": "bowler",
-          "final_price": 7.5,
+          "final_price": 8.5,
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "pbks_arshdeep-singh": {
-          "player_id": "pbks_arshdeep-singh",
-          "name": "Arshdeep Singh",
-          "team": "PBKS",
-          "role": "bowler",
-          "final_price": 7.5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "pbks_marco-jansen": {
-          "player_id": "pbks_marco-jansen",
-          "name": "Marco Jansen",
-          "team": "PBKS",
+        "gt_washington-sundar": {
+          "player_id": "gt_washington-sundar",
+          "name": "Washington Sundar",
+          "team": "GT",
           "role": "all_rounder",
-          "final_price": 7.5,
+          "final_price": 8.5,
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "pbks_priyansh-arya": {
-          "player_id": "pbks_priyansh-arya",
-          "name": "Priyansh Arya",
-          "team": "PBKS",
-          "role": "batter",
-          "final_price": 7.5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "pbks_vyshak-vijaykumar": {
-          "player_id": "pbks_vyshak-vijaykumar",
-          "name": "Vyshak Vijaykumar",
-          "team": "PBKS",
+        "gt_mohammed-siraj": {
+          "player_id": "gt_mohammed-siraj",
+          "name": "Mohammed Siraj",
+          "team": "GT",
           "role": "bowler",
-          "final_price": 7.5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "pbks_lockie-ferguson": {
-          "player_id": "pbks_lockie-ferguson",
-          "name": "Lockie Ferguson",
-          "team": "PBKS",
-          "role": "bowler",
-          "final_price": 7,
+          "final_price": 8,
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "pbks_nehal-wadhera": {
-          "player_id": "pbks_nehal-wadhera",
-          "name": "Nehal Wadhera",
-          "team": "PBKS",
-          "role": "batter",
+        "gt_mohd-arshad-khan": {
+          "player_id": "gt_mohd-arshad-khan",
+          "name": "Mohd. Arshad Khan",
+          "team": "GT",
+          "role": "all_rounder",
+          "final_price": 8,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "gt_manav-suthar": {
+          "player_id": "gt_manav-suthar",
+          "name": "Manav Suthar",
+          "team": "GT",
+          "role": "all_rounder",
           "final_price": 7,
           "is_uncapped": true,
           "pricing_eligible": true
         },
-        "pbks_shashank-singh": {
-          "player_id": "pbks_shashank-singh",
-          "name": "Shashank Singh",
-          "team": "PBKS",
-          "role": "batter",
+        "gt_nishant-sindhu": {
+          "player_id": "gt_nishant-sindhu",
+          "name": "Nishant Sindhu",
+          "team": "GT",
+          "role": "all_rounder",
           "final_price": 7,
           "is_uncapped": true,
           "pricing_eligible": true
         },
-        "pbks_xavier-bartlett": {
-          "player_id": "pbks_xavier-bartlett",
-          "name": "Xavier Bartlett",
-          "team": "PBKS",
+        "gt_rahul-tewatia": {
+          "player_id": "gt_rahul-tewatia",
+          "name": "Rahul Tewatia",
+          "team": "GT",
+          "role": "all_rounder",
+          "final_price": 7,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "gt_sai-kishore": {
+          "player_id": "gt_sai-kishore",
+          "name": "Sai Kishore",
+          "team": "GT",
           "role": "bowler",
-          "final_price": 7,
+          "final_price": 6.5,
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "pbks_harpreet-brar": {
-          "player_id": "pbks_harpreet-brar",
-          "name": "Harpreet Brar",
-          "team": "PBKS",
+        "gt_ashok-sharma": {
+          "player_id": "gt_ashok-sharma",
+          "name": "Ashok Sharma",
+          "team": "GT",
           "role": "bowler",
           "final_price": 6,
           "is_uncapped": true,
           "pricing_eligible": true
         },
-        "pbks_azmatullah-omarzai": {
-          "player_id": "pbks_azmatullah-omarzai",
-          "name": "Azmatullah Omarzai",
-          "team": "PBKS",
-          "role": "all_rounder",
-          "final_price": 4.5,
+        "gt_prasidh-krishna": {
+          "player_id": "gt_prasidh-krishna",
+          "name": "Prasidh Krishna",
+          "team": "GT",
+          "role": "bowler",
+          "final_price": 6,
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "pbks_ben-dwarshuis": {
-          "player_id": "pbks_ben-dwarshuis",
-          "name": "Ben Dwarshuis",
-          "team": "PBKS",
-          "role": "bowler",
-          "final_price": 4.5,
+        "gt_shahrukh-khan": {
+          "player_id": "gt_shahrukh-khan",
+          "name": "Shahrukh Khan",
+          "team": "GT",
+          "role": "batter",
+          "final_price": 6,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "gt_glenn-phillips": {
+          "player_id": "gt_glenn-phillips",
+          "name": "Glenn Phillips",
+          "team": "GT",
+          "role": "wicket_keeper",
+          "final_price": 5.5,
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "pbks_harnoor-pannu": {
-          "player_id": "pbks_harnoor-pannu",
-          "name": "Harnoor Pannu",
-          "team": "PBKS",
-          "role": "batter",
-          "final_price": 4.5,
+        "gt_kumar-kushagra": {
+          "player_id": "gt_kumar-kushagra",
+          "name": "Kumar Kushagra",
+          "team": "GT",
+          "role": "wicket_keeper",
+          "final_price": 5.5,
           "is_uncapped": true,
           "pricing_eligible": true
         },
-        "pbks_mitch-owen": {
-          "player_id": "pbks_mitch-owen",
-          "name": "Mitch Owen",
-          "team": "PBKS",
-          "role": "all_rounder",
-          "final_price": 4.5,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
-        "pbks_musheer-khan": {
-          "player_id": "pbks_musheer-khan",
-          "name": "Musheer Khan",
-          "team": "PBKS",
-          "role": "batter",
-          "final_price": 4.5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "pbks_pravin-dubey": {
-          "player_id": "pbks_pravin-dubey",
-          "name": "Pravin Dubey",
-          "team": "PBKS",
-          "role": "bowler",
-          "final_price": 4.5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "pbks_pyla-avinash": {
-          "player_id": "pbks_pyla-avinash",
-          "name": "Pyla Avinash",
-          "team": "PBKS",
-          "role": "batter",
-          "final_price": 4.5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "pbks_vishal-nishad": {
-          "player_id": "pbks_vishal-nishad",
-          "name": "Vishal Nishad",
-          "team": "PBKS",
-          "role": "bowler",
-          "final_price": 4.5,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "pbks_vishnu-vinod": {
-          "player_id": "pbks_vishnu-vinod",
-          "name": "Vishnu Vinod",
-          "team": "PBKS",
+        "gt_anuj-rawat": {
+          "player_id": "gt_anuj-rawat",
+          "name": "Anuj Rawat",
+          "team": "GT",
           "role": "wicket_keeper",
           "final_price": 4.5,
           "is_uncapped": true,
           "pricing_eligible": true
         },
-        "pbks_yash-thakur": {
-          "player_id": "pbks_yash-thakur",
-          "name": "Yash Thakur",
-          "team": "PBKS",
+        "gt_connor-esterhuizen": {
+          "player_id": "gt_connor-esterhuizen",
+          "name": "Connor Esterhuizen",
+          "team": "GT",
+          "role": "wicket_keeper",
+          "final_price": 4.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "gt_gurnoor-singh-brar": {
+          "player_id": "gt_gurnoor-singh-brar",
+          "name": "Gurnoor Singh Brar",
+          "team": "GT",
+          "role": "all_rounder",
+          "final_price": 4.5,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "gt_ishant-sharma": {
+          "player_id": "gt_ishant-sharma",
+          "name": "Ishant Sharma",
+          "team": "GT",
+          "role": "bowler",
+          "final_price": 4.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "gt_jayant-yadav": {
+          "player_id": "gt_jayant-yadav",
+          "name": "Jayant Yadav",
+          "team": "GT",
+          "role": "bowler",
+          "final_price": 4.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "gt_kulwant-khejroliya": {
+          "player_id": "gt_kulwant-khejroliya",
+          "name": "Kulwant Khejroliya",
+          "team": "GT",
+          "role": "bowler",
+          "final_price": 4.5,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "gt_luke-wood": {
+          "player_id": "gt_luke-wood",
+          "name": "Luke Wood",
+          "team": "GT",
+          "role": "bowler",
+          "final_price": 4.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "gt_tom-banton": {
+          "player_id": "gt_tom-banton",
+          "name": "Tom Banton",
+          "team": "GT",
+          "role": "wicket_keeper",
+          "final_price": 4.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_heinrich-klaasen": {
+          "player_id": "srh_heinrich-klaasen",
+          "name": "Heinrich Klaasen",
+          "team": "SRH",
+          "role": "wicket_keeper",
+          "final_price": 9.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_travis-head": {
+          "player_id": "srh_travis-head",
+          "name": "Travis Head",
+          "team": "SRH",
+          "role": "batter",
+          "final_price": 9.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_abhishek-sharma": {
+          "player_id": "srh_abhishek-sharma",
+          "name": "Abhishek Sharma",
+          "team": "SRH",
+          "role": "batter",
+          "final_price": 9,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_nitish-kumar-reddy": {
+          "player_id": "srh_nitish-kumar-reddy",
+          "name": "Nitish Kumar Reddy",
+          "team": "SRH",
+          "role": "all_rounder",
+          "final_price": 9,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_ishan-kishan": {
+          "player_id": "srh_ishan-kishan",
+          "name": "Ishan Kishan",
+          "team": "SRH",
+          "role": "wicket_keeper",
+          "final_price": 8.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_pat-cummins": {
+          "player_id": "srh_pat-cummins",
+          "name": "Pat Cummins",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 8,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_sakib-hussain": {
+          "player_id": "srh_sakib-hussain",
+          "name": "Sakib Hussain",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 8,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "srh_eshan-malinga": {
+          "player_id": "srh_eshan-malinga",
+          "name": "Eshan Malinga",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 7.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_harsh-dubey": {
+          "player_id": "srh_harsh-dubey",
+          "name": "Harsh Dubey",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 7.5,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "srh_praful-hinge": {
+          "player_id": "srh_praful-hinge",
+          "name": "Praful Hinge",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 7.5,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "srh_shivang-kumar": {
+          "player_id": "srh_shivang-kumar",
+          "name": "Shivang Kumar",
+          "team": "SRH",
+          "role": "all_rounder",
+          "final_price": 7.5,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "srh_salil-arora": {
+          "player_id": "srh_salil-arora",
+          "name": "Salil Arora",
+          "team": "SRH",
+          "role": "wicket_keeper",
+          "final_price": 7,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "srh_aniket-verma": {
+          "player_id": "srh_aniket-verma",
+          "name": "Aniket Verma",
+          "team": "SRH",
+          "role": "batter",
+          "final_price": 6.5,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "srh_harshal-patel": {
+          "player_id": "srh_harshal-patel",
+          "name": "Harshal Patel",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 6.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_smaran-ravichandran": {
+          "player_id": "srh_smaran-ravichandran",
+          "name": "Smaran Ravichandran",
+          "team": "SRH",
+          "role": "batter",
+          "final_price": 6.5,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "srh_jaydev-unadkat": {
+          "player_id": "srh_jaydev-unadkat",
+          "name": "Jaydev Unadkat",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 6,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_david-payne": {
+          "player_id": "srh_david-payne",
+          "name": "David Payne",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 5.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_dilshan-madushanka": {
+          "player_id": "srh_dilshan-madushanka",
+          "name": "Dilshan Madushanka",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 5.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_liam-livingstone": {
+          "player_id": "srh_liam-livingstone",
+          "name": "Liam Livingstone",
+          "team": "SRH",
+          "role": "all_rounder",
+          "final_price": 5.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_amit-kumar": {
+          "player_id": "srh_amit-kumar",
+          "name": "Amit Kumar",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 4.5,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "srh_brydon-carse": {
+          "player_id": "srh_brydon-carse",
+          "name": "Brydon Carse",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 4.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_gerald-coetzee": {
+          "player_id": "srh_gerald-coetzee",
+          "name": "Gerald Coetzee",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 4.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_kamindu-mendis": {
+          "player_id": "srh_kamindu-mendis",
+          "name": "Kamindu Mendis",
+          "team": "SRH",
+          "role": "all_rounder",
+          "final_price": 4.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_krains-fuletra": {
+          "player_id": "srh_krains-fuletra",
+          "name": "Krains Fuletra",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 4.5,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "srh_onkar-tarmale": {
+          "player_id": "srh_onkar-tarmale",
+          "name": "Onkar Tarmale",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 4.5,
+          "is_uncapped": true,
+          "pricing_eligible": true
+        },
+        "srh_shivam-mavi": {
+          "player_id": "srh_shivam-mavi",
+          "name": "Shivam Mavi",
+          "team": "SRH",
+          "role": "bowler",
+          "final_price": 4.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "srh_zeeshan-ansari": {
+          "player_id": "srh_zeeshan-ansari",
+          "name": "Zeeshan Ansari",
+          "team": "SRH",
           "role": "bowler",
           "final_price": 4.5,
           "is_uncapped": true,
