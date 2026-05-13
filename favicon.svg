@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cricket favicon">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#17336b"/>
+      <stop offset="100%" stop-color="#081224"/>
+    </linearGradient>
+    <linearGradient id="wicket" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffd979"/>
+      <stop offset="100%" stop-color="#ffb23e"/>
+    </linearGradient>
+    <linearGradient id="ball" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff8ee"/>
+      <stop offset="100%" stop-color="#f7d5b8"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="12" y="12" width="232" height="232" rx="56" fill="url(#bg)"/>
+  <circle cx="128" cy="128" r="92" fill="rgba(124,196,255,0.08)"/>
+
+  <g transform="translate(0 4)">
+    <rect x="84" y="70" width="14" height="90" rx="7" fill="url(#wicket)"/>
+    <rect x="121" y="70" width="14" height="90" rx="7" fill="url(#wicket)"/>
+    <rect x="158" y="70" width="14" height="90" rx="7" fill="url(#wicket)"/>
+    <rect x="86" y="58" width="47" height="10" rx="5" fill="#ffe9ae"/>
+    <rect x="123" y="58" width="47" height="10" rx="5" fill="#ffe9ae"/>
+  </g>
+
+  <g transform="translate(150 146)">
+    <circle cx="0" cy="0" r="42" fill="url(#ball)"/>
+    <path d="M -11 -37 C -1 -10 -1 10 -11 37" fill="none" stroke="#d74045" stroke-width="8" stroke-linecap="round"/>
+    <path d="M 11 -37 C 1 -10 1 10 11 37" fill="none" stroke="#d74045" stroke-width="8" stroke-linecap="round"/>
+    <path d="M -15 -21 L -6 -15 M -14 -4 L -3 1 M -14 12 L -4 17 M 5 -17 L 15 -11 M 4 0 L 16 5 M 5 17 L 14 22" fill="none" stroke="#d74045" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="-12" cy="-13" r="4" fill="#ffffff" opacity="0.7"/>
+  </g>
+</svg>

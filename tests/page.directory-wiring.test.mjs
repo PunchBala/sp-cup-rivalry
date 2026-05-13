@@ -6,6 +6,8 @@ import path from 'node:path';
 test('public duel directory wiring exists in the page shell', async () => {
   const html = await fs.readFile(path.resolve(process.cwd(), 'index.html'), 'utf8');
 
+  assert.match(html, /favicon\.svg/);
+  assert.match(html, /theme-color/);
   assert.match(html, /id="heroActions"/);
   assert.match(html, /id="participantBannerSlot"/);
   assert.match(html, /id="surfaceBackdrop"/);
