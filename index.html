@@ -1067,6 +1067,45 @@
       background:linear-gradient(180deg, rgba(112,235,187,.2), rgba(17,78,57,.16));
       color:#e6fff2;
     }
+    .fantasy-boost-inline{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:24px;
+      height:24px;
+      padding:0 7px;
+      border-radius:999px;
+      border:1px solid rgba(124,196,255,.16);
+      background:rgba(255,255,255,.04);
+      color:#d7e7ff;
+      font-size:13px;
+      font-weight:900;
+      line-height:1;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      vertical-align:middle;
+    }
+    .fantasy-boost-inline.mini-boost-all-in{
+      border-color:rgba(255,186,108,.34);
+      background:linear-gradient(180deg, rgba(255,186,108,.22), rgba(110,57,20,.18));
+      color:#fff1ca;
+    }
+    .fantasy-boost-inline.mini-boost-x-factor{
+      border-color:rgba(196,160,255,.32);
+      background:linear-gradient(180deg, rgba(196,160,255,.22), rgba(65,35,118,.18));
+      color:#f1e6ff;
+    }
+    .fantasy-boost-inline.mini-boost-deep-pockets{
+      border-color:rgba(112,235,187,.3);
+      background:linear-gradient(180deg, rgba(112,235,187,.2), rgba(17,78,57,.16));
+      color:#e6fff2;
+    }
+    .fantasy-name-inline{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      min-width:0;
+    }
     .fantasy-slot-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
     @media (max-width:760px){.fantasy-slot-grid{grid-template-columns:1fr}}
     .fantasy-slot-card{
@@ -9327,6 +9366,33 @@ function titleBandScore(pick, live){
       return `Boost: ${miniFantasyPowerBoostLabel(key)}`;
     }
 
+    function miniFantasyPowerBoostSymbol(powerBoostKey = ''){
+      const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
+      if (key === 'all_in') return '\u26A1';
+      if (key === 'x_factor') return '\u{1F0CF}';
+      if (key === 'deep_pockets') return '\u{1F4B0}';
+      return '';
+    }
+
+    function miniFantasyPowerBoostChipText(powerBoostKey = '', boostedPlayerName = ''){
+      const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
+      if (!key) return 'Boost: none';
+      const symbol = miniFantasyPowerBoostSymbol(key);
+      if (key === 'all_in') return `${symbol} Boost: All In (captain off)`;
+      if (key === 'x_factor' && boostedPlayerName) return `${symbol} Boost: X-Factor on ${boostedPlayerName}`;
+      if (key === 'x_factor') return `${symbol} Boost: X-Factor`;
+      if (key === 'deep_pockets') return `${symbol} Boost: Deep Pockets (\u221E)`;
+      return `Boost: ${miniFantasyPowerBoostLabel(key)}`;
+    }
+
+    function miniFantasyPowerBoostInlineBadgeHtml(powerBoostKey = '', boostedPlayerName = ''){
+      const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
+      if (!key) return '';
+      const symbol = miniFantasyPowerBoostSymbol(key);
+      if (!symbol) return '';
+      return `<span class="fantasy-boost-inline ${miniFantasyPowerBoostToneClass(key)}" title="${escapeHtml(miniFantasyPowerBoostChipText(key, boostedPlayerName || ''))}">${escapeHtml(symbol)}</span>`;
+    }
+
     function miniFantasyPowerBoostAvailability({ ignoreMatchNo = null } = {}){
       const entries = currentMiniFantasyEntries();
       const used = new Set();
@@ -10693,6 +10759,9 @@ function titleBandScore(pick, live){
       const detail = describeMiniFantasyEntry(recapEntry, liveProvisional?.pointsIndex || pointsIndex, liveProvisional);
       const bestPick = detail.bestPick;
       const recapBudget = getMiniFantasyEntryBudget(detail.powerBoostKey || recapEntry.powerBoostKey || recapEntry.power_boost_key || '');
+      const recapBoostNarrative = detail.powerBoostKey
+        ? miniFantasyPowerBoostNarrative(detail.powerBoostKey || recapEntry.powerBoostKey || recapEntry.power_boost_key || '', detail.boostedPlayerName || '')
+        : '';
       panel.innerHTML = `
         <div class="fantasy-recap-grid">
           <div class="fantasy-detail-header">
@@ -10714,10 +10783,10 @@ function titleBandScore(pick, live){
           <div class="fantasy-window-note">${escapeHtml(detail.isNoResult
             ? 'This fixture ended with no result, so everyone finished on 0 Mini Fantasy points.'
             : stage === 'final'
-            ? `Final recap: ${detail.captain ? `${detail.captain.name} delivered ${formatMiniFantasyPoints(detail.captain.scoredPoints ?? detail.captain.points)} captain points.` : 'Captain was not set.'} ${bestPick ? `${bestPick.name} was your best pick on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)} points.` : ''}`
+            ? `Final recap: ${detail.captain ? `${detail.captain.name} delivered ${formatMiniFantasyPoints(detail.captain.scoredPoints ?? detail.captain.points)} captain points.` : 'Captain was not set.'} ${bestPick ? `${bestPick.name} was your best pick on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)} points.` : ''}${recapBoostNarrative ? ` ${recapBoostNarrative}` : ''}`
             : stage === 'live'
-              ? `This team is still live. ${detail.captain ? `${detail.captain.name} is currently returning ${formatMiniFantasyPoints(detail.captain.scoredPoints ?? detail.captain.points)} captain points.` : 'Captain is not set yet.'}`
-              : 'This team is locked and waiting for scoring to start.')}</div>
+              ? `This team is still live. ${detail.captain ? `${detail.captain.name} is currently returning ${formatMiniFantasyPoints(detail.captain.scoredPoints ?? detail.captain.points)} captain points.` : 'Captain is not set yet.'}${recapBoostNarrative ? ` ${recapBoostNarrative}` : ''}`
+              : `This team is locked and waiting for scoring to start.${recapBoostNarrative ? ` ${recapBoostNarrative}` : ''}`)}</div>
           <div class="fantasy-entry-player-list">
             ${detail.players.map((player) => `
               <div class="fantasy-entry-player ${player.isCaptain ? 'top' : ''}">
@@ -10914,7 +10983,7 @@ function titleBandScore(pick, live){
                 <div class="fantasy-leaderboard-copy">
                   <div class="fantasy-leaderboard-name">
                     <span class="fantasy-leaderboard-rank">#${escapeHtml(String(row.displayRank || row.rank || ''))}</span>
-                    <span>${escapeHtml(row.display_name || row.owner_handle)}</span>
+                    <span class="fantasy-name-inline">${escapeHtml(row.display_name || row.owner_handle)}${row.fixturePowerBoostKey ? miniFantasyPowerBoostInlineBadgeHtml(row.fixturePowerBoostKey || '', row.fixtureBoostedPlayerName || '') : ''}</span>
                     ${row.medal ? `<span class="fantasy-medal ${escapeHtml(row.medal)}">${escapeHtml(miniFantasyMedalLabel(row.medal))}</span>` : ''}
                   </div>
                   <div class="small">@${escapeHtml(row.owner_handle)}</div>
@@ -10983,6 +11052,10 @@ function titleBandScore(pick, live){
       const spotlight = buildMiniFantasyFixtureSpotlight(board);
       const fixtureOptions = miniFantasyRecentFixtureOptions(Array.isArray(board.rows) ? board.rows.length : 0);
       const activeOption = fixtureOptions.find((option) => option.isActive) || null;
+      const fixtureBudget = getMiniFantasyEntryBudget(selectedRow.fixturePowerBoostKey || '');
+      const fixtureBoostNarrative = selectedRow.fixturePowerBoostKey
+        ? miniFantasyPowerBoostNarrative(selectedRow.fixturePowerBoostKey || '', selectedRow.fixtureBoostedPlayerName || '')
+        : '';
       const hasAuditLog = selectedRow.fixtureStatus === 'locked_entry' && (selectedRow.fixtureSavedAt || Number(selectedRow.fixtureSpentCredits || 0) > 0 || detailPlayers.length);
       const auditNote = hasAuditLog
         ? [
@@ -11005,10 +11078,10 @@ function titleBandScore(pick, live){
         : selectedRow.fixtureIsNoResult
           ? `Match ${board.fixture.match_no} ended with no result, so no Mini Fantasy points were awarded.`
         : board.stage === 'final'
-          ? `${viewedName} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)}.` : ''}`
-          : board.stage === 'live'
-            ? `${viewedName} is live on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} is currently worth ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${board.provisional?.updatedAtUtc ? ` Manual refresh updated ${formatMiniFantasyAuditTimestamp(board.provisional.updatedAtUtc)}.` : ''}`
-            : `${viewedName} locked this team. Points will start updating once Match ${board.fixture.match_no} begins.`;
+          ? `${viewedName} finished on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} returned ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${bestPick ? ` Best pick: ${bestPick.name} on ${formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points)}.` : ''}${fixtureBoostNarrative ? ` ${fixtureBoostNarrative}` : ''}`
+        : board.stage === 'live'
+            ? `${viewedName} is live on ${formatMiniFantasyPoints(selectedRow.fixturePoints)} points.${captain ? ` Captain ${captain.name} is currently worth ${formatMiniFantasyPoints(captain.scoredPoints ?? captain.points)}.` : ''}${fixtureBoostNarrative ? ` ${fixtureBoostNarrative}` : ''}${board.provisional?.updatedAtUtc ? ` Manual refresh updated ${formatMiniFantasyAuditTimestamp(board.provisional.updatedAtUtc)}.` : ''}`
+            : `${viewedName} locked this team. Points will start updating once Match ${board.fixture.match_no} begins.${fixtureBoostNarrative ? ` ${fixtureBoostNarrative}` : ''}`;
       panel.innerHTML = `
         <div class="fantasy-entry-team">
           <div class="fantasy-history-shell">
@@ -11047,7 +11120,7 @@ function titleBandScore(pick, live){
           <div class="fantasy-picks-focus">
             <div class="fantasy-detail-header">
               <div>
-                <div class="fantasy-picks-focus-title">Now viewing ${escapeHtml(viewedName)}'s Match ${escapeHtml(String(board.fixture.match_no))} team</div>
+                <div class="fantasy-picks-focus-title">Now viewing <span class="fantasy-name-inline">${escapeHtml(viewedName)}${selectedRow.fixturePowerBoostKey ? miniFantasyPowerBoostInlineBadgeHtml(selectedRow.fixturePowerBoostKey || '', selectedRow.fixtureBoostedPlayerName || '') : ''}</span>'s Match ${escapeHtml(String(board.fixture.match_no))} team</div>
                 <div class="fantasy-picks-focus-note">This is the center stage for the selected locked fixture. Click another user in the leaderboard rail to swap teams, or jump to a different past fixture above without losing this view.</div>
               </div>
               <div>
@@ -11079,6 +11152,7 @@ function titleBandScore(pick, live){
                     : selectedRow.fixtureStatus === 'no_locked_teams'
                       ? '<span class="fantasy-summary-chip">No teams locked</span>'
                       : captain ? `<span class="fantasy-summary-chip">Captain: ${escapeHtml(captain.name)}</span>` : ''}
+              ${selectedRow.fixtureStatus !== 'did_not_lock' && selectedRow.fixturePowerBoostKey ? `<span class="fantasy-summary-chip mini-boost-pill ${miniFantasyPowerBoostToneClass(selectedRow.fixturePowerBoostKey || '')}">${escapeHtml(miniFantasyPowerBoostChipText(selectedRow.fixturePowerBoostKey || '', selectedRow.fixtureBoostedPlayerName || ''))}</span>` : ''}
               ${hasAuditLog && Number(selectedRow.fixtureSpentCredits || 0) > 0 ? `<span class="fantasy-summary-chip">Spent: ${escapeHtml(formatMiniFantasyPrice(selectedRow.fixtureSpentCredits))}</span>` : ''}
               ${hasAuditLog && selectedRow.fixtureSavedAt ? `<span class="fantasy-summary-chip">Saved: ${escapeHtml(formatMiniFantasyAuditTimestamp(selectedRow.fixtureSavedAt))}</span>` : ''}
             </div>
