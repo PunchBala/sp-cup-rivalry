@@ -31,6 +31,19 @@ async function expectLocatorCountAtLeast(locator, minimum) {
     .toBeGreaterThanOrEqual(minimum);
 }
 
+async function waitForHeroAppReady(page) {
+  await expect(page.locator('#profileChipButton')).toBeVisible({ timeout: 20000 });
+  await expect
+    .poll(async () => {
+      const text = await page.locator('#leaguePill').textContent();
+      return (text || '').trim();
+    }, {
+      timeout: 20000,
+      message: 'Expected hero pill to move past the initial loading state'
+    })
+    .not.toContain('loading...');
+}
+
 test('duels beta supports picker search, clash resolution, and armed start gating without runtime errors', async ({ page }) => {
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(String(error)));
@@ -50,8 +63,9 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
 
   await page.goto('http://127.0.0.1:4173/index.html?room=sp-cup-2026&duel=senthil-vibeesh');
 
-  await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Duels');
-  await expect(page.locator('#leaguePill')).toContainText('Duels: SP Cup 2026');
+  await waitForHeroAppReady(page);
+  await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Duels', { timeout: 20000 });
+  await expect(page.locator('#leaguePill')).toContainText('Duels: SP Cup 2026', { timeout: 20000 });
   await expect(page.getByRole('button', { name: 'Duel', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Mini Fantasy', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Duel', exact: true }).click();
@@ -223,7 +237,7 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
 
   await page.goto('http://127.0.0.1:4173/index.html?room=sp-cup-2026');
 
-  await expect(page.locator('#profileChipButton')).toBeVisible();
+  await waitForHeroAppReady(page);
   await page.locator('#profileChipButton').click();
   await expect(page.locator('#profileDrawer')).toBeVisible();
   await page.locator('#authDisplayName').fill('Mini Bala');
@@ -231,7 +245,7 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
   await page.locator('#authForm button[type="submit"]').click();
   await expect(page.locator('#profileChipButton')).toContainText('Mini Bala');
 
-  await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Mini Fantasy');
+  await expect(page.locator('#leagueTitle')).toContainText('SP Cup 2026 Mini Fantasy', { timeout: 20000 });
   await expect(page.getByRole('button', { name: 'Duel', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Badges', exact: true })).toBeVisible();
   await expect(page.locator('#browseDuelsButton')).toHaveCount(0);
@@ -380,7 +394,8 @@ test('mini fantasy locked fixture viewer defaults to the latest lock and can swi
 
   await page.goto('http://127.0.0.1:4173/index.html?room=sp-cup-2026');
 
-  await expect(page.locator('#profileChipButton')).toContainText('Fixture Tester');
+  await waitForHeroAppReady(page);
+  await expect(page.locator('#profileChipButton')).toContainText('Fixture Tester', { timeout: 20000 });
   await expect(page.locator('#miniFantasyLockedViewer')).toContainText('Most Recent Locked Fixture');
   await expect(page.locator('#miniFantasyHistorySelect')).toHaveValue('15');
   await expect(page.locator('#miniFantasyHistorySelect')).toContainText('Latest lock - Match 15');

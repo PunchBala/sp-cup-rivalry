@@ -9359,15 +9359,6 @@ function titleBandScore(pick, live){
       return `${miniFantasyPowerBoostLabel(key)} is armed for this fixture.`;
     }
 
-    function miniFantasyPowerBoostChipText(powerBoostKey = '', boostedPlayerName = ''){
-      const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
-      if (key === 'deep_pockets') return '\u{1F4B0} Boost: Deep Pockets (\u221E)';
-      if (!key) return 'Boost: none';
-      if (key === 'all_in') return '⚡ Boost: All In (captain off)';
-      if (key === 'x_factor' && boostedPlayerName) return `🃏 Boost: X-Factor on ${boostedPlayerName}`;
-      if (key === 'deep_pockets') return `💰 Boost: Deep Pockets (${MINI_FANTASY_DEEP_POCKETS_BUDGET} cr)`;
-      return `Boost: ${miniFantasyPowerBoostLabel(key)}`;
-    }
 
     function miniFantasyPowerBoostSymbol(powerBoostKey = ''){
       const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
