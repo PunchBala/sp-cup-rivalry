@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-05-15T20:56:47.159Z",
+    "as_of_utc": "2026-05-15T21:59:49.722Z",
     "price_min": 4.5,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -86,9 +86,9 @@
   "summary": {
     "total_players_received": 257,
     "eligible_players_ranked": 257,
-    "price_rises": 2,
+    "price_rises": 0,
     "price_drops": 0,
-    "price_unchanged": 255
+    "price_unchanged": 257
   },
   "players": [
     {
@@ -3509,12 +3509,12 @@
       "role": "wicket_keeper",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 6.5,
-      "initial_price": 6.5,
+      "old_price": 7,
+      "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
       "final_price": 7,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 9,
       "season_total_points": 248,
       "season_avg_points": 27.56,
@@ -3527,8 +3527,7 @@
       "rank": 140,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 140"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-15T14:00:00"
     },
@@ -3539,12 +3538,12 @@
       "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
+      "old_price": 6.5,
+      "initial_price": 6.5,
       "target_price": 6.5,
       "smoothed_price": 6.5,
       "final_price": 6.5,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 6,
       "season_total_points": 92,
       "season_avg_points": 15.33,
@@ -3557,8 +3556,7 @@
       "rank": 170,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 170"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-15T14:00:00"
     },
@@ -7661,5 +7659,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-05-15T20:56:47.159Z"
+  "generated_at_utc": "2026-05-15T21:59:49.722Z"
 }
