@@ -2,8 +2,8 @@
   "season": 2026,
   "provider": "data/live.json",
   "source": "data/live.json",
-  "fetchedAt": "2026-05-15T19:25:12.012Z",
-  "scrapeStatus": "ok (59 processed matches, 1 scorecard call this run)",
+  "fetchedAt": "2026-05-15T20:56:47.159Z",
+  "scrapeStatus": "ok (59 processed matches, 0 scorecard calls this run)",
   "scrapeReport": {
     "orangeCap": {
       "ok": true,
@@ -56,10 +56,11 @@
       "method": "computed standings from completed matches"
     },
     "mostDots": {
-      "ok": true,
+      "ok": false,
       "source": "IPLT20 official most dots feed",
       "method": "parsed JSONP mostdotballsbowledtournament feed from Sports Mechanic stats feed",
-      "rows": 117
+      "reason": "refresh interval not reached",
+      "cachedRows": 117
     },
     "mvp": {
       "ok": true,
@@ -76,7 +77,7 @@
       "source": "IPLT20 official fairplay feed",
       "method": "parsed JSONP fairplayTotal table from Sports Mechanic stats feed",
       "rows": 10,
-      "updatedAt": "15-05-2026 : 23:21:04"
+      "updatedAt": "16-05-2026 : 01:00:01"
     },
     "leastMvp": {
       "ok": true,
@@ -92,7 +93,7 @@
       "maxBacklogScorecardsPerRun": 2,
       "maxFreshScorecardCallsPerRun": 1,
       "historicalReplayApiFallbackAllowed": false,
-      "scorecardCallsThisRun": 1,
+      "scorecardCallsThisRun": 0,
       "scorecardCacheHitsThisRun": 0,
       "forcedScorecardRefetchIds": [],
       "forcedScorecardRefetches": 0,
@@ -100,7 +101,7 @@
       "historicalReplayMissingCaches": 0,
       "freshScorecardBudgetExhausted": false,
       "freshScorecardBudgetSkips": 0,
-      "freshScorecardBudgetRemaining": 0,
+      "freshScorecardBudgetRemaining": 1,
       "backlogRemaining": 0
     }
   },
@@ -109,19 +110,19 @@
       "dayKey": "2026-05-15",
       "quietRefreshesUsed": 0,
       "lastQuietRefreshAt": null,
-      "lastLiveRefreshAt": "2026-05-15T19:25:09.373Z",
-      "lastSeriesInfoAt": "2026-05-15T19:25:09.373Z",
+      "lastLiveRefreshAt": "2026-05-15T20:56:46.233Z",
+      "lastSeriesInfoAt": "2026-05-15T20:56:46.233Z",
       "lastDecision": {
-        "at": "2026-05-15T19:25:07.994Z",
+        "at": "2026-05-15T20:56:45.032Z",
         "shouldRefresh": true,
         "mode": "scheduled_window",
         "reason": "inside planned refresh window",
-        "nextPlannedAt": "2026-05-15T20:00:00.000Z"
+        "nextPlannedAt": "2026-05-15T21:00:00.000Z"
       },
-      "nextPlannedRefreshAt": "2026-05-15T20:00:00.000Z",
+      "nextPlannedRefreshAt": "2026-05-15T21:00:00.000Z",
       "nextPlannedMode": "scheduled_window",
       "nextPlannedReason": "league-stage refresh plan",
-      "nextPlannedCalculatedAt": "2026-05-15T19:25:09.374Z"
+      "nextPlannedCalculatedAt": "2026-05-15T20:56:46.234Z"
     },
     "cache": {
       "seriesId": "87c62aac-bc3c-4738-ab93-19da0690488f",
@@ -622837,7 +622838,7 @@
       },
       {
         "processedMatchCount": 59,
-        "fetchedAt": "2026-05-15T19:25:12.012Z",
+        "fetchedAt": "2026-05-15T20:56:47.159Z",
         "snapshot": {
           "season": 2026,
           "provider": "CricketData.org",
@@ -623605,7 +623606,7 @@
                 "T Natarajan": 5,
                 "Kuldeep Yadav": 7,
                 "Vipraj Nigam": 2,
-                "Mohammad Shami": 9,
+                "Mohammad Shami": 10,
                 "Prince Yadav": 16,
                 "Mohsin Khan": 10,
                 "Anrich Nortje": 0,
@@ -623677,7 +623678,6 @@
                 "Saurabh Dubey": 0,
                 "Raj Bawa": 1,
                 "Azmatullah Omarzai": 2,
-                "Mohammed Shami": 1,
                 "Akash Maharaj Singh": 3,
                 "Spencer Johnson": 1
               },
@@ -623735,7 +623735,7 @@
                 "T Natarajan": 191,
                 "Kuldeep Yadav": 198,
                 "Vipraj Nigam": 54,
-                "Mohammad Shami": 258,
+                "Mohammad Shami": 282,
                 "Prince Yadav": 270,
                 "Mohsin Khan": 120,
                 "Anrich Nortje": 24,
@@ -623807,7 +623807,6 @@
                 "Saurabh Dubey": 13,
                 "Raj Bawa": 6,
                 "Azmatullah Omarzai": 24,
-                "Mohammed Shami": 24,
                 "Akash Maharaj Singh": 24,
                 "Spencer Johnson": 24
               },
@@ -623865,7 +623864,7 @@
                 "T Natarajan": 356,
                 "Kuldeep Yadav": 352,
                 "Vipraj Nigam": 113,
-                "Mohammad Shami": 373,
+                "Mohammad Shami": 414,
                 "Prince Yadav": 384,
                 "Mohsin Khan": 149,
                 "Anrich Nortje": 39,
@@ -623937,7 +623936,6 @@
                 "Saurabh Dubey": 21,
                 "Raj Bawa": 11,
                 "Azmatullah Omarzai": 36,
-                "Mohammed Shami": 41,
                 "Akash Maharaj Singh": 26,
                 "Spencer Johnson": 39
               },
@@ -624666,9 +624664,9 @@
                   "balls": 12
                 },
                 "Mohammad Shami": {
-                  "wickets": 3,
-                  "runs": 42,
-                  "balls": 48
+                  "wickets": 4,
+                  "runs": 83,
+                  "balls": 72
                 },
                 "Prince Yadav": {
                   "wickets": 3,
@@ -625023,11 +625021,6 @@
                 "Azmatullah Omarzai": {
                   "wickets": 2,
                   "runs": 36,
-                  "balls": 24
-                },
-                "Mohammed Shami": {
-                  "wickets": 1,
-                  "runs": 41,
                   "balls": 24
                 },
                 "Akash Maharaj Singh": {
@@ -625469,7 +625462,7 @@
                 "Abdul Samad": 6,
                 "Mukul Choudhary": 9,
                 "Shahbaz Ahmed": 2,
-                "Mohammad Shami": 11,
+                "Mohammad Shami": 12,
                 "Anrich Nortje": 1,
                 "Mohsin Khan": 5,
                 "Mukesh Kumar": 9,
@@ -625573,7 +625566,6 @@
                 "Saurabh Dubey": 1,
                 "Azmatullah Omarzai": 1,
                 "Vishnu Vinod": 1,
-                "Mohammed Shami": 1,
                 "Akash Maharaj Singh": 1,
                 "Spencer Johnson": 1
               }
@@ -626082,12 +626074,12 @@
               "Vaibhav Arora",
               "Axar Patel",
               "Krunal Pandya",
+              "Mohammad Shami",
               "Mohsin Khan",
               "Praful Hinge",
               "Shardul Thakur",
               "Varun Chakaravarthy",
               "Brijesh Sharma",
-              "Mohammad Shami",
               "Nandre Burger",
               "Yuzvendra Chahal",
               "AM Ghazanfar",
@@ -626156,7 +626148,6 @@
               "George Linde",
               "Lockie Ferguson",
               "Lungisani Ngidi",
-              "Mohammed Shami",
               "Raghu Sharma",
               "Raj Angad Bawa",
               "Raj Bawa",
@@ -633435,11 +633426,11 @@
             "winner": "Punjab Kings",
             "ranking": [
               "Punjab Kings",
-              "Gujarat Titans",
               "Chennai Super Kings",
+              "Gujarat Titans",
               "Kolkata Knight Riders",
-              "Sunrisers Hyderabad",
               "Lucknow Super Giants",
+              "Sunrisers Hyderabad",
               "Mumbai Indians",
               "Rajasthan Royals",
               "Royal Challengers Bengaluru",
@@ -633447,11 +633438,11 @@
             ],
             "extendedRanking": [
               "Punjab Kings",
-              "Gujarat Titans",
               "Chennai Super Kings",
+              "Gujarat Titans",
               "Kolkata Knight Riders",
-              "Sunrisers Hyderabad",
               "Lucknow Super Giants",
+              "Sunrisers Hyderabad",
               "Mumbai Indians",
               "Rajasthan Royals",
               "Royal Challengers Bengaluru",
@@ -633475,6 +633466,23 @@
                   "AvePoints": "10.00"
                 }
               },
+              "Chennai Super Kings": {
+                "matches": 12,
+                "average": null,
+                "points": 119,
+                "raw": {
+                  "TeamID": "11",
+                  "TeamName": "CSK",
+                  "TeamFullName": "Chennai Super Kings",
+                  "No": "12",
+                  "HM": "6",
+                  "HP": "59",
+                  "AM": "6",
+                  "AP": "60",
+                  "Points": "119",
+                  "AvePoints": "9.92"
+                }
+              },
               "Gujarat Titans": {
                 "matches": 12,
                 "average": null,
@@ -633490,23 +633498,6 @@
                   "AP": "60",
                   "Points": "119",
                   "AvePoints": "9.92"
-                }
-              },
-              "Chennai Super Kings": {
-                "matches": 11,
-                "average": null,
-                "points": 109,
-                "raw": {
-                  "TeamID": "11",
-                  "TeamName": "CSK",
-                  "TeamFullName": "Chennai Super Kings",
-                  "No": "11",
-                  "HM": "6",
-                  "HP": "59",
-                  "AM": "5",
-                  "AP": "50",
-                  "Points": "109",
-                  "AvePoints": "9.91"
                 }
               },
               "Kolkata Knight Riders": {
@@ -633526,6 +633517,23 @@
                   "AvePoints": "9.91"
                 }
               },
+              "Lucknow Super Giants": {
+                "matches": 12,
+                "average": null,
+                "points": 118,
+                "raw": {
+                  "TeamID": "25",
+                  "TeamName": "LSG",
+                  "TeamFullName": "Lucknow Super Giants",
+                  "No": "12",
+                  "HM": "6",
+                  "HP": "60",
+                  "AM": "6",
+                  "AP": "58",
+                  "Points": "118",
+                  "AvePoints": "9.83"
+                }
+              },
               "Sunrisers Hyderabad": {
                 "matches": 12,
                 "average": null,
@@ -633541,23 +633549,6 @@
                   "AP": "58",
                   "Points": "118",
                   "AvePoints": "9.83"
-                }
-              },
-              "Lucknow Super Giants": {
-                "matches": 11,
-                "average": null,
-                "points": 108,
-                "raw": {
-                  "TeamID": "25",
-                  "TeamName": "LSG",
-                  "TeamFullName": "Lucknow Super Giants",
-                  "No": "11",
-                  "HM": "5",
-                  "HP": "50",
-                  "AM": "6",
-                  "AP": "58",
-                  "Points": "108",
-                  "AvePoints": "9.82"
                 }
               },
               "Mumbai Indians": {
@@ -633629,7 +633620,7 @@
                 }
               }
             },
-            "updatedAt": "15-05-2026 : 23:21:04",
+            "updatedAt": "16-05-2026 : 01:00:01",
             "source": "IPLT20 official fairplay feed"
           },
           "highestScoreTeam": {
@@ -633782,6 +633773,7 @@
               "Shardul Thakur",
               "Blessing Muzarabani",
               "Ravi Bishnoi",
+              "Mohammad Shami",
               "Harsh Dubey",
               "Varun Chakaravarthy",
               "Jofra Archer",
@@ -633801,7 +633793,6 @@
               "Vijaykumar Vyshak",
               "Yuzvendra Chahal",
               "Mitchell Starc",
-              "Mohammad Shami",
               "Romario Shepherd",
               "Ravindra Jadeja",
               "Xavier Bartlett",
@@ -633866,7 +633857,6 @@
               "Raj Angad Bawa",
               "Spencer Johnson",
               "Lockie Ferguson",
-              "Mohammed Shami",
               "Trent Boult",
               "Kyle Jamieson",
               "Shahbaz Ahmed",
@@ -633912,6 +633902,7 @@
               "Shardul Thakur": "4/39",
               "Blessing Muzarabani": "4/41",
               "Ravi Bishnoi": "4/41",
+              "Mohammad Shami": "4/83",
               "Harsh Dubey": "3/12",
               "Varun Chakaravarthy": "3/14",
               "Jofra Archer": "3/20",
@@ -633931,7 +633922,6 @@
               "Vijaykumar Vyshak": "3/34",
               "Yuzvendra Chahal": "3/36",
               "Mitchell Starc": "3/40",
-              "Mohammad Shami": "3/42",
               "Romario Shepherd": "3/54",
               "Ravindra Jadeja": "2/8",
               "Xavier Bartlett": "2/9",
@@ -633996,7 +633986,6 @@
               "Raj Angad Bawa": "1/39",
               "Spencer Johnson": "1/39",
               "Lockie Ferguson": "1/41",
-              "Mohammed Shami": "1/41",
               "Trent Boult": "1/41",
               "Kyle Jamieson": "1/42",
               "Shahbaz Ahmed": "1/45",
@@ -634093,8 +634082,8 @@
               "Shivang Kumar",
               "Sandeep Sharma",
               "Avesh Khan",
-              "Kuldeep Yadav",
               "Mohammad Shami",
+              "Kuldeep Yadav",
               "Suyash Sharma",
               "Mukesh Kumar",
               "Tushar Deshpande",
@@ -634163,8 +634152,8 @@
               "Shivang Kumar": 24,
               "Sandeep Sharma": 24.25,
               "Avesh Khan": 24.67,
+              "Mohammad Shami": 28.2,
               "Kuldeep Yadav": 28.29,
-              "Mohammad Shami": 28.67,
               "Suyash Sharma": 29,
               "Mukesh Kumar": 29.33,
               "Tushar Deshpande": 30,
@@ -643241,7 +643230,7 @@
         "T Natarajan": 5,
         "Kuldeep Yadav": 7,
         "Vipraj Nigam": 2,
-        "Mohammad Shami": 9,
+        "Mohammad Shami": 10,
         "Prince Yadav": 16,
         "Mohsin Khan": 10,
         "Anrich Nortje": 0,
@@ -643313,7 +643302,6 @@
         "Saurabh Dubey": 0,
         "Raj Bawa": 1,
         "Azmatullah Omarzai": 2,
-        "Mohammed Shami": 1,
         "Akash Maharaj Singh": 3,
         "Spencer Johnson": 1
       },
@@ -643371,7 +643359,7 @@
         "T Natarajan": 191,
         "Kuldeep Yadav": 198,
         "Vipraj Nigam": 54,
-        "Mohammad Shami": 258,
+        "Mohammad Shami": 282,
         "Prince Yadav": 270,
         "Mohsin Khan": 120,
         "Anrich Nortje": 24,
@@ -643443,7 +643431,6 @@
         "Saurabh Dubey": 13,
         "Raj Bawa": 6,
         "Azmatullah Omarzai": 24,
-        "Mohammed Shami": 24,
         "Akash Maharaj Singh": 24,
         "Spencer Johnson": 24
       },
@@ -643501,7 +643488,7 @@
         "T Natarajan": 356,
         "Kuldeep Yadav": 352,
         "Vipraj Nigam": 113,
-        "Mohammad Shami": 373,
+        "Mohammad Shami": 414,
         "Prince Yadav": 384,
         "Mohsin Khan": 149,
         "Anrich Nortje": 39,
@@ -643573,7 +643560,6 @@
         "Saurabh Dubey": 21,
         "Raj Bawa": 11,
         "Azmatullah Omarzai": 36,
-        "Mohammed Shami": 41,
         "Akash Maharaj Singh": 26,
         "Spencer Johnson": 39
       },
@@ -644302,9 +644288,9 @@
           "balls": 12
         },
         "Mohammad Shami": {
-          "wickets": 3,
-          "runs": 42,
-          "balls": 48
+          "wickets": 4,
+          "runs": 83,
+          "balls": 72
         },
         "Prince Yadav": {
           "wickets": 3,
@@ -644659,11 +644645,6 @@
         "Azmatullah Omarzai": {
           "wickets": 2,
           "runs": 36,
-          "balls": 24
-        },
-        "Mohammed Shami": {
-          "wickets": 1,
-          "runs": 41,
           "balls": 24
         },
         "Akash Maharaj Singh": {
@@ -645105,7 +645086,7 @@
         "Abdul Samad": 6,
         "Mukul Choudhary": 9,
         "Shahbaz Ahmed": 2,
-        "Mohammad Shami": 11,
+        "Mohammad Shami": 12,
         "Anrich Nortje": 1,
         "Mohsin Khan": 5,
         "Mukesh Kumar": 9,
@@ -645209,14 +645190,13 @@
         "Saurabh Dubey": 1,
         "Azmatullah Omarzai": 1,
         "Vishnu Vinod": 1,
-        "Mohammed Shami": 1,
         "Akash Maharaj Singh": 1,
         "Spencer Johnson": 1
       }
     },
     "liveOverlay": {
       "matchId": null,
-      "generatedAt": "2026-05-15T19:25:09.642Z",
+      "generatedAt": "2026-05-15T20:56:46.253Z",
       "aggregates": null,
       "status": null,
       "source": null
@@ -645246,9 +645226,9 @@
     },
     "lastRun": {
       "seriesInfoCalls": 1,
-      "scorecardCalls": 1,
+      "scorecardCalls": 0,
       "scorecardCacheHits": 0,
-      "backlogProcessed": 1,
+      "backlogProcessed": 0,
       "backlogRemaining": 0,
       "missingProcessedScorecards": 0,
       "missingProcessedScorecardMatchIds": [],
@@ -645272,7 +645252,7 @@
     "aggregateSchemaVersion": 5,
     "providerStatus": {
       "state": "ok",
-      "lastAttemptAt": "2026-05-15T19:25:07.991Z",
+      "lastAttemptAt": "2026-05-15T20:56:45.027Z",
       "lastErrorAt": null,
       "reason": null,
       "hitsToday": null,
@@ -645734,12 +645714,12 @@
       "Vaibhav Arora",
       "Axar Patel",
       "Krunal Pandya",
+      "Mohammad Shami",
       "Mohsin Khan",
       "Praful Hinge",
       "Shardul Thakur",
       "Varun Chakaravarthy",
       "Brijesh Sharma",
-      "Mohammad Shami",
       "Nandre Burger",
       "Yuzvendra Chahal",
       "AM Ghazanfar",
@@ -645808,7 +645788,6 @@
       "George Linde",
       "Lockie Ferguson",
       "Lungisani Ngidi",
-      "Mohammed Shami",
       "Raghu Sharma",
       "Raj Angad Bawa",
       "Raj Bawa",
@@ -653087,11 +653066,11 @@
     "winner": "Punjab Kings",
     "ranking": [
       "Punjab Kings",
-      "Gujarat Titans",
       "Chennai Super Kings",
+      "Gujarat Titans",
       "Kolkata Knight Riders",
-      "Sunrisers Hyderabad",
       "Lucknow Super Giants",
+      "Sunrisers Hyderabad",
       "Mumbai Indians",
       "Rajasthan Royals",
       "Royal Challengers Bengaluru",
@@ -653099,11 +653078,11 @@
     ],
     "extendedRanking": [
       "Punjab Kings",
-      "Gujarat Titans",
       "Chennai Super Kings",
+      "Gujarat Titans",
       "Kolkata Knight Riders",
-      "Sunrisers Hyderabad",
       "Lucknow Super Giants",
+      "Sunrisers Hyderabad",
       "Mumbai Indians",
       "Rajasthan Royals",
       "Royal Challengers Bengaluru",
@@ -653127,6 +653106,23 @@
           "AvePoints": "10.00"
         }
       },
+      "Chennai Super Kings": {
+        "matches": 12,
+        "average": null,
+        "points": 119,
+        "raw": {
+          "TeamID": "11",
+          "TeamName": "CSK",
+          "TeamFullName": "Chennai Super Kings",
+          "No": "12",
+          "HM": "6",
+          "HP": "59",
+          "AM": "6",
+          "AP": "60",
+          "Points": "119",
+          "AvePoints": "9.92"
+        }
+      },
       "Gujarat Titans": {
         "matches": 12,
         "average": null,
@@ -653142,23 +653138,6 @@
           "AP": "60",
           "Points": "119",
           "AvePoints": "9.92"
-        }
-      },
-      "Chennai Super Kings": {
-        "matches": 11,
-        "average": null,
-        "points": 109,
-        "raw": {
-          "TeamID": "11",
-          "TeamName": "CSK",
-          "TeamFullName": "Chennai Super Kings",
-          "No": "11",
-          "HM": "6",
-          "HP": "59",
-          "AM": "5",
-          "AP": "50",
-          "Points": "109",
-          "AvePoints": "9.91"
         }
       },
       "Kolkata Knight Riders": {
@@ -653178,6 +653157,23 @@
           "AvePoints": "9.91"
         }
       },
+      "Lucknow Super Giants": {
+        "matches": 12,
+        "average": null,
+        "points": 118,
+        "raw": {
+          "TeamID": "25",
+          "TeamName": "LSG",
+          "TeamFullName": "Lucknow Super Giants",
+          "No": "12",
+          "HM": "6",
+          "HP": "60",
+          "AM": "6",
+          "AP": "58",
+          "Points": "118",
+          "AvePoints": "9.83"
+        }
+      },
       "Sunrisers Hyderabad": {
         "matches": 12,
         "average": null,
@@ -653193,23 +653189,6 @@
           "AP": "58",
           "Points": "118",
           "AvePoints": "9.83"
-        }
-      },
-      "Lucknow Super Giants": {
-        "matches": 11,
-        "average": null,
-        "points": 108,
-        "raw": {
-          "TeamID": "25",
-          "TeamName": "LSG",
-          "TeamFullName": "Lucknow Super Giants",
-          "No": "11",
-          "HM": "5",
-          "HP": "50",
-          "AM": "6",
-          "AP": "58",
-          "Points": "108",
-          "AvePoints": "9.82"
         }
       },
       "Mumbai Indians": {
@@ -653281,7 +653260,7 @@
         }
       }
     },
-    "updatedAt": "15-05-2026 : 23:21:04",
+    "updatedAt": "16-05-2026 : 01:00:01",
     "source": "IPLT20 official fairplay feed"
   },
   "highestScoreTeam": {
@@ -653434,6 +653413,7 @@
       "Shardul Thakur",
       "Blessing Muzarabani",
       "Ravi Bishnoi",
+      "Mohammad Shami",
       "Harsh Dubey",
       "Varun Chakaravarthy",
       "Jofra Archer",
@@ -653453,7 +653433,6 @@
       "Vijaykumar Vyshak",
       "Yuzvendra Chahal",
       "Mitchell Starc",
-      "Mohammad Shami",
       "Romario Shepherd",
       "Ravindra Jadeja",
       "Xavier Bartlett",
@@ -653518,7 +653497,6 @@
       "Raj Angad Bawa",
       "Spencer Johnson",
       "Lockie Ferguson",
-      "Mohammed Shami",
       "Trent Boult",
       "Kyle Jamieson",
       "Shahbaz Ahmed",
@@ -653564,6 +653542,7 @@
       "Shardul Thakur": "4/39",
       "Blessing Muzarabani": "4/41",
       "Ravi Bishnoi": "4/41",
+      "Mohammad Shami": "4/83",
       "Harsh Dubey": "3/12",
       "Varun Chakaravarthy": "3/14",
       "Jofra Archer": "3/20",
@@ -653583,7 +653562,6 @@
       "Vijaykumar Vyshak": "3/34",
       "Yuzvendra Chahal": "3/36",
       "Mitchell Starc": "3/40",
-      "Mohammad Shami": "3/42",
       "Romario Shepherd": "3/54",
       "Ravindra Jadeja": "2/8",
       "Xavier Bartlett": "2/9",
@@ -653648,7 +653626,6 @@
       "Raj Angad Bawa": "1/39",
       "Spencer Johnson": "1/39",
       "Lockie Ferguson": "1/41",
-      "Mohammed Shami": "1/41",
       "Trent Boult": "1/41",
       "Kyle Jamieson": "1/42",
       "Shahbaz Ahmed": "1/45",
@@ -653745,8 +653722,8 @@
       "Shivang Kumar",
       "Sandeep Sharma",
       "Avesh Khan",
-      "Kuldeep Yadav",
       "Mohammad Shami",
+      "Kuldeep Yadav",
       "Suyash Sharma",
       "Mukesh Kumar",
       "Tushar Deshpande",
@@ -653815,8 +653792,8 @@
       "Shivang Kumar": 24,
       "Sandeep Sharma": 24.25,
       "Avesh Khan": 24.67,
+      "Mohammad Shami": 28.2,
       "Kuldeep Yadav": 28.29,
-      "Mohammad Shami": 28.67,
       "Suyash Sharma": 29,
       "Mukesh Kumar": 29.33,
       "Tushar Deshpande": 30,
