@@ -1,7 +1,7 @@
 {
   "job_meta": {
     "season": "IPL 2026",
-    "as_of_utc": "2026-05-17T14:24:30.004Z",
+    "as_of_utc": "2026-05-17T15:55:53.703Z",
     "price_min": 4.5,
     "price_max": 10,
     "recent_matches_window": 3,
@@ -86,9 +86,9 @@
   "summary": {
     "total_players_received": 257,
     "eligible_players_ranked": 257,
-    "price_rises": 8,
-    "price_drops": 14,
-    "price_unchanged": 235
+    "price_rises": 5,
+    "price_drops": 1,
+    "price_unchanged": 251
   },
   "players": [
     {
@@ -2421,12 +2421,12 @@
       "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 9.5,
-      "initial_price": 9.5,
+      "old_price": 9,
+      "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
       "final_price": 9,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 12,
       "season_total_points": 622,
       "season_avg_points": 51.83,
@@ -2439,8 +2439,7 @@
       "rank": 14,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 14"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-16T14:00:00"
     },
@@ -2684,12 +2683,12 @@
       "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
+      "old_price": 7,
+      "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
       "final_price": 7,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 10,
       "season_total_points": 290.5,
       "season_avg_points": 29.05,
@@ -2702,8 +2701,7 @@
       "rank": 114,
       "missed_fixture_streak": 1,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 114"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-13T14:00:00"
     },
@@ -2831,12 +2829,12 @@
       "role": "wicket_keeper",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 5.5,
-      "initial_price": 5.5,
+      "old_price": 5,
+      "initial_price": 5,
       "target_price": 5,
       "smoothed_price": 5,
       "final_price": 5,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 3,
       "season_total_points": 43,
       "season_avg_points": 14.33,
@@ -2850,7 +2848,6 @@
       "missed_fixture_streak": 4,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 156",
         "Applied 1.5-credit missed-fixture penalty after 4 consecutive misses"
       ],
       "last_match_played_at_utc": "2026-04-26T14:00:00"
@@ -3336,12 +3333,12 @@
       "role": "wicket_keeper",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 8,
-      "initial_price": 8,
+      "old_price": 7.5,
+      "initial_price": 7.5,
       "target_price": 7.5,
       "smoothed_price": 7.5,
       "final_price": 7.5,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 11,
       "season_total_points": 404,
       "season_avg_points": 36.73,
@@ -3354,8 +3351,7 @@
       "rank": 76,
       "missed_fixture_streak": 1,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 76"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-10T10:00:00"
     },
@@ -3483,12 +3479,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
+      "old_price": 7,
+      "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
       "final_price": 7,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 12,
       "season_total_points": 342.5,
       "season_avg_points": 28.54,
@@ -3501,8 +3497,7 @@
       "rank": 113,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 113"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-15T14:00:00"
     },
@@ -4666,12 +4661,12 @@
       "role": "all_rounder",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 8.5,
-      "initial_price": 8.5,
+      "old_price": 9,
+      "initial_price": 9,
       "target_price": 9,
       "smoothed_price": 9,
       "final_price": 9,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 2,
       "season_total_points": 125,
       "season_avg_points": 62.5,
@@ -4684,39 +4679,7 @@
       "rank": 21,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 21"
-      ],
-      "last_match_played_at_utc": "2026-05-17T10:00:00"
-    },
-    {
-      "player_id": "pbks_cooper-connolly",
-      "name": "Cooper Connolly",
-      "team": "PBKS",
-      "role": "all_rounder",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 9.5,
-      "initial_price": 9.5,
-      "target_price": 8,
-      "smoothed_price": 8.5,
-      "final_price": 8.5,
-      "price_change": -1,
-      "matches_played": 12,
-      "season_total_points": 704,
-      "season_avg_points": 58.67,
-      "recent_avg_points": 39.33,
-      "last_match_points": 51,
-      "score_basis": 45.78,
-      "reliability_factor": 1,
-      "adjusted_score": 45.78,
-      "percentile": 80.47,
-      "rank": 51,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 51",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-17T10:00:00"
     },
@@ -4746,6 +4709,36 @@
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing"
+      ],
+      "last_match_played_at_utc": "2026-05-17T10:00:00"
+    },
+    {
+      "player_id": "pbks_cooper-connolly",
+      "name": "Cooper Connolly",
+      "team": "PBKS",
+      "role": "all_rounder",
+      "is_uncapped": false,
+      "pricing_eligible": true,
+      "old_price": 8.5,
+      "initial_price": 8.5,
+      "target_price": 8,
+      "smoothed_price": 8,
+      "final_price": 8,
+      "price_change": -0.5,
+      "matches_played": 12,
+      "season_total_points": 704,
+      "season_avg_points": 58.67,
+      "recent_avg_points": 39.33,
+      "last_match_points": 51,
+      "score_basis": 45.78,
+      "reliability_factor": 1,
+      "adjusted_score": 45.78,
+      "percentile": 80.47,
+      "rank": 51,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 51"
       ],
       "last_match_played_at_utc": "2026-05-17T10:00:00"
     },
@@ -4895,6 +4888,36 @@
       "last_match_played_at_utc": "2026-05-14T14:00:00"
     },
     {
+      "player_id": "pbks_shashank-singh",
+      "name": "Shashank Singh",
+      "team": "PBKS",
+      "role": "batter",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 7,
+      "initial_price": 7,
+      "target_price": 7.5,
+      "smoothed_price": 7.5,
+      "final_price": 7.5,
+      "price_change": 0.5,
+      "matches_played": 10,
+      "season_total_points": 268,
+      "season_avg_points": 26.8,
+      "recent_avg_points": 27.67,
+      "last_match_points": 86,
+      "score_basis": 27.38,
+      "reliability_factor": 1,
+      "adjusted_score": 27.38,
+      "percentile": 59.38,
+      "rank": 105,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 105"
+      ],
+      "last_match_played_at_utc": "2026-05-17T10:00:00"
+    },
+    {
       "player_id": "pbks_suryansh-shedge",
       "name": "Suryansh Shedge",
       "team": "PBKS",
@@ -4924,10 +4947,10 @@
       "last_match_played_at_utc": "2026-05-17T10:00:00"
     },
     {
-      "player_id": "pbks_shashank-singh",
-      "name": "Shashank Singh",
+      "player_id": "pbks_harpreet-brar",
+      "name": "Harpreet Brar",
       "team": "PBKS",
-      "role": "batter",
+      "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
       "old_price": 6.5,
@@ -4936,20 +4959,20 @@
       "smoothed_price": 7,
       "final_price": 7,
       "price_change": 0.5,
-      "matches_played": 10,
-      "season_total_points": 268,
-      "season_avg_points": 26.8,
-      "recent_avg_points": 27.67,
-      "last_match_points": 86,
-      "score_basis": 27.38,
+      "matches_played": 2,
+      "season_total_points": 69,
+      "season_avg_points": 34.5,
+      "recent_avg_points": 34.5,
+      "last_match_points": 64,
+      "score_basis": 34.5,
       "reliability_factor": 1,
-      "adjusted_score": 27.38,
-      "percentile": 59.38,
-      "rank": 105,
+      "adjusted_score": 34.5,
+      "percentile": 69.92,
+      "rank": 78,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 105",
+        "Target price assigned from rank bucket at rank 78",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-05-17T10:00:00"
@@ -4990,12 +5013,12 @@
       "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 7.5,
-      "initial_price": 7.5,
+      "old_price": 7,
+      "initial_price": 7,
       "target_price": 7,
       "smoothed_price": 7,
       "final_price": 7,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 1,
       "season_total_points": 57,
       "season_avg_points": 57,
@@ -5009,7 +5032,6 @@
       "missed_fixture_streak": 2,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 99",
         "Applied 0.5-credit missed-fixture penalty after 2 consecutive misses"
       ],
       "last_match_played_at_utc": "2026-05-11T14:00:00"
@@ -5050,12 +5072,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
+      "old_price": 6.5,
+      "initial_price": 6.5,
       "target_price": 6.5,
       "smoothed_price": 6.5,
       "final_price": 6.5,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 1,
       "season_total_points": 37,
       "season_avg_points": 37,
@@ -5069,41 +5091,9 @@
       "missed_fixture_streak": 2,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 138",
         "Applied 0.5-credit missed-fixture penalty after 2 consecutive misses"
       ],
       "last_match_played_at_utc": "2026-05-11T14:00:00"
-    },
-    {
-      "player_id": "pbks_harpreet-brar",
-      "name": "Harpreet Brar",
-      "team": "PBKS",
-      "role": "bowler",
-      "is_uncapped": true,
-      "pricing_eligible": true,
-      "old_price": 5,
-      "initial_price": 5,
-      "target_price": 7.5,
-      "smoothed_price": 6.5,
-      "final_price": 6.5,
-      "price_change": 1.5,
-      "matches_played": 2,
-      "season_total_points": 69,
-      "season_avg_points": 34.5,
-      "recent_avg_points": 34.5,
-      "last_match_points": 64,
-      "score_basis": 34.5,
-      "reliability_factor": 1,
-      "adjusted_score": 34.5,
-      "percentile": 69.92,
-      "rank": 78,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 78",
-        "Applied smoothing against the target price"
-      ],
-      "last_match_played_at_utc": "2026-05-17T10:00:00"
     },
     {
       "player_id": "pbks_lockie-ferguson",
@@ -5170,12 +5160,12 @@
       "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 7,
-      "initial_price": 7,
+      "old_price": 6.5,
+      "initial_price": 6.5,
       "target_price": 6.5,
       "smoothed_price": 6.5,
       "final_price": 6.5,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 8,
       "season_total_points": 241.5,
       "season_avg_points": 30.19,
@@ -5189,7 +5179,6 @@
       "missed_fixture_streak": 3,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 95",
         "Applied 1-credit missed-fixture penalty after 3 consecutive misses"
       ],
       "last_match_played_at_utc": "2026-05-06T14:00:00"
@@ -5201,12 +5190,12 @@
       "role": "bowler",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 6.5,
-      "initial_price": 6.5,
+      "old_price": 6,
+      "initial_price": 6,
       "target_price": 6,
       "smoothed_price": 6,
       "final_price": 6,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 1,
       "season_total_points": 8,
       "season_avg_points": 8,
@@ -5220,7 +5209,6 @@
       "missed_fixture_streak": 2,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 185",
         "Applied 0.5-credit missed-fixture penalty after 2 consecutive misses"
       ],
       "last_match_played_at_utc": "2026-05-11T14:00:00"
@@ -5232,12 +5220,12 @@
       "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 6,
-      "initial_price": 6,
+      "old_price": 5.5,
+      "initial_price": 5.5,
       "target_price": 5.5,
       "smoothed_price": 5.5,
       "final_price": 5.5,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 6,
       "season_total_points": 93,
       "season_avg_points": 15.5,
@@ -5251,7 +5239,6 @@
       "missed_fixture_streak": 4,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 149",
         "Applied 1.5-credit missed-fixture penalty after 4 consecutive misses"
       ],
       "last_match_played_at_utc": "2026-05-03T14:00:00"
@@ -5413,12 +5400,12 @@
       "role": "bowler",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
+      "old_price": 9.5,
+      "initial_price": 9.5,
       "target_price": 9.5,
       "smoothed_price": 9.5,
       "final_price": 9.5,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 13,
       "season_total_points": 823,
       "season_avg_points": 63.31,
@@ -5431,8 +5418,7 @@
       "rank": 9,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 9"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-17T10:00:00"
     },
@@ -5443,11 +5429,11 @@
       "role": "batter",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 8.5,
-      "initial_price": 8.5,
+      "old_price": 9,
+      "initial_price": 9,
       "target_price": 9.5,
-      "smoothed_price": 9,
-      "final_price": 9,
+      "smoothed_price": 9.5,
+      "final_price": 9.5,
       "price_change": 0.5,
       "matches_played": 13,
       "season_total_points": 831,
@@ -5462,8 +5448,7 @@
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 7",
-        "Applied smoothing against the target price"
+        "Target price assigned from rank bucket at rank 7"
       ],
       "last_match_played_at_utc": "2026-05-17T10:00:00"
     },
@@ -5474,12 +5459,12 @@
       "role": "batter",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 8,
-      "initial_price": 8,
+      "old_price": 8.5,
+      "initial_price": 8.5,
       "target_price": 8.5,
       "smoothed_price": 8.5,
       "final_price": 8.5,
-      "price_change": 0.5,
+      "price_change": 0,
       "matches_played": 12,
       "season_total_points": 672,
       "season_avg_points": 56,
@@ -5492,8 +5477,7 @@
       "rank": 43,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 43"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-17T10:00:00"
     },
@@ -5525,6 +5509,36 @@
         "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-13T14:00:00"
+    },
+    {
+      "player_id": "rcb_rasikh-dar",
+      "name": "Rasikh Dar",
+      "team": "RCB",
+      "role": "bowler",
+      "is_uncapped": true,
+      "pricing_eligible": true,
+      "old_price": 8,
+      "initial_price": 8,
+      "target_price": 8.5,
+      "smoothed_price": 8.5,
+      "final_price": 8.5,
+      "price_change": 0.5,
+      "matches_played": 9,
+      "season_total_points": 370.5,
+      "season_avg_points": 41.17,
+      "recent_avg_points": 51,
+      "last_match_points": 87,
+      "score_basis": 47.72,
+      "reliability_factor": 1,
+      "adjusted_score": 47.72,
+      "percentile": 82.42,
+      "rank": 46,
+      "missed_fixture_streak": 0,
+      "calculation_notes": [
+        "Used old_price for smoothing",
+        "Target price assigned from rank bucket at rank 46"
+      ],
+      "last_match_played_at_utc": "2026-05-17T10:00:00"
     },
     {
       "player_id": "rcb_josh-hazlewood",
@@ -5562,12 +5576,12 @@
       "role": "all_rounder",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 9,
-      "initial_price": 9,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": -1,
+      "price_change": 0,
       "matches_played": 13,
       "season_total_points": 500,
       "season_avg_points": 38.46,
@@ -5580,17 +5594,16 @@
       "rank": 64,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 64"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-17T10:00:00"
     },
     {
-      "player_id": "rcb_rasikh-dar",
-      "name": "Rasikh Dar",
+      "player_id": "rcb_venkatesh-iyer",
+      "name": "Venkatesh Iyer",
       "team": "RCB",
-      "role": "bowler",
-      "is_uncapped": true,
+      "role": "all_rounder",
+      "is_uncapped": false,
       "pricing_eligible": true,
       "old_price": 7.5,
       "initial_price": 7.5,
@@ -5598,20 +5611,20 @@
       "smoothed_price": 8,
       "final_price": 8,
       "price_change": 0.5,
-      "matches_played": 9,
-      "season_total_points": 370.5,
-      "season_avg_points": 41.17,
-      "recent_avg_points": 51,
-      "last_match_points": 87,
-      "score_basis": 47.72,
+      "matches_played": 3,
+      "season_total_points": 157,
+      "season_avg_points": 52.33,
+      "recent_avg_points": 52.33,
+      "last_match_points": 107,
+      "score_basis": 52.33,
       "reliability_factor": 1,
-      "adjusted_score": 47.72,
-      "percentile": 82.42,
-      "rank": 46,
+      "adjusted_score": 52.33,
+      "percentile": 85.16,
+      "rank": 39,
       "missed_fixture_streak": 0,
       "calculation_notes": [
         "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 46",
+        "Target price assigned from rank bucket at rank 39",
         "Applied smoothing against the target price"
       ],
       "last_match_played_at_utc": "2026-05-17T10:00:00"
@@ -5682,12 +5695,12 @@
       "role": "all_rounder",
       "is_uncapped": false,
       "pricing_eligible": true,
-      "old_price": 8,
-      "initial_price": 8,
+      "old_price": 7.5,
+      "initial_price": 7.5,
       "target_price": 7.5,
       "smoothed_price": 7.5,
       "final_price": 7.5,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 12,
       "season_total_points": 337,
       "season_avg_points": 28.08,
@@ -5700,39 +5713,7 @@
       "rank": 79,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 79"
-      ],
-      "last_match_played_at_utc": "2026-05-17T10:00:00"
-    },
-    {
-      "player_id": "rcb_venkatesh-iyer",
-      "name": "Venkatesh Iyer",
-      "team": "RCB",
-      "role": "all_rounder",
-      "is_uncapped": false,
-      "pricing_eligible": true,
-      "old_price": 6.5,
-      "initial_price": 6.5,
-      "target_price": 8.5,
-      "smoothed_price": 7.5,
-      "final_price": 7.5,
-      "price_change": 1,
-      "matches_played": 3,
-      "season_total_points": 157,
-      "season_avg_points": 52.33,
-      "recent_avg_points": 52.33,
-      "last_match_points": 107,
-      "score_basis": 52.33,
-      "reliability_factor": 1,
-      "adjusted_score": 52.33,
-      "percentile": 85.16,
-      "rank": 39,
-      "missed_fixture_streak": 0,
-      "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 39",
-        "Applied smoothing against the target price"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-17T10:00:00"
     },
@@ -6275,12 +6256,12 @@
       "role": "batter",
       "is_uncapped": true,
       "pricing_eligible": true,
-      "old_price": 8.5,
-      "initial_price": 8.5,
+      "old_price": 8,
+      "initial_price": 8,
       "target_price": 8,
       "smoothed_price": 8,
       "final_price": 8,
-      "price_change": -0.5,
+      "price_change": 0,
       "matches_played": 11,
       "season_total_points": 672,
       "season_avg_points": 61.09,
@@ -6293,8 +6274,7 @@
       "rank": 48,
       "missed_fixture_streak": 0,
       "calculation_notes": [
-        "Used old_price for smoothing",
-        "Target price assigned from rank bucket at rank 48"
+        "Used old_price for smoothing"
       ],
       "last_match_played_at_utc": "2026-05-09T14:00:00"
     },
@@ -7686,5 +7666,5 @@
       "last_match_played_at_utc": null
     }
   ],
-  "generated_at_utc": "2026-05-17T14:24:30.004Z"
+  "generated_at_utc": "2026-05-17T15:55:53.703Z"
 }
