@@ -1,8 +1,8 @@
 {
   "version": "mini_fantasy_open_fixture_prices_v1",
   "season": "IPL 2026",
-  "generated_at_utc": "2026-05-20T19:21:40.401Z",
-  "source_price_book_generated_at_utc": "2026-05-20T19:21:40.401Z",
+  "generated_at_utc": "2026-05-20T21:48:43.122Z",
+  "source_price_book_generated_at_utc": "2026-05-20T21:48:43.122Z",
   "fixtures": [
     {
       "season": "IPL 2026",
@@ -25,12 +25,12 @@
           "is_uncapped": true,
           "pricing_eligible": true
         },
-        "csk_sanju-samson": {
-          "player_id": "csk_sanju-samson",
-          "name": "Sanju Samson",
+        "csk_akeal-hosein": {
+          "player_id": "csk_akeal-hosein",
+          "name": "Akeal Hosein",
           "team": "CSK",
-          "role": "wicket_keeper",
-          "final_price": 8.5,
+          "role": "bowler",
+          "final_price": 7.5,
           "is_uncapped": false,
           "pricing_eligible": true
         },
@@ -43,6 +43,15 @@
           "is_uncapped": false,
           "pricing_eligible": true
         },
+        "csk_sanju-samson": {
+          "player_id": "csk_sanju-samson",
+          "name": "Sanju Samson",
+          "team": "CSK",
+          "role": "wicket_keeper",
+          "final_price": 8.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
         "csk_urvil-patel": {
           "player_id": "csk_urvil-patel",
           "name": "Urvil Patel",
@@ -50,15 +59,6 @@
           "role": "wicket_keeper",
           "final_price": 8,
           "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "csk_akeal-hosein": {
-          "player_id": "csk_akeal-hosein",
-          "name": "Akeal Hosein",
-          "team": "CSK",
-          "role": "bowler",
-          "final_price": 7.5,
-          "is_uncapped": false,
           "pricing_eligible": true
         },
         "csk_anshul-kamboj": {
@@ -115,6 +115,15 @@
           "is_uncapped": false,
           "pricing_eligible": true
         },
+        "csk_spencer-johnson": {
+          "player_id": "csk_spencer-johnson",
+          "name": "Spencer Johnson",
+          "team": "CSK",
+          "role": "bowler",
+          "final_price": 7,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
         "csk_ayush-mhatre": {
           "player_id": "csk_ayush-mhatre",
           "name": "Ayush Mhatre",
@@ -140,15 +149,6 @@
           "role": "all_rounder",
           "final_price": 7,
           "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "csk_spencer-johnson": {
-          "player_id": "csk_spencer-johnson",
-          "name": "Spencer Johnson",
-          "team": "CSK",
-          "role": "bowler",
-          "final_price": 7,
-          "is_uncapped": false,
           "pricing_eligible": true
         },
         "csk_sarfaraz-khan": {
@@ -250,21 +250,21 @@
           "is_uncapped": false,
           "pricing_eligible": true
         },
-        "gt_shubman-gill": {
-          "player_id": "gt_shubman-gill",
-          "name": "Shubman Gill",
-          "team": "GT",
-          "role": "batter",
-          "final_price": 10,
-          "is_uncapped": false,
-          "pricing_eligible": true
-        },
         "gt_sai-sudharsan": {
           "player_id": "gt_sai-sudharsan",
           "name": "Sai Sudharsan",
           "team": "GT",
           "role": "batter",
           "final_price": 9.5,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
+        "gt_shubman-gill": {
+          "player_id": "gt_shubman-gill",
+          "name": "Shubman Gill",
+          "team": "GT",
+          "role": "batter",
+          "final_price": 10,
           "is_uncapped": false,
           "pricing_eligible": true
         },
@@ -340,13 +340,13 @@
           "is_uncapped": true,
           "pricing_eligible": true
         },
-        "gt_sai-kishore": {
-          "player_id": "gt_sai-kishore",
-          "name": "Sai Kishore",
+        "gt_manav-suthar": {
+          "player_id": "gt_manav-suthar",
+          "name": "Manav Suthar",
           "team": "GT",
-          "role": "bowler",
-          "final_price": 7,
-          "is_uncapped": false,
+          "role": "all_rounder",
+          "final_price": 6,
+          "is_uncapped": true,
           "pricing_eligible": true
         },
         "gt_rahul-tewatia": {
@@ -358,20 +358,20 @@
           "is_uncapped": true,
           "pricing_eligible": true
         },
+        "gt_sai-kishore": {
+          "player_id": "gt_sai-kishore",
+          "name": "Sai Kishore",
+          "team": "GT",
+          "role": "bowler",
+          "final_price": 7,
+          "is_uncapped": false,
+          "pricing_eligible": true
+        },
         "gt_ashok-sharma": {
           "player_id": "gt_ashok-sharma",
           "name": "Ashok Sharma",
           "team": "GT",
           "role": "bowler",
-          "final_price": 6,
-          "is_uncapped": true,
-          "pricing_eligible": true
-        },
-        "gt_manav-suthar": {
-          "player_id": "gt_manav-suthar",
-          "name": "Manav Suthar",
-          "team": "GT",
-          "role": "all_rounder",
           "final_price": 6,
           "is_uncapped": true,
           "pricing_eligible": true
