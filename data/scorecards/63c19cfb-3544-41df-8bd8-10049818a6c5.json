@@ -1,11 +1,11 @@
 {
   "matchId": "63c19cfb-3544-41df-8bd8-10049818a6c5",
-  "cachedAt": "2026-04-27T18:24:52.753Z",
+  "cachedAt": "2026-05-20T20:37:52.368Z",
   "data": {
     "id": "63c19cfb-3544-41df-8bd8-10049818a6c5",
     "name": "Delhi Capitals vs Royal Challengers Bengaluru, 39th Match, Indian Premier League 2026",
     "matchType": "t20",
-    "status": "Royal Challengers Bengaluru won by 9 wkts",
+    "status": "Royal Challengers Bengaluru won by 9 wickets",
     "venue": "Arun Jaitley Stadium, Delhi",
     "date": "2026-04-27",
     "dateTimeGMT": "2026-04-27T14:00:00",
@@ -16,207 +16,185 @@
     "teamInfo": [
       {
         "name": "Delhi Capitals",
-        "shortname": "DC",
-        "img": "https://g.cricapi.com/iapi/148-637874596301457910.png?w=48"
+        "shortname": "DC"
       },
       {
         "name": "Royal Challengers Bengaluru",
-        "shortname": "RCBW",
-        "img": "https://g.cricapi.com/iapi/21439-638468478038395955.jpg?w=48"
+        "shortname": "RCB"
       }
     ],
     "score": [
       {
+        "inning": "Delhi Capitals Inning 1",
         "r": 75,
         "w": 10,
-        "o": 16.3,
-        "inning": "Delhi Capitals Inning 1"
+        "o": "16.3"
       },
       {
+        "inning": "Royal Challengers Bengaluru Inning 1",
         "r": 77,
         "w": 1,
-        "o": 6.3,
-        "inning": "Royal Challengers Bengaluru Inning 1"
+        "o": "6.3"
       }
     ],
-    "tossWinner": "royal challengers bengaluru",
-    "tossChoice": "bowl",
+    "tossWinner": "",
+    "tossChoice": "",
     "matchWinner": "Royal Challengers Bengaluru",
+    "matchStarted": true,
+    "matchEnded": true,
     "series_id": "87c62aac-bc3c-4738-ab93-19da0690488f",
     "scorecard": [
       {
+        "inning": "Delhi Capitals Inning 1",
+        "totals": {
+          "r": 75,
+          "w": 10,
+          "o": "16.3"
+        },
         "batting": [
           {
             "batsman": {
-              "id": "ba18ea55-4d65-4514-b8da-c3cc1fc286ce",
               "name": "Sahil Parakh"
-            },
-            "dismissal": "bowled",
-            "bowler": {
-              "id": "3f3ecf51-8411-4046-9477-18c0fe3da6ac",
-              "name": "Bhuvneshwar Kumar"
             },
             "dismissal-text": "b Bhuvneshwar Kumar",
             "r": 0,
             "b": 2,
             "4s": 0,
             "6s": 0,
-            "sr": 0
+            "sr": 0,
+            "dismissal": "bowled",
+            "bowler": {
+              "name": "Bhuvneshwar Kumar"
+            }
           },
           {
             "batsman": {
-              "id": "a034346c-b408-4d29-a0f0-8b12430be28e",
-              "name": "KL Rahul"
-            },
-            "dismissal": "catch",
-            "bowler": {
-              "id": "2190c28d-1712-4fd2-ae44-9ac54319fc21",
-              "name": "Josh Hazlewood"
-            },
-            "catcher": {
-              "id": "e28de73b-f5df-49eb-bdf6-c50471319404",
-              "name": "Jitesh Sharma"
+              "name": "K L Rahul"
             },
             "dismissal-text": "c Jitesh Sharma b Josh Hazlewood",
             "r": 1,
             "b": 3,
             "4s": 0,
             "6s": 0,
-            "sr": 33.33
-          },
-          {
-            "batsman": {
-              "id": "64360dd6-a8db-47ae-8837-638a5bbbaae6",
-              "name": "Nitish Rana"
-            },
-            "dismissal": "catch",
+            "sr": 33.33,
+            "dismissal": "caught",
             "bowler": {
-              "id": "2190c28d-1712-4fd2-ae44-9ac54319fc21",
               "name": "Josh Hazlewood"
             },
             "catcher": {
-              "id": "74c6584a-45a5-4781-a5e7-c0c9340da954",
-              "name": "Devdutt Padikkal"
+              "name": "Jitesh Sharma"
+            }
+          },
+          {
+            "batsman": {
+              "name": "Nitish Rana"
             },
             "dismissal-text": "c Devdutt Padikkal b Josh Hazlewood",
             "r": 1,
             "b": 9,
             "4s": 0,
             "6s": 0,
-            "sr": 11.11
-          },
-          {
-            "batsman": {
-              "id": "3ec5f8da-2054-4ebb-b9be-2668ddc45e66",
-              "name": "Sameer Rizvi"
-            },
-            "dismissal": "catch",
+            "sr": 11.11,
+            "dismissal": "caught",
             "bowler": {
-              "id": "2190c28d-1712-4fd2-ae44-9ac54319fc21",
               "name": "Josh Hazlewood"
             },
             "catcher": {
-              "id": "e28de73b-f5df-49eb-bdf6-c50471319404",
-              "name": "Jitesh Sharma"
+              "name": "Devdutt Padikkal"
+            }
+          },
+          {
+            "batsman": {
+              "name": "Sameer Rizvi"
             },
             "dismissal-text": "c Jitesh Sharma b Josh Hazlewood",
             "r": 0,
             "b": 1,
             "4s": 0,
             "6s": 0,
-            "sr": 0
+            "sr": 0,
+            "dismissal": "caught",
+            "bowler": {
+              "name": "Josh Hazlewood"
+            },
+            "catcher": {
+              "name": "Jitesh Sharma"
+            }
           },
           {
             "batsman": {
-              "id": "de19a93e-06df-4597-9186-7a53c1613552",
               "name": "Tristan Stubbs"
-            },
-            "dismissal": "catch",
-            "bowler": {
-              "id": "3f3ecf51-8411-4046-9477-18c0fe3da6ac",
-              "name": "Bhuvneshwar Kumar"
-            },
-            "catcher": {
-              "id": "74c6584a-45a5-4781-a5e7-c0c9340da954",
-              "name": "Devdutt Padikkal"
             },
             "dismissal-text": "c Devdutt Padikkal b Bhuvneshwar Kumar",
             "r": 5,
             "b": 3,
             "4s": 1,
             "6s": 0,
-            "sr": 166.67
-          },
-          {
-            "batsman": {
-              "id": "670ae8ac-4fe9-4f0c-84ee-320b13039f34",
-              "name": "Axar Patel"
-            },
-            "dismissal": "catch",
+            "sr": 166.67,
+            "dismissal": "caught",
             "bowler": {
-              "id": "3f3ecf51-8411-4046-9477-18c0fe3da6ac",
               "name": "Bhuvneshwar Kumar"
             },
             "catcher": {
-              "id": "e28de73b-f5df-49eb-bdf6-c50471319404",
-              "name": "Jitesh Sharma"
+              "name": "Devdutt Padikkal"
+            }
+          },
+          {
+            "batsman": {
+              "name": "Axar Patel"
             },
             "dismissal-text": "c Jitesh Sharma b Bhuvneshwar Kumar",
             "r": 0,
             "b": 3,
             "4s": 0,
             "6s": 0,
-            "sr": 0
+            "sr": 0,
+            "dismissal": "caught",
+            "bowler": {
+              "name": "Bhuvneshwar Kumar"
+            },
+            "catcher": {
+              "name": "Jitesh Sharma"
+            }
           },
           {
             "batsman": {
-              "id": "8199e3da-acb4-4bac-ab02-47d7ca004ed2",
               "name": "Abishek Porel"
-            },
-            "dismissal": "bowled",
-            "bowler": {
-              "id": "2190c28d-1712-4fd2-ae44-9ac54319fc21",
-              "name": "Josh Hazlewood"
             },
             "dismissal-text": "b Josh Hazlewood",
             "r": 30,
             "b": 33,
             "4s": 3,
             "6s": 0,
-            "sr": 90.91
+            "sr": 90.91,
+            "dismissal": "bowled",
+            "bowler": {
+              "name": "Josh Hazlewood"
+            }
           },
           {
             "batsman": {
-              "id": "2f50df2f-809d-44f9-b5be-ccb846515861",
               "name": "David Miller"
             },
-            "dismissal": "catch",
-            "bowler": {
-              "id": "a1f7a1f3-f19c-43d2-bcd7-b4bae22f5842",
-              "name": "Rasikh Salam Dar"
-            },
-            "catcher": {
-              "id": "e28de73b-f5df-49eb-bdf6-c50471319404",
-              "name": "Jitesh Sharma"
-            },
-            "dismissal-text": "c Jitesh Sharma b Rasikh Salam Dar",
+            "dismissal-text": "c Jitesh Sharma b Rasikh Dar",
             "r": 19,
             "b": 18,
             "4s": 3,
             "6s": 0,
-            "sr": 105.56
+            "sr": 105.56,
+            "dismissal": "caught",
+            "bowler": {
+              "name": "Rasikh Dar"
+            },
+            "catcher": {
+              "name": "Jitesh Sharma"
+            }
           },
           {
             "batsman": {
-              "id": "5673ee27-bf33-44b8-8973-41fd37923fed",
               "name": "Kyle Jamieson"
             },
-            "dismissal": "lbw",
-            "bowler": {
-              "id": "81c09c1b-1b1d-4e87-9eaa-d7d0a89a6159",
-              "name": "Krunal Pandya"
-            },
-            "dismissal-text": "lbw b Krunal Pandya",
+            "dismissal-text": "lbw Krunal Pandya",
             "r": 12,
             "b": 13,
             "4s": 1,
@@ -225,24 +203,21 @@
           },
           {
             "batsman": {
-              "id": "1e651cfb-57f1-48da-bf9d-83cbff1733d1",
               "name": "Kuldeep Yadav"
-            },
-            "dismissal": "bowled",
-            "bowler": {
-              "id": "2bf2258f-f35e-4831-884e-f88ef46968f5",
-              "name": "Suyash Sharma"
             },
             "dismissal-text": "b Suyash Sharma",
             "r": 3,
             "b": 11,
             "4s": 0,
             "6s": 0,
-            "sr": 27.27
+            "sr": 27.27,
+            "dismissal": "bowled",
+            "bowler": {
+              "name": "Suyash Sharma"
+            }
           },
           {
             "batsman": {
-              "id": "75fb3972-0436-40ee-bf45-73b1dba7b53e",
               "name": "Dushmantha Chameera"
             },
             "dismissal-text": "not out",
@@ -256,190 +231,135 @@
         "bowling": [
           {
             "bowler": {
-              "id": "3f3ecf51-8411-4046-9477-18c0fe3da6ac",
               "name": "Bhuvneshwar Kumar"
             },
-            "o": 3,
+            "o": "3",
             "m": 0,
             "r": 5,
             "w": 3,
             "nb": 0,
-            "wd": 1,
-            "eco": 1.7
+            "wd": 0,
+            "eco": 0,
+            "dots": 15
           },
           {
             "bowler": {
-              "id": "2190c28d-1712-4fd2-ae44-9ac54319fc21",
               "name": "Josh Hazlewood"
             },
-            "o": 3.3,
+            "o": "3.3",
             "m": 0,
             "r": 12,
             "w": 4,
             "nb": 0,
             "wd": 0,
-            "eco": 3.4
+            "eco": 0,
+            "dots": 15
           },
           {
             "bowler": {
-              "id": "a1f7a1f3-f19c-43d2-bcd7-b4bae22f5842",
-              "name": "Rasikh Salam Dar"
+              "name": "Rasikh Dar"
             },
-            "o": 2,
+            "o": "2",
             "m": 0,
             "r": 21,
             "w": 1,
             "nb": 0,
             "wd": 0,
-            "eco": 10.5
+            "eco": 0,
+            "dots": 3
           },
           {
             "bowler": {
-              "id": "7fd4fa20-bc49-4337-ae8a-540b67cb011d",
-              "name": "Romario Shepherd",
-              "altnames": [
-                "romario shepherd"
-              ]
+              "name": "Romario Shepherd"
             },
-            "o": 2,
+            "o": "2",
             "m": 0,
             "r": 21,
             "w": 0,
             "nb": 0,
             "wd": 0,
-            "eco": 10.5
+            "eco": 0,
+            "dots": 3
           },
           {
             "bowler": {
-              "id": "2bf2258f-f35e-4831-884e-f88ef46968f5",
               "name": "Suyash Sharma"
             },
-            "o": 4,
+            "o": "4",
             "m": 1,
             "r": 7,
             "w": 1,
             "nb": 0,
-            "wd": 3,
-            "eco": 1.8
+            "wd": 0,
+            "eco": 0,
+            "dots": 20
           },
           {
             "bowler": {
-              "id": "81c09c1b-1b1d-4e87-9eaa-d7d0a89a6159",
               "name": "Krunal Pandya"
             },
-            "o": 2,
+            "o": "2",
             "m": 0,
             "r": 9,
             "w": 1,
             "nb": 0,
             "wd": 0,
-            "eco": 4.5
+            "eco": 0,
+            "dots": 4
           }
         ],
         "catching": [
           {
             "catcher": {
-              "id": "e28de73b-f5df-49eb-bdf6-c50471319404",
               "name": "Jitesh Sharma"
             },
-            "stumped": 0,
-            "runout": 0,
             "catch": 4,
-            "cb": 0,
-            "lbw": 0,
-            "bowled": 0
+            "stumped": 0
           },
           {
             "catcher": {
-              "id": "74c6584a-45a5-4781-a5e7-c0c9340da954",
               "name": "Devdutt Padikkal"
             },
-            "stumped": 0,
-            "runout": 0,
             "catch": 2,
-            "cb": 0,
-            "lbw": 0,
-            "bowled": 0
-          },
-          {
-            "stumped": 0,
-            "runout": 0,
-            "catch": 0,
-            "cb": 0,
-            "lbw": 0,
-            "bowled": 1,
-            "catcher": {
-              "id": "3f3ecf51-8411-4046-9477-18c0fe3da6ac",
-              "name": "Bhuvneshwar Kumar"
-            }
-          },
-          {
-            "stumped": 0,
-            "runout": 0,
-            "catch": 0,
-            "cb": 0,
-            "lbw": 0,
-            "bowled": 1,
-            "catcher": {
-              "id": "2190c28d-1712-4fd2-ae44-9ac54319fc21",
-              "name": "Josh Hazlewood"
-            }
-          },
-          {
-            "stumped": 0,
-            "runout": 0,
-            "catch": 0,
-            "cb": 0,
-            "lbw": 1,
-            "bowled": 0,
-            "catcher": {
-              "id": "81c09c1b-1b1d-4e87-9eaa-d7d0a89a6159",
-              "name": "Krunal Pandya"
-            }
-          },
-          {
-            "stumped": 0,
-            "runout": 0,
-            "catch": 0,
-            "cb": 0,
-            "lbw": 0,
-            "bowled": 1,
-            "catcher": {
-              "id": "2bf2258f-f35e-4831-884e-f88ef46968f5",
-              "name": "Suyash Sharma"
-            }
+            "stumped": 0
           }
         ],
-        "extras": {},
-        "totals": {},
-        "inning": "Delhi Capitals Inning 1"
+        "extras": {
+          "b": 0,
+          "lb": 0,
+          "w": 4,
+          "nb": 0,
+          "p": 0
+        }
       },
       {
+        "inning": "Royal Challengers Bengaluru Inning 1",
+        "totals": {
+          "r": 77,
+          "w": 1,
+          "o": "6.3"
+        },
         "batting": [
           {
             "batsman": {
-              "id": "d8b0e01b-b754-432b-80a4-551e8c7ec8ca",
               "name": "Jacob Bethell"
-            },
-            "dismissal": "catch",
-            "bowler": {
-              "id": "5673ee27-bf33-44b8-8973-41fd37923fed",
-              "name": "Kyle Jamieson"
-            },
-            "catcher": {
-              "id": "d8826d0d-ef95-4dce-a47a-b09b97f49f07",
-              "name": "T Natarajan"
             },
             "dismissal-text": "c T Natarajan b Kyle Jamieson",
             "r": 20,
             "b": 11,
             "4s": 1,
             "6s": 2,
-            "sr": 181.82
+            "sr": 181.82,
+            "dismissal": "caught",
+            "bowler": {
+              "name": "Kyle Jamieson"
+            },
+            "catcher": {
+              "name": "T Natarajan"
+            }
           },
           {
             "batsman": {
-              "id": "c61d247d-7f77-452c-b495-2813a9cd0ac4",
               "name": "Virat Kohli"
             },
             "dismissal-text": "not out",
@@ -451,7 +371,6 @@
           },
           {
             "batsman": {
-              "id": "74c6584a-45a5-4781-a5e7-c0c9340da954",
               "name": "Devdutt Padikkal"
             },
             "dismissal-text": "not out",
@@ -465,77 +384,74 @@
         "bowling": [
           {
             "bowler": {
-              "id": "5673ee27-bf33-44b8-8973-41fd37923fed",
               "name": "Kyle Jamieson"
             },
-            "o": 3,
+            "o": "3",
             "m": 0,
             "r": 42,
             "w": 1,
             "nb": 0,
             "wd": 0,
-            "eco": 14
+            "eco": 0,
+            "dots": 6
           },
           {
             "bowler": {
-              "id": "75fb3972-0436-40ee-bf45-73b1dba7b53e",
               "name": "Dushmantha Chameera"
             },
-            "o": 2,
+            "o": "2",
             "m": 0,
             "r": 18,
             "w": 0,
             "nb": 0,
             "wd": 0,
-            "eco": 9
+            "eco": 0,
+            "dots": 5
           },
           {
             "bowler": {
-              "id": "670ae8ac-4fe9-4f0c-84ee-320b13039f34",
               "name": "Axar Patel"
             },
-            "o": 1,
+            "o": "1",
             "m": 0,
             "r": 5,
             "w": 0,
             "nb": 0,
             "wd": 0,
-            "eco": 5
+            "eco": 0,
+            "dots": 1
           },
           {
             "bowler": {
-              "id": "d8826d0d-ef95-4dce-a47a-b09b97f49f07",
               "name": "T Natarajan"
             },
-            "o": 0.3,
+            "o": "0.3",
             "m": 0,
             "r": 12,
             "w": 0,
             "nb": 0,
             "wd": 0,
-            "eco": 24
+            "eco": 0,
+            "dots": 1
           }
         ],
         "catching": [
           {
             "catcher": {
-              "id": "d8826d0d-ef95-4dce-a47a-b09b97f49f07",
               "name": "T Natarajan"
             },
-            "stumped": 0,
-            "runout": 0,
             "catch": 1,
-            "cb": 0,
-            "lbw": 0,
-            "bowled": 0
+            "stumped": 0
           }
         ],
-        "extras": {},
-        "totals": {},
-        "inning": "Royal Challengers Bengaluru Inning 1"
+        "extras": {
+          "b": 0,
+          "lb": 0,
+          "w": 0,
+          "nb": 0,
+          "p": 0
+        }
       }
-    ],
-    "matchStarted": true,
-    "matchEnded": true
+    ]
   }
 }
