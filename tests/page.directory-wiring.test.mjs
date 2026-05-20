@@ -124,6 +124,9 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /All In/);
   assert.match(html, /X-Factor/);
   assert.match(html, /Deep Pockets/);
+  assert.match(html, /League \+ playoffs schedule/);
+  assert.match(html, /Playoff plan:/);
+  assert.match(html, /special <code>3x<\/code> boosts/);
   assert.match(html, /function miniFantasyPowerBoostInlineBadgeHtml/);
   assert.match(html, /fantasy-boost-inline/);
   assert.match(html, /Mini Fantasy current pricing/);

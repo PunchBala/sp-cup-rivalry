@@ -1583,7 +1583,8 @@
                     <li><strong>Bowling economy bonus:</strong> minimum 2 overs, then economy below 6 = +8, below 7 = +5, below 8 = +2, above 10 = -5.</li>
                     <li><strong>Milestone bonuses:</strong> fifty +10, hundred +25, quick 30 under 15 balls +8, 3 wickets +12, 4 wickets +20, 5 wickets +30, and a duck penalty of -5 when a batter is dismissed for 0.</li>
                     <li><strong>Mini Fantasy extras:</strong> each selected player who appears in the fixture gets <code>+2</code>. Each selected player from the winning side gets <code>+5</code> once the result is final.</li>
-                    <li><strong>Season boosts:</strong> <code>All In</code> gives 1.5x to the whole team for one fixture and replaces the captain slot, <code>X-Factor</code> gives 2x to one non-captain, and <code>Deep Pockets</code> removes the lineup credit cap for one fixture with an <code>&infin;</code> budget. Each boost can only be used once all season.</li>
+                    <li><strong>Season boosts:</strong> <code>All In</code> gives 1.5x to the whole team for one fixture and replaces the captain slot, <code>X-Factor</code> gives 2x to one non-captain, and <code>Deep Pockets</code> removes the lineup credit cap for one fixture with an <code>&infin;</code> budget. Each boost can only be used once across the league stage.</li>
+                    <li><strong>Playoff plan:</strong> after Match 70 locks the top four, every playoff Mini Fantasy lineup will get <code>X-Factor</code> by default, the budget cap rises to <code>35</code>, and league-stage uses of <code>All In</code>, <code>X-Factor</code>, and <code>Deep Pockets</code> do not carry over. The playoffs will also introduce <code>2</code> special <code>3x</code> boosts that are only available in the playoff games, with at most <code>1</code> of those boosts usable in any single playoff fixture.</li>
                     <li><strong>Captain + no-result rule:</strong> your captain gets <code>1.5x</code> of every eligible point, including appearance and winner bonuses, unless <code>All In</code> is active instead. If a fixture ends with no result, every Mini Fantasy player score for that match becomes <code>0</code>.</li>
                     <li><strong>Missed-lock safety net:</strong> if you miss a completed fixture after joining, you receive <code>40%</code> of the average locked score for that fixture. Your first 3 missed locks are capped at <code>50</code> points each, then the cap drops to <code>30</code> from the 4th missed lock onward. If nobody locked a team for that fixture, nobody gets any fallback points.</li>
                     <li><strong>Fixture-day visit bonus:</strong> signed-in users who open the app on an India fixture day receive <code>+5</code> once for that calendar day in <code>Asia/Kolkata</code>.</li>
@@ -1633,8 +1634,8 @@
 
     <div id="scheduleSection" class="section-hidden">
       <div class="card">
-        <div class="section-title">League-stage schedule</div>
-        <div class="schedule-summary" id="scheduleSummary">Official league-stage schedule in UTC, with your browser's local time alongside it.</div>
+        <div class="section-title">League + playoffs schedule</div>
+        <div class="schedule-summary" id="scheduleSummary">League and playoff schedule in UTC, with your browser's local time alongside it. The playoff bracket will show as TBD until Match 70 confirms the top four.</div>
         <div class="table-wrap"><table id="scheduleTable" class="schedule-table"></table></div>
       </div>
     </div>
@@ -1993,7 +1994,7 @@
       'Zeeshan Ansari', 'Sakib Hussain', 'Onkar Tarmale', 'Amit Kumar', 'Praful Hinge'
     ];
 
-    // ========= LEAGUE-STAGE SCHEDULE (UTC) =========
+    // ========= SEASON SCHEDULE (UTC) =========
     const LEAGUE_STAGE_SCHEDULE_FALLBACK = [
       {
             "match_no": 1,
@@ -2694,6 +2695,46 @@
             "date_utc": "2026-05-24",
             "time_utc": "14:00:00Z",
             "datetime_utc": "2026-05-24T14:00:00Z"
+      },
+      {
+            "match_no": 71,
+            "home_team": "TBD",
+            "away_team": "TBD",
+            "venue": "Himachal Pradesh Cricket Association Stadium, Dharamshala",
+            "fixture": "TBD vs TBD, Qualifier 1",
+            "date_utc": "2026-05-26",
+            "time_utc": "14:00:00Z",
+            "datetime_utc": "2026-05-26T14:00:00Z"
+      },
+      {
+            "match_no": 72,
+            "home_team": "TBD",
+            "away_team": "TBD",
+            "venue": "New International Cricket Stadium, New Chandigarh",
+            "fixture": "TBD vs TBD, Eliminator",
+            "date_utc": "2026-05-27",
+            "time_utc": "14:00:00Z",
+            "datetime_utc": "2026-05-27T14:00:00Z"
+      },
+      {
+            "match_no": 73,
+            "home_team": "TBD",
+            "away_team": "TBD",
+            "venue": "New International Cricket Stadium, New Chandigarh",
+            "fixture": "TBD vs TBD, Qualifier 2",
+            "date_utc": "2026-05-29",
+            "time_utc": "14:00:00Z",
+            "datetime_utc": "2026-05-29T14:00:00Z"
+      },
+      {
+            "match_no": 74,
+            "home_team": "TBD",
+            "away_team": "TBD",
+            "venue": "Narendra Modi Stadium, Ahmedabad",
+            "fixture": "TBD vs TBD, Final",
+            "date_utc": "2026-05-31",
+            "time_utc": "14:00:00Z",
+            "datetime_utc": "2026-05-31T14:00:00Z"
       }
 ];
     let LEAGUE_STAGE_SCHEDULE = LEAGUE_STAGE_SCHEDULE_FALLBACK.slice();
@@ -4405,7 +4446,7 @@ function titleBandScore(pick, live){
       const next = nextPlannedRefreshMoment(new Date());
       pill.textContent = next
         ? `Next planned update: ${formatDate(next.toISOString())}`
-        : 'Next planned update: league stage completed';
+        : 'Next planned update: season slate completed';
     }
 
     function currentNextMatch(){
@@ -7726,7 +7767,7 @@ function titleBandScore(pick, live){
           <div class="player-name">Duels data unavailable</div>
           <div class="small">No duel fixture could be loaded yet. Check the requested room slug or fixture file.</div>
         </div>`;
-      document.getElementById('nextMatchMeta').textContent = 'Next match still uses the shared league-stage schedule.';
+      document.getElementById('nextMatchMeta').textContent = 'Next match still uses the shared season schedule.';
       document.getElementById('nextMatchTeams').textContent = '--';
       document.getElementById('nextMatchVenue').textContent = '--';
       document.getElementById('nextMatchImpact').textContent = 'Load a valid duel fixture to calculate rivalry-specific swing points.';
@@ -9255,8 +9296,8 @@ function titleBandScore(pick, live){
       const now = new Date();
       const nextRefresh = nextPlannedRefreshMoment(now);
       summary.textContent = nextRefresh
-        ? `League-stage schedule in UTC, with local browser time alongside it. Next planned update window: ${formatDate(nextRefresh.toISOString())}.`
-        : 'League-stage schedule in UTC, with local browser time alongside it. Refresh windows are complete for the league stage.';
+        ? `League and playoff schedule in UTC, with local browser time alongside it. Qualifier 1, Eliminator, Qualifier 2, and Final stay TBD until Match 70 confirms the top four. Next planned update window: ${formatDate(nextRefresh.toISOString())}.`
+        : 'League and playoff schedule in UTC, with local browser time alongside it. The playoff bracket updates after Match 70, and refresh windows are complete for the current season slate.';
 
       table.innerHTML = `
         <thead>

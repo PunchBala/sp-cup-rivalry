@@ -212,7 +212,7 @@ test('duels beta supports picker search, clash resolution, and armed start gatin
   await expect(page.locator('#statsSummary')).toContainText('board');
 
   await page.getByRole('button', { name: 'Schedule' }).click();
-  await expect(page.locator('#scheduleSummary')).toContainText('League-stage schedule');
+  await expect(page.locator('#scheduleSummary')).toContainText('League and playoff schedule');
   await expectLocatorCountAtLeast(page.locator('#scheduleTable tbody tr'), 10);
 
   expect(pageErrors).toEqual([]);

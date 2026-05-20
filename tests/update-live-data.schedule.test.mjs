@@ -53,8 +53,8 @@ test('merges overlapping double-header refresh buckets correctly', () => {
   ]);
 });
 
-test('reports no future refresh once the league-stage plan is complete', () => {
-  const afterFinal = new Date('2026-05-24T22:05:00Z');
+test('reports no future refresh once the full season plan is complete', () => {
+  const afterFinal = new Date('2026-05-31T22:05:00Z');
   assert.equal(nextScheduledRefreshAt(schedule, afterFinal), null);
 
   const decision = createScheduleDecision(schedule, afterFinal);
