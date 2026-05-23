@@ -6,7 +6,8 @@ import assert from 'node:assert/strict';
 
 import {
   convertOfficialScorecardInputToProviderShape,
-  markManualBackfillMatchRefEnded
+  markManualBackfillMatchRefEnded,
+  validateOfficialInnings
 } from '../scripts/backfill-official-scorecard.mjs';
 import {
   buildMiniFantasyPlayerHistoriesFromProcessedMatches,
@@ -221,4 +222,37 @@ test('manual official backfill marks stale match refs as ended before replay', (
   assert.equal(matchRef.matchStarted, true);
   assert.equal(matchRef.matchEnded, true);
   assert.equal(matchRef.status, 'Sunrisers Hyderabad won by 33 runs');
+});
+
+test('manual official validation does not count retired hurt as a wicket', () => {
+  const errors = validateOfficialInnings(
+    {
+      team: 'Mumbai Indians',
+      totalRuns: 222,
+      wickets: 5,
+      overs: '20',
+      extras: { byes: 0, legByes: 2, wides: 9, noBalls: 1, penalties: 0 },
+      batting: [
+        { name: 'Ryan Rickelton', dismissalText: 'c Keeper b Bowler', runs: 37, balls: 22, fours: 3, sixes: 3 },
+        { name: 'Rohit Sharma', dismissalText: 'retired hurt', runs: 19, balls: 13, fours: 2, sixes: 1 },
+        { name: 'Surya Kumar Yadav', dismissalText: 'c Fielder b Bowler', runs: 33, balls: 22, fours: 5, sixes: 0 },
+        { name: 'Tilak Varma', dismissalText: 'c Fielder b Bowler', runs: 1, balls: 3, fours: 0, sixes: 0 },
+        { name: 'Hardik Pandya', dismissalText: 'c Fielder b Bowler', runs: 40, balls: 22, fours: 6, sixes: 1 },
+        { name: 'Sherfane Rutherford', dismissalText: 'not out', runs: 71, balls: 31, fours: 1, sixes: 9 },
+        { name: 'Naman Dhir', dismissalText: 'c Fielder b Bowler', runs: 1, balls: 2, fours: 0, sixes: 0 },
+        { name: 'Mitchell Santner', dismissalText: 'not out', runs: 8, balls: 6, fours: 1, sixes: 0 }
+      ],
+      bowling: [
+        { name: 'Bowler 1', overs: '4', maidens: 0, runs: 58, wickets: 1, dots: 10 },
+        { name: 'Bowler 2', overs: '4', maidens: 0, runs: 38, wickets: 0, dots: 6 },
+        { name: 'Bowler 3', overs: '2.5', maidens: 0, runs: 23, wickets: 1, dots: 8 },
+        { name: 'Bowler 4', overs: '4', maidens: 0, runs: 26, wickets: 1, dots: 7 },
+        { name: 'Bowler 5', overs: '4', maidens: 0, runs: 47, wickets: 2, dots: 6 },
+        { name: 'Bowler 6', overs: '1.1', maidens: 0, runs: 28, wickets: 0, dots: 2 }
+      ]
+    },
+    ['Mumbai Indians']
+  );
+
+  assert.deepEqual(errors, []);
 });

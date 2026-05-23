@@ -357,7 +357,12 @@ function inningsExtrasRuns(extras = {}) {
   return Object.values(inningsExtrasObject(extras)).reduce((sum, value) => sum + Number(value || 0), 0);
 }
 
-function validateOfficialInnings(innings, expectedTeams = []) {
+function countsAsDismissal(dismissalText) {
+  const lower = normalizeName(dismissalText).toLowerCase();
+  return lower && lower !== 'not out' && !lower.includes('retired hurt');
+}
+
+export function validateOfficialInnings(innings, expectedTeams = []) {
   const errors = [];
   const team = normalizeName(innings?.team);
   if (!team) errors.push('team is required');
@@ -378,7 +383,7 @@ function validateOfficialInnings(innings, expectedTeams = []) {
   const extrasRuns = inningsExtrasRuns(innings?.extras);
   const bowlingRuns = bowling.reduce((sum, row) => sum + toNumber(row?.runs), 0);
   const byesAndLegByesAndPenalties = toNumber(innings?.extras?.byes) + toNumber(innings?.extras?.legByes) + toNumber(innings?.extras?.penalties);
-  const dismissedBatters = batting.filter((row) => normalizeName(row?.dismissalText || row?.dismissal).toLowerCase() !== 'not out').length;
+  const dismissedBatters = batting.filter((row) => countsAsDismissal(row?.dismissalText || row?.dismissal)).length;
 
   if (Number.isFinite(totalRuns) && battingRuns + extrasRuns !== totalRuns) {
     errors.push(`batting runs ${battingRuns} + extras ${extrasRuns} does not equal totalRuns ${totalRuns}`);
