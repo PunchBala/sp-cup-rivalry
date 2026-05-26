@@ -4428,7 +4428,27 @@ function titleBandScore(pick, live){
       };
       const key = keyByMatchNo[Number(matchNo || 0)];
       const teams = key ? bracket?.[key]?.teams : null;
-      return Array.isArray(teams) ? teams.filter(Boolean) : [];
+      const resolvedTeams = Array.isArray(teams) ? teams.filter(Boolean) : [];
+      if (resolvedTeams.length === 2) return resolvedTeams;
+
+      const titleWinner = LIVE_2026?.titleWinner && typeof LIVE_2026.titleWinner === 'object'
+        ? LIVE_2026.titleWinner
+        : {};
+      const ranking = Array.isArray(titleWinner.ranking)
+        ? titleWinner.ranking.filter(Boolean)
+        : [];
+      const playoffTeams = Array.isArray(titleWinner.playoffs)
+        ? titleWinner.playoffs.filter(Boolean)
+        : [];
+      const seededTeams = ranking.length >= 4 ? ranking.slice(0, 4) : playoffTeams.slice(0, 4);
+
+      if (Number(matchNo || 0) === 71 && seededTeams.length >= 2) {
+        return seededTeams.slice(0, 2);
+      }
+      if (Number(matchNo || 0) === 72 && seededTeams.length >= 4) {
+        return seededTeams.slice(2, 4);
+      }
+      return [];
     }
 
     function activeLeagueStageSchedule(){
