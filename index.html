@@ -12005,7 +12005,7 @@ function titleBandScore(pick, live){
                 <button class="studio-button ghost" type="button" data-mini-clear="${slotIndex}" ${player && !locked ? '' : 'disabled'}>Clear</button>
                 <button class="studio-button secondary" type="button" data-mini-captain="${slotIndex}" ${player && !locked && !captainDisabledByAllIn ? '' : 'disabled'}>${captainDisabledByAllIn ? 'All In replaces captain' : (draft.captainPlayerId === player?.player_id ? 'Captain locked' : 'Make captain')}</button>
                 ${individualTargetEnabled ? `<button class="studio-button ghost" type="button" data-mini-boost-target="${slotIndex}" ${player && !locked && draft.captainPlayerId !== player.player_id && draft.playoff3xPlayerId !== player.player_id ? '' : 'disabled'}>${draft.boostedPlayerId === player?.player_id ? 'Clear X-Factor' : (player ? (draft.captainPlayerId === player.player_id ? 'Captain cannot take it' : (draft.playoff3xPlayerId === player.player_id ? '3x already here' : 'Make X-Factor')) : 'Pick player first')}</button>` : ''}
-                ${tripleTargetEnabled ? `<button class="studio-button ghost" type="button" data-mini-playoff-3x-target="${slotIndex}" ${player && !locked && draft.captainPlayerId !== player.player_id && draft.boostedPlayerId !== player.player_id ? '' : 'disabled'}>${draft.playoff3xPlayerId === player?.player_id ? 'Clear 3x target' : (player ? (draft.captainPlayerId === player.player_id ? 'Captain cannot take it' : (draft.boostedPlayerId === player.player_id ? 'X-Factor already here' : 'Make 3x target')) : 'Pick player first')}</button>` : ''}
+                ${tripleTargetEnabled ? `<button class="studio-button ghost" type="button" data-mini-playoff-triple-target="${slotIndex}" ${player && !locked && draft.captainPlayerId !== player.player_id && draft.boostedPlayerId !== player.player_id ? '' : 'disabled'}>${draft.playoff3xPlayerId === player?.player_id ? 'Clear 3x target' : (player ? (draft.captainPlayerId === player.player_id ? 'Captain cannot take it' : (draft.boostedPlayerId === player.player_id ? 'X-Factor already here' : 'Make 3x target')) : 'Pick player first')}</button>` : ''}
               </div>
             </div>
           `).join('')}
@@ -12081,9 +12081,9 @@ function titleBandScore(pick, live){
           render();
         };
       });
-      panel.querySelectorAll('[data-mini-playoff-3x-target]').forEach((button) => {
+      panel.querySelectorAll('[data-mini-playoff-triple-target]').forEach((button) => {
         button.onclick = () => {
-          const slotIndex = Number(button.dataset.miniPlayoff3xTarget || 0);
+          const slotIndex = Number(button.dataset.miniPlayoffTripleTarget || 0);
           const playerId = draft.selectedPlayerIds[slotIndex] || '';
           if (!playerId) return;
           if (draft.playoff3xPlayerId === playerId) {
@@ -12220,7 +12220,7 @@ function titleBandScore(pick, live){
                             ${pickerTripleTargetEnabled ? `
                               <span
                                 class="fantasy-picker-captain-btn ${draft.playoff3xPlayerId === player.player_id ? 'is-captain' : ''} ${draft.captainPlayerId === player.player_id || draft.boostedPlayerId === player.player_id ? 'is-disabled' : ''}"
-                                data-mini-picker-playoff-3x-target="${escapeHtml(player.player_id)}"
+                                data-mini-picker-playoff-triple-target="${escapeHtml(player.player_id)}"
                                 data-disabled="${draft.captainPlayerId === player.player_id || draft.boostedPlayerId === player.player_id ? 'true' : 'false'}"
                                 title="${draft.playoff3xPlayerId === player.player_id ? 'Triple Crown selected' : 'Set Triple Crown'}"
                                 role="button"
@@ -12319,11 +12319,11 @@ function titleBandScore(pick, live){
           button.click();
         };
       });
-      body.querySelectorAll('[data-mini-picker-playoff-3x-target]').forEach((button) => {
+      body.querySelectorAll('[data-mini-picker-playoff-triple-target]').forEach((button) => {
         button.onclick = (event) => {
           event.stopPropagation();
           if (button.dataset.disabled === 'true') return;
-          const playerId = button.dataset.miniPickerPlayoff3xTarget || '';
+          const playerId = button.dataset.miniPickerPlayoffTripleTarget || '';
           if (!playerId) return;
           const pickerDraft = ensureMiniFantasyDraft(fixture.match_no);
           if (!pickerDraft.selectedPlayerIds.includes(playerId)) return;
