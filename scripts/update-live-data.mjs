@@ -39,7 +39,15 @@ const IPLT20_MOST_DOTS_MIN_REFRESH_MINUTES = parseEnvInt(process.env.IPLT20_MOST
 const IPLT20_MOST_DOTS_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/284-mostdotballsbowledtournament.js?callback=onmostdotballsbowledtournament';
 const IPLT20_FAIRPLAY_ENABLED = parseEnvBool(process.env.IPLT20_FAIRPLAY_ENABLED, true);
 const IPLT20_FAIRPLAY_FEED_URL = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats/2026-fairplayList.js?callback=onFairplayAward';
-const AGGREGATE_SCHEMA_VERSION = 5;
+const AGGREGATE_SCHEMA_VERSION = 6;
+const PLAYOFF_FIRST_MATCH_NO = 71;
+const PLAYOFF_LAST_MATCH_NO = 74;
+const PLAYOFF_MATCH_LABELS = {
+  71: 'Qualifier 1',
+  72: 'Eliminator',
+  73: 'Qualifier 2',
+  74: 'Final'
+};
 const LEAST_MVP_MIN_MATCHES = 5;
 const MVP_FOUR_POINTS = 1;
 const MVP_WICKET_POINTS = 25;
@@ -452,7 +460,9 @@ function createEmptyAggregates() {
     bowling3w: {},
     bowling4w: {},
     bowling5w: {},
-    playerMatches: {}
+    playerMatches: {},
+    matchResults: {},
+    leagueStageRanking: []
   };
 }
 
@@ -545,7 +555,7 @@ function createEmptyLive() {
         hitsLimit: null
       }
     },
-    titleWinner: { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [] },
+    titleWinner: { winner: null, finalists: [], playoffs: [], ranking: [], extendedRanking: [], bracket: {} },
     orangeCap: { ranking: [], extendedRanking: [] },
     mostSixes: { ranking: [], extendedRanking: [] },
     purpleCap: { ranking: [], extendedRanking: [] },
@@ -1568,10 +1578,11 @@ export function buildCurrentProcessedMatchRefs(live, matchList) {
   );
 }
 
-function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true } = {}) {
+function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true, matchNo = null } = {}) {
   const inningsBlocks = safeArray(scorecardData.scorecard);
   const topScores = scoreLinesForScorecard(scorecardData, inningsBlocks);
   const participants = new Set();
+  const resolvedMatchNo = Number(matchNo || scorecardData?.matchNo || scorecardData?.match_no || parseMatchNoFromText(scorecardData?.name || scorecardData?.matchType || '')) || null;
 
   for (const innings of inningsBlocks) {
     for (const bat of safeArray(innings.batting)) {
@@ -1656,6 +1667,7 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
     }
 
     const winner = resolveScorecardWinner(scorecardData, [teamA, teamB]);
+    const noResult = isNoResultStatus(scorecardData, winner, teamA, teamB);
     if (winner === teamA) {
       standingA.wins += 1;
       standingA.points += 2;
@@ -1664,11 +1676,29 @@ function applyScorecardToAggregates(aggregates, scorecardData, { isFinal = true 
       standingB.wins += 1;
       standingB.points += 2;
       standingA.losses += 1;
-    } else if (isNoResultStatus(scorecardData, winner, teamA, teamB)) {
+    } else if (noResult) {
       standingA.noResult += 1;
       standingB.noResult += 1;
       standingA.points += 1;
       standingB.points += 1;
+    }
+
+    if (resolvedMatchNo) {
+      const resultWinner = winner === teamA || winner === teamB ? winner : null;
+      aggregates.matchResults = aggregates.matchResults || {};
+      aggregates.matchResults[String(resolvedMatchNo)] = {
+        match_no: resolvedMatchNo,
+        label: PLAYOFF_MATCH_LABELS[resolvedMatchNo] || `Match ${resolvedMatchNo}`,
+        teams: [teamA, teamB],
+        winner: resultWinner,
+        loser: resultWinner === teamA ? teamB : (resultWinner === teamB ? teamA : null),
+        no_result: Boolean(noResult),
+        status: normalizeName(scorecardData?.status || scorecardData?.matchWinner || '') || null
+      };
+    }
+
+    if (resolvedMatchNo && resolvedMatchNo <= 70) {
+      aggregates.leagueStageRanking = buildStandingsRanking(aggregates);
     }
   }
 }
@@ -1704,6 +1734,11 @@ function combineAggregates(baseAgg, overlayAgg) {
   for (const [team, standing] of Object.entries(overlayAgg.standings || {})) {
     const target = ensureStandingTeam(out.standings, team);
     for (const [k, v] of Object.entries(standing)) target[k] = (target[k] || 0) + Number(v || 0);
+  }
+
+  out.matchResults = { ...(out.matchResults || {}), ...(overlayAgg.matchResults || {}) };
+  if (Array.isArray(overlayAgg.leagueStageRanking) && overlayAgg.leagueStageRanking.length) {
+    out.leagueStageRanking = [...overlayAgg.leagueStageRanking];
   }
 
   return out;
@@ -2016,7 +2051,10 @@ export async function buildMiniFantasyPlayerHistoriesFromProcessedMatches(proces
       const scorecardResult = normalizeScorecardResult(await resolveScorecard(processedRef?.id));
       if (scorecardResult) {
         matchAggregate = createEmptyAggregates();
-        applyScorecardToAggregates(matchAggregate, scorecardResult.data, { isFinal: true });
+        applyScorecardToAggregates(matchAggregate, scorecardResult.data, {
+          isFinal: true,
+          matchNo: processedRef?.matchNo || processedRef?.match_no || processedMatchNo
+        });
       }
     } catch (error) {
       const notReadyScorecard = scorecardNotReadyDetails(error, processedRef?.id);
@@ -2157,6 +2195,118 @@ function buildStandingsRanking(agg) {
     .map(([team, s]) => [team, s, standingNrr(s)])
     .sort((a, b) => b[1].points - a[1].points || b[2] - a[2] || a[0].localeCompare(b[0]))
     .map(([team]) => team);
+}
+
+function uniqueNames(names = []) {
+  const seen = new Set();
+  const out = [];
+  for (const name of safeArray(names).map(normalizeName).filter(Boolean)) {
+    const key = name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(name);
+  }
+  return out;
+}
+
+function playoffMatchResult(agg, matchNo) {
+  const results = agg?.matchResults || {};
+  return results[String(matchNo)] || results[matchNo] || null;
+}
+
+function resultWinnerWithinTeams(result, teams = []) {
+  const winner = normalizeName(result?.winner || '');
+  if (!winner) return null;
+  return safeArray(teams).some((team) => normalizeName(team).toLowerCase() === winner.toLowerCase())
+    ? winner
+    : null;
+}
+
+function otherPlayoffTeam(teams = [], team = '') {
+  const target = normalizeName(team).toLowerCase();
+  return safeArray(teams).map(normalizeName).find((name) => name && name.toLowerCase() !== target) || null;
+}
+
+function buildPlayoffTitleWinnerPayload(standings = [], agg = {}) {
+  const leagueSeeds = uniqueNames(
+    safeArray(agg.leagueStageRanking).length ? agg.leagueStageRanking : standings
+  );
+  const playoffSeeds = leagueSeeds.slice(0, 4);
+  const leagueComplete = Boolean(playoffMatchResult(agg, 70));
+  const q1Teams = playoffSeeds.slice(0, 2);
+  const eliminatorTeams = playoffSeeds.slice(2, 4);
+
+  const qualifier1 = playoffMatchResult(agg, 71);
+  const eliminator = playoffMatchResult(agg, 72);
+  const qualifier1Winner = resultWinnerWithinTeams(qualifier1, q1Teams);
+  const qualifier1Loser = qualifier1Winner ? otherPlayoffTeam(q1Teams, qualifier1Winner) : null;
+  const eliminatorWinner = resultWinnerWithinTeams(eliminator, eliminatorTeams);
+  const eliminatorLoser = eliminatorWinner ? otherPlayoffTeam(eliminatorTeams, eliminatorWinner) : null;
+
+  const qualifier2Teams = uniqueNames([eliminatorWinner, qualifier1Loser]).slice(0, 2);
+  const qualifier2 = playoffMatchResult(agg, 73);
+  const qualifier2Winner = resultWinnerWithinTeams(qualifier2, qualifier2Teams);
+  const qualifier2Loser = qualifier2Winner ? otherPlayoffTeam(qualifier2Teams, qualifier2Winner) : null;
+
+  const finalTeams = uniqueNames([qualifier1Winner, qualifier2Winner]).slice(0, 2);
+  const final = playoffMatchResult(agg, 74);
+  const finalWinner = resultWinnerWithinTeams(final, finalTeams);
+  const finalLoser = finalWinner ? otherPlayoffTeam(finalTeams, finalWinner) : null;
+
+  const provisionalRanking = finalWinner
+    ? uniqueNames([finalWinner, finalLoser, qualifier2Loser, eliminatorLoser, ...leagueSeeds])
+    : (finalTeams.length === 2
+        ? uniqueNames([...finalTeams, qualifier2Loser, eliminatorLoser, ...leagueSeeds])
+        : (eliminatorLoser
+            ? uniqueNames([...playoffSeeds.filter((team) => team !== eliminatorLoser), eliminatorLoser, ...leagueSeeds])
+            : leagueSeeds));
+
+  const finalists = finalWinner && finalLoser
+    ? [finalWinner, finalLoser]
+    : (finalTeams.length === 2 ? finalTeams : []);
+
+  return {
+    winner: leagueComplete ? (finalWinner || null) : (standings[0] || null),
+    finalists,
+    playoffs: playoffSeeds,
+    ranking: provisionalRanking.slice(0, 10),
+    extendedRanking: uniqueNames([...provisionalRanking, ...standings]),
+    bracket: {
+      qualifier1: {
+        match_no: 71,
+        label: PLAYOFF_MATCH_LABELS[71],
+        teams: q1Teams,
+        winner: qualifier1Winner,
+        loser: qualifier1Loser
+      },
+      eliminator: {
+        match_no: 72,
+        label: PLAYOFF_MATCH_LABELS[72],
+        teams: eliminatorTeams,
+        winner: eliminatorWinner,
+        loser: eliminatorLoser
+      },
+      qualifier2: {
+        match_no: 73,
+        label: PLAYOFF_MATCH_LABELS[73],
+        teams: qualifier2Teams,
+        winner: qualifier2Winner,
+        loser: qualifier2Loser
+      },
+      final: {
+        match_no: 74,
+        label: PLAYOFF_MATCH_LABELS[74],
+        teams: finalTeams,
+        winner: finalWinner,
+        loser: finalLoser
+      },
+      league_complete: leagueComplete,
+      seed_ranking: playoffSeeds,
+      update_note: leagueComplete
+        ? 'Playoff teams resolve automatically as Qualifier 1, Eliminator, Qualifier 2, and Final scorecards are filled.'
+        : 'Playoff pairings will resolve automatically after Match 70 is completed.'
+    }
+  };
 }
 
 
@@ -2370,7 +2520,7 @@ export async function rebuildHistoricalState(processedIds, baseLive = null, { in
     if (scorecardResult) {
       if (scorecardResult.source === 'cache') cacheHits += 1;
       if (isApiScorecardSource(scorecardResult.source)) apiCalls += 1;
-      applyScorecardToAggregates(rebuilt, scorecardResult.data, { isFinal: true });
+      applyScorecardToAggregates(rebuilt, scorecardResult.data, { isFinal: true, matchNo: processedMatchCount });
     }
     const historicalCumulativeDots = resolveHistoricalCumulativeDots(baseLive, processedMatchCount);
     if (Object.keys(historicalCumulativeDots).length) {
@@ -2452,7 +2602,10 @@ export async function repairScoreHistoryGaps(live, processedRefs, { loadScorecar
     if (isApiScorecardSource(scorecardResult.source)) apiCalls += 1;
 
     const nextAgg = cloneJson(previousAgg);
-    applyScorecardToAggregates(nextAgg, scorecardResult.data, { isFinal: true });
+    applyScorecardToAggregates(nextAgg, scorecardResult.data, {
+      isFinal: true,
+      matchNo: matchRef?.matchNo || matchRef?.match_no || count
+    });
     byCount.set(count, {
       processedMatchCount: count,
       fetchedAt: isoNow(),
@@ -2498,13 +2651,7 @@ function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = nul
     values: bowlSr.values
   };
   live.mostCatches = { ranking: catches.slice(0, 10), extendedRanking: catches, values: agg.catches || {} };
-  live.titleWinner = {
-    winner: standings[0] || null,
-    finalists: standings.slice(0, 2),
-    playoffs: standings.slice(0, 4),
-    ranking: standings.slice(0, 10),
-    extendedRanking: standings
-  };
+  live.titleWinner = buildPlayoffTitleWinnerPayload(standings, agg);
   live.tableBottom = { ranking: standings.slice(0, 10), extendedRanking: standings };
   live.mostDots = {
     ranking: normalizedDotsRanking.slice(0, 10),
@@ -2897,7 +3044,10 @@ async function main() {
     } else {
       live.meta.lastRun.scorecardCalls += 1;
     }
-    applyScorecardToAggregates(finalizedAgg, scorecardResult.data, { isFinal: true });
+    applyScorecardToAggregates(finalizedAgg, scorecardResult.data, {
+      isFinal: true,
+      matchNo: match.matchNo || match.match_no || parseMatchNoFromText(match.matchKey || match.name || '')
+    });
     processedIds.add(match.id);
     if (match.matchKey) {
       processedKeySet.add(match.matchKey);
@@ -2942,7 +3092,10 @@ async function main() {
         }
         live.meta.lastRun.liveOverlayFetched = true;
         overlayAgg = createEmptyAggregates();
-        applyScorecardToAggregates(overlayAgg, scorecardResult.data, { isFinal: false });
+        applyScorecardToAggregates(overlayAgg, scorecardResult.data, {
+          isFinal: false,
+          matchNo: activeMatch.matchNo || activeMatch.match_no || parseMatchNoFromText(activeMatch.matchKey || activeMatch.name || '')
+        });
         live.meta.liveOverlay = {
           matchId: activeMatch.id,
           generatedAt: isoNow(),

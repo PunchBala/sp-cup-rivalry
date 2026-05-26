@@ -5,6 +5,8 @@ import {
   MINI_FANTASY_BUDGET,
   MINI_FANTASY_DEEP_POCKETS_BUDGET,
   MINI_FANTASY_NEW_PLAYER_BASELINE_POINTS,
+  MINI_FANTASY_PLAYOFF_3X_BOOST_KEY,
+  MINI_FANTASY_PLAYOFF_BUDGET,
   buildMiniFantasyEntryAuditLog,
   buildMiniFantasyLeaderboard,
   buildMiniFantasyFixturePointsIndex,
@@ -20,6 +22,7 @@ import {
   getMiniFantasyFixtureOpenAtUtc,
   getMiniFantasyOpenFixtures,
   getMiniFantasyWinningTeamCode,
+  isMiniFantasyPlayoffFixture,
   resolvePlayerHistory,
   serializeMiniFantasyLeaderboardRows,
   scoreMiniFantasyEntry,
@@ -937,6 +940,67 @@ test('validateMiniFantasyEntry enforces budget, team split, and role minimums', 
   assert.equal(invalid.valid, false);
   assert.match(invalid.errors.join(' | '), /Squad budget exceeded/);
   assert.match(invalid.errors.join(' | '), /batter or wicket keeper/);
+});
+
+test('validateMiniFantasyEntry applies playoff budget, required target, and playoff-only boost rules', () => {
+  const fixture = {
+    match_no: 71,
+    home_team: 'Royal Challengers Bengaluru',
+    away_team: 'Gujarat Titans',
+    home_team_code: 'RCB',
+    away_team_code: 'GT'
+  };
+  const pool = [
+    { player_id: 'rcb_a', name: 'RCB Batter', team: 'RCB', role: 'batter', final_price: 10, pricing_eligible: true },
+    { player_id: 'rcb_b', name: 'RCB Bowler', team: 'RCB', role: 'bowler', final_price: 8.5, pricing_eligible: true },
+    { player_id: 'gt_a', name: 'GT Keeper', team: 'GT', role: 'wicket_keeper', final_price: 9, pricing_eligible: true },
+    { player_id: 'gt_b', name: 'GT Bowler', team: 'GT', role: 'bowler', final_price: 7.5, pricing_eligible: true }
+  ];
+
+  assert.equal(isMiniFantasyPlayoffFixture(fixture), true);
+
+  const validDefault = validateMiniFantasyEntry({
+    fixture,
+    selectedPlayerIds: ['rcb_a', 'rcb_b', 'gt_a', 'gt_b'],
+    captainPlayerId: 'rcb_a',
+    boostedPlayerId: 'gt_a',
+    playerPool: pool
+  });
+  assert.equal(validDefault.valid, true);
+  assert.equal(validDefault.budget, MINI_FANTASY_PLAYOFF_BUDGET);
+  assert.equal(validDefault.total_cost, 35);
+  assert.equal(validDefault.budget_remaining, 0);
+
+  const invalidMissingTarget = validateMiniFantasyEntry({
+    fixture,
+    selectedPlayerIds: ['rcb_a', 'rcb_b', 'gt_a', 'gt_b'],
+    captainPlayerId: 'rcb_a',
+    playerPool: pool
+  });
+  assert.equal(invalidMissingTarget.valid, false);
+  assert.match(invalidMissingTarget.errors.join(' | '), /playoff x-factor/i);
+
+  const invalidLeagueBoost = validateMiniFantasyEntry({
+    fixture,
+    selectedPlayerIds: ['rcb_a', 'rcb_b', 'gt_a', 'gt_b'],
+    captainPlayerId: '',
+    powerBoostKey: 'all_in',
+    boostedPlayerId: 'gt_a',
+    playerPool: pool
+  });
+  assert.equal(invalidLeagueBoost.valid, false);
+  assert.match(invalidLeagueBoost.errors.join(' | '), /cannot be carried into playoff fixtures/i);
+
+  const validTriple = validateMiniFantasyEntry({
+    fixture,
+    selectedPlayerIds: ['rcb_a', 'rcb_b', 'gt_a', 'gt_b'],
+    captainPlayerId: 'rcb_a',
+    powerBoostKey: MINI_FANTASY_PLAYOFF_3X_BOOST_KEY,
+    boostedPlayerId: 'gt_a',
+    playerPool: pool
+  });
+  assert.equal(validTriple.valid, true);
+  assert.equal(validTriple.power_boost_key, MINI_FANTASY_PLAYOFF_3X_BOOST_KEY);
 });
 
 test('generateMiniFantasyPriceBook and buildFixturePlayerPool work from live history plus squad roles', () => {
@@ -2509,4 +2573,88 @@ test('scoreMiniFantasyEntry applies All In and X-Factor multipliers without stac
   assert.equal(xFactor.power_boost_bonus_points, 14);
   assert.equal(xFactor.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 28);
   assert.equal(xFactor.power_boost_multiplier_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 2);
+});
+
+test('scoreMiniFantasyEntry gives playoff entries a default 2x target and upgrades it to 3x with Triple Crown', () => {
+  const baseEntry = {
+    matchNo: 71,
+    selectedPlayerIds: [
+      buildMiniFantasyPlayerId('RCB', 'RCB Batter'),
+      buildMiniFantasyPlayerId('RCB', 'RCB Bowler'),
+      buildMiniFantasyPlayerId('GT', 'GT Bowler'),
+      buildMiniFantasyPlayerId('GT', 'GT Keeper')
+    ],
+    captainPlayerId: buildMiniFantasyPlayerId('RCB', 'RCB Batter'),
+    boostedPlayerId: buildMiniFantasyPlayerId('GT', 'GT Keeper')
+  };
+  const schedule = [
+    { match_no: 71, datetime_utc: '2026-05-26T14:00:00Z', home_team: 'Royal Challengers Bengaluru', away_team: 'Gujarat Titans' }
+  ];
+  const squads = {
+    RCB: ['RCB Batter', 'RCB Bowler'],
+    GT: ['GT Bowler', 'GT Keeper']
+  };
+  const liveData = {
+    meta: {
+      cache: {
+        matchList: [
+          {
+            matchNo: 71,
+            status: 'Royal Challengers Bengaluru won by 6 wkts',
+            teams: ['Royal Challengers Bengaluru', 'Gujarat Titans']
+          }
+        ]
+      },
+      scoreHistory: [
+        {
+          processedMatchCount: 71,
+          snapshot: {
+            meta: {
+              aggregates: {
+                playerMatches: {
+                  'RCB Batter': 1,
+                  'RCB Bowler': 1,
+                  'GT Bowler': 1,
+                  'GT Keeper': 1
+                }
+              }
+            },
+            mvp: {
+              values: {
+                'RCB Batter': { score: 40 },
+                'RCB Bowler': { score: 20 },
+                'GT Bowler': { score: 10 },
+                'GT Keeper': { score: 12 }
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  const defaultPlayoff = scoreMiniFantasyEntry({
+    entry: baseEntry,
+    liveData,
+    schedule,
+    squads
+  });
+  assert.equal(defaultPlayoff.total_points, 137.5);
+  assert.equal(defaultPlayoff.power_boost_bonus_points, 14);
+  assert.equal(defaultPlayoff.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 28);
+  assert.equal(defaultPlayoff.power_boost_multiplier_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 2);
+
+  const tripleCrown = scoreMiniFantasyEntry({
+    entry: {
+      ...baseEntry,
+      powerBoostKey: MINI_FANTASY_PLAYOFF_3X_BOOST_KEY
+    },
+    liveData,
+    schedule,
+    squads
+  });
+  assert.equal(tripleCrown.total_points, 151.5);
+  assert.equal(tripleCrown.power_boost_bonus_points, 28);
+  assert.equal(tripleCrown.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 42);
+  assert.equal(tripleCrown.power_boost_multiplier_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 3);
 });
