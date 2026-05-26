@@ -1208,6 +1208,8 @@
     }
     .fantasy-picker-card.has-captain-action .fantasy-picker-captain-btn{opacity:1;transform:none;pointer-events:auto}
     .fantasy-picker-captain-btn.is-captain{opacity:1;transform:none;pointer-events:auto;border-color:rgba(255,200,87,.3);background:rgba(255,200,87,.16);color:#ffe8b5}
+    .fantasy-picker-captain-btn.is-disabled{opacity:.55;pointer-events:none}
+    .fantasy-picker-meta-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
     .fantasy-crown-icon{display:inline-block;margin-right:5px;font-size:11px;line-height:1}
     .fantasy-pill-strong{color:#fff}
     .fantasy-highlight{
@@ -12189,16 +12191,46 @@ function titleBandScore(pick, live){
                           ${player.pickedInOtherSlot ? `<div class="fantasy-picker-badge">Picked in slot ${player.selectedSlotIndex + 1} - tap to unselect</div>` : ''}
                           ${player.selectedInCurrentSlot ? '<div class="fantasy-picker-badge current">Selected in this slot - tap to unselect</div>' : ''}
                         </div>
-                        ${player.selectedSlotIndex !== -1 && !captainDisabledByAllIn ? `
-                          <span
-                            class="fantasy-picker-captain-btn ${draft.captainPlayerId === player.player_id ? 'is-captain' : ''}"
-                            data-mini-picker-captain="${escapeHtml(player.player_id)}"
-                            title="${draft.captainPlayerId === player.player_id ? 'Captain selected' : 'Make captain'}"
-                            role="button"
-                            tabindex="0"
-                          >
-                            <span class="fantasy-crown-icon" aria-hidden="true">&#9819;</span>${draft.captainPlayerId === player.player_id ? 'Captain' : 'Make captain'}
-                          </span>
+                        ${player.selectedSlotIndex !== -1 ? `
+                          <div class="fantasy-picker-meta-actions">
+                            ${!captainDisabledByAllIn ? `
+                              <span
+                                class="fantasy-picker-captain-btn ${draft.captainPlayerId === player.player_id ? 'is-captain' : ''}"
+                                data-mini-picker-captain="${escapeHtml(player.player_id)}"
+                                title="${draft.captainPlayerId === player.player_id ? 'Captain selected' : 'Make captain'}"
+                                role="button"
+                                tabindex="0"
+                              >
+                                <span class="fantasy-crown-icon" aria-hidden="true">&#9819;</span>${draft.captainPlayerId === player.player_id ? 'Captain' : 'Make captain'}
+                              </span>
+                            ` : ''}
+                            ${pickerTargetEnabled ? `
+                              <span
+                                class="fantasy-picker-captain-btn ${draft.boostedPlayerId === player.player_id ? 'is-captain' : ''} ${draft.captainPlayerId === player.player_id || draft.playoff3xPlayerId === player.player_id ? 'is-disabled' : ''}"
+                                data-mini-picker-boost-target="${escapeHtml(player.player_id)}"
+                                data-disabled="${draft.captainPlayerId === player.player_id || draft.playoff3xPlayerId === player.player_id ? 'true' : 'false'}"
+                                title="${draft.boostedPlayerId === player.player_id ? 'Playoff X-Factor selected' : 'Set playoff X-Factor'}"
+                                role="button"
+                                tabindex="0"
+                                aria-disabled="${draft.captainPlayerId === player.player_id || draft.playoff3xPlayerId === player.player_id ? 'true' : 'false'}"
+                              >
+                                ${draft.boostedPlayerId === player.player_id ? '2x X-Factor' : (draft.captainPlayerId === player.player_id ? 'Captain cannot take 2x' : (draft.playoff3xPlayerId === player.player_id ? '3x already here' : 'Set 2x'))}
+                              </span>
+                            ` : ''}
+                            ${pickerTripleTargetEnabled ? `
+                              <span
+                                class="fantasy-picker-captain-btn ${draft.playoff3xPlayerId === player.player_id ? 'is-captain' : ''} ${draft.captainPlayerId === player.player_id || draft.boostedPlayerId === player.player_id ? 'is-disabled' : ''}"
+                                data-mini-picker-playoff-3x-target="${escapeHtml(player.player_id)}"
+                                data-disabled="${draft.captainPlayerId === player.player_id || draft.boostedPlayerId === player.player_id ? 'true' : 'false'}"
+                                title="${draft.playoff3xPlayerId === player.player_id ? 'Triple Crown selected' : 'Set Triple Crown'}"
+                                role="button"
+                                tabindex="0"
+                                aria-disabled="${draft.captainPlayerId === player.player_id || draft.boostedPlayerId === player.player_id ? 'true' : 'false'}"
+                              >
+                                ${draft.playoff3xPlayerId === player.player_id ? '3x Triple Crown' : (draft.captainPlayerId === player.player_id ? 'Captain cannot take 3x' : (draft.boostedPlayerId === player.player_id ? '2x already here' : 'Set 3x'))}
+                              </span>
+                            ` : ''}
+                          </div>
                         ` : ''}
                       </div>
                     ` : ''}
@@ -12254,6 +12286,52 @@ function titleBandScore(pick, live){
             pickerDraft.playoff3xPlayerId = '';
           }
           MINI_FANTASY_DRAFTS[fixture.match_no] = pickerDraft;
+          setMiniFantasyNotice(null);
+          render();
+        };
+        button.onkeydown = (event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          event.stopPropagation();
+          button.click();
+        };
+      });
+      body.querySelectorAll('[data-mini-picker-boost-target]').forEach((button) => {
+        button.onclick = (event) => {
+          event.stopPropagation();
+          if (button.dataset.disabled === 'true') return;
+          const playerId = button.dataset.miniPickerBoostTarget || '';
+          if (!playerId) return;
+          const pickerDraft = ensureMiniFantasyDraft(fixture.match_no);
+          if (!pickerDraft.selectedPlayerIds.includes(playerId)) return;
+          if (pickerDraft.boostedPlayerId === playerId) {
+            setMiniFantasyDraftBoostedPlayer(fixture.match_no, '');
+          } else {
+            setMiniFantasyDraftBoostedPlayer(fixture.match_no, playerId);
+          }
+          setMiniFantasyNotice(null);
+          render();
+        };
+        button.onkeydown = (event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          event.stopPropagation();
+          button.click();
+        };
+      });
+      body.querySelectorAll('[data-mini-picker-playoff-3x-target]').forEach((button) => {
+        button.onclick = (event) => {
+          event.stopPropagation();
+          if (button.dataset.disabled === 'true') return;
+          const playerId = button.dataset.miniPickerPlayoff3xTarget || '';
+          if (!playerId) return;
+          const pickerDraft = ensureMiniFantasyDraft(fixture.match_no);
+          if (!pickerDraft.selectedPlayerIds.includes(playerId)) return;
+          if (pickerDraft.playoff3xPlayerId === playerId) {
+            setMiniFantasyDraftPlayoff3xPlayer(fixture.match_no, '');
+          } else {
+            setMiniFantasyDraftPlayoff3xPlayer(fixture.match_no, playerId);
+          }
           setMiniFantasyNotice(null);
           render();
         };
