@@ -71,8 +71,44 @@
     return Math.round(numeric * 100) / 100;
   }
 
+  const MINI_FANTASY_ENTRY_META_KEY = '__mini_fantasy_meta';
   const MINI_FANTASY_ENTRY_LEGACY_SELECT = 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at';
   const MINI_FANTASY_ENTRY_POWER_SELECT = 'id,user_id,owner_handle,display_name,season,match_no,home_team_code,away_team_code,fixture_label,fixture_datetime_utc,selected_player_ids,captain_player_id,power_boost_key,boosted_player_id,price_snapshot,spent_credits,saved_at,created_at,updated_at';
+
+  function withMiniFantasyEntryMeta(priceSnapshot, metaPatch = {}) {
+    const snapshot = priceSnapshot && typeof priceSnapshot === 'object' && !Array.isArray(priceSnapshot)
+      ? cloneJson(priceSnapshot)
+      : {};
+    const nextMeta = {
+      ...(snapshot?.[MINI_FANTASY_ENTRY_META_KEY] && typeof snapshot[MINI_FANTASY_ENTRY_META_KEY] === 'object' && !Array.isArray(snapshot[MINI_FANTASY_ENTRY_META_KEY])
+        ? snapshot[MINI_FANTASY_ENTRY_META_KEY]
+        : {}),
+      ...metaPatch
+    };
+    Object.keys(nextMeta).forEach((key) => {
+      if (!normalizeWhitespace(nextMeta[key])) delete nextMeta[key];
+    });
+    if (Object.keys(nextMeta).length) {
+      snapshot[MINI_FANTASY_ENTRY_META_KEY] = nextMeta;
+    } else {
+      delete snapshot[MINI_FANTASY_ENTRY_META_KEY];
+    }
+    return snapshot;
+  }
+
+  function resolveMiniFantasyPlayoff3xPlayerId(entry = {}) {
+    const snapshot = entry?.priceSnapshot && typeof entry.priceSnapshot === 'object'
+      ? entry.priceSnapshot
+      : (entry?.price_snapshot && typeof entry.price_snapshot === 'object' ? entry.price_snapshot : {});
+    const meta = snapshot?.[MINI_FANTASY_ENTRY_META_KEY];
+    return normalizeWhitespace(
+      entry?.playoff3xPlayerId
+      || entry?.playoff_3x_player_id
+      || meta?.playoff3xPlayerId
+      || meta?.playoff_3x_player_id
+      || ''
+    ) || null;
+  }
 
   function readStoredJson(key, fallback = null) {
     try {
@@ -399,6 +435,7 @@
     }
 
     function buildMiniFantasyEntryPayload(entry, currentUser, safeSeason, matchNo, { includePowerBoostFields = true } = {}) {
+      const playoff3xPlayerId = resolveMiniFantasyPlayoff3xPlayerId(entry);
       const payload = {
         user_id: currentUser.userId,
         owner_handle: currentUser.ownerId,
@@ -411,7 +448,9 @@
         fixture_datetime_utc: entry?.fixtureDatetimeUtc || null,
         selected_player_ids: cloneJson(entry?.selectedPlayerIds || []),
         captain_player_id: normalizeWhitespace(entry?.captainPlayerId || '') || null,
-        price_snapshot: cloneJson(entry?.priceSnapshot || {}),
+        price_snapshot: withMiniFantasyEntryMeta(entry?.priceSnapshot || {}, {
+          playoff3xPlayerId: playoff3xPlayerId || ''
+        }),
         spent_credits: roundCreditAmount(entry?.spentCredits || 0),
         saved_at: entry?.savedAt || new Date().toISOString()
       };
@@ -491,6 +530,11 @@
 
 function normalizeMiniFantasyEntryRow(row) {
   if (!row) return null;
+  const priceSnapshot = cloneJson(row.price_snapshot || {});
+  const playoff3xPlayerId = resolveMiniFantasyPlayoff3xPlayerId({
+    playoff_3x_player_id: row.playoff_3x_player_id,
+    price_snapshot: priceSnapshot
+  });
   return {
     id: row.id || null,
     userId: row.user_id || null,
@@ -506,7 +550,8 @@ function normalizeMiniFantasyEntryRow(row) {
         captainPlayerId: normalizeWhitespace(row.captain_player_id || '') || null,
         powerBoostKey: normalizeWhitespace(row.power_boost_key || '') || null,
         boostedPlayerId: normalizeWhitespace(row.boosted_player_id || '') || null,
-        priceSnapshot: cloneJson(row.price_snapshot || {}),
+        playoff3xPlayerId,
+        priceSnapshot,
         spentCredits: roundCreditAmount(row.spent_credits || 0),
         savedAt: row.saved_at || null,
         createdAt: row.created_at || null,

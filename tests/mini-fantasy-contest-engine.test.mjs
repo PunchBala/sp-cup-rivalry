@@ -997,10 +997,24 @@ test('validateMiniFantasyEntry applies playoff budget, required target, and play
     captainPlayerId: 'rcb_a',
     powerBoostKey: MINI_FANTASY_PLAYOFF_3X_BOOST_KEY,
     boostedPlayerId: 'gt_a',
+    playoff3xPlayerId: 'gt_b',
     playerPool: pool
   });
   assert.equal(validTriple.valid, true);
   assert.equal(validTriple.power_boost_key, MINI_FANTASY_PLAYOFF_3X_BOOST_KEY);
+  assert.equal(validTriple.playoff_3x_player_id, 'gt_b');
+
+  const invalidTripleOverlap = validateMiniFantasyEntry({
+    fixture,
+    selectedPlayerIds: ['rcb_a', 'rcb_b', 'gt_a', 'gt_b'],
+    captainPlayerId: 'rcb_a',
+    powerBoostKey: MINI_FANTASY_PLAYOFF_3X_BOOST_KEY,
+    boostedPlayerId: 'gt_a',
+    playoff3xPlayerId: 'gt_a',
+    playerPool: pool
+  });
+  assert.equal(invalidTripleOverlap.valid, false);
+  assert.match(invalidTripleOverlap.errors.join(' | '), /different player than the playoff x-factor/i);
 });
 
 test('generateMiniFantasyPriceBook and buildFixturePlayerPool work from live history plus squad roles', () => {
@@ -2575,7 +2589,7 @@ test('scoreMiniFantasyEntry applies All In and X-Factor multipliers without stac
   assert.equal(xFactor.power_boost_multiplier_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 2);
 });
 
-test('scoreMiniFantasyEntry gives playoff entries a default 2x target and upgrades it to 3x with Triple Crown', () => {
+test('scoreMiniFantasyEntry keeps the playoff 2x target and adds a separate Triple Crown 3x player', () => {
   const baseEntry = {
     matchNo: 71,
     selectedPlayerIds: [
@@ -2647,14 +2661,17 @@ test('scoreMiniFantasyEntry gives playoff entries a default 2x target and upgrad
   const tripleCrown = scoreMiniFantasyEntry({
     entry: {
       ...baseEntry,
-      powerBoostKey: MINI_FANTASY_PLAYOFF_3X_BOOST_KEY
+      powerBoostKey: MINI_FANTASY_PLAYOFF_3X_BOOST_KEY,
+      playoff3xPlayerId: buildMiniFantasyPlayerId('GT', 'GT Bowler')
     },
     liveData,
     schedule,
     squads
   });
-  assert.equal(tripleCrown.total_points, 151.5);
-  assert.equal(tripleCrown.power_boost_bonus_points, 28);
-  assert.equal(tripleCrown.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 42);
-  assert.equal(tripleCrown.power_boost_multiplier_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 3);
+  assert.equal(tripleCrown.total_points, 161.5);
+  assert.equal(tripleCrown.power_boost_bonus_points, 38);
+  assert.equal(tripleCrown.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 28);
+  assert.equal(tripleCrown.scored_points_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Bowler')], 36);
+  assert.equal(tripleCrown.power_boost_multiplier_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Keeper')], 2);
+  assert.equal(tripleCrown.power_boost_multiplier_by_player_id[buildMiniFantasyPlayerId('GT', 'GT Bowler')], 3);
 });

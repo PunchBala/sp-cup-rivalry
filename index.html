@@ -1793,6 +1793,7 @@
       MINI_FANTASY_DAILY_VISIT_BONUS_POINTS,
       MINI_FANTASY_DAILY_VISIT_TIME_ZONE,
       MINI_FANTASY_DEEP_POCKETS_BUDGET,
+      MINI_FANTASY_ENTRY_META_KEY,
       MINI_FANTASY_FIRST_MATCH_OPEN_AT_UTC,
       MINI_FANTASY_FIRST_OPEN_MATCH_NO,
       MINI_FANTASY_LAUNCH_AT_UTC,
@@ -1823,6 +1824,7 @@
       isMiniFantasyFixtureDayInTimeZone,
       isFixtureLocked,
       normalizeMiniFantasyPowerBoostKey,
+      resolveMiniFantasyPlayoff3xPlayerId,
       resolveMiniFantasyPlayerTeamCode,
       scoreMiniFantasyLineup,
       scoreMiniFantasyEntry,
@@ -4942,33 +4944,68 @@ function titleBandScore(pick, live){
       return { version: 1, entries: [] };
     }
 
+    function resolveMiniFantasyEntrySnapshot(entry = {}){
+      return entry?.priceSnapshot && typeof entry.priceSnapshot === 'object'
+        ? entry.priceSnapshot
+        : (entry?.price_snapshot && typeof entry.price_snapshot === 'object' ? entry.price_snapshot : {});
+    }
+
+    function resolveMiniFantasyEntryMeta(entry = {}){
+      const snapshot = resolveMiniFantasyEntrySnapshot(entry);
+      const meta = snapshot?.[MINI_FANTASY_ENTRY_META_KEY];
+      return meta && typeof meta === 'object' && !Array.isArray(meta) ? meta : {};
+    }
+
+    function withMiniFantasyEntrySnapshotMeta(priceSnapshot, metaPatch = {}){
+      const snapshot = priceSnapshot && typeof priceSnapshot === 'object' && !Array.isArray(priceSnapshot)
+        ? cloneJson(priceSnapshot)
+        : {};
+      const nextMeta = {
+        ...(resolveMiniFantasyEntryMeta({ priceSnapshot: snapshot }) || {}),
+        ...metaPatch
+      };
+      Object.keys(nextMeta).forEach((key) => {
+        if (!normalizeTextValue(nextMeta[key])) delete nextMeta[key];
+      });
+      if (Object.keys(nextMeta).length) {
+        snapshot[MINI_FANTASY_ENTRY_META_KEY] = nextMeta;
+      } else {
+        delete snapshot[MINI_FANTASY_ENTRY_META_KEY];
+      }
+      return snapshot;
+    }
+
     function loadStoredMiniFantasyEntriesStore(){
       const raw = readStoredJson(LOCAL_MINI_FANTASY_ENTRIES_STORAGE_KEY, emptyMiniFantasyEntryStore());
       if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return emptyMiniFantasyEntryStore();
       if (!Array.isArray(raw.entries)) return emptyMiniFantasyEntryStore();
       return {
         version: 1,
-        entries: raw.entries.map((entry) => ({
-          id: entry?.id || null,
-          userId: entry?.userId || null,
-          ownerHandle: normalizeOwnerId(entry?.ownerHandle || entry?.ownerId || ''),
-          displayName: normalizeTextValue(entry?.displayName || entry?.display_name || ''),
-          season: normalizeTextValue(entry?.season || MINI_FANTASY_SEASON),
-          matchNo: Number(entry?.matchNo || 0) || null,
-          homeTeamCode: normalizeTextValue(entry?.homeTeamCode || ''),
-          awayTeamCode: normalizeTextValue(entry?.awayTeamCode || ''),
-          fixtureLabel: normalizeTextValue(entry?.fixtureLabel || ''),
-          fixtureDatetimeUtc: entry?.fixtureDatetimeUtc || null,
-          selectedPlayerIds: Array.isArray(entry?.selectedPlayerIds) ? entry.selectedPlayerIds.filter(Boolean) : [],
-          captainPlayerId: normalizeTextValue(entry?.captainPlayerId || '') || null,
-          powerBoostKey: normalizeMiniFantasyPowerBoostKey(entry?.powerBoostKey || entry?.power_boost_key || ''),
-          boostedPlayerId: normalizeTextValue(entry?.boostedPlayerId || entry?.boosted_player_id || '') || null,
-          priceSnapshot: cloneJson(entry?.priceSnapshot || {}),
-          spentCredits: Number(entry?.spentCredits || 0) || 0,
-          savedAt: entry?.savedAt || null,
-          createdAt: entry?.createdAt || null,
-          updatedAt: entry?.updatedAt || null
-        })).filter((entry) => entry.ownerHandle && entry.matchNo)
+        entries: raw.entries.map((entry) => {
+          const priceSnapshot = resolveMiniFantasyEntrySnapshot(entry);
+          return {
+            id: entry?.id || null,
+            userId: entry?.userId || null,
+            ownerHandle: normalizeOwnerId(entry?.ownerHandle || entry?.ownerId || ''),
+            displayName: normalizeTextValue(entry?.displayName || entry?.display_name || ''),
+            season: normalizeTextValue(entry?.season || MINI_FANTASY_SEASON),
+            matchNo: Number(entry?.matchNo || 0) || null,
+            homeTeamCode: normalizeTextValue(entry?.homeTeamCode || ''),
+            awayTeamCode: normalizeTextValue(entry?.awayTeamCode || ''),
+            fixtureLabel: normalizeTextValue(entry?.fixtureLabel || ''),
+            fixtureDatetimeUtc: entry?.fixtureDatetimeUtc || null,
+            selectedPlayerIds: Array.isArray(entry?.selectedPlayerIds) ? entry.selectedPlayerIds.filter(Boolean) : [],
+            captainPlayerId: normalizeTextValue(entry?.captainPlayerId || '') || null,
+            powerBoostKey: normalizeMiniFantasyPowerBoostKey(entry?.powerBoostKey || entry?.power_boost_key || ''),
+            boostedPlayerId: normalizeTextValue(entry?.boostedPlayerId || entry?.boosted_player_id || '') || null,
+            playoff3xPlayerId: resolveMiniFantasyPlayoff3xPlayerId(entry) || null,
+            priceSnapshot: cloneJson(priceSnapshot),
+            spentCredits: Number(entry?.spentCredits || 0) || 0,
+            savedAt: entry?.savedAt || null,
+            createdAt: entry?.createdAt || null,
+            updatedAt: entry?.updatedAt || null
+          };
+        }).filter((entry) => entry.ownerHandle && entry.matchNo)
       };
     }
 
@@ -5012,7 +5049,10 @@ function titleBandScore(pick, live){
         captainPlayerId: normalizeTextValue(entry?.captainPlayerId || '') || null,
         powerBoostKey: normalizeMiniFantasyPowerBoostKey(entry?.powerBoostKey || entry?.power_boost_key || ''),
         boostedPlayerId: normalizeTextValue(entry?.boostedPlayerId || entry?.boosted_player_id || '') || null,
-        priceSnapshot: cloneJson(entry?.priceSnapshot || {}),
+        playoff3xPlayerId: resolveMiniFantasyPlayoff3xPlayerId(entry) || null,
+        priceSnapshot: withMiniFantasyEntrySnapshotMeta(entry?.priceSnapshot || {}, {
+          playoff3xPlayerId: resolveMiniFantasyPlayoff3xPlayerId(entry) || ''
+        }),
         spentCredits: Number(entry?.spentCredits || 0) || 0,
         savedAt: entry?.savedAt || new Date().toISOString(),
         createdAt: entry?.createdAt || new Date().toISOString(),
@@ -9521,7 +9561,8 @@ function titleBandScore(pick, live){
         selectedPlayerIds: ['', '', '', ''],
         captainPlayerId: '',
         powerBoostKey: '',
-        boostedPlayerId: ''
+        boostedPlayerId: '',
+        playoff3xPlayerId: ''
       };
     }
 
@@ -9538,7 +9579,7 @@ function titleBandScore(pick, live){
       return `mini-boost-${key.replace(/_/g, '-')}`;
     }
 
-    function miniFantasyPowerBoostNarrative(powerBoostKey = '', boostedPlayerName = ''){
+    function miniFantasyPowerBoostNarrative(powerBoostKey = '', boostedPlayerName = '', playoff3xPlayerName = ''){
       const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
       if (!key) return 'No season power boost is armed.';
       if (key === 'all_in') return 'All In is armed for this fixture and replaces the captain slot.';
@@ -9551,9 +9592,13 @@ function titleBandScore(pick, live){
         return 'Deep Pockets removed the squad budget cap for this fixture.';
       }
       if (key === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY) {
-        return boostedPlayerName
-          ? `Triple Crown upgrades the playoff X-Factor target ${boostedPlayerName} to 3x.`
-          : 'Triple Crown upgrades your playoff X-Factor target to 3x.';
+        if (boostedPlayerName && playoff3xPlayerName) {
+          return `Playoff X-Factor is active on ${boostedPlayerName}, and Triple Crown adds a separate 3x target on ${playoff3xPlayerName}.`;
+        }
+        if (playoff3xPlayerName) {
+          return `Triple Crown is armed on ${playoff3xPlayerName} alongside your default playoff X-Factor target.`;
+        }
+        return 'Triple Crown adds a separate 3x non-captain target on top of your default playoff X-Factor.';
       }
       return `${miniFantasyPowerBoostLabel(key)} is armed for this fixture.`;
     }
@@ -9568,7 +9613,7 @@ function titleBandScore(pick, live){
       return '';
     }
 
-    function miniFantasyPowerBoostChipText(powerBoostKey = '', boostedPlayerName = ''){
+    function miniFantasyPowerBoostChipText(powerBoostKey = '', boostedPlayerName = '', playoff3xPlayerName = ''){
       const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
       if (!key) return 'Boost: none';
       const symbol = miniFantasyPowerBoostSymbol(key);
@@ -9576,17 +9621,18 @@ function titleBandScore(pick, live){
       if (key === 'x_factor' && boostedPlayerName) return `${symbol} Boost: X-Factor on ${boostedPlayerName}`;
       if (key === 'x_factor') return `${symbol} Boost: X-Factor`;
       if (key === 'deep_pockets') return `${symbol} Boost: Deep Pockets (\u221E)`;
-      if (key === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY && boostedPlayerName) return `${symbol} Boost: Triple Crown on ${boostedPlayerName}`;
+      if (key === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY && boostedPlayerName && playoff3xPlayerName) return `${symbol} Boost: 2x ${boostedPlayerName}, 3x ${playoff3xPlayerName}`;
+      if (key === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY && playoff3xPlayerName) return `${symbol} Boost: Triple Crown on ${playoff3xPlayerName}`;
       if (key === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY) return `${symbol} Boost: Triple Crown`;
       return `Boost: ${miniFantasyPowerBoostLabel(key)}`;
     }
 
-    function miniFantasyPowerBoostInlineBadgeHtml(powerBoostKey = '', boostedPlayerName = ''){
+    function miniFantasyPowerBoostInlineBadgeHtml(powerBoostKey = '', boostedPlayerName = '', playoff3xPlayerName = ''){
       const key = normalizeMiniFantasyPowerBoostKey(powerBoostKey);
       if (!key) return '';
       const symbol = miniFantasyPowerBoostSymbol(key);
       if (!symbol) return '';
-      return `<span class="fantasy-boost-inline ${miniFantasyPowerBoostToneClass(key)}" title="${escapeHtml(miniFantasyPowerBoostChipText(key, boostedPlayerName || ''))}">${escapeHtml(symbol)}</span>`;
+      return `<span class="fantasy-boost-inline ${miniFantasyPowerBoostToneClass(key)}" title="${escapeHtml(miniFantasyPowerBoostChipText(key, boostedPlayerName || '', playoff3xPlayerName || ''))}">${escapeHtml(symbol)}</span>`;
     }
 
     function miniFantasyPowerBoostAvailability({ ignoreMatchNo = null, fixture = null } = {}){
@@ -9670,7 +9716,8 @@ function titleBandScore(pick, live){
               selectedPlayerIds: [...(savedEntry.selectedPlayerIds || [])].slice(0, 4),
               captainPlayerId: savedEntry.captainPlayerId || '',
               powerBoostKey: normalizeMiniFantasyPowerBoostKey(savedEntry.powerBoostKey || savedEntry.power_boost_key || ''),
-              boostedPlayerId: normalizeTextValue(savedEntry.boostedPlayerId || savedEntry.boosted_player_id || '') || ''
+              boostedPlayerId: normalizeTextValue(savedEntry.boostedPlayerId || savedEntry.boosted_player_id || '') || '',
+              playoff3xPlayerId: resolveMiniFantasyPlayoff3xPlayerId(savedEntry) || ''
             }
           : emptyMiniFantasyDraft();
         while (fromSaved.selectedPlayerIds.length < 4) fromSaved.selectedPlayerIds.push('');
@@ -9679,6 +9726,10 @@ function titleBandScore(pick, live){
         if (fromSaved.powerBoostKey === 'all_in') fromSaved.captainPlayerId = '';
         if (!isPlayoffFixture && fromSaved.powerBoostKey !== 'x_factor') fromSaved.boostedPlayerId = '';
         if (isPlayoffFixture && fromSaved.boostedPlayerId === fromSaved.captainPlayerId) fromSaved.boostedPlayerId = '';
+        if (!isPlayoffFixture || fromSaved.powerBoostKey !== MINI_FANTASY_PLAYOFF_3X_BOOST_KEY) fromSaved.playoff3xPlayerId = '';
+        if (fromSaved.playoff3xPlayerId && (!fromSaved.selectedPlayerIds.includes(fromSaved.playoff3xPlayerId) || fromSaved.playoff3xPlayerId === fromSaved.captainPlayerId || fromSaved.playoff3xPlayerId === fromSaved.boostedPlayerId)) {
+          fromSaved.playoff3xPlayerId = '';
+        }
         MINI_FANTASY_DRAFTS[target] = fromSaved;
       }
       return MINI_FANTASY_DRAFTS[target];
@@ -9732,6 +9783,7 @@ function titleBandScore(pick, live){
         playerPool,
         powerBoostKey: resolvedDraft.powerBoostKey || '',
         boostedPlayerId: resolvedDraft.boostedPlayerId || '',
+        playoff3xPlayerId: resolvedDraft.playoff3xPlayerId || '',
         budget: getMiniFantasyEntryBudget(resolvedDraft.powerBoostKey || '', fixture)
       });
     }
@@ -10026,7 +10078,7 @@ function titleBandScore(pick, live){
         multiplierParts.push(`x${formatMiniFantasyPoints(player.captainMultiplier)} captain`);
       }
       if (Number(player.powerBoostMultiplier || 0) > 1) {
-        multiplierParts.push(`x${formatMiniFantasyPoints(player.powerBoostMultiplier)} ${player.isPowerBoostTarget ? 'X-Factor' : 'All In'}`);
+        multiplierParts.push(`x${formatMiniFantasyPoints(player.powerBoostMultiplier)} ${player.isPlayoff3xTarget ? 'Triple Crown' : (player.isPowerBoostTarget ? 'X-Factor' : 'All In')}`);
       }
       return multiplierParts.length
         ? `${baseLine}, ${multiplierParts.join(', ')} -> ${formatMiniFantasyPoints(scoredPoints)}`
@@ -10066,7 +10118,8 @@ function titleBandScore(pick, live){
         powerBoostBonus: Number(player?.power_boost_bonus ?? player?.powerBoostBonus ?? 0) || 0,
         scoredPoints: Number(player?.scored_points ?? player?.scoredPoints ?? 0) || 0,
         isCaptain: Boolean(player?.is_captain ?? player?.isCaptain),
-        isPowerBoostTarget: Boolean(player?.is_power_boost_target ?? player?.isPowerBoostTarget)
+        isPowerBoostTarget: Boolean(player?.is_power_boost_target ?? player?.isPowerBoostTarget),
+        isPlayoff3xTarget: Boolean(player?.is_playoff_3x_target ?? player?.isPlayoff3xTarget)
       }));
       const pointsByPlayerId = Object.fromEntries(players.map((player) => [player.playerId, player.points]));
       const scoredPointsByPlayerId = Object.fromEntries(players.map((player) => [player.playerId, player.scoredPoints]));
@@ -10075,8 +10128,10 @@ function titleBandScore(pick, live){
         ? ''
         : normalizeTextValue(auditLog.captain_player_id || auditLog.captainPlayerId || '');
       const boostedPlayerId = normalizeTextValue(auditLog.boosted_player_id || auditLog.boostedPlayerId || '');
+      const playoff3xPlayerId = normalizeTextValue(auditLog.playoff_3x_player_id || auditLog.playoff3xPlayerId || '') || '';
       const captain = players.find((player) => player.isCaptain || player.playerId === captainPlayerId) || null;
       const boostedPlayer = players.find((player) => player.playerId === boostedPlayerId) || null;
+      const playoff3xPlayer = players.find((player) => player.playerId === playoff3xPlayerId) || null;
       const bestPickPlayerId = normalizeTextValue(auditLog.best_pick_player_id || auditLog.bestPickPlayerId || '');
       const bestPick = players.find((player) => player.playerId === bestPickPlayerId)
         || [...players].sort((a, b) => b.scoredPoints - a.scoredPoints || a.name.localeCompare(b.name))[0]
@@ -10093,15 +10148,17 @@ function titleBandScore(pick, live){
         powerBoostKey: powerBoostKey || '',
         boostedPlayerId: boostedPlayerId || '',
         boostedPlayerName: boostedPlayer?.name || '',
+        playoff3xPlayerId: playoff3xPlayerId || '',
+        playoff3xPlayerName: playoff3xPlayer?.name || '',
         powerBoostBonusPoints: Number(auditLog.power_boost_bonus_points ?? auditLog.powerBoostBonusPoints ?? 0) || 0,
         appearanceBonusPoints: Number(auditLog.appearance_bonus_points || auditLog.appearanceBonusPoints || 0) || 0,
         winnerBonusPoints: Number(auditLog.winner_bonus_points || auditLog.winnerBonusPoints || 0) || 0,
         summary: auditLog.is_no_result || auditLog.isNoResult
           ? 'This fixture ended with no result, so no Mini Fantasy points were awarded.'
           : captain
-            ? `${captain.name} carries the captain armband. ${miniFantasyPowerBoostNarrative(powerBoostKey, boostedPlayer?.name || '')}`
+            ? `${captain.name} carries the captain armband. ${miniFantasyPowerBoostNarrative(powerBoostKey, boostedPlayer?.name || '', playoff3xPlayer?.name || '')}`
             : (powerBoostKey === 'all_in'
-                ? miniFantasyPowerBoostNarrative(powerBoostKey, boostedPlayer?.name || '')
+                ? miniFantasyPowerBoostNarrative(powerBoostKey, boostedPlayer?.name || '', playoff3xPlayer?.name || '')
                 : 'Captain is not set on this saved team.'),
         isNoResult: Boolean(auditLog.is_no_result ?? auditLog.isNoResult),
         auditLog
@@ -10161,7 +10218,22 @@ function titleBandScore(pick, live){
             || auditLog.boostedPlayerId
             || ''
           ) || null,
-          price_snapshot: priceSnapshot,
+          playoff_3x_player_id: normalizeTextValue(
+            matchSummary?.playoff_3x_player_id
+            || matchSummary?.playoff3xPlayerId
+            || auditLog.playoff_3x_player_id
+            || auditLog.playoff3xPlayerId
+            || ''
+          ) || null,
+          price_snapshot: withMiniFantasyEntrySnapshotMeta(priceSnapshot, {
+            playoff3xPlayerId: normalizeTextValue(
+              matchSummary?.playoff_3x_player_id
+              || matchSummary?.playoff3xPlayerId
+              || auditLog.playoff_3x_player_id
+              || auditLog.playoff3xPlayerId
+              || ''
+            ) || ''
+          }),
           spent_credits: Number(matchSummary?.spent_credits ?? matchSummary?.spentCredits ?? auditLog.spent_credits ?? auditLog.spentCredits ?? 0) || 0,
           saved_at: normalizeTextValue(matchSummary?.saved_at || matchSummary?.savedAt || auditLog.saved_at || auditLog.savedAt || '') || null
         };
@@ -10181,6 +10253,8 @@ function titleBandScore(pick, live){
           powerBoostKey: '',
           boostedPlayerId: '',
           boostedPlayerName: '',
+          playoff3xPlayerId: '',
+          playoff3xPlayerName: '',
           powerBoostBonusPoints: 0,
           appearanceBonusPoints: 0,
           winnerBonusPoints: 0,
@@ -10210,7 +10284,8 @@ function titleBandScore(pick, live){
           selectedPlayerIds,
           spentCredits: entry.spentCredits ?? entry.spent_credits ?? 0,
           powerBoostKey: entry.powerBoostKey ?? entry.power_boost_key ?? '',
-          boostedPlayerId: entry.boostedPlayerId ?? entry.boosted_player_id ?? ''
+          boostedPlayerId: entry.boostedPlayerId ?? entry.boosted_player_id ?? '',
+          playoff3xPlayerId: resolveMiniFantasyPlayoff3xPlayerId(entry) || ''
         },
         score: {
           ...score,
@@ -10229,12 +10304,14 @@ function titleBandScore(pick, live){
         powerBoostKey: normalizeMiniFantasyPowerBoostKey(entry.powerBoostKey || entry.power_boost_key || ''),
         boostedPlayerId: normalizeTextValue(entry.boostedPlayerId || entry.boosted_player_id || '') || '',
         boostedPlayerName: '',
+        playoff3xPlayerId: resolveMiniFantasyPlayoff3xPlayerId(entry) || '',
+        playoff3xPlayerName: '',
         powerBoostBonusPoints: Number(score.power_boost_bonus_points || 0) || 0,
         appearanceBonusPoints: Number(score.appearance_bonus_points || 0) || 0,
         winnerBonusPoints: Number(score.winner_bonus_points || 0) || 0,
         summary: score.is_no_result
           ? 'This fixture ended with no result, so no Mini Fantasy points were awarded.'
-          : `${miniFantasyPowerBoostNarrative(entry.powerBoostKey || entry.power_boost_key || '', '')} Captain is not set on this saved team.`,
+          : `${miniFantasyPowerBoostNarrative(entry.powerBoostKey || entry.power_boost_key || '', '', '')} Captain is not set on this saved team.`,
         isNoResult: Boolean(score.is_no_result),
         auditLog
       };
@@ -10329,6 +10406,8 @@ function titleBandScore(pick, live){
         let fixturePowerBoostKey = detail ? detail.powerBoostKey : '';
         let fixtureBoostedPlayerId = detail ? detail.boostedPlayerId : '';
         let fixtureBoostedPlayerName = detail ? detail.boostedPlayerName : '';
+        let fixturePlayoff3xPlayerId = detail ? detail.playoff3xPlayerId : '';
+        let fixturePlayoff3xPlayerName = detail ? detail.playoff3xPlayerName : '';
         let fixturePowerBoostBonusPoints = detail ? detail.powerBoostBonusPoints : 0;
         let fixtureAppearanceBonusPoints = detail ? detail.appearanceBonusPoints : 0;
         let fixtureWinnerBonusPoints = detail ? detail.winnerBonusPoints : 0;
@@ -10346,6 +10425,8 @@ function titleBandScore(pick, live){
           fixturePowerBoostKey = fallbackDetail ? fallbackDetail.powerBoostKey : normalizeMiniFantasyPowerBoostKey(matchSummary.power_boost_key || matchSummary.powerBoostKey || '');
           fixtureBoostedPlayerId = fallbackDetail ? fallbackDetail.boostedPlayerId : (normalizeTextValue(matchSummary.boosted_player_id || matchSummary.boostedPlayerId || '') || '');
           fixtureBoostedPlayerName = fallbackDetail ? fallbackDetail.boostedPlayerName : '';
+          fixturePlayoff3xPlayerId = fallbackDetail ? fallbackDetail.playoff3xPlayerId : (normalizeTextValue(matchSummary.playoff_3x_player_id || matchSummary.playoff3xPlayerId || '') || '');
+          fixturePlayoff3xPlayerName = fallbackDetail ? fallbackDetail.playoff3xPlayerName : '';
           fixturePowerBoostBonusPoints = fallbackDetail ? fallbackDetail.powerBoostBonusPoints : 0;
           fixtureAppearanceBonusPoints = fallbackDetail ? fallbackDetail.appearanceBonusPoints : 0;
           fixtureWinnerBonusPoints = fallbackDetail ? fallbackDetail.winnerBonusPoints : 0;
@@ -10367,6 +10448,8 @@ function titleBandScore(pick, live){
           fixturePowerBoostKey,
           fixtureBoostedPlayerId,
           fixtureBoostedPlayerName,
+          fixturePlayoff3xPlayerId,
+          fixturePlayoff3xPlayerName,
           fixturePowerBoostBonusPoints,
           fixtureAppearanceBonusPoints,
           fixtureWinnerBonusPoints,
@@ -10701,6 +10784,9 @@ function titleBandScore(pick, live){
       if (draft.boostedPlayerId && !nextIds.includes(draft.boostedPlayerId)) {
         draft.boostedPlayerId = '';
       }
+      if (draft.playoff3xPlayerId && !nextIds.includes(draft.playoff3xPlayerId)) {
+        draft.playoff3xPlayerId = '';
+      }
       MINI_FANTASY_DRAFTS[matchNo] = draft;
     }
 
@@ -10712,6 +10798,7 @@ function titleBandScore(pick, live){
       draft.selectedPlayerIds = nextIds;
       if (draft.captainPlayerId === removed) draft.captainPlayerId = '';
       if (draft.boostedPlayerId === removed) draft.boostedPlayerId = '';
+      if (draft.playoff3xPlayerId === removed) draft.playoff3xPlayerId = '';
       MINI_FANTASY_DRAFTS[matchNo] = draft;
     }
 
@@ -10723,10 +10810,17 @@ function titleBandScore(pick, live){
       if (draft.powerBoostKey === 'all_in') {
         draft.captainPlayerId = '';
         draft.boostedPlayerId = '';
+        draft.playoff3xPlayerId = '';
       } else if (!isPlayoffFixture && draft.powerBoostKey !== 'x_factor') {
         draft.boostedPlayerId = '';
+        draft.playoff3xPlayerId = '';
       } else if (draft.boostedPlayerId && (!draft.selectedPlayerIds.includes(draft.boostedPlayerId) || draft.boostedPlayerId === draft.captainPlayerId)) {
         draft.boostedPlayerId = '';
+      }
+      if (!isPlayoffFixture || draft.powerBoostKey !== MINI_FANTASY_PLAYOFF_3X_BOOST_KEY) {
+        draft.playoff3xPlayerId = '';
+      } else if (draft.playoff3xPlayerId && (!draft.selectedPlayerIds.includes(draft.playoff3xPlayerId) || draft.playoff3xPlayerId === draft.captainPlayerId || draft.playoff3xPlayerId === draft.boostedPlayerId)) {
+        draft.playoff3xPlayerId = '';
       }
       MINI_FANTASY_DRAFTS[matchNo] = draft;
     }
@@ -10737,10 +10831,23 @@ function titleBandScore(pick, live){
       const isPlayoffFixture = isMiniFantasyPlayoffFixture(fixture);
       const normalizedPlayerId = normalizeTextValue(playerId);
       const canTarget = isPlayoffFixture || draft.powerBoostKey === 'x_factor';
-      if (!canTarget || !normalizedPlayerId || !draft.selectedPlayerIds.includes(normalizedPlayerId) || normalizedPlayerId === draft.captainPlayerId) {
+      if (!canTarget || !normalizedPlayerId || !draft.selectedPlayerIds.includes(normalizedPlayerId) || normalizedPlayerId === draft.captainPlayerId || normalizedPlayerId === draft.playoff3xPlayerId) {
         draft.boostedPlayerId = '';
       } else {
         draft.boostedPlayerId = normalizedPlayerId;
+      }
+      MINI_FANTASY_DRAFTS[matchNo] = draft;
+    }
+
+    function setMiniFantasyDraftPlayoff3xPlayer(matchNo, playerId = ''){
+      const draft = ensureMiniFantasyDraft(matchNo);
+      const fixture = miniFantasyFixtureByMatchNo(matchNo);
+      const normalizedPlayerId = normalizeTextValue(playerId);
+      const canTarget = isMiniFantasyPlayoffFixture(fixture) && draft.powerBoostKey === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY;
+      if (!canTarget || !normalizedPlayerId || !draft.selectedPlayerIds.includes(normalizedPlayerId) || normalizedPlayerId === draft.captainPlayerId || normalizedPlayerId === draft.boostedPlayerId) {
+        draft.playoff3xPlayerId = '';
+      } else {
+        draft.playoff3xPlayerId = normalizedPlayerId;
       }
       MINI_FANTASY_DRAFTS[matchNo] = draft;
     }
@@ -10976,7 +11083,7 @@ function titleBandScore(pick, live){
       const recapDisplayBoostKey = recapBoostKey || (recapIsPlayoff && detail.boostedPlayerId ? 'x_factor' : '');
       const recapBudget = getMiniFantasyEntryBudget(recapBoostKey, recapFixture);
       const recapBoostNarrative = recapDisplayBoostKey
-        ? miniFantasyPowerBoostNarrative(recapDisplayBoostKey, detail.boostedPlayerName || '')
+        ? miniFantasyPowerBoostNarrative(recapDisplayBoostKey, detail.boostedPlayerName || '', detail.playoff3xPlayerName || '')
         : '';
       panel.innerHTML = `
         <div class="fantasy-recap-grid">
@@ -10993,7 +11100,7 @@ function titleBandScore(pick, live){
           <div class="fantasy-summary-strip">
             <span class="pill">${detail.captain ? `Captain: ${detail.captain.name}` : 'Captain pending'}</span>
             <span class="pill">Spent: ${escapeHtml(formatMiniFantasyBudgetValue(recapEntry.spentCredits || 0))} / ${escapeHtml(formatMiniFantasyBudgetValue(recapBudget))}</span>
-            <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(recapDisplayBoostKey)}">${escapeHtml(miniFantasyPowerBoostChipText(recapDisplayBoostKey, detail.boostedPlayerName || ''))}</span>
+            <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(recapDisplayBoostKey)}">${escapeHtml(miniFantasyPowerBoostChipText(recapDisplayBoostKey, detail.boostedPlayerName || '', detail.playoff3xPlayerName || ''))}</span>
             ${bestPick ? `<span class="pill">Best pick: ${escapeHtml(bestPick.name)} ${escapeHtml(formatMiniFantasyPoints(bestPick.scoredPoints ?? bestPick.points))} pts</span>` : ''}
           </div>
           <div class="fantasy-window-note">${escapeHtml(detail.isNoResult
@@ -11008,7 +11115,7 @@ function titleBandScore(pick, live){
               <div class="fantasy-entry-player ${player.isCaptain ? 'top' : ''}">
                 <div class="fantasy-entry-copy">
                   <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
-                  <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}${player.isPowerBoostTarget ? ' - X-Factor' : ''}</div>
+                  <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}${player.isPowerBoostTarget ? ' - X-Factor' : ''}${player.isPlayoff3xTarget ? ' - Triple Crown' : ''}</div>
                 </div>
                 <div class="fantasy-entry-copy" style="justify-items:end">
                   <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.scoredPoints ?? player.points))}</div>
@@ -11099,7 +11206,7 @@ function titleBandScore(pick, live){
       const fixtureDisplayBoostKey = selectedRow.fixturePowerBoostKey || (isMiniFantasyPlayoffFixture(board.fixture) && selectedRow.fixtureBoostedPlayerId ? 'x_factor' : '');
       const fixtureBudget = getMiniFantasyEntryBudget(selectedRow.fixturePowerBoostKey || '', board.fixture);
       const fixtureBoostNarrative = fixtureDisplayBoostKey
-        ? miniFantasyPowerBoostNarrative(fixtureDisplayBoostKey, selectedRow.fixtureBoostedPlayerName || '')
+        ? miniFantasyPowerBoostNarrative(fixtureDisplayBoostKey, selectedRow.fixtureBoostedPlayerName || '', selectedRow.fixturePlayoff3xPlayerName || '')
         : '';
       const detailNote = selectedRow.fixtureStatus === 'did_not_lock'
         ? `${selectedRow.display_name || selectedRow.owner_handle} did not save a team before this fixture locked.`
@@ -11127,7 +11234,7 @@ function titleBandScore(pick, live){
             <span class="fantasy-summary-chip">Fixture: ${escapeHtml(statusLabel)}</span>
             <span class="fantasy-summary-chip">${escapeHtml(board.fixture.home_team_code || teamShort(board.fixture.home_team || ''))} vs ${escapeHtml(board.fixture.away_team_code || teamShort(board.fixture.away_team || ''))}</span>
             ${selectedRow.fixtureStatus === 'did_not_lock' ? '<span class="fantasy-summary-chip fantasy-did-not-lock">Did not lock</span>' : captain ? `<span class="fantasy-summary-chip">Captain: ${escapeHtml(captain.name)}</span>` : ''}
-            ${selectedRow.fixtureStatus !== 'did_not_lock' ? `<span class="fantasy-summary-chip mini-boost-pill ${miniFantasyPowerBoostToneClass(fixtureDisplayBoostKey)}">${escapeHtml(miniFantasyPowerBoostChipText(fixtureDisplayBoostKey, selectedRow.fixtureBoostedPlayerName || ''))}</span>` : ''}
+            ${selectedRow.fixtureStatus !== 'did_not_lock' ? `<span class="fantasy-summary-chip mini-boost-pill ${miniFantasyPowerBoostToneClass(fixtureDisplayBoostKey)}">${escapeHtml(miniFantasyPowerBoostChipText(fixtureDisplayBoostKey, selectedRow.fixtureBoostedPlayerName || '', selectedRow.fixturePlayoff3xPlayerName || ''))}</span>` : ''}
           </div>
           <div class="fantasy-entry-summary">
             ${board.summary.map((line) => `<div class="fantasy-window-note">${escapeHtml(line)}</div>`).join('')}
@@ -11147,7 +11254,7 @@ function titleBandScore(pick, live){
                   <div class="fantasy-entry-player ${player.isCaptain ? 'top' : ''}">
                     <div class="fantasy-entry-copy">
                       <div class="fantasy-slot-name">${escapeHtml(player.name)}</div>
-                      <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}${player.isPowerBoostTarget ? ' - X-Factor' : ''}</div>
+                      <div class="fantasy-picker-role">${escapeHtml(player.team)} - ${escapeHtml((player.role || '').replace('_', ' '))}${player.isCaptain ? ' - captain' : ''}${player.isPowerBoostTarget ? ' - X-Factor' : ''}${player.isPlayoff3xTarget ? ' - Triple Crown' : ''}</div>
                     </div>
                     <div class="fantasy-entry-copy" style="justify-items:end">
                       <div class="fantasy-slot-name">${escapeHtml(formatMiniFantasyPoints(player.scoredPoints ?? player.points))}</div>
@@ -11200,7 +11307,7 @@ function titleBandScore(pick, live){
                 <div class="fantasy-leaderboard-copy">
                   <div class="fantasy-leaderboard-name">
                     <span class="fantasy-leaderboard-rank">#${escapeHtml(String(row.displayRank || row.rank || ''))}</span>
-                    <span class="fantasy-name-inline">${escapeHtml(row.display_name || row.owner_handle)}${row.fixturePowerBoostKey || (isMiniFantasyPlayoffFixture(recentBoard.fixture) && row.fixtureBoostedPlayerId) ? miniFantasyPowerBoostInlineBadgeHtml(row.fixturePowerBoostKey || 'x_factor', row.fixtureBoostedPlayerName || '') : ''}</span>
+                    <span class="fantasy-name-inline">${escapeHtml(row.display_name || row.owner_handle)}${row.fixturePowerBoostKey || (isMiniFantasyPlayoffFixture(recentBoard.fixture) && row.fixtureBoostedPlayerId) ? miniFantasyPowerBoostInlineBadgeHtml(row.fixturePowerBoostKey || 'x_factor', row.fixtureBoostedPlayerName || '', row.fixturePlayoff3xPlayerName || '') : ''}</span>
                     ${row.medal ? `<span class="fantasy-medal ${escapeHtml(row.medal)}">${escapeHtml(miniFantasyMedalLabel(row.medal))}</span>` : ''}
                   </div>
                   <div class="small">@${escapeHtml(row.owner_handle)}</div>
@@ -11272,7 +11379,7 @@ function titleBandScore(pick, live){
       const fixtureDisplayBoostKey = selectedRow.fixturePowerBoostKey || (isMiniFantasyPlayoffFixture(board.fixture) && selectedRow.fixtureBoostedPlayerId ? 'x_factor' : '');
       const fixtureBudget = getMiniFantasyEntryBudget(selectedRow.fixturePowerBoostKey || '', board.fixture);
       const fixtureBoostNarrative = fixtureDisplayBoostKey
-        ? miniFantasyPowerBoostNarrative(fixtureDisplayBoostKey, selectedRow.fixtureBoostedPlayerName || '')
+        ? miniFantasyPowerBoostNarrative(fixtureDisplayBoostKey, selectedRow.fixtureBoostedPlayerName || '', selectedRow.fixturePlayoff3xPlayerName || '')
         : '';
       const hasAuditLog = selectedRow.fixtureStatus === 'locked_entry' && (selectedRow.fixtureSavedAt || Number(selectedRow.fixtureSpentCredits || 0) > 0 || detailPlayers.length);
       const auditNote = hasAuditLog
@@ -11338,7 +11445,7 @@ function titleBandScore(pick, live){
           <div class="fantasy-picks-focus">
             <div class="fantasy-detail-header">
               <div>
-                <div class="fantasy-picks-focus-title">Now viewing <span class="fantasy-name-inline">${escapeHtml(viewedName)}${fixtureDisplayBoostKey ? miniFantasyPowerBoostInlineBadgeHtml(fixtureDisplayBoostKey, selectedRow.fixtureBoostedPlayerName || '') : ''}</span>'s Match ${escapeHtml(String(board.fixture.match_no))} team</div>
+                <div class="fantasy-picks-focus-title">Now viewing <span class="fantasy-name-inline">${escapeHtml(viewedName)}${fixtureDisplayBoostKey ? miniFantasyPowerBoostInlineBadgeHtml(fixtureDisplayBoostKey, selectedRow.fixtureBoostedPlayerName || '', selectedRow.fixturePlayoff3xPlayerName || '') : ''}</span>'s Match ${escapeHtml(String(board.fixture.match_no))} team</div>
                 <div class="fantasy-picks-focus-note">This is the center stage for the selected locked fixture. Click another user in the leaderboard rail to swap teams, or jump to a different past fixture above without losing this view.</div>
               </div>
               <div>
@@ -11370,7 +11477,7 @@ function titleBandScore(pick, live){
                     : selectedRow.fixtureStatus === 'no_locked_teams'
                       ? '<span class="fantasy-summary-chip">No teams locked</span>'
                       : captain ? `<span class="fantasy-summary-chip">Captain: ${escapeHtml(captain.name)}</span>` : ''}
-              ${selectedRow.fixtureStatus !== 'did_not_lock' && fixtureDisplayBoostKey ? `<span class="fantasy-summary-chip mini-boost-pill ${miniFantasyPowerBoostToneClass(fixtureDisplayBoostKey)}">${escapeHtml(miniFantasyPowerBoostChipText(fixtureDisplayBoostKey, selectedRow.fixtureBoostedPlayerName || ''))}</span>` : ''}
+              ${selectedRow.fixtureStatus !== 'did_not_lock' && fixtureDisplayBoostKey ? `<span class="fantasy-summary-chip mini-boost-pill ${miniFantasyPowerBoostToneClass(fixtureDisplayBoostKey)}">${escapeHtml(miniFantasyPowerBoostChipText(fixtureDisplayBoostKey, selectedRow.fixtureBoostedPlayerName || '', selectedRow.fixturePlayoff3xPlayerName || ''))}</span>` : ''}
               ${hasAuditLog && Number(selectedRow.fixtureSpentCredits || 0) > 0 ? `<span class="fantasy-summary-chip">Spent: ${escapeHtml(formatMiniFantasyPrice(selectedRow.fixtureSpentCredits))}</span>` : ''}
               ${hasAuditLog && selectedRow.fixtureSavedAt ? `<span class="fantasy-summary-chip">Saved: ${escapeHtml(formatMiniFantasyAuditTimestamp(selectedRow.fixtureSavedAt))}</span>` : ''}
             </div>
@@ -11492,6 +11599,9 @@ function titleBandScore(pick, live){
       const priceSnapshot = existing?.priceSnapshot && Object.keys(existing.priceSnapshot).length
         ? existing.priceSnapshot
         : buildEntryPriceSnapshot(playerPool);
+      const playoff3xPlayerId = isPlayoffFixture && selectedPowerBoost === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY
+        ? (draft.playoff3xPlayerId || null)
+        : null;
       const payload = {
         ownerHandle: CURRENT_USER.ownerId,
         displayName: CURRENT_USER.displayName,
@@ -11506,7 +11616,10 @@ function titleBandScore(pick, live){
         captainPlayerId: selectedPowerBoost === 'all_in' ? null : draft.captainPlayerId,
         powerBoostKey: selectedPowerBoost || null,
         boostedPlayerId: (isPlayoffFixture || selectedPowerBoost === 'x_factor') ? (draft.boostedPlayerId || null) : null,
-        priceSnapshot,
+        playoff3xPlayerId,
+        priceSnapshot: withMiniFantasyEntrySnapshotMeta(priceSnapshot, {
+          playoff3xPlayerId: playoff3xPlayerId || ''
+        }),
         spentCredits: validation.total_cost,
         savedAt: new Date().toISOString()
       };
@@ -11523,12 +11636,13 @@ function titleBandScore(pick, live){
             selectedPlayerIds: [...selectedPlayerIds, '', '', '', ''].slice(0, 4),
             captainPlayerId: selectedPowerBoost === 'all_in' ? '' : draft.captainPlayerId,
             powerBoostKey: selectedPowerBoost || '',
-            boostedPlayerId: (isPlayoffFixture || selectedPowerBoost === 'x_factor') ? (draft.boostedPlayerId || '') : ''
+            boostedPlayerId: (isPlayoffFixture || selectedPowerBoost === 'x_factor') ? (draft.boostedPlayerId || '') : '',
+            playoff3xPlayerId: playoff3xPlayerId || ''
           };
         }
         setMiniFantasyNotice('good', {
           title: `Match ${fixture.match_no} team saved`,
-          text: `Your ${payload.homeTeamCode} vs ${payload.awayTeamCode} Mini Fantasy team is saved with ${validation.total_cost} credits spent${selectedPowerBoost ? ` and ${miniFantasyPowerBoostLabel(selectedPowerBoost)} armed` : isPlayoffFixture ? ' and the default playoff X-Factor target set' : ''}. You can still edit it until lock.`
+          text: `Your ${payload.homeTeamCode} vs ${payload.awayTeamCode} Mini Fantasy team is saved with ${validation.total_cost} credits spent${selectedPowerBoost === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY ? `, playoff X-Factor on ${(playerPool.find((player) => player.player_id === (draft.boostedPlayerId || '')) || {}).name || 'your 2x target'}, and Triple Crown on ${(playerPool.find((player) => player.player_id === (playoff3xPlayerId || '')) || {}).name || 'your 3x target'}` : selectedPowerBoost ? ` and ${miniFantasyPowerBoostLabel(selectedPowerBoost)} armed` : isPlayoffFixture ? ' and the default playoff X-Factor target set' : ''}. You can still edit it until lock.`
         });
       } catch (error) {
         setMiniFantasyNotice('bad', {
@@ -11764,8 +11878,12 @@ function titleBandScore(pick, live){
       const selectedPowerBoostDefinition = getMiniFantasyPowerBoostDefinition(selectedPowerBoost);
       const entryBudget = Number(validation.budget || getMiniFantasyEntryBudget(selectedPowerBoost, fixture)) || getMiniFantasyEntryBudget(selectedPowerBoost, fixture);
       const individualTargetEnabled = isPlayoffFixture || selectedPowerBoost === 'x_factor';
+      const tripleTargetEnabled = isPlayoffFixture && selectedPowerBoost === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY;
       const boostedPlayer = individualTargetEnabled
         ? (poolById.get(draft.boostedPlayerId || '') || null)
+        : null;
+      const playoff3xPlayer = tripleTargetEnabled
+        ? (poolById.get(draft.playoff3xPlayerId || '') || null)
         : null;
       const captainDisabledByAllIn = selectedPowerBoost === 'all_in';
       const availableBoosts = miniFantasyPowerBoostDefinitions(fixture).map((definition) => ({
@@ -11791,7 +11909,7 @@ function titleBandScore(pick, live){
         ? (boostedPlayer
             ? `Playoff X-Factor is active on ${boostedPlayer.name}.`
             : 'Playoff X-Factor target is not set yet.')
-        : miniFantasyPowerBoostNarrative(selectedPowerBoost, boostedPlayer?.name || '');
+        : miniFantasyPowerBoostNarrative(selectedPowerBoost, boostedPlayer?.name || '', playoff3xPlayer?.name || '');
 
       panel.innerHTML = `
         <div class="fantasy-builder-top">
@@ -11804,7 +11922,7 @@ function titleBandScore(pick, live){
             <span class="pill">Spent: ${escapeHtml(formatMiniFantasyBudgetValue(spentCredits))} / ${escapeHtml(formatMiniFantasyBudgetValue(entryBudget))}</span>
             <span class="pill">Left: ${escapeHtml(formatMiniFantasyBudgetValue(budgetRemaining))}</span>
             <span class="pill">Captain: ${captainDisabledByAllIn ? 'Replaced by All In' : (draft.captainPlayerId ? 'Set' : 'Pick 1')}</span>
-            <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(activeBoostChipKey)}">${escapeHtml(miniFantasyPowerBoostChipText(activeBoostChipKey, boostedPlayer?.name || ''))}</span>
+            <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(activeBoostChipKey)}">${escapeHtml(miniFantasyPowerBoostChipText(activeBoostChipKey, boostedPlayer?.name || '', playoff3xPlayer?.name || ''))}</span>
             ${entry ? '<span class="pill">Saved entry</span>' : '<span class="pill">Not picked yet</span>'}
           </div>
         </div>
@@ -11850,11 +11968,15 @@ function titleBandScore(pick, live){
                 ? `X-Factor is armed on ${boostedPlayer.name}. If you move the captain onto that player, the target will clear automatically.`
                 : 'Choose one non-captain from your four picks below to arm X-Factor before you save.')
               : isPlayoffFixture
-              ? escapeHtml(boostedPlayer
-                ? `Default playoff X-Factor is on ${boostedPlayer.name}. Triple Crown upgrades that same target from 2x to 3x.`
-                : 'Choose one non-captain from your four picks below as the required playoff X-Factor target before you save.')
+              ? escapeHtml(selectedPowerBoost === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY
+                ? (boostedPlayer && playoff3xPlayer
+                    ? `Default playoff X-Factor is on ${boostedPlayer.name}, and Triple Crown is on ${playoff3xPlayer.name}. Keep them on different non-captains.`
+                    : 'Choose one non-captain for the default playoff X-Factor and a different non-captain for Triple Crown.')
+                : (boostedPlayer
+                    ? `Default playoff X-Factor is on ${boostedPlayer.name}.`
+                    : 'Choose one non-captain from your four picks below as the required playoff X-Factor target before you save.'))
               : escapeHtml(selectedPowerBoostDefinition
-                ? miniFantasyPowerBoostNarrative(selectedPowerBoost, boostedPlayer?.name || '')
+                ? miniFantasyPowerBoostNarrative(selectedPowerBoost, boostedPlayer?.name || '', playoff3xPlayer?.name || '')
                 : 'Only one season boost can be armed on a fixture, and each named boost can be used once across the entire season.')
           }</div>
         </div>
@@ -11868,7 +11990,8 @@ function titleBandScore(pick, live){
                   <span class="pill">${escapeHtml(player.team)}</span>
                   <span class="pill">${escapeHtml(player.role.replace('_', ' '))}</span>
                   <span class="pill">${escapeHtml(String(player.final_price))} cr</span>
-                  ${individualTargetEnabled && draft.boostedPlayerId === player.player_id ? (selectedPowerBoost === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY ? '<span class="fantasy-boost-tag mini-boost-pill mini-boost-playoff-3x">&#127919; 3x target</span>' : '<span class="fantasy-boost-tag mini-boost-pill mini-boost-x-factor">&#127183; X-Factor target</span>') : ''}
+                  ${individualTargetEnabled && draft.boostedPlayerId === player.player_id ? '<span class="fantasy-boost-tag mini-boost-pill mini-boost-x-factor">&#127183; X-Factor target</span>' : ''}
+                  ${tripleTargetEnabled && draft.playoff3xPlayerId === player.player_id ? '<span class="fantasy-boost-tag mini-boost-pill mini-boost-playoff-3x">&#127919; 3x target</span>' : ''}
                   ${selectedPowerBoost === 'deep_pockets' ? '<span class="fantasy-boost-tag pending mini-boost-pill mini-boost-deep-pockets">💰 Deep Pockets active</span>' : ''}
                   ${selectedPowerBoost === 'all_in' ? '<span class="fantasy-boost-tag pending mini-boost-pill mini-boost-all-in">⚡ All In active</span>' : ''}
                 </div>
@@ -11879,7 +12002,8 @@ function titleBandScore(pick, live){
                 <button class="studio-button ${player ? 'ghost' : ''}" type="button" data-mini-pick="${slotIndex}" ${locked ? 'disabled' : ''}>${player ? 'Change player' : 'Choose player'}</button>
                 <button class="studio-button ghost" type="button" data-mini-clear="${slotIndex}" ${player && !locked ? '' : 'disabled'}>Clear</button>
                 <button class="studio-button secondary" type="button" data-mini-captain="${slotIndex}" ${player && !locked && !captainDisabledByAllIn ? '' : 'disabled'}>${captainDisabledByAllIn ? 'All In replaces captain' : (draft.captainPlayerId === player?.player_id ? 'Captain locked' : 'Make captain')}</button>
-                ${individualTargetEnabled ? `<button class="studio-button ghost" type="button" data-mini-boost-target="${slotIndex}" ${player && !locked && draft.captainPlayerId !== player.player_id ? '' : 'disabled'}>${draft.boostedPlayerId === player?.player_id ? 'Clear X-Factor' : (player ? (draft.captainPlayerId === player.player_id ? 'Captain cannot take it' : (selectedPowerBoost === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY ? 'Make 3x target' : 'Make X-Factor')) : 'Pick player first')}</button>` : ''}
+                ${individualTargetEnabled ? `<button class="studio-button ghost" type="button" data-mini-boost-target="${slotIndex}" ${player && !locked && draft.captainPlayerId !== player.player_id && draft.playoff3xPlayerId !== player.player_id ? '' : 'disabled'}>${draft.boostedPlayerId === player?.player_id ? 'Clear X-Factor' : (player ? (draft.captainPlayerId === player.player_id ? 'Captain cannot take it' : (draft.playoff3xPlayerId === player.player_id ? '3x already here' : 'Make X-Factor')) : 'Pick player first')}</button>` : ''}
+                ${tripleTargetEnabled ? `<button class="studio-button ghost" type="button" data-mini-playoff-3x-target="${slotIndex}" ${player && !locked && draft.captainPlayerId !== player.player_id && draft.boostedPlayerId !== player.player_id ? '' : 'disabled'}>${draft.playoff3xPlayerId === player?.player_id ? 'Clear 3x target' : (player ? (draft.captainPlayerId === player.player_id ? 'Captain cannot take it' : (draft.boostedPlayerId === player.player_id ? 'X-Factor already here' : 'Make 3x target')) : 'Pick player first')}</button>` : ''}
               </div>
             </div>
           `).join('')}
@@ -11926,6 +12050,9 @@ function titleBandScore(pick, live){
           if ((isMiniFantasyPlayoffFixture(fixture) || draft.powerBoostKey === 'x_factor') && draft.boostedPlayerId === playerId) {
             draft.boostedPlayerId = '';
           }
+          if (draft.playoff3xPlayerId === playerId) {
+            draft.playoff3xPlayerId = '';
+          }
           MINI_FANTASY_DRAFTS[fixture.match_no] = draft;
           setMiniFantasyNotice(null);
           render();
@@ -11947,6 +12074,20 @@ function titleBandScore(pick, live){
             setMiniFantasyDraftBoostedPlayer(fixture.match_no, '');
           } else {
             setMiniFantasyDraftBoostedPlayer(fixture.match_no, playerId);
+          }
+          setMiniFantasyNotice(null);
+          render();
+        };
+      });
+      panel.querySelectorAll('[data-mini-playoff-3x-target]').forEach((button) => {
+        button.onclick = () => {
+          const slotIndex = Number(button.dataset.miniPlayoff3xTarget || 0);
+          const playerId = draft.selectedPlayerIds[slotIndex] || '';
+          if (!playerId) return;
+          if (draft.playoff3xPlayerId === playerId) {
+            setMiniFantasyDraftPlayoff3xPlayer(fixture.match_no, '');
+          } else {
+            setMiniFantasyDraftPlayoff3xPlayer(fixture.match_no, playerId);
           }
           setMiniFantasyNotice(null);
           render();
@@ -11994,8 +12135,12 @@ function titleBandScore(pick, live){
       const pickerBudget = Number(pickerValidation.budget || getMiniFantasyEntryBudget(selectedPowerBoost, fixture)) || getMiniFantasyEntryBudget(selectedPowerBoost, fixture);
       const captainDisabledByAllIn = selectedPowerBoost === 'all_in';
       const pickerTargetEnabled = isPlayoffFixture || selectedPowerBoost === 'x_factor';
+      const pickerTripleTargetEnabled = isPlayoffFixture && selectedPowerBoost === MINI_FANTASY_PLAYOFF_3X_BOOST_KEY;
       const pickerBoostedPlayer = pickerTargetEnabled
         ? (playerPool.find((player) => player.player_id === draft.boostedPlayerId) || null)
+        : null;
+      const pickerPlayoff3xPlayer = pickerTripleTargetEnabled
+        ? (playerPool.find((player) => player.player_id === draft.playoff3xPlayerId) || null)
         : null;
       const pickerDisplayBoostKey = selectedPowerBoost || (isPlayoffFixture && pickerBoostedPlayer ? 'x_factor' : '');
       captureSearchInputState(document.getElementById('miniFantasyPickerSearch'), MINI_FANTASY_PICKER_STATE);
@@ -12022,7 +12167,7 @@ function titleBandScore(pick, live){
           <span class="pill">Credits: ${escapeHtml(formatMiniFantasyBudgetValue(pickerValidation.total_cost))} / ${escapeHtml(formatMiniFantasyBudgetValue(pickerBudget))}</span>
           <span class="pill">Left: ${escapeHtml(formatMiniFantasyBudgetValue(pickerValidation.budget_remaining))}</span>
           <span class="pill">Captain: ${captainDisabledByAllIn ? 'Replaced by All In' : (draft.captainPlayerId ? 'Set' : 'Pick 1')}</span>
-          <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(pickerDisplayBoostKey)}">${escapeHtml(selectedPowerBoostDefinition || pickerDisplayBoostKey ? miniFantasyPowerBoostChipText(pickerDisplayBoostKey, pickerBoostedPlayer?.name || '') : 'Boost: none')}</span>
+          <span class="pill mini-boost-pill ${miniFantasyPowerBoostToneClass(pickerDisplayBoostKey)}">${escapeHtml(selectedPowerBoostDefinition || pickerDisplayBoostKey ? miniFantasyPowerBoostChipText(pickerDisplayBoostKey, pickerBoostedPlayer?.name || '', pickerPlayoff3xPlayer?.name || '') : 'Boost: none')}</span>
         </div>
       `;
       body.innerHTML = filtered.length
@@ -12104,6 +12249,9 @@ function titleBandScore(pick, live){
           pickerDraft.captainPlayerId = playerId;
           if ((isMiniFantasyPlayoffFixture(fixture) || pickerDraft.powerBoostKey === 'x_factor') && pickerDraft.boostedPlayerId === playerId) {
             pickerDraft.boostedPlayerId = '';
+          }
+          if (pickerDraft.playoff3xPlayerId === playerId) {
+            pickerDraft.playoff3xPlayerId = '';
           }
           MINI_FANTASY_DRAFTS[fixture.match_no] = pickerDraft;
           setMiniFantasyNotice(null);
