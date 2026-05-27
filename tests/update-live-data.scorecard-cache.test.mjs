@@ -18,6 +18,7 @@ import {
   isIncompleteCompletedScorecardError,
   matchKeyForMatch,
   readCachedScorecard,
+  refreshDerivedOutputs,
   repairKnownLivePlayerAliasesDeep,
   repairScoreHistoryGaps,
   rebuildHistoricalState,
@@ -1153,6 +1154,49 @@ test('live alias repair merges K L Rahul into KL Rahul for batting and MVP board
   assert.equal(repaired.meta.aggregates.playerMatches['KL Rahul'], 1);
   assert.equal(repaired.meta.aggregates.battingRuns['K L Rahul'], undefined);
   assert.equal(repaired.meta.aggregates.battingRuns['Kl Rahul'], undefined);
+});
+
+test('refreshDerivedOutputs merges split KL Rahul aggregates for orange cap and duel values', () => {
+  const live = {
+    meta: {
+      aggregates: {
+        battingRuns: { 'KL Rahul': 309, 'K L Rahul': 284 },
+        battingBalls: { 'KL Rahul': 169, 'K L Rahul': 171 },
+        battingFours: { 'KL Rahul': 31, 'K L Rahul': 25 },
+        battingSixes: { 'KL Rahul': 17, 'K L Rahul': 14 },
+        bowlingWickets: {},
+        bowlingBalls: {},
+        bowlingRunsConceded: {},
+        bowlingDots: {},
+        catches: {},
+        stumpings: {},
+        battingFifties: {},
+        battingHundreds: {},
+        battingImpact30s: {},
+        battingDucks: {},
+        bowling3w: {},
+        bowling4w: {},
+        bowling5w: {},
+        playerMatches: { 'KL Rahul': 1, 'K L Rahul': 1 },
+        teamHighestScore: {},
+        standings: {},
+        bestBowlingFigures: {}
+      }
+    },
+    mostDots: { ranking: [], extendedRanking: [], values: {} }
+  };
+
+  refreshDerivedOutputs(live);
+
+  assert.equal(live.meta.aggregates.battingRuns['KL Rahul'], 593);
+  assert.equal(live.meta.aggregates.battingBalls['KL Rahul'], 340);
+  assert.equal(live.meta.aggregates.battingFours['KL Rahul'], 56);
+  assert.equal(live.meta.aggregates.battingSixes['KL Rahul'], 31);
+  assert.equal(live.meta.aggregates.playerMatches['KL Rahul'], 2);
+  assert.equal(live.meta.aggregates.battingRuns['K L Rahul'], undefined);
+  assert.equal(live.orangeCap.ranking[0], 'KL Rahul');
+  assert.equal(live.mvp.values['KL Rahul']?.runs, 593);
+  assert.equal(live.mvp.values['KL Rahul']?.sixes, 31);
 });
 
 test('historical mini fantasy replay ignores contaminated pre-match dot snapshots', async () => {

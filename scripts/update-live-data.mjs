@@ -1769,7 +1769,7 @@ function buildHistoricalPlayerDisplayNameMap(...maps) {
     for (const rawName of Object.keys(mapObj || {})) {
       const canonicalKey = canonicalPlayerPoolKey(rawName);
       if (!canonicalKey || out[canonicalKey]) continue;
-      out[canonicalKey] = rawName;
+      out[canonicalKey] = PLAYER_DISPLAY_NAME_OVERRIDES[canonicalKey] || rawName;
     }
   });
   return out;
@@ -2218,6 +2218,34 @@ function uniqueNames(names = []) {
   return out;
 }
 
+function canonicalizeAggregatePlayerMaps(agg = {}, displayNameMap = null) {
+  const canonicalMapKeys = [
+    'battingRuns',
+    'battingBalls',
+    'battingFours',
+    'battingSixes',
+    'bowlingWickets',
+    'bowlingBalls',
+    'bowlingRunsConceded',
+    'bowlingDots',
+    'catches',
+    'stumpings',
+    'battingFifties',
+    'battingHundreds',
+    'battingImpact30s',
+    'battingDucks',
+    'bowling3w',
+    'bowling4w',
+    'bowling5w',
+    'playerMatches'
+  ];
+  for (const key of canonicalMapKeys) {
+    if (!isPlainObject(agg?.[key])) continue;
+    agg[key] = canonicalizePlayerNumericMap(agg[key], displayNameMap);
+  }
+  return agg;
+}
+
 function playoffMatchResult(agg, matchNo) {
   const results = agg?.matchResults || {};
   return results[String(matchNo)] || results[matchNo] || null;
@@ -2628,6 +2656,9 @@ export async function repairScoreHistoryGaps(live, processedRefs, { loadScorecar
 }
 
 function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = null) {
+  const fallbackDotsValues = dotsPayload?.values || live?.mostDots?.values || {};
+  const displayNameMap = buildAggregatePlayerDisplayNameMap(agg, fallbackDotsValues);
+  canonicalizeAggregatePlayerMaps(agg, displayNameMap);
   const orange = sortByValueDesc(agg.battingRuns);
   const sixes = sortByValueDesc(agg.battingSixes);
   const wickets = sortByValueDesc(agg.bowlingWickets);
@@ -2640,7 +2671,6 @@ function fillDerivedOutputs(live, agg, dotsPayload = null, fairPlayPayload = nul
   const standings = buildStandingsRanking(agg);
   const striker = buildStrikerRanking(agg);
   const dots = dotsPayload?.extendedRanking?.length ? dotsPayload : (live.mostDots || { ranking: [], extendedRanking: [], values: {} });
-  const displayNameMap = buildAggregatePlayerDisplayNameMap(agg, dots.values || {});
   const normalizedDotsValues = canonicalizePlayerNumericMap(dots.values || {}, displayNameMap);
   const normalizedDotsRanking = rankDotsValues(normalizedDotsValues);
 
