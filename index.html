@@ -10374,10 +10374,17 @@ function titleBandScore(pick, live){
       const stage = miniFantasyRecentFixtureStage(fixture);
       const liveProvisional = stage === 'live' ? miniFantasyLiveProvisionalContext(matchNo) : null;
       const entryRows = currentMiniFantasyLeaderboardEntries();
+      const fixtureEntryRows = entryRows
+        .filter((entry) => Number(entry.matchNo || entry.match_no || 0) === matchNo);
       const entryByOwner = new Map(
-        entryRows
-          .filter((entry) => Number(entry.matchNo || entry.match_no || 0) === matchNo)
+        fixtureEntryRows
           .map((entry) => [normalizeOwnerId(entry.ownerHandle || entry.owner_handle || ''), entry])
+          .filter(([ownerHandle]) => ownerHandle)
+      );
+      const entryByUserId = new Map(
+        fixtureEntryRows
+          .map((entry) => [normalizeTextValue(entry.userId || entry.user_id || ''), entry])
+          .filter(([userId]) => userId)
       );
       const pointsIndex = liveProvisional?.pointsIndex || buildMiniFantasyFixturePointsIndex({
         liveData: LIVE_2026,
@@ -10387,7 +10394,8 @@ function titleBandScore(pick, live){
       });
       const rankedRows = leaderboardRows.map((row) => {
         const ownerHandle = normalizeOwnerId(row.owner_handle || '');
-        const fixtureEntry = entryByOwner.get(ownerHandle) || null;
+        const userId = normalizeTextValue(row.user_id || row.userId || '');
+        const fixtureEntry = entryByOwner.get(ownerHandle) || (userId ? entryByUserId.get(userId) : null) || null;
         const matchSummary = (Array.isArray(row.matches) ? row.matches : []).find((item) => Number(item?.match_no || 0) === matchNo) || null;
         const detail = fixtureEntry ? describeMiniFantasyEntry(fixtureEntry, pointsIndex, liveProvisional) : null;
         const auditFallbackEntry = !fixtureEntry && matchSummary?.audit_log
