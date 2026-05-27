@@ -79,8 +79,12 @@ const UNCAPPED_MVP_PLAYERS = [
 const PLAYER_KEY_ALIASES = {
   // Keep this tiny. Only canonicalize genuinely recurring data-provider variants.
   'vaibhav sooryavanshi': 'vaibhav suryavanshi',
+  'k l rahul': 'kl rahul',
   'mohammed shami': 'mohammad shami',
   'auqib nabi dar': 'auqib nabi'
+};
+const PLAYER_DISPLAY_NAME_OVERRIDES = {
+  'kl rahul': 'KL Rahul'
 };
 const UNCAPPED_MVP_PLAYER_KEYS = new Set(UNCAPPED_MVP_PLAYERS.map((name) => canonicalPlayerPoolKey(name)));
 
@@ -239,6 +243,8 @@ function isPlainObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 function formatCanonicalPlayerDisplayName(key) {
+  const normalized = normalizePlayerKey(key);
+  if (PLAYER_DISPLAY_NAME_OVERRIDES[normalized]) return PLAYER_DISPLAY_NAME_OVERRIDES[normalized];
   return normalizeName(key)
     .split(' ')
     .filter(Boolean)
@@ -247,8 +253,9 @@ function formatCanonicalPlayerDisplayName(key) {
 }
 function canonicalizeKnownPlayerAliasLabel(value) {
   const normalized = normalizePlayerKey(value);
-  const canonical = PLAYER_KEY_ALIASES[normalized];
-  if (!canonical || canonical === normalized) return normalizeName(value);
+  const canonical = PLAYER_KEY_ALIASES[normalized] || normalized;
+  if (PLAYER_DISPLAY_NAME_OVERRIDES[canonical]) return PLAYER_DISPLAY_NAME_OVERRIDES[canonical];
+  if (canonical === normalized) return normalizeName(value);
   return formatCanonicalPlayerDisplayName(canonical);
 }
 function mergeKnownPlayerAliasValues(existing, incoming, fieldPath = '') {
@@ -311,9 +318,11 @@ export function repairKnownLivePlayerAliasesDeep(value) {
   const result = {};
   for (const [rawKey, rawValue] of Object.entries(value)) {
     const normalizedKey = normalizePlayerKey(rawKey);
-    const canonicalKey = PLAYER_KEY_ALIASES[normalizedKey] && PLAYER_KEY_ALIASES[normalizedKey] !== normalizedKey
-      ? formatCanonicalPlayerDisplayName(PLAYER_KEY_ALIASES[normalizedKey])
-      : rawKey;
+    const canonicalPlayerKey = PLAYER_KEY_ALIASES[normalizedKey] || normalizedKey;
+    const canonicalKey = PLAYER_DISPLAY_NAME_OVERRIDES[canonicalPlayerKey]
+      || (PLAYER_KEY_ALIASES[normalizedKey] && PLAYER_KEY_ALIASES[normalizedKey] !== normalizedKey
+        ? formatCanonicalPlayerDisplayName(canonicalPlayerKey)
+        : rawKey);
     const nextValue = repairKnownLivePlayerAliasesDeep(rawValue);
     result[canonicalKey] = Object.prototype.hasOwnProperty.call(result, canonicalKey)
       ? mergeKnownPlayerAliasValues(result[canonicalKey], nextValue, canonicalKey)
