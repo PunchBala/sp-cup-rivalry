@@ -141,3 +141,60 @@ test('refreshDerivedOutputs merges lowercase dot totals into display-name MVP ro
   assert.equal(live.mvp.values['bhuvneshwar kumar'], undefined);
   assert.equal(live.mvp.values['anshul kamboj'], undefined);
 });
+
+test('refreshDerivedOutputs advances the playoff bracket after the eliminator', () => {
+  const live = {
+    meta: {
+      aggregates: {
+        battingRuns: {},
+        battingBalls: {},
+        battingFours: {},
+        battingSixes: {},
+        bowlingWickets: {},
+        bowlingBalls: {},
+        bowlingRunsConceded: {},
+        catches: {},
+        stumpings: {},
+        bowlingDots: {},
+        battingFifties: {},
+        battingHundreds: {},
+        battingImpact30s: {},
+        battingDucks: {},
+        bowling3w: {},
+        bowling4w: {},
+        bowling5w: {},
+        playerMatches: {},
+        teamHighestScore: {},
+        standings: {},
+        bestBowlingFigures: {},
+        leagueStageRanking: [
+          'Royal Challengers Bengaluru',
+          'Gujarat Titans',
+          'Sunrisers Hyderabad',
+          'Rajasthan Royals'
+        ],
+        matchResults: {
+          '70': { winner: 'Delhi Capitals' },
+          '71': { winner: 'Royal Challengers Bengaluru' },
+          '72': { winner: 'Rajasthan Royals' }
+        }
+      }
+    }
+  };
+
+  refreshDerivedOutputs(live);
+
+  assert.deepEqual(live.titleWinner.ranking.slice(0, 4), [
+    'Royal Challengers Bengaluru',
+    'Gujarat Titans',
+    'Rajasthan Royals',
+    'Sunrisers Hyderabad'
+  ]);
+  assert.deepEqual(live.titleWinner.bracket.qualifier2.teams, [
+    'Gujarat Titans',
+    'Rajasthan Royals'
+  ]);
+  assert.deepEqual(live.titleWinner.bracket.final.teams, [
+    'Royal Challengers Bengaluru'
+  ]);
+});

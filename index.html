@@ -4455,20 +4455,38 @@ function titleBandScore(pick, live){
       return [];
     }
 
+    function miniFantasyPlayoffTeamsForSchedule(matchNo){
+      const bracket = miniFantasyPlayoffBracket();
+      const keyByMatchNo = {
+        71: 'qualifier1',
+        72: 'eliminator',
+        73: 'qualifier2',
+        74: 'final'
+      };
+      const key = keyByMatchNo[Number(matchNo || 0)];
+      if (!key) return [];
+
+      const teams = bracket?.[key]?.teams;
+      const resolvedTeams = Array.isArray(teams) ? teams.filter(Boolean) : [];
+      if (resolvedTeams.length) return resolvedTeams;
+      return miniFantasyPlayoffTeamsForMatch(matchNo);
+    }
+
     function activeLeagueStageSchedule(){
       return (Array.isArray(LEAGUE_STAGE_SCHEDULE) ? LEAGUE_STAGE_SCHEDULE : []).map((match) => {
         const matchNo = Number(match?.match_no || match?.matchNo || 0);
-        const playoffTeams = isMiniFantasyPlayoffMatchNo(matchNo) ? miniFantasyPlayoffTeamsForMatch(matchNo) : [];
+        const playoffTeams = isMiniFantasyPlayoffMatchNo(matchNo) ? miniFantasyPlayoffTeamsForSchedule(matchNo) : [];
         if (playoffTeams.length !== 2) {
           if (isMiniFantasyPlayoffMatchNo(matchNo)) {
             const label = String(match?.fixture || '').split(',').slice(1).join(',').trim() || `Match ${matchNo}`;
+            const [knownTeam] = playoffTeams;
             return {
               ...match,
-              home_team: 'TBD',
-              away_team: 'TBD',
-              home_team_code: 'TBD',
+              home_team: knownTeam || 'TBD',
+              away_team: knownTeam ? 'TBD' : 'TBD',
+              home_team_code: knownTeam ? teamShort(knownTeam) : 'TBD',
               away_team_code: 'TBD',
-              fixture: `TBD vs TBD${label ? `, ${label}` : ''}`,
+              fixture: `${knownTeam || 'TBD'} vs TBD${label ? `, ${label}` : ''}`,
               playoff_pending_note: 'Teams will update automatically after Match 70 and playoff results are filled.'
             };
           }

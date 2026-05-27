@@ -2252,7 +2252,7 @@ function buildPlayoffTitleWinnerPayload(standings = [], agg = {}) {
   const eliminatorWinner = resultWinnerWithinTeams(eliminator, eliminatorTeams);
   const eliminatorLoser = eliminatorWinner ? otherPlayoffTeam(eliminatorTeams, eliminatorWinner) : null;
 
-  const qualifier2Teams = uniqueNames([eliminatorWinner, qualifier1Loser]).slice(0, 2);
+  const qualifier2Teams = uniqueNames([qualifier1Loser, eliminatorWinner]).slice(0, 2);
   const qualifier2 = playoffMatchResult(agg, 73);
   const qualifier2Winner = resultWinnerWithinTeams(qualifier2, qualifier2Teams);
   const qualifier2Loser = qualifier2Winner ? otherPlayoffTeam(qualifier2Teams, qualifier2Winner) : null;
