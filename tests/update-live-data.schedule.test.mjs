@@ -198,3 +198,60 @@ test('refreshDerivedOutputs advances the playoff bracket after the eliminator', 
     'Royal Challengers Bengaluru'
   ]);
 });
+
+test('refreshDerivedOutputs advances the playoff bracket after qualifier 2', () => {
+  const live = {
+    meta: {
+      aggregates: {
+        battingRuns: {},
+        battingBalls: {},
+        battingFours: {},
+        battingSixes: {},
+        bowlingWickets: {},
+        bowlingBalls: {},
+        bowlingRunsConceded: {},
+        catches: {},
+        stumpings: {},
+        bowlingDots: {},
+        battingFifties: {},
+        battingHundreds: {},
+        battingImpact30s: {},
+        battingDucks: {},
+        bowling3w: {},
+        bowling4w: {},
+        bowling5w: {},
+        playerMatches: {},
+        teamHighestScore: {},
+        standings: {},
+        bestBowlingFigures: {},
+        leagueStageRanking: [
+          'Royal Challengers Bengaluru',
+          'Gujarat Titans',
+          'Sunrisers Hyderabad',
+          'Rajasthan Royals'
+        ],
+        matchResults: {
+          '70': { winner: 'Delhi Capitals' },
+          '71': { winner: 'Royal Challengers Bengaluru' },
+          '72': { winner: 'Rajasthan Royals' },
+          '73': { winner: 'Gujarat Titans' }
+        }
+      }
+    }
+  };
+
+  refreshDerivedOutputs(live);
+
+  assert.deepEqual(live.titleWinner.ranking.slice(0, 4), [
+    'Royal Challengers Bengaluru',
+    'Gujarat Titans',
+    'Rajasthan Royals',
+    'Sunrisers Hyderabad'
+  ]);
+  assert.equal(live.titleWinner.bracket.qualifier2.winner, 'Gujarat Titans');
+  assert.equal(live.titleWinner.bracket.qualifier2.loser, 'Rajasthan Royals');
+  assert.deepEqual(live.titleWinner.bracket.final.teams, [
+    'Royal Challengers Bengaluru',
+    'Gujarat Titans'
+  ]);
+});

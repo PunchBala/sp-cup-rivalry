@@ -10,6 +10,7 @@ import {
   findMissingProcessedScorecardRefs,
   inferProcessedMatchKeys,
   matchKeyForMatch,
+  readLeagueStageSchedule,
   readCachedScorecard,
   rebuildHistoricalState,
   refreshDerivedOutputs,
@@ -23,6 +24,12 @@ const DATA_FILE = path.join(ROOT_DIR, 'data', 'live.json');
 const SQUADS_FILE = path.join(ROOT_DIR, 'ipl_2026_squads.json');
 const SCORECARD_CACHE_DIR = path.join(ROOT_DIR, 'data', 'scorecards');
 const MANUAL_SCORECARD_DIR = path.join(ROOT_DIR, 'manual-scorecards');
+const PLAYOFF_MATCH_LABELS = {
+  71: 'Qualifier 1',
+  72: 'Eliminator',
+  73: 'Qualifier 2',
+  74: 'Final'
+};
 
 const USAGE = `Usage:
   node scripts/backfill-official-scorecard.mjs --init --match 41 [--output manual-scorecards/match-41.json]
@@ -183,6 +190,66 @@ function findMatchRef(live, { matchNo = null, matchId = null } = {}) {
   }
 
   return null;
+}
+
+function scheduleEntryForMatchNo(scheduleEntries, matchNo) {
+  const targetMatchNo = Number(matchNo || 0);
+  if (!Number.isFinite(targetMatchNo) || targetMatchNo <= 0) return null;
+  return safeArray(scheduleEntries).find((entry) => Number(entry?.match_no || 0) === targetMatchNo) || null;
+}
+
+function buildFallbackMatchRefFromSchedule(manualInput, scheduleEntry) {
+  const matchNo = Number(manualInput?.matchNo || scheduleEntry?.match_no || 0) || null;
+  const teams = uniqueNames(safeArray(manualInput?.innings).map((inning) => normalizeName(inning?.team)).filter(Boolean));
+  const matchLabel = PLAYOFF_MATCH_LABELS[matchNo] || '';
+  const fixtureName = teams.length === 2
+    ? `${teams[0]} vs ${teams[1]}${matchLabel ? `, ${matchLabel}` : ''}, Indian Premier League 2026`
+    : normalizeName(scheduleEntry?.fixture || '');
+  return {
+    id: String(manualInput?.matchId || '').trim(),
+    name: fixtureName,
+    status: normalizeName(manualInput?.status || ''),
+    dateTimeGMT: String(scheduleEntry?.datetime_utc || '').replace(/Z$/i, ''),
+    teams,
+    matchStarted: true,
+    matchEnded: true,
+    venue: normalizeName(scheduleEntry?.venue || ''),
+    matchNo,
+    matchKey: matchNo ? `match:${matchNo}` : null
+  };
+}
+
+function uniqueNames(values = []) {
+  const seen = new Set();
+  const output = [];
+  for (const value of safeArray(values)) {
+    const name = normalizeName(value);
+    const key = name.toLowerCase();
+    if (!name || seen.has(key)) continue;
+    seen.add(key);
+    output.push(name);
+  }
+  return output;
+}
+
+async function resolveMatchRef(live, manualInput = {}) {
+  const direct = findMatchRef(live, { matchNo: manualInput?.matchNo, matchId: manualInput?.matchId });
+  if (direct) return direct;
+
+  const scheduleEntries = await readLeagueStageSchedule();
+  const scheduleEntry = scheduleEntryForMatchNo(scheduleEntries, manualInput?.matchNo);
+  if (!scheduleEntry) return null;
+
+  const fallback = buildFallbackMatchRefFromSchedule(manualInput, scheduleEntry);
+  if (!fallback?.id) return null;
+
+  if (!Array.isArray(live.meta?.cache?.matchList)) {
+    live.meta = live.meta && typeof live.meta === 'object' ? live.meta : {};
+    live.meta.cache = live.meta.cache && typeof live.meta.cache === 'object' ? live.meta.cache : {};
+    live.meta.cache.matchList = [];
+  }
+  live.meta.cache.matchList.push(fallback);
+  return fallback;
 }
 
 function defaultOutputPath(matchRef) {
@@ -611,7 +678,7 @@ async function main() {
   const live = await loadLiveSnapshot();
   const teamCodeByName = await loadTeamCodeMap();
   const manualInput = await readJson(inputPath);
-  const matchRef = findMatchRef(live, { matchNo: manualInput?.matchNo, matchId: manualInput?.matchId });
+  const matchRef = await resolveMatchRef(live, manualInput);
   if (!matchRef) {
     throw new Error(`Could not resolve match ${manualInput?.matchNo || manualInput?.matchId || '(unknown)'} from current live match cache`);
   }
