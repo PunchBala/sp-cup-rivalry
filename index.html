@@ -1452,6 +1452,59 @@
     .badge-rule strong{color:#eef4ff}
     .badge-card.unlocked .badge-rule{color:#dfe9fb}
     .badge-unlock-note{font-size:11px;line-height:1.35;color:#d8f8e4}
+    .season-recap-shell{
+      display:grid;
+      gap:18px;
+      padding:18px;
+      border-radius:20px;
+      border:1px solid rgba(124,196,255,.16);
+      background:linear-gradient(180deg, rgba(12,20,43,.96), rgba(8,13,29,.94));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .season-recap-header{display:grid;gap:8px}
+    .season-recap-title{font-size:20px;font-weight:900;color:#fff}
+    .season-recap-subtitle{font-size:13px;line-height:1.55;color:#dce9ff;max-width:860px}
+    .season-recap-meta{display:flex;gap:10px;flex-wrap:wrap}
+    .season-recap-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(124,196,255,.18);
+      background:rgba(255,255,255,.04);
+      font-size:12px;
+      font-weight:800;
+      color:#dce9ff;
+    }
+    .season-recap-locked{
+      display:grid;
+      gap:8px;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid rgba(255,200,87,.22);
+      background:linear-gradient(180deg, rgba(255,200,87,.10), rgba(255,139,162,.05));
+    }
+    .season-recap-group{display:grid;gap:10px}
+    .season-recap-group-title{
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:#9cb7ff;
+    }
+    .season-recap-card-value{
+      font-size:19px;
+      font-weight:900;
+      line-height:1.15;
+      color:#fff;
+    }
+    .season-recap-card-meta{
+      font-size:12px;
+      line-height:1.45;
+      color:#bdd2f7;
+    }
+    .season-recap-card-wide{grid-column:1 / -1}
 
   </style>
 
@@ -6959,6 +7012,840 @@ function titleBandScore(pick, live){
       };
     }
 
+    function miniFantasyLeaderboardRowKey(row = {}){
+      const userId = normalizeTextValue(row.user_id || row.userId || '');
+      return userId || normalizeOwnerId(row.owner_handle || row.ownerHandle || '') || '';
+    }
+
+    function currentMiniFantasyLeaderboardRow(leaderboardRows = []){
+      if (!CURRENT_USER) return null;
+      const ownHandle = normalizeOwnerId(CURRENT_USER.ownerId || '');
+      const ownUserId = normalizeTextValue(CURRENT_USER.userId || '');
+      return (Array.isArray(leaderboardRows) ? leaderboardRows : []).find((row) =>
+        (ownHandle && normalizeOwnerId(row.owner_handle || row.ownerHandle || '') === ownHandle)
+        || (ownUserId && normalizeTextValue(row.user_id || row.userId || '') === ownUserId)
+      ) || null;
+    }
+
+    function miniFantasySeasonFinalMatchNo(){
+      return activeLeagueStageSchedule().reduce((best, fixture) => Math.max(best, Number(fixture?.match_no || fixture?.matchNo || 0) || 0), 0);
+    }
+
+    function isMiniFantasySeasonComplete(){
+      const finalMatchNo = miniFantasySeasonFinalMatchNo();
+      return finalMatchNo > 0 && getCompletedMiniFantasyMatchCount(LIVE_2026) >= finalMatchNo;
+    }
+
+    function buildMiniFantasyCompetitionRankMap(items = []){
+      const sorted = (Array.isArray(items) ? items : []).slice().sort((a, b) => {
+        const pointDiff = (Number(b?.points || 0) || 0) - (Number(a?.points || 0) || 0);
+        if (pointDiff) return pointDiff;
+        return String(a?.label || a?.key || '').localeCompare(String(b?.label || b?.key || ''));
+      });
+      const rankMap = new Map();
+      let lastPoints = null;
+      let currentRank = 0;
+      sorted.forEach((item, index) => {
+        const points = Number(item?.points || 0) || 0;
+        if (lastPoints === null || Math.abs(points - lastPoints) > 0.001) {
+          currentRank = index + 1;
+          lastPoints = points;
+        }
+        rankMap.set(String(item?.key || ''), currentRank);
+      });
+      return rankMap;
+    }
+
+    function formatMiniFantasyRecapPercent(value){
+      const amount = Number(value || 0) || 0;
+      const rounded = Math.round(amount);
+      const display = Math.abs(amount - rounded) < 0.05 ? String(rounded) : amount.toFixed(1);
+      return `${display}%`;
+    }
+
+    function miniFantasyRecapTeamLabel(value){
+      const raw = normalizeTextValue(value || '');
+      if (!raw) return 'Unknown team';
+      const targetCode = officialTeamCode(raw) || raw.toUpperCase();
+      for (const fixture of activeLeagueStageSchedule()) {
+        const homeCode = officialTeamCode(fixture?.home_team_code || fixture?.home_team || '');
+        const awayCode = officialTeamCode(fixture?.away_team_code || fixture?.away_team || '');
+        if (homeCode === targetCode) return normalizeTextValue(fixture?.home_team || '') || targetCode;
+        if (awayCode === targetCode) return normalizeTextValue(fixture?.away_team || '') || targetCode;
+      }
+      return targetCode;
+    }
+
+    function miniFantasyRecapFixtureLabel(record = {}){
+      const matchNo = Number(record?.matchNo || record?.match_no || 0) || 0;
+      const fixture = record?.fixture || {};
+      const explicit = normalizeTextValue(fixture?.fixture || record?.fixtureLabel || '');
+      if (explicit) return `Match ${matchNo} - ${formatFixtureLabel(explicit)}`;
+      const home = normalizeTextValue(fixture?.home_team || fixture?.homeTeam || fixture?.home_team_code || fixture?.homeTeamCode || '') || 'TBD';
+      const away = normalizeTextValue(fixture?.away_team || fixture?.awayTeam || fixture?.away_team_code || fixture?.awayTeamCode || '') || 'TBD';
+      return `Match ${matchNo} - ${formatFixtureLabel(`${home} vs ${away}`)}`;
+    }
+
+    function buildMiniFantasySeasonRankTimeline(leaderboardRows = [], completedMatchNos = [], ownKey = ''){
+      const rows = (Array.isArray(leaderboardRows) ? leaderboardRows : [])
+        .map((row) => {
+          const key = miniFantasyLeaderboardRowKey(row);
+          if (!key) return null;
+          const summaryByMatch = new Map(
+            (Array.isArray(row.matches) ? row.matches : [])
+              .map((summary) => [Number(summary?.match_no || 0) || 0, summary])
+              .filter(([matchNo]) => matchNo)
+          );
+          return {
+            key,
+            label: normalizeTextValue(row.display_name || row.displayName || row.owner_handle || row.ownerHandle || key) || key,
+            summaryByMatch
+          };
+        })
+        .filter(Boolean);
+      if (!rows.length || !ownKey) return [];
+      const cumulative = new Map(rows.map((row) => [row.key, 0]));
+      return (Array.isArray(completedMatchNos) ? completedMatchNos : []).map((matchNo) => {
+        rows.forEach((row) => {
+          const summary = row.summaryByMatch.get(matchNo);
+          const points = Number(summary?.total_points || summary?.totalPoints || 0) || 0;
+          cumulative.set(row.key, (Number(cumulative.get(row.key) || 0) || 0) + points);
+        });
+        const ranked = rows.map((row) => ({
+          key: row.key,
+          label: row.label,
+          points: Number(cumulative.get(row.key) || 0) || 0
+        }));
+        const rankMap = buildMiniFantasyCompetitionRankMap(ranked);
+        return {
+          matchNo,
+          ownRank: rankMap.get(ownKey) || null,
+          ownPoints: Number(cumulative.get(ownKey) || 0) || 0
+        };
+      });
+    }
+
+    function buildMiniFantasySeasonRecapSnapshot(profile = profileSnapshot()){
+      const leaderboardRows = Array.isArray(miniFantasyLeaderboardData()?.rows) ? miniFantasyLeaderboardData().rows : [];
+      const ownRow = currentMiniFantasyLeaderboardRow(leaderboardRows);
+      const finalMatchNo = miniFantasySeasonFinalMatchNo();
+      const completedMatchCount = getCompletedMiniFantasyMatchCount(LIVE_2026);
+      const seasonComplete = finalMatchNo > 0 && completedMatchCount >= finalMatchNo;
+      const lockedNote = finalMatchNo
+        ? `This full wrap unlocks once Match ${finalMatchNo} is final. Right now we are at ${completedMatchCount}/${finalMatchNo} completed Mini Fantasy fixtures.`
+        : 'This full wrap unlocks once the final fixture is completed.';
+      if (!ownRow) {
+        return {
+          seasonComplete,
+          finalMatchNo,
+          completedMatchCount,
+          summary: seasonComplete
+            ? 'No scored Mini Fantasy season was found for this account.'
+            : lockedNote,
+          groups: [],
+          hasData: false,
+          missedLockCount: 0,
+          lockedFixtureCount: 0
+        };
+      }
+
+      const ownHandle = normalizeOwnerId(CURRENT_USER?.ownerId || ownRow.owner_handle || '') || '';
+      const ownUserId = normalizeTextValue(CURRENT_USER?.userId || ownRow.user_id || ownRow.userId || '') || '';
+      const ownKey = ownUserId || ownHandle || miniFantasyLeaderboardRowKey(ownRow);
+      const ownMatches = Array.isArray(ownRow.matches) ? ownRow.matches : [];
+      const fieldMatchesByNo = new Map();
+      leaderboardRows.forEach((row) => {
+        const ownerHandle = normalizeOwnerId(row.owner_handle || row.ownerHandle || '') || '';
+        const userId = normalizeTextValue(row.user_id || row.userId || '') || '';
+        const key = userId || ownerHandle || '';
+        const displayName = normalizeTextValue(row.display_name || row.displayName || row.owner_handle || row.ownerHandle || '') || key;
+        (Array.isArray(row.matches) ? row.matches : []).forEach((matchSummary) => {
+          const matchNo = Number(matchSummary?.match_no || 0) || 0;
+          if (!matchNo || !key) return;
+          if (!fieldMatchesByNo.has(matchNo)) fieldMatchesByNo.set(matchNo, []);
+          fieldMatchesByNo.get(matchNo).push({
+            key,
+            ownerHandle,
+            userId,
+            displayName,
+            matchSummary
+          });
+        });
+      });
+
+      const records = ownMatches
+        .map((ownMatchSummary) => {
+          const matchNo = Number(ownMatchSummary?.match_no || 0) || 0;
+          if (!matchNo) return null;
+          const fixture = miniFantasyFixtureByMatchNo(matchNo);
+          const source = normalizeTextValue(ownMatchSummary?.source || '');
+          const detail = ownMatchSummary?.audit_log ? describeMiniFantasyAuditLog(ownMatchSummary.audit_log) : null;
+          const ownPoints = Number(ownMatchSummary?.total_points ?? ownMatchSummary?.totalPoints ?? detail?.totalPoints ?? 0) || 0;
+          const fieldEntries = Array.isArray(fieldMatchesByNo.get(matchNo)) ? fieldMatchesByNo.get(matchNo) : [];
+          const lockedFieldEntries = fieldEntries
+            .filter((item) => normalizeTextValue(item.matchSummary?.source || '') === 'locked_entry' && item.matchSummary?.audit_log)
+            .map((item) => ({
+              ...item,
+              detail: describeMiniFantasyAuditLog(item.matchSummary.audit_log)
+            }))
+            .filter((item) => item.detail && !item.detail.isNoResult);
+          const ownershipCounts = new Map();
+          let maxFixturePoints = 0;
+          lockedFieldEntries.forEach((item) => {
+            const uniqueIds = [...new Set((Array.isArray(item.detail.players) ? item.detail.players : []).map((player) => normalizeTextValue(player.playerId || '')).filter(Boolean))];
+            uniqueIds.forEach((playerId) => {
+              ownershipCounts.set(playerId, (ownershipCounts.get(playerId) || 0) + 1);
+            });
+            (Array.isArray(item.detail.players) ? item.detail.players : []).forEach((player) => {
+              maxFixturePoints = Math.max(maxFixturePoints, Number(player.scoredPoints ?? player.points ?? 0) || 0);
+            });
+          });
+          const pointsRankMap = buildMiniFantasyCompetitionRankMap(fieldEntries.map((item) => ({
+            key: item.key,
+            label: item.displayName || item.ownerHandle || item.key,
+            points: Number(item.matchSummary?.total_points || item.matchSummary?.totalPoints || 0) || 0
+          })));
+          const captain = detail?.captain || null;
+          const captainBonusPoints = captain
+            ? Math.max(0, (Number(captain.scoredPoints ?? 0) || 0) - (Number(captain.eligiblePoints ?? captain.points ?? 0) || 0))
+            : 0;
+          const players = Array.isArray(detail?.players) ? detail.players : [];
+          const bestPick = detail?.bestPick || null;
+          return {
+            matchNo,
+            fixture,
+            fixtureLabel: miniFantasyRecapFixtureLabel({ matchNo, fixture }),
+            source,
+            detail,
+            ownPoints,
+            ownRank: pointsRankMap.get(ownKey) || null,
+            fieldEntries,
+            lockedFieldEntries,
+            lockedFieldCount: lockedFieldEntries.length,
+            ownershipCounts,
+            maxFixturePoints,
+            standardRelief: calculateMiniFantasyMissedLockPointsForPlayedFixture(ownMatches, lockedFieldEntries.length ? (lockedFieldEntries.reduce((sum, item) => sum + Number(item.detail?.totalPoints || 0), 0) / lockedFieldEntries.length) : 0, matchNo),
+            players,
+            selectedPlayerIds: players.map((player) => normalizeTextValue(player.playerId || '')).filter(Boolean),
+            spentCredits: Number(detail?.spentCredits || 0) || 0,
+            totalPoints: Number(detail?.totalPoints || ownPoints || 0) || 0,
+            bestPick,
+            bestPickShare: bestPick && Number(detail?.totalPoints || 0) > 0
+              ? (Number(bestPick.scoredPoints ?? bestPick.points ?? 0) || 0) / Number(detail.totalPoints || 0)
+              : 0,
+            lowPlayerCount: players.filter((player) => Number(player.scoredPoints ?? player.points ?? 0) < 10).length,
+            captainBonusPoints,
+            powerBoostBonusPoints: Number(detail?.powerBoostBonusPoints || 0) || 0,
+            isLockedEntry: source === 'locked_entry' && detail && !detail.isNoResult,
+            isMissedLock: source === 'missed_lock_relief',
+            isPlayoff: isMiniFantasyPlayoffMatchNo(matchNo)
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.matchNo - b.matchNo);
+
+      const lockedRecords = records.filter((record) => record.isLockedEntry);
+      const completedMatchNos = [...fieldMatchesByNo.keys()]
+        .filter((matchNo) => Number(matchNo || 0) <= completedMatchCount)
+        .sort((a, b) => a - b);
+      const rankTimeline = buildMiniFantasySeasonRankTimeline(leaderboardRows, completedMatchNos, ownKey);
+
+      const playerStatsById = new Map();
+      const teamPointsByTeam = new Map();
+      const rolePointsByRole = new Map();
+      const pickedPlayerIds = new Set();
+      const allSelectedIdsByRecord = records.map((record) => new Set(record.selectedPlayerIds || []));
+      let totalSeasonPoints = 0;
+      let captainBonusTotal = 0;
+      let powerBoostBonusTotal = 0;
+      let painTaxCredits = 0;
+      let podiumGold = 0;
+      let podiumSilver = 0;
+      let podiumBronze = 0;
+      let plus200Count = 0;
+      let missedLockCount = 0;
+
+      records.forEach((record) => {
+        if (record.ownRank === 1) podiumGold += 1;
+        if (record.ownRank === 2) podiumSilver += 1;
+        if (record.ownRank === 3) podiumBronze += 1;
+        if (record.isMissedLock) missedLockCount += 1;
+      });
+
+      lockedRecords.forEach((record) => {
+        totalSeasonPoints += Number(record.totalPoints || 0) || 0;
+        captainBonusTotal += Number(record.captainBonusPoints || 0) || 0;
+        powerBoostBonusTotal += Number(record.powerBoostBonusPoints || 0) || 0;
+        if (Number(record.totalPoints || 0) >= 200) plus200Count += 1;
+        record.players.forEach((player) => {
+          const playerId = normalizeTextValue(player.playerId || '');
+          if (!playerId) return;
+          const ownershipCount = Number(record.ownershipCounts.get(playerId) || 0) || 0;
+          const lockedFieldCount = Number(record.lockedFieldCount || 0) || 0;
+          const points = Number(player.scoredPoints ?? player.points ?? 0) || 0;
+          const eligiblePoints = Number(player.eligiblePoints ?? player.points ?? 0) || 0;
+          const price = Number(player.price || 0) || 0;
+          const team = normalizeTextValue(player.team || '').toUpperCase() || 'UNK';
+          const role = normalizeTextValue(player.role || '').replace(/_/g, ' ') || 'player';
+          pickedPlayerIds.add(playerId);
+          const stat = playerStatsById.get(playerId) || {
+            playerId,
+            name: normalizeTextValue(player.name || fallbackMiniFantasyPlayerName(playerId)) || fallbackMiniFantasyPlayerName(playerId),
+            team,
+            role,
+            appearances: 0,
+            totalPoints: 0,
+            totalEligiblePoints: 0,
+            totalPriceSpent: 0,
+            totalOwnershipRatio: 0,
+            totalOwnershipCount: 0,
+            minScore: Infinity,
+            maxScore: 0,
+            scores: [],
+            selectedMatchNos: []
+          };
+          stat.appearances += 1;
+          stat.totalPoints += points;
+          stat.totalEligiblePoints += eligiblePoints;
+          stat.totalPriceSpent += price;
+          stat.totalOwnershipCount += ownershipCount;
+          stat.totalOwnershipRatio += lockedFieldCount ? (ownershipCount / lockedFieldCount) : 0;
+          stat.minScore = Math.min(stat.minScore, points);
+          stat.maxScore = Math.max(stat.maxScore, points);
+          stat.scores.push(points);
+          stat.selectedMatchNos.push(record.matchNo);
+          playerStatsById.set(playerId, stat);
+          teamPointsByTeam.set(team, (Number(teamPointsByTeam.get(team) || 0) || 0) + points);
+          rolePointsByRole.set(role, (Number(rolePointsByRole.get(role) || 0) || 0) + points);
+          if (points < 10) painTaxCredits += price;
+        });
+      });
+
+      const playerStats = [...playerStatsById.values()].map((stat) => ({
+        ...stat,
+        averagePoints: stat.appearances ? stat.totalPoints / stat.appearances : 0,
+        averagePrice: stat.appearances ? stat.totalPriceSpent / stat.appearances : 0,
+        pointsPerCredit: stat.totalPriceSpent > 0 ? stat.totalPoints / stat.totalPriceSpent : 0,
+        averageOwnershipRatio: stat.appearances ? stat.totalOwnershipRatio / stat.appearances : 0,
+        scoreRange: Number.isFinite(stat.minScore) ? stat.maxScore - stat.minScore : 0
+      }));
+
+      const repeatedPlayers = playerStats.filter((stat) => stat.appearances >= 2);
+      const valuePool = repeatedPlayers.length ? repeatedPlayers : playerStats;
+      const expensivePoolBase = playerStats.filter((stat) => stat.averagePrice >= 8.5);
+      const expensivePool = expensivePoolBase.some((stat) => stat.appearances >= 2)
+        ? expensivePoolBase.filter((stat) => stat.appearances >= 2)
+        : expensivePoolBase;
+      const chalkPoolBase = playerStats.filter((stat) => stat.appearances >= 2);
+      const chalkPool = chalkPoolBase.filter((stat) => stat.averageOwnershipRatio >= 0.35);
+
+      const mostSelectedPlayer = playerStats.slice().sort((a, b) =>
+        b.appearances - a.appearances
+        || b.totalPoints - a.totalPoints
+        || a.name.localeCompare(b.name)
+      )[0] || null;
+      const seasonMvp = playerStats.slice().sort((a, b) =>
+        b.totalPoints - a.totalPoints
+        || b.appearances - a.appearances
+        || a.name.localeCompare(b.name)
+      )[0] || null;
+      const bestSinglePlayerHit = lockedRecords
+        .flatMap((record) => record.players.map((player) => ({
+          record,
+          player,
+          points: Number(player.scoredPoints ?? player.points ?? 0) || 0
+        })))
+        .sort((a, b) => b.points - a.points || a.player.name.localeCompare(b.player.name))[0] || null;
+      const bestCaptainCall = lockedRecords
+        .filter((record) => record.detail?.captain)
+        .map((record) => ({
+          record,
+          captain: record.detail.captain,
+          points: Number(record.detail.captain.scoredPoints ?? record.detail.captain.points ?? 0) || 0
+        }))
+        .sort((a, b) => b.points - a.points || a.captain.name.localeCompare(b.captain.name))[0] || null;
+      const bestBoostHit = lockedRecords
+        .filter((record) => Number(record.powerBoostBonusPoints || 0) > 0)
+        .slice()
+        .sort((a, b) => Number(b.powerBoostBonusPoints || 0) - Number(a.powerBoostBonusPoints || 0) || b.matchNo - a.matchNo)[0] || null;
+      const valueKing = valuePool.slice().sort((a, b) =>
+        b.pointsPerCredit - a.pointsPerCredit
+        || b.averagePoints - a.averagePoints
+        || a.name.localeCompare(b.name)
+      )[0] || null;
+      const luxuryFlop = expensivePool.slice().sort((a, b) =>
+        a.pointsPerCredit - b.pointsPerCredit
+        || b.averagePrice - a.averagePrice
+        || a.name.localeCompare(b.name)
+      )[0] || null;
+      const highestFixture = lockedRecords.slice().sort((a, b) => Number(b.totalPoints || 0) - Number(a.totalPoints || 0) || b.matchNo - a.matchNo)[0] || null;
+      const lowestFixture = lockedRecords.slice().sort((a, b) => Number(a.totalPoints || 0) - Number(b.totalPoints || 0) || a.matchNo - b.matchNo)[0] || null;
+      const playoffBest = lockedRecords.filter((record) => record.isPlayoff).slice().sort((a, b) => Number(b.totalPoints || 0) - Number(a.totalPoints || 0) || b.matchNo - a.matchNo)[0] || null;
+
+      const differentialCandidates = lockedRecords
+        .flatMap((record) => record.players.map((player) => ({
+          record,
+          player,
+          ownershipCount: Number(record.ownershipCounts.get(normalizeTextValue(player.playerId || '')) || 0) || 0,
+          points: Number(player.scoredPoints ?? player.points ?? 0) || 0
+        })));
+      const differentialDemon = differentialCandidates
+        .filter((item) => item.ownershipCount === 1)
+        .sort((a, b) => b.points - a.points || a.player.name.localeCompare(b.player.name))[0]
+        || differentialCandidates
+          .slice()
+          .sort((a, b) => a.ownershipCount - b.ownershipCount || b.points - a.points || a.player.name.localeCompare(b.player.name))[0]
+        || null;
+
+      const moneyball = lockedRecords
+        .filter((record) => Number(record.spentCredits || 0) > 0)
+        .map((record) => ({
+          ...record,
+          pointsPerCredit: Number(record.totalPoints || 0) / Number(record.spentCredits || 1)
+        }))
+        .sort((a, b) => b.pointsPerCredit - a.pointsPerCredit || Number(b.totalPoints || 0) - Number(a.totalPoints || 0) || b.matchNo - a.matchNo)[0] || null;
+
+      const comebackRun = rankTimeline.reduce((best, item, index) => {
+        if (index === 0 || !Number.isFinite(item.ownRank)) return best;
+        const previousRank = Number(rankTimeline[index - 1]?.ownRank || 0) || 0;
+        const currentRank = Number(item.ownRank || 0) || 0;
+        const jump = previousRank && currentRank ? previousRank - currentRank : 0;
+        if (!jump || jump <= Number(best.jump || 0)) return best;
+        return {
+          jump,
+          fromRank: previousRank,
+          toRank: currentRank,
+          matchNo: item.matchNo
+        };
+      }, { jump: 0, fromRank: null, toRank: null, matchNo: null });
+
+      const setAndForgetHero = (repeatedPlayers.length ? repeatedPlayers : playerStats).slice().sort((a, b) =>
+        b.averagePoints - a.averagePoints
+        || b.appearances - a.appearances
+        || a.name.localeCompare(b.name)
+      )[0] || null;
+
+      const captainCurseMatches = lockedRecords.filter((record) => {
+        const captain = record.detail?.captain || null;
+        if (!captain || !record.players.length) return false;
+        const teamFloor = record.players.reduce((worst, player) => Math.min(worst, Number(player.scoredPoints ?? player.points ?? 0) || 0), Infinity);
+        return Number.isFinite(teamFloor) && (Number(captain.scoredPoints ?? captain.points ?? 0) || 0) <= teamFloor;
+      });
+
+      const boostBurn = lockedRecords
+        .filter((record) => Number(record.powerBoostBonusPoints || 0) > 0)
+        .slice()
+        .sort((a, b) => Number(a.powerBoostBonusPoints || 0) - Number(b.powerBoostBonusPoints || 0) || a.matchNo - b.matchNo)[0] || null;
+
+      const oneThatGotAway = (Array.isArray(MINI_FANTASY_PRICE_BOOK?.players) ? MINI_FANTASY_PRICE_BOOK.players : [])
+        .filter((player) => {
+          const playerId = normalizeTextValue(player?.player_id || player?.playerId || '');
+          return playerId && !pickedPlayerIds.has(playerId);
+        })
+        .slice()
+        .sort((a, b) => Number(b?.season_total_points || 0) - Number(a?.season_total_points || 0) || String(a?.name || '').localeCompare(String(b?.name || '')))[0] || null;
+
+      const chalkTrap = (chalkPool.length ? chalkPool : chalkPoolBase).slice().sort((a, b) => {
+        const aScore = (a.averageOwnershipRatio * 100) - a.averagePoints;
+        const bScore = (b.averageOwnershipRatio * 100) - b.averagePoints;
+        return bScore - aScore
+          || b.averageOwnershipRatio - a.averageOwnershipRatio
+          || a.averagePoints - b.averagePoints
+          || a.name.localeCompare(b.name);
+      })[0] || null;
+
+      const cookedFixture = lockedRecords.slice().sort((a, b) =>
+        b.lowPlayerCount - a.lowPlayerCount
+        || Number(a.totalPoints || 0) - Number(b.totalPoints || 0)
+        || a.matchNo - b.matchNo
+      )[0] || null;
+      const oneManRescue = lockedRecords.slice().sort((a, b) =>
+        Number(b.bestPickShare || 0) - Number(a.bestPickShare || 0)
+        || Number(b.totalPoints || 0) - Number(a.totalPoints || 0)
+        || b.matchNo - a.matchNo
+      )[0] || null;
+      const dudTrio = lockedRecords
+        .filter((record) => record.lowPlayerCount >= 3)
+        .slice()
+        .sort((a, b) => b.lowPlayerCount - a.lowPlayerCount || Number(a.totalPoints || 0) - Number(b.totalPoints || 0) || a.matchNo - b.matchNo)[0]
+        || null;
+
+      const multiplierShare = totalSeasonPoints > 0
+        ? ((captainBonusTotal + powerBoostBonusTotal) / totalSeasonPoints) * 100
+        : 0;
+      const multiplierDependencyTone = multiplierShare >= 18 ? 'story-dead' : multiplierShare >= 10 ? 'story-you' : 'story-swing';
+      const multiplierDependencyHead = multiplierShare >= 18 ? 'Heavy dependency' : multiplierShare >= 10 ? 'Healthy boost use' : 'Mostly raw points';
+      const multiplierDependencyNote = multiplierShare >= 18
+        ? `Roughly ${formatMiniFantasyRecapPercent(multiplierShare)} of your season came from captain and boost multipliers. The edges did a lot of the lifting.`
+        : multiplierShare >= 10
+          ? `About ${formatMiniFantasyRecapPercent(multiplierShare)} of your season came from captain and boost multipliers. You used the extras well without over-living there.`
+          : `Only ${formatMiniFantasyRecapPercent(multiplierShare)} of your season came from captain and boost multipliers. Most of your points were straight-up picks.`;
+
+      const teamAvailability = new Map();
+      (Array.isArray(MINI_FANTASY_PRICE_BOOK?.players) ? MINI_FANTASY_PRICE_BOOK.players : []).forEach((player) => {
+        const team = normalizeTextValue(player?.team || '').toUpperCase();
+        if (!team) return;
+        teamAvailability.set(team, (Number(teamAvailability.get(team) || 0) || 0) + (Number(player?.season_total_points || 0) || 0));
+      });
+      const farmedTeam = [...teamPointsByTeam.entries()]
+        .map(([team, points]) => ({ team, points: Number(points || 0) || 0 }))
+        .sort((a, b) => b.points - a.points || a.team.localeCompare(b.team))[0] || null;
+      const fadedWrongTeam = [...teamAvailability.entries()]
+        .map(([team, totalPoints]) => {
+          const captured = Number(teamPointsByTeam.get(team) || 0) || 0;
+          return {
+            team,
+            totalPoints: Number(totalPoints || 0) || 0,
+            captured,
+            gap: (Number(totalPoints || 0) || 0) - captured,
+            captureRate: Number(totalPoints || 0) > 0 ? captured / Number(totalPoints || 0) : 0
+          };
+        })
+        .filter((item) => item.totalPoints > 0)
+        .sort((a, b) => b.gap - a.gap || a.captureRate - b.captureRate || a.team.localeCompare(b.team))[0] || null;
+
+      const streakState = new Map();
+      let loyalPick = null;
+      records.forEach((record, index) => {
+        const selectedIds = allSelectedIdsByRecord[index];
+        selectedIds.forEach((playerId) => {
+          const next = (Number(streakState.get(playerId) || 0) || 0) + 1;
+          streakState.set(playerId, next);
+          if (!loyalPick || next > loyalPick.streak || (next === loyalPick.streak && playerId.localeCompare(loyalPick.playerId) < 0)) {
+            const stat = playerStatsById.get(playerId);
+            loyalPick = {
+              playerId,
+              streak: next,
+              name: stat?.name || fallbackMiniFantasyPlayerName(playerId),
+              matchNo: record.matchNo
+            };
+          }
+        });
+        [...streakState.keys()].forEach((playerId) => {
+          if (!selectedIds.has(playerId)) streakState.set(playerId, 0);
+        });
+      });
+
+      const boomOrBust = (repeatedPlayers.length ? repeatedPlayers : playerStats)
+        .slice()
+        .sort((a, b) => b.scoreRange - a.scoreRange || b.maxScore - a.maxScore || a.name.localeCompare(b.name))[0] || null;
+
+      const topRole = [...rolePointsByRole.entries()]
+        .map(([role, points]) => ({ role, points: Number(points || 0) || 0 }))
+        .sort((a, b) => b.points - a.points || a.role.localeCompare(b.role))[0] || null;
+      const cookedWeeks = lockedRecords.filter((record) => record.lowPlayerCount >= 3).length;
+      const rolePhrase = topRole
+        ? (topRole.role.includes('bowler')
+            ? 'trusted bowlers'
+            : topRole.role.includes('all')
+              ? 'leaned on all-rounders'
+              : 'backed batters')
+        : 'spread the risk';
+      const multiplierPhrase = multiplierShare >= 18
+        ? 'lived off multipliers'
+        : multiplierShare >= 10
+          ? 'squeezed real value from captaincy and boosts'
+          : 'mostly won the honest way';
+      const chaosPhrase = cookedWeeks >= 3
+        ? `and survived ${cookedWeeks} fully cooked weeks.`
+        : cookedWeeks > 0
+          ? `and only got properly cooked ${cookedWeeks} time${cookedWeeks === 1 ? '' : 's'}.`
+          : 'and somehow dodged the fully cooked weeks.';
+      const seasonOneLiner = `You ${rolePhrase}, ${multiplierPhrase}, ${chaosPhrase}`;
+
+      const averageFixtureScore = lockedRecords.length
+        ? lockedRecords.reduce((sum, record) => sum + Number(record.totalPoints || 0), 0) / lockedRecords.length
+        : 0;
+
+      const buildCard = ({ label, head, value = '', note = '', tone = 'story-chalk', wide = false }) => ({
+        label,
+        head,
+        value,
+        note,
+        tone,
+        wide
+      });
+
+      const strongCoreCards = [
+        buildCard({
+          label: 'Most selected player',
+          head: mostSelectedPlayer?.name || 'No locked teams yet',
+          value: mostSelectedPlayer ? `${mostSelectedPlayer.appearances} picks` : '—',
+          note: mostSelectedPlayer ? `You trusted ${mostSelectedPlayer.name} the most, and he returned ${formatMiniFantasyPoints(mostSelectedPlayer.totalPoints)} points across the season.` : 'Lock a few teams and this trust meter will wake up.',
+          tone: 'story-chalk'
+        }),
+        buildCard({
+          label: 'Your season MVP',
+          head: seasonMvp?.name || 'No season MVP yet',
+          value: seasonMvp ? `${formatMiniFantasyPoints(seasonMvp.totalPoints)} pts` : '—',
+          note: seasonMvp ? `${seasonMvp.name} gave you the biggest total haul of the season.` : 'No scored fixtures yet.',
+          tone: 'story-swing'
+        }),
+        buildCard({
+          label: 'Best single-player hit',
+          head: bestSinglePlayerHit?.player?.name || 'No spike yet',
+          value: bestSinglePlayerHit ? `${formatMiniFantasyPoints(bestSinglePlayerHit.points)} pts` : '—',
+          note: bestSinglePlayerHit ? `${miniFantasyRecapFixtureLabel(bestSinglePlayerHit.record)} was your biggest one-player detonation.` : 'Still waiting for a monster individual return.',
+          tone: 'story-you'
+        }),
+        buildCard({
+          label: 'Best captain call',
+          head: bestCaptainCall?.captain?.name || 'No captain return yet',
+          value: bestCaptainCall ? `${formatMiniFantasyPoints(bestCaptainCall.points)} captain pts` : '—',
+          note: bestCaptainCall ? `${miniFantasyRecapFixtureLabel(bestCaptainCall.record)} was your cleanest armband hit.` : 'No captain return has landed yet.',
+          tone: 'story-captain'
+        }),
+        buildCard({
+          label: 'Captain bank',
+          head: `${formatMiniFantasyPoints(captainBonusTotal)} bonus pts`,
+          value: lockedRecords.length ? `${lockedRecords.length} locked fixtures` : '—',
+          note: 'This is the extra value the captain multiplier put directly into your season total.',
+          tone: 'story-captain'
+        }),
+        buildCard({
+          label: 'Multiplier share',
+          head: formatMiniFantasyRecapPercent(multiplierShare),
+          value: `${formatMiniFantasyPoints(captainBonusTotal + powerBoostBonusTotal)} boosted pts`,
+          note: 'Captain, X-Factor, and Triple Crown are all folded into this slice of your season total.',
+          tone: multiplierShare >= 15 ? 'story-you' : 'story-swing'
+        }),
+        buildCard({
+          label: 'Best boost hit',
+          head: bestBoostHit ? `${formatMiniFantasyPoints(bestBoostHit.powerBoostBonusPoints)} bonus pts` : 'No boost spike',
+          value: bestBoostHit?.detail?.boostedPlayerName || bestBoostHit?.detail?.playoff3xPlayerName || '—',
+          note: bestBoostHit ? `${miniFantasyRecapFixtureLabel(bestBoostHit)} was your richest boost return.` : 'No separate boost target paid off yet.',
+          tone: 'story-you'
+        }),
+        buildCard({
+          label: 'Value king',
+          head: valueKing?.name || 'No value king yet',
+          value: valueKing ? `${roundMiniFantasyValue(valueKing.pointsPerCredit)} pts / cr` : '—',
+          note: valueKing ? `${formatMiniFantasyPoints(valueKing.totalPoints)} points from ${formatMiniFantasyPrice(valueKing.totalPriceSpent)} spent across ${valueKing.appearances} picks.` : 'Need at least one scored lineup to judge value.',
+          tone: 'story-swing'
+        }),
+        buildCard({
+          label: 'Luxury flop',
+          head: luxuryFlop?.name || 'No expensive flop',
+          value: luxuryFlop ? `${roundMiniFantasyValue(luxuryFlop.pointsPerCredit)} pts / cr` : '—',
+          note: luxuryFlop ? `${luxuryFlop.name} cost ${formatMiniFantasyPrice(luxuryFlop.averagePrice)} on average and never really justified the spend.` : 'Your premium picks behaved themselves.',
+          tone: 'story-dead'
+        }),
+        buildCard({
+          label: 'Highest fixture score',
+          head: highestFixture ? `${formatMiniFantasyPoints(highestFixture.totalPoints)} pts` : '—',
+          value: highestFixture ? `Match ${highestFixture.matchNo}` : '—',
+          note: highestFixture ? `${miniFantasyRecapFixtureLabel(highestFixture)} was your season peak.` : 'No peak without a locked team.',
+          tone: 'story-swing'
+        }),
+        buildCard({
+          label: 'Average fixture score',
+          head: lockedRecords.length ? `${formatMiniFantasyPoints(averageFixtureScore)} pts` : '—',
+          value: lockedRecords.length ? `${lockedRecords.length} scored fixtures` : '—',
+          note: 'This is your season baseline whenever a lineup actually locked and scored.',
+          tone: 'story-chalk'
+        }),
+        buildCard({
+          label: 'Lowest fixture score',
+          head: lowestFixture ? `${formatMiniFantasyPoints(lowestFixture.totalPoints)} pts` : '—',
+          value: lowestFixture ? `Match ${lowestFixture.matchNo}` : '—',
+          note: lowestFixture ? `${miniFantasyRecapFixtureLabel(lowestFixture)} was the floor.` : 'No disaster card yet.',
+          tone: 'story-dead'
+        }),
+        buildCard({
+          label: 'Podium finishes',
+          head: `${podiumGold}G · ${podiumSilver}S · ${podiumBronze}B`,
+          value: `${podiumGold + podiumSilver + podiumBronze} podiums`,
+          note: 'Gold, silver, and bronze finishes across the whole Mini Fantasy rail.',
+          tone: 'story-captain'
+        }),
+        buildCard({
+          label: '200+ club',
+          head: String(plus200Count),
+          value: plus200Count === 1 ? 'one big week' : `${plus200Count} big weeks`,
+          note: 'How many times your 4-player lineup cracked the 200-point line.',
+          tone: 'story-swing'
+        }),
+        buildCard({
+          label: 'Missed lock count',
+          head: String(missedLockCount),
+          value: missedLockCount === 1 ? 'one missed deadline' : `${missedLockCount} missed deadlines`,
+          note: 'This one matters because missed-lock relief can quietly shape the whole season story.',
+          tone: missedLockCount ? 'story-dead' : 'story-chalk'
+        })
+      ];
+
+      const goodStatCards = [
+        buildCard({
+          label: 'Clutch king',
+          head: playoffBest ? `${formatMiniFantasyPoints(playoffBest.totalPoints)} pts` : 'No playoff score yet',
+          value: playoffBest ? `Match ${playoffBest.matchNo}` : '—',
+          note: playoffBest ? `${miniFantasyRecapFixtureLabel(playoffBest)} was your best pressure-game performance.` : 'The playoff stretch has not scored yet.',
+          tone: 'story-captain'
+        }),
+        buildCard({
+          label: 'Differential demon',
+          head: differentialDemon?.player?.name || 'No differential hit yet',
+          value: differentialDemon ? `${formatMiniFantasyPoints(differentialDemon.points)} pts` : '—',
+          note: differentialDemon
+            ? (differentialDemon.ownershipCount === 1
+                ? `${miniFantasyRecapFixtureLabel(differentialDemon.record)} was the cleanest solo strike.`
+                : `${miniFantasyRecapFixtureLabel(differentialDemon.record)} was still your best low-owned swing.`)
+            : 'No low-owned spike landed.',
+          tone: 'story-you'
+        }),
+        buildCard({
+          label: 'Moneyball',
+          head: moneyball ? `${roundMiniFantasyValue(moneyball.pointsPerCredit)} pts / cr` : 'No moneyball entry yet',
+          value: moneyball ? `${formatMiniFantasyPoints(moneyball.totalPoints)} on ${formatMiniFantasyPrice(moneyball.spentCredits)}` : '—',
+          note: moneyball ? `${miniFantasyRecapFixtureLabel(moneyball)} squeezed the most out of your budget.` : 'Need a scored lineup to judge efficiency.',
+          tone: 'story-swing'
+        }),
+        buildCard({
+          label: 'Comeback run',
+          head: comebackRun.jump ? `+${comebackRun.jump} places` : 'No jump yet',
+          value: comebackRun.jump ? `#${comebackRun.fromRank} to #${comebackRun.toRank}` : '—',
+          note: comebackRun.jump ? `Your biggest single-fixture climb came right after Match ${comebackRun.matchNo}.` : 'You never had a dramatic rank slingshot, which usually means the season was steady.',
+          tone: 'story-chalk'
+        }),
+        buildCard({
+          label: 'Set-and-forget hero',
+          head: setAndForgetHero?.name || 'No repeat hero yet',
+          value: setAndForgetHero ? `${formatMiniFantasyPoints(setAndForgetHero.averagePoints)} pts avg` : '—',
+          note: setAndForgetHero ? `You kept backing ${setAndForgetHero.name}, and ${setAndForgetHero.appearances} selections paid off at a healthy clip.` : 'No repeat favourite emerged.',
+          tone: 'story-swing'
+        })
+      ];
+
+      const badStatCards = [
+        buildCard({
+          label: 'Captain curse',
+          head: `${captainCurseMatches.length} time${captainCurseMatches.length === 1 ? '' : 's'}`,
+          value: captainCurseMatches[0]?.detail?.captain?.name || 'No cursed captain',
+          note: captainCurseMatches.length
+            ? `${captainCurseMatches[0].detail.captain.name} sank ${miniFantasyRecapFixtureLabel(captainCurseMatches[0])}, and the armband hurt you ${captainCurseMatches.length} time${captainCurseMatches.length === 1 ? '' : 's'} overall.`
+            : 'Your captain was never the worst scorer in the lineup. That is tidy work.',
+          tone: captainCurseMatches.length ? 'story-dead' : 'story-swing'
+        }),
+        buildCard({
+          label: 'Boost burn',
+          head: boostBurn ? `${formatMiniFantasyPoints(boostBurn.powerBoostBonusPoints)} bonus pts` : 'No boost burn',
+          value: boostBurn?.detail?.boostedPlayerName || boostBurn?.detail?.playoff3xPlayerName || '—',
+          note: boostBurn ? `${miniFantasyRecapFixtureLabel(boostBurn)} gave you the weakest boost return of the season.` : 'No separate boost target ever flopped badly enough to earn this.',
+          tone: 'story-dead'
+        }),
+        buildCard({
+          label: 'The one that got away',
+          head: oneThatGotAway?.name || 'Nobody escaped you',
+          value: oneThatGotAway ? `${formatMiniFantasyPoints(Number(oneThatGotAway.season_total_points || 0))} season pts` : '—',
+          note: oneThatGotAway ? `${oneThatGotAway.name} was the highest-scoring season asset you never touched even once.` : 'You got a piece of every major scorer at least once.',
+          tone: 'story-dead'
+        }),
+        buildCard({
+          label: 'Chalk trap',
+          head: chalkTrap?.name || 'No chalk trap yet',
+          value: chalkTrap ? `${formatMiniFantasyRecapPercent(chalkTrap.averageOwnershipRatio * 100)} avg field share` : '—',
+          note: chalkTrap ? `${chalkTrap.name} rode with the crowd and only gave you ${formatMiniFantasyPoints(chalkTrap.averagePoints)} points per pick on average.` : 'No crowd-followed pick hurt you often enough to earn this tag.',
+          tone: 'story-chalk'
+        })
+      ];
+
+      const uglyStatCards = [
+        buildCard({
+          label: 'Cooked fixture',
+          head: cookedFixture ? `Match ${cookedFixture.matchNo}` : 'Never cooked',
+          value: cookedFixture ? `${formatMiniFantasyPoints(cookedFixture.totalPoints)} pts` : '—',
+          note: cookedFixture ? `${cookedFixture.lowPlayerCount} pick${cookedFixture.lowPlayerCount === 1 ? '' : 's'} came in under 10 points here, and the whole lineup felt it.` : 'No true cooked week landed.',
+          tone: 'story-dead'
+        }),
+        buildCard({
+          label: 'One-man rescue',
+          head: oneManRescue?.bestPick?.name || 'No rescue job yet',
+          value: oneManRescue ? formatMiniFantasyRecapPercent((Number(oneManRescue.bestPickShare || 0) || 0) * 100) : '—',
+          note: oneManRescue ? `${oneManRescue.bestPick.name} carried ${miniFantasyRecapFixtureLabel(oneManRescue)} almost alone.` : 'No single player had to drag the whole team.',
+          tone: 'story-you'
+        }),
+        buildCard({
+          label: 'Dud trio',
+          head: dudTrio ? `Match ${dudTrio.matchNo}` : 'No dud trio',
+          value: dudTrio ? `${dudTrio.lowPlayerCount} duds` : 'Avoided',
+          note: dudTrio ? `${formatMiniFantasyPoints(dudTrio.totalPoints)} total points with three or more players stuck under 10.` : 'You never had three players all collapse in the same lineup.',
+          tone: 'story-dead'
+        }),
+        buildCard({
+          label: 'Pain tax',
+          head: `${formatMiniFantasyPrice(painTaxCredits)} burned`,
+          value: lockedRecords.length ? `${lockedRecords.length} scored fixtures` : '—',
+          note: 'Credits spent on players who returned fewer than 10 points. This is the part of the budget that still stings.',
+          tone: 'story-dead'
+        }),
+        buildCard({
+          label: 'Multiplier dependency',
+          head: multiplierDependencyHead,
+          value: `${formatMiniFantasyRecapPercent(multiplierShare)} boosted share`,
+          note: multiplierDependencyNote,
+          tone: multiplierDependencyTone
+        })
+      ];
+
+      const extraCards = [
+        buildCard({
+          label: 'Team you farmed most',
+          head: farmedTeam ? miniFantasyRecapTeamLabel(farmedTeam.team) : 'No team farmed yet',
+          value: farmedTeam ? `${formatMiniFantasyPoints(farmedTeam.points)} pts` : '—',
+          note: farmedTeam ? `${miniFantasyRecapTeamLabel(farmedTeam.team)} gave you the richest points stream all season.` : 'No team-based edge yet.',
+          tone: 'story-swing'
+        }),
+        buildCard({
+          label: 'Team you kept fading wrong',
+          head: fadedWrongTeam ? miniFantasyRecapTeamLabel(fadedWrongTeam.team) : 'No fade yet',
+          value: fadedWrongTeam ? `${formatMiniFantasyPoints(fadedWrongTeam.captured)} / ${formatMiniFantasyPoints(fadedWrongTeam.totalPoints)} pts captured` : '—',
+          note: fadedWrongTeam ? `${miniFantasyRecapTeamLabel(fadedWrongTeam.team)} kept producing season points you did not fully cash in on.` : 'No franchise clearly slipped through your hands.',
+          tone: 'story-dead'
+        }),
+        buildCard({
+          label: 'Most loyal pick',
+          head: loyalPick?.name || 'No loyalty streak yet',
+          value: loyalPick ? `${loyalPick.streak} straight picks` : '—',
+          note: loyalPick ? `${loyalPick.name} was your longest ride without a break.` : 'No player ever stayed locked in for a real streak.',
+          tone: 'story-chalk'
+        }),
+        buildCard({
+          label: 'Boom or bust',
+          head: boomOrBust?.name || 'No volatility yet',
+          value: boomOrBust ? `${formatMiniFantasyPoints(boomOrBust.scoreRange)} pt swing` : '—',
+          note: boomOrBust ? `${boomOrBust.name} swung from ${formatMiniFantasyPoints(boomOrBust.minScore)} to ${formatMiniFantasyPoints(boomOrBust.maxScore)} across your teams.` : 'No player had a real rollercoaster arc for you.',
+          tone: 'story-you'
+        }),
+        buildCard({
+          label: 'Your season in one line',
+          head: seasonOneLiner,
+          value: `${lockedRecords.length} scored teams`,
+          note: 'A quick roast-and-respect summary of how this Mini Fantasy season felt from your seat.',
+          tone: 'story-captain',
+          wide: true
+        })
+      ];
+
+      return {
+        seasonComplete,
+        finalMatchNo,
+        completedMatchCount,
+        summary: seasonComplete
+          ? `${profile.total ? `${CURRENT_USER.displayName}'s 2026 Mini Fantasy wrap is ready.` : 'Your 2026 Mini Fantasy wrap is ready.'}`
+          : lockedNote,
+        hasData: Boolean(records.length),
+        lockedFixtureCount: lockedRecords.length,
+        missedLockCount,
+        groups: [
+          { title: 'Strong core', cards: strongCoreCards },
+          { title: 'Good stats', cards: goodStatCards },
+          { title: 'Bad stats', cards: badStatCards },
+          { title: 'Ugly stats', cards: uglyStatCards },
+          { title: 'Very fun extras', cards: extraCards }
+        ]
+      };
+    }
+
     function buildBadgeSnapshot(){
       const profile = profileSnapshot();
       const cacheKey = [
@@ -6985,7 +7872,8 @@ function titleBandScore(pick, live){
       const value = {
         badges,
         unlockedCount: badges.filter((badge) => badge.unlocked).length,
-        totalCount: badges.length
+        totalCount: badges.length,
+        seasonRecap: buildMiniFantasySeasonRecapSnapshot(profile)
       };
       MINI_FANTASY_BADGE_CACHE = { key: cacheKey, value };
       return value;
@@ -12391,6 +13279,57 @@ function titleBandScore(pick, live){
       renderMiniFantasyPicker();
     }
 
+    function renderMiniFantasySeasonRecapSection(recap = {}){
+      const groups = Array.isArray(recap?.groups) ? recap.groups : [];
+      const summary = normalizeTextValue(recap?.summary || '')
+        || 'A full Mini Fantasy wrap will appear here once the season closes.';
+      const completedMatchCount = Number(recap?.completedMatchCount || 0) || 0;
+      const finalMatchNo = Number(recap?.finalMatchNo || 0) || 0;
+      const lockedFixtureCount = Number(recap?.lockedFixtureCount || 0) || 0;
+      const missedLockCount = Number(recap?.missedLockCount || 0) || 0;
+      const seasonComplete = Boolean(recap?.seasonComplete);
+      return `
+        <div class="season-recap-shell">
+          <div class="season-recap-header">
+            <div class="season-recap-title">Season Recap</div>
+            <div class="season-recap-subtitle">${escapeHtml(summary)}</div>
+            <div class="season-recap-meta">
+              <span class="season-recap-pill">${escapeHtml(seasonComplete ? 'Unlocked after Match 74' : 'Unlocks after the final')}</span>
+              <span class="season-recap-pill">${escapeHtml(`${completedMatchCount}/${finalMatchNo || completedMatchCount || 0} fixtures final`)}</span>
+              <span class="season-recap-pill">${escapeHtml(`${lockedFixtureCount} locked team${lockedFixtureCount === 1 ? '' : 's'}`)}</span>
+              <span class="season-recap-pill">${escapeHtml(`${missedLockCount} missed lock${missedLockCount === 1 ? '' : 's'}`)}</span>
+            </div>
+          </div>
+          ${seasonComplete
+            ? groups.map((group) => {
+              const cards = Array.isArray(group?.cards) ? group.cards : [];
+              if (!cards.length) return '';
+              return `
+                <div class="season-recap-group">
+                  <div class="season-recap-group-title">${escapeHtml(group.title || '')}</div>
+                  <div class="fantasy-story-grid">
+                    ${cards.map((card) => `
+                      <div class="fantasy-story-card ${escapeHtml(card?.tone || 'story-chalk')} ${card?.wide ? 'season-recap-card-wide' : ''}">
+                        <div class="fantasy-story-label">${escapeHtml(card?.label || '')}</div>
+                        <div class="fantasy-story-head">${escapeHtml(card?.head || '')}</div>
+                        <div class="season-recap-card-value">${escapeHtml(card?.value || '—')}</div>
+                        <div class="fantasy-story-note">${escapeHtml(card?.note || '')}</div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')
+            : `
+              <div class="season-recap-locked">
+                <div class="fantasy-story-head">Recap locked until the last game is final</div>
+                <div class="fantasy-story-note">${escapeHtml(summary)}</div>
+              </div>
+            `}
+        </div>
+      `;
+    }
+
     function renderBadgesSection(){
       const panel = document.getElementById('badgesPanel');
       if (!panel) return;
@@ -12404,6 +13343,7 @@ function titleBandScore(pick, live){
         return;
       }
       const snapshot = buildBadgeSnapshot();
+      const seasonRecap = snapshot.seasonRecap || null;
       panel.innerHTML = `
         <div class="badges-shell">
           <div class="badges-summary">
@@ -12430,6 +13370,7 @@ function titleBandScore(pick, live){
             `).join('')}
           </div>
         </div>
+        ${seasonRecap ? renderMiniFantasySeasonRecapSection(seasonRecap) : ''}
       `;
     }
 

@@ -115,6 +115,11 @@ test('public duel directory wiring exists in the page shell', async () => {
   assert.match(html, /Full Send/);
   assert.match(html, /Zero Mercy/);
   assert.match(html, /Early Bird/);
+  assert.match(html, /Season Recap/);
+  assert.match(html, /Most selected player/);
+  assert.match(html, /Multiplier share/);
+  assert.match(html, /Boost burn/);
+  assert.match(html, /Your season in one line/);
   assert.match(html, /Admin control/);
   assert.match(html, /older than 4 days/);
   assert.match(html, /Admin live panel/);

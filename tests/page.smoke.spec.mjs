@@ -257,6 +257,7 @@ test('mini fantasy opens Match 14 early, shows future submit windows, and ranks 
   await expect(page.locator('#badgesSection')).toContainText("Mini Bala's badge cabinet");
   await expect(page.locator('#badgesPanel')).toContainText('unlocked');
   await expect(page.locator('#badgesPanel')).toContainText('Budget Bandit');
+  await expect(page.locator('#badgesPanel')).toContainText('Season Recap');
   await page.getByRole('button', { name: 'Mini Fantasy', exact: true }).click();
 
   await expectLocatorCountAtLeast(page.locator('#miniFantasyFixtures [data-mini-fixture]'), 1);
